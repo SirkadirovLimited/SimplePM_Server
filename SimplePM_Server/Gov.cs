@@ -12,6 +12,7 @@ using IniParser.Model;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Diagnostics;
+using System.Web;
 
 namespace SimplePM_Server
 {
@@ -38,7 +39,7 @@ namespace SimplePM_Server
 
         private static void setExceptionHandler()
         {
-            //NBug.Settings.ReleaseMode = true;
+            NBug.Settings.ReleaseMode = true;
             
             NBug.Settings.StoragePath = NBug.Enums.StoragePath.CurrentDirectory;
             NBug.Settings.UIMode = NBug.Enums.UIMode.Full;
@@ -156,8 +157,8 @@ namespace SimplePM_Server
                     submissionInfo["userId"] = dataReader["userId"].ToString();
                     submissionInfo["problemId"] = dataReader["problemId"].ToString();
                     submissionInfo["testType"] = dataReader["testType"].ToString();
-                    submissionInfo["problemCode"] = dataReader["problemCode"].ToString();
-                    submissionInfo["customTest"] = dataReader["customTest"].ToString();
+                    submissionInfo["problemCode"] = HttpUtility.HtmlDecode(dataReader["problemCode"].ToString());
+                    submissionInfo["customTest"] = HttpUtility.HtmlDecode(dataReader["customTest"].ToString());
                 }
 
                 dataReader.Close();
@@ -165,12 +166,13 @@ namespace SimplePM_Server
                 if (submissionInfo.Count > 0)
                 {
                     string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'processing' WHERE `submissionId` = '" + submissionInfo["submissionId"] + "' LIMIT 1;";
-                    MySqlCommand cmdUpdate = new MySqlCommand(queryUpdate, connection);
-                    cmdUpdate.ExecuteNonQuery();
+                    new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
                     _customersCount++;
 
                     SimplePM_Officiant officiant = new SimplePM_Officiant(connection, sConfig, submissionInfo);
                     officiant.serveSubmission();
+
+                    _customersCount--;
                 }
 
             }).Start();
