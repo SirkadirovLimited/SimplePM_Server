@@ -56,5 +56,26 @@ namespace SimplePM_Server
                     return SubmissionLanguage.unset;
             }
         }
+
+        public static string getExtByLang(SubmissionLanguage lang)
+        {
+            switch (lang)
+            {
+                case SubmissionLanguage.freepascal:
+                    return "pas";
+                case SubmissionLanguage.csharp:
+                    return "cs";
+                case SubmissionLanguage.cpp:
+                    return "cpp";
+                case SubmissionLanguage.c:
+                    return "c";
+                case SubmissionLanguage.python:
+                    return "py";
+                case SubmissionLanguage.lua:
+                    return "lua";
+                default:
+                    return "txt";
+            }
+        }
     }
 }

@@ -11,6 +11,7 @@ using IniParser.Model;
 //For errors
 using System.Windows.Forms;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace SimplePM_Server
 {
@@ -168,7 +169,7 @@ namespace SimplePM_Server
                     cmdUpdate.ExecuteNonQuery();
                     _customersCount++;
 
-                    SimplePM_Officiant officiant = new SimplePM_Officiant(connection, submissionInfo);
+                    SimplePM_Officiant officiant = new SimplePM_Officiant(connection, sConfig, submissionInfo);
                     officiant.serveSubmission();
                 }
 
