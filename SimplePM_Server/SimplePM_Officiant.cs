@@ -20,12 +20,13 @@ namespace SimplePM_Server
 
         public void serveSubmission()
         {
-            SimplePM_Compiler compiler = new SimplePM_Compiler(connection, submissionInfo);
+            SimplePM_Compiler compiler = new SimplePM_Compiler(submissionInfo["submissionId"], submissionInfo["problemCode"]);
+            SimplePM_Compiler.CompilerResult cResult;
 
             switch (Submission.getCodeLanguageByName(submissionInfo["codeLang"]))
             {
                 case Submission.SubmissionLanguage.freepascal:
-                    
+                    cResult = compiler.startFreepascalCompiler();
                     break;
                 case Submission.SubmissionLanguage.unset:
                     Console.WriteLine("[ERROR] Language not supported on submission '" + submissionInfo["submissionId"] + "'");

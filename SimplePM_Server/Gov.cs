@@ -10,6 +10,7 @@ using IniParser;
 using IniParser.Model;
 //For errors
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace SimplePM_Server
 {
@@ -30,11 +31,42 @@ namespace SimplePM_Server
         public static int _maxCustomersCount = 10;
         
         public static IniData sConfig;
+        public static NotifyIcon nIcon = new NotifyIcon();
 
         private static int sleepTime = 1000;
 
+        private static void setExceptionHandler()
+        {
+            //NBug.Settings.ReleaseMode = true;
+            
+            NBug.Settings.StoragePath = NBug.Enums.StoragePath.CurrentDirectory;
+            NBug.Settings.UIMode = NBug.Enums.UIMode.Full;
+            NBug.Settings.UIProvider = NBug.Enums.UIProvider.WinForms;
+
+            AppDomain.CurrentDomain.UnhandledException += NBug.Handler.UnhandledException;
+        }
+
+        public static void viewCompilersInfo(IniData sConfig)
+        {
+            Console.WriteLine("\n█ Compilers information █");
+            //Free Pascal
+            Console.WriteLine("Free Pascal: " + sConfig["Compilers"]["freepascal_enabled"] + ", <" + sConfig["Compilers"]["freepascal_location"] + ">");
+            //CSharp
+            Console.WriteLine("CSharp: " + sConfig["Compilers"]["csharp_enabled"] + ", <" + sConfig["Compilers"]["csharp_location"] + ">");
+            //Cpp
+            Console.WriteLine("CPP: " + sConfig["Compilers"]["cpp_enabled"] + ", <" + sConfig["Compilers"]["cpp_location"] + ">");
+            //C
+            Console.WriteLine("C: " + sConfig["Compilers"]["c_enabled"] + ", <" + sConfig["Compilers"]["c_location"] + ">");
+            //Python
+            Console.WriteLine("Python: " + sConfig["Compilers"]["python_enabled"] + ", <" + sConfig["Compilers"]["python_location"] + ">");
+            //Lua
+            Console.WriteLine("Lua: " + sConfig["Compilers"]["lua_enabled"] + ", <" + sConfig["Compilers"]["lua_location"] + ">");
+        }
+
         static void Main(string[] args)
         {
+            setExceptionHandler();
+
             //Генерирую "шапку" консоли сервера
             generateProgramHeader();
             try
@@ -44,7 +76,8 @@ namespace SimplePM_Server
             }
             catch (Exception)
             {
-                MessageBox.Show("SimplePM_Server configuration file (server_config.ini) is not found in the same directory as SimplePM_Server.exe!" +
+                MessageBox.Show(
+                    "SimplePM_Server configuration file (server_config.ini) is not found in the same directory as SimplePM_Server.exe!" +
                     "\nUse SimplePM_Server Configuration Tool to generate new configuration file!" +
                     "\n",
                     "Configuration file not found!",
@@ -54,12 +87,14 @@ namespace SimplePM_Server
                 Environment.Exit(-2);
             }
 
+            viewCompilersInfo(sConfig);
+
             //Добавляю поток управления
             new Thread(new ThreadStart(cmdCatcher)).Start();
             
             //Добавляю основной поток
             new Thread(() => {
-                MySqlConnection conn = startMysqlConnection();
+                MySqlConnection conn = startMysqlConnection(sConfig);
                 while (true)
                 {
                     try
@@ -76,7 +111,7 @@ namespace SimplePM_Server
         private static void generateProgramHeader()
         {
             Console.Title = "SimplePM_Server";
-
+            
             Console.WriteLine("█ SimplePM_Server v" + _MAJOR_VER_ + "." + _MINOR_VER_ + "." + _PATCH_VER_ + "-" + _RELEASE_TYPE_ + _RELEASE_ID_);
             Console.WriteLine("█ Copyright (C) 2017, Kadirov Yurij. All rights are reserved.");
             Console.WriteLine("█ Official website: www.sirkadirov.com");
@@ -140,24 +175,25 @@ namespace SimplePM_Server
             }).Start();
         }
 
-        public static MySqlConnection startMysqlConnection()
+        public static MySqlConnection startMysqlConnection(IniData sConfig)
         {
-            try
-            {
-                MySqlConnection db = new MySqlConnection("server=" + db_host + ";uid=" + db_user + ";pwd=" + db_pass + ";database=" + db_name + ";Charset=utf8;");
-                db.Open();
+            MySqlConnection db = new MySqlConnection(
+                "server=" + sConfig["Database"]["db_host"] +
+                ";uid=" + sConfig["Database"]["db_user"] +
+                ";pwd=" + sConfig["Database"]["db_pass"] +
+                ";database=" + sConfig["Database"]["db_name"] +
+                ";Charset=" + sConfig["Database"]["db_chst"] + ";"
+            );
+            db.Open();
+            
+            Console.WriteLine("\n█ Database connection established successfully! █");
+            Console.WriteLine("MySQL server version: " + db.ServerVersion);
+            Console.WriteLine("Database name: " + db.Database);
+            Console.WriteLine("MySQl connection timeout: " + db.ConnectionTimeout);
 
-                Console.WriteLine("MySQL server version: " + db.ServerVersion);
-                Console.WriteLine("Database name: " + db.Database);
-                Console.WriteLine("MySQl connection timeout: " + db.ConnectionTimeout);
+            Console.WriteLine();
 
-                return db;
-            }
-            catch (MySqlException)
-            {
-                Environment.Exit(-1);
-                return null;
-            }
+            return db;
         }
     }
 }

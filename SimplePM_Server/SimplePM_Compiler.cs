@@ -9,13 +9,12 @@ namespace SimplePM_Server
 {
     class SimplePM_Compiler
     {
-        private MySqlConnection connection;
-        private Dictionary<string, string> submissionInfo;
+        private string submissionId, problemCode;
 
-        public SimplePM_Compiler(MySqlConnection connection, Dictionary<string,string> submissionInfo)
+        public SimplePM_Compiler(string submissionId, string problemCode)
         {
-            this.connection = connection;
-            this.submissionInfo = submissionInfo;
+            this.submissionId = submissionId;
+            this.problemCode = problemCode;
         }
 
         public class CompilerResult
@@ -25,7 +24,7 @@ namespace SimplePM_Server
             public string compilerMessage = null;
         }
 
-        public CompilerResult freepascalCompiler()
+        public CompilerResult startFreepascalCompiler()
         {
             return null;
         }
