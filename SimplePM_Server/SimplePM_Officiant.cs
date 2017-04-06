@@ -39,6 +39,7 @@ namespace SimplePM_Server
             SimplePM_Compiler compiler = new SimplePM_Compiler(sConfig, ulong.Parse(submissionInfo["submissionId"]), fileExt);
             SimplePM_Compiler.CompilerResult cResult;
 
+            //Запускаем определённый компилятор в зависимости от языка решения задачи
             switch (Submission.getCodeLanguageByName(submissionInfo["codeLang"]))
             {
                 case Submission.SubmissionLanguage.freepascal:
@@ -48,34 +49,44 @@ namespace SimplePM_Server
                     return;
             }
 
+            //Записываем в базу данных сообщение компилятора
             string queryUpdate = "UPDATE `spm_submissions` SET `compiler_text` = '" + cResult.compilerMessage + "' WHERE `submissionId` = '" + submissionInfo["submissionId"] + "' LIMIT 1;";
             new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
 
+            //Проверяем на наличие ошибок компиляции
             if (cResult.hasErrors)
             {
-                queryUpdate = "UPDATE `spm_submissions` SET `status` = 'error' WHERE `submissionId` = '" + submissionInfo["submissionId"] + "' LIMIT 1;";
+                //Ошибка компиляции, записываем это в БД
+                queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready', `hasError` = true WHERE `submissionId` = '" + submissionInfo["submissionId"] + "' LIMIT 1;";
                 new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
             }
             else
             {
+                //Выполняем различные действия в зависимости от теста
                 switch (submissionInfo["testType"])
                 {
                     case "syntax":
-                        queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready' WHERE `submissionId` = '" + submissionInfo["submissionId"] + "' LIMIT 1;";
+                        queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready' WHERE `submissionId` = '" + submissionInfo["submissionId"].ToString() + "' LIMIT 1;";
                         new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
                         break;
                     case "debug":
 
                         break;
                     case "release":
-
+                        SimplePM_Tester releaseTester = new SimplePM_Tester(
+                            connection,
+                            fileLocation,
+                            ulong.Parse( submissionInfo["problemId"].ToString() ),
+                            ulong.Parse( submissionInfo["submissionId"].ToString() )
+                        );
+                        releaseTester.ReleaseTest();
                         break;
                 }
             }
 
+            //Очищаем папку экзешников от мусора
             File.Delete(cResult.exe_fullname);
             File.Delete(fileLocation);
-
         }
     }
 }

@@ -71,23 +71,9 @@ namespace SimplePM_Server
 
             //Генерирую "шапку" консоли сервера
             generateProgramHeader();
-            try
-            {
-                FileIniDataParser iniParser = new FileIniDataParser();
-                sConfig = iniParser.ReadFile("server_config.ini", Encoding.UTF8);
-            }
-            catch (Exception)
-            {
-                MessageBox.Show(
-                    "SimplePM_Server configuration file (server_config.ini) is not found in the same directory as SimplePM_Server.exe!" +
-                    "\nUse SimplePM_Server Configuration Tool to generate new configuration file!" +
-                    "\n",
-                    "Configuration file not found!",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-                Environment.Exit(-2);
-            }
+            
+            FileIniDataParser iniParser = new FileIniDataParser();
+            sConfig = iniParser.ReadFile("server_config.ini", Encoding.UTF8);
 
             viewCompilersInfo(sConfig);
 

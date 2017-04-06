@@ -46,7 +46,7 @@ namespace SimplePM_Server
         {
             Process fpcProc = new Process();
 
-            ProcessStartInfo pStartInfo = new ProcessStartInfo(sConfig["Compilers"]["freepascal_location"], fileLocation + " -ve -vw -vn -vh -vi -vl -vs -vb -vd -vq");
+            ProcessStartInfo pStartInfo = new ProcessStartInfo(sConfig["Compilers"]["freepascal_location"], " -ve -vw -vi -vb -Twin64 " + fileLocation);
             pStartInfo.ErrorDialog = false;
             pStartInfo.WindowStyle = ProcessWindowStyle.Minimized;
             pStartInfo.RedirectStandardOutput = true;
