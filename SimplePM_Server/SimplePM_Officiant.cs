@@ -31,6 +31,8 @@ namespace SimplePM_Server
             string fileLocation = sConfig["Program"]["tempPath"] + submissionInfo["submissionId"] + fileExt;
 
             StreamWriter codeWriter = File.CreateText(fileLocation);
+
+            File.SetAttributes(fileLocation, FileAttributes.Temporary | FileAttributes.NotContentIndexed);
             
             codeWriter.WriteLine(submissionInfo["problemCode"]);
             codeWriter.Flush();
@@ -75,7 +77,7 @@ namespace SimplePM_Server
                     case "release":
                         SimplePM_Tester releaseTester = new SimplePM_Tester(
                             connection,
-                            fileLocation,
+                            cResult.exe_fullname,
                             ulong.Parse( submissionInfo["problemId"].ToString() ),
                             ulong.Parse( submissionInfo["submissionId"].ToString() )
                         );
@@ -85,8 +87,12 @@ namespace SimplePM_Server
             }
 
             //Очищаем папку экзешников от мусора
-            File.Delete(cResult.exe_fullname);
-            File.Delete(fileLocation);
+            try
+            {
+                File.Delete(cResult.exe_fullname);
+                File.Delete(fileLocation);
+            }
+            catch (Exception) { }
         }
     }
 }

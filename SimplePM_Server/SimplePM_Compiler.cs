@@ -46,7 +46,8 @@ namespace SimplePM_Server
         {
             Process fpcProc = new Process();
 
-            ProcessStartInfo pStartInfo = new ProcessStartInfo(sConfig["Compilers"]["freepascal_location"], " -ve -vw -vi -vb -Twin64 " + fileLocation);
+            // -Twin64
+            ProcessStartInfo pStartInfo = new ProcessStartInfo(sConfig["Compilers"]["freepascal_location"], " -ve -vw -vi -vb " + fileLocation);
             pStartInfo.ErrorDialog = false;
             pStartInfo.WindowStyle = ProcessWindowStyle.Minimized;
             pStartInfo.RedirectStandardOutput = true;
@@ -61,7 +62,15 @@ namespace SimplePM_Server
             result.compilerMessage = HttpUtility.HtmlEncode(reader.ReadToEnd());
             
             fpcProc.WaitForExit();
-            
+
+            string oFileLocation = sConfig["Program"]["tempPath"] + submissionId + ".o";
+            try
+            {
+                File.Delete(oFileLocation);
+            }
+            catch (Exception) { }
+
+
             return returnCompilerResult(result);
         }
 
