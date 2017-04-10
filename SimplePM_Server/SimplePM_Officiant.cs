@@ -21,7 +21,18 @@ namespace SimplePM_Server
 
         public void serveSubmission()
         {
+            //Определяем язык написания пользовательской программы
             Submission.SubmissionLanguage codeLang = Submission.getCodeLanguageByName(submissionInfo["codeLang"]);
+
+            //Сводим на нет все попытки "подлома"
+            switch (codeLang)
+            {
+                case Submission.SubmissionLanguage.freepascal:
+                    submissionInfo["problemCode"].Replace("uses", "");
+                    break;
+                default:
+                    return;
+            }
 
             string fileExt = "." + Submission.getExtByLang(codeLang);
             string fileLocation = sConfig["Program"]["tempPath"] + submissionInfo["submissionId"] + fileExt;
@@ -38,9 +49,10 @@ namespace SimplePM_Server
             SimplePM_Compiler.CompilerResult cResult;
 
             //Запускаем определённый компилятор в зависимости от языка решения задачи
-            switch (Submission.getCodeLanguageByName(submissionInfo["codeLang"]))
+            switch (codeLang)
             {
                 case Submission.SubmissionLanguage.freepascal:
+                    //Запускаем компилятор
                     cResult = compiler.startFreepascalCompiler();
                     break;
                 default:

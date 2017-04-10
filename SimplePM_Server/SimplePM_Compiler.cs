@@ -37,6 +37,7 @@ namespace SimplePM_Server
 
         public CompilerResult startFreepascalCompiler()
         {
+            //Создаём новый экземпляр процесса компилятора
             Process fpcProc = new Process();
 
             // -Twin64
