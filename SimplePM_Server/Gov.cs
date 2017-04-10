@@ -1,17 +1,21 @@
-﻿using System;
+﻿/*
+ * Copyright (C) 2017, Kadirov Yurij.
+ * Licensed under CC BY-NC-SA 4.0 license.
+ * 
+ * @Author: Kadirov Yurij
+ * @Website: https://sirkadirov.com/
+ * @Email: admin@sirkadirov.com
+ * @Repo: http://spm.sirkadirov.com/
+ */
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
-//MySQL client
 using MySql.Data.MySqlClient;
-//INI Parser
 using IniParser;
 using IniParser.Model;
-//For errors
 using System.Windows.Forms;
-using System.Drawing;
-using System.Diagnostics;
 using System.Web;
 
 namespace SimplePM_Server
@@ -149,12 +153,21 @@ namespace SimplePM_Server
 
                 dataReader.Close();
 
+                //Производим проверку на успешное получение данных о запросе
                 if (submissionInfo.Count > 0)
                 {
+                    //Получаем сложность поставленной задачи
+                    string queryGetDifficulty = "SELECT `difficulty` FROM `spm_problems` WHERE `id` = '" + submissionInfo["problemId"] + "' LIMIT 1;";
+                    MySqlCommand cmdGetProblemDifficulty = new MySqlCommand(queryGetDifficulty, connection);
+                    submissionInfo["difficulty"] = cmdGetProblemDifficulty.ExecuteScalar().ToString();
+
+                    //Устанавливаем статус запроса на "в обработке"
                     string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'processing' WHERE `submissionId` = '" + submissionInfo["submissionId"] + "' LIMIT 1;";
                     new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
                     _customersCount++;
 
+                    //Зовём официанта-шляпочника
+                    //уж он знает, что делать в таких вот ситуациях
                     SimplePM_Officiant officiant = new SimplePM_Officiant(connection, sConfig, submissionInfo);
                     officiant.serveSubmission();
 
@@ -166,6 +179,8 @@ namespace SimplePM_Server
 
         public static MySqlConnection startMysqlConnection(IniData sConfig)
         {
+            //Подключаемся к базе данных на удалённом
+            //MySQL сервере и получаем дескриптор подключения к ней
             MySqlConnection db = new MySqlConnection(
                 "server=" + sConfig["Database"]["db_host"] +
                 ";uid=" + sConfig["Database"]["db_user"] +
@@ -174,7 +189,7 @@ namespace SimplePM_Server
                 ";Charset=" + sConfig["Database"]["db_chst"] + ";"
             );
             db.Open();
-            
+            //Отображаем краткую (и никому не нужную) информацию о подключении
             Console.WriteLine("\n█ Database connection established successfully! █");
             Console.WriteLine("MySQL server version: " + db.ServerVersion);
             Console.WriteLine("Database name: " + db.Database);
@@ -182,6 +197,7 @@ namespace SimplePM_Server
 
             Console.WriteLine();
 
+            //Возвращаем дескриптор подключения к базе данных
             return db;
         }
     }

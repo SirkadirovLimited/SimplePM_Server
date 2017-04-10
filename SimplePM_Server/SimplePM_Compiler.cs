@@ -1,15 +1,8 @@
-﻿using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using System.Diagnostics;
-using IniParser;
 using IniParser.Model;
 using System.IO;
 using System.Web;
-using System.Web.UI;
 
 namespace SimplePM_Server
 {

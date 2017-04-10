@@ -1,11 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Web;
 using System.Runtime.InteropServices;
 
@@ -15,14 +12,17 @@ namespace SimplePM_Server
     {
         private MySqlConnection connection;
         private string exeFileUrl;
-        private ulong problemId, submissionId;
+        private ulong problemId, submissionId,userId;
+        private float problemDifficulty;
 
-        public SimplePM_Tester(MySqlConnection connection, string exeFileUrl, ulong problemId, ulong submissionId)
+        public SimplePM_Tester(MySqlConnection connection, string exeFileUrl, ulong problemId, ulong submissionId, float problemDifficulty, ulong userId)
         {
             this.connection = connection;
             this.exeFileUrl = exeFileUrl;
             this.problemId = problemId;
             this.submissionId = submissionId;
+            this.problemDifficulty = problemDifficulty;
+            this.userId = userId;
         }
 
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -46,6 +46,7 @@ namespace SimplePM_Server
 
             //Переменная результата выполнения всех тестов
             string _problemTestingResult = "";
+            int _problemPassedTests = 0;
 
             Dictionary<int, Dictionary<string, string>> testsInfo = new Dictionary<int, Dictionary<string, string>>();
             
@@ -150,7 +151,10 @@ namespace SimplePM_Server
                         //Добавляем результат
                         //Console.WriteLine("'" + pOut + "'");
                         if (output == pOut)
+                        {
                             _problemTestingResult += '+';
+                            _problemPassedTests++;
+                        }
                         else
                             _problemTestingResult += '-';
                     }
@@ -159,15 +163,36 @@ namespace SimplePM_Server
 
             }
 
-            
-            //Тестов нет, но вы держитесь!
-            if (_problemTestingResult.Length <= 0)
-                _problemTestingResult = "+";
+            //Объявляем переменную численного результата тестирования
+            float _bResult = 0;
+
+            try
+            {
+                //Тестов нет, но вы держитесь!
+                if (_problemTestingResult.Length <= 0)
+                {
+                    _problemTestingResult = "+";
+                    _problemPassedTests = 1;
+                }
+
+                //Вычисляем полученный балл за решение задачи
+                //на основе количества пройденных тестов
+                _bResult = (_problemPassedTests / testsInfo.Count) * problemDifficulty;
+            }
+            catch (Exception) { _bResult = problemDifficulty; _problemTestingResult = "+"; }
             
             //ОТПРАВКА РЕЗУЛЬТАТОВ ТЕСТИРОВАНИЯ НА СЕРВЕР БД
             //В ТАБЛИЦУ РЕЗУЛЬТАТОВ (`spm_submissions`)
-            string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready', `result` = '" + _problemTestingResult + "' WHERE `submissionId` = '" + submissionId.ToString() + "' LIMIT 1;";
+            string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready'," +
+                                                              "`result` = '" + _problemTestingResult + "', " +
+                                                              "`b` = '" + _bResult.ToString() + "' " +
+                                 "WHERE `submissionId` = '" + submissionId.ToString() + "' LIMIT 1;";
             new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+            //Обновляем количество баллов и рейтинг пользователя
+            //для этого вызываем пользовательские процедуры mysql,
+            //созданные как раз для этих нужд
+            new MySqlCommand("CALL updateBCount(" + userId + ");", connection);
+            new MySqlCommand("CALL updateRating(" + userId + ");", connection);
         }
     }
 }

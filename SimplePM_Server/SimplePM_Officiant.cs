@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
-using IniParser;
 using IniParser.Model;
 using System.IO;
 
@@ -79,7 +75,9 @@ namespace SimplePM_Server
                             connection,
                             cResult.exe_fullname,
                             ulong.Parse( submissionInfo["problemId"].ToString() ),
-                            ulong.Parse( submissionInfo["submissionId"].ToString() )
+                            ulong.Parse( submissionInfo["submissionId"].ToString() ),
+                            float.Parse( submissionInfo["difficulty"] ),
+                            ulong.Parse(submissionInfo["userId"])
                         );
                         releaseTester.ReleaseTest();
                         break;
