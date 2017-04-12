@@ -191,8 +191,8 @@ namespace SimplePM_Server
             //Обновляем количество баллов и рейтинг пользователя
             //для этого вызываем пользовательские процедуры mysql,
             //созданные как раз для этих нужд
-            new MySqlCommand("CALL updateBCount(" + userId + ");", connection);
-            new MySqlCommand("CALL updateRating(" + userId + ");", connection);
+            new MySqlCommand("CALL updateBCount(" + userId + ")", connection);
+            new MySqlCommand("CALL updateRating(" + userId + ")", connection);
         }
     }
 }
