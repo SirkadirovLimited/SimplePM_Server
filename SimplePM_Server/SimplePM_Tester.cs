@@ -75,6 +75,11 @@ namespace SimplePM_Server
                     "timeLimit",
                     HttpUtility.HtmlDecode(dataReader["timeLimit"].ToString())
                 );
+                //Memory limit
+                tmpDict.Add(
+                    "memoryLimit",
+                    HttpUtility.HtmlDecode(dataReader["memoryLimit"].ToString())
+                );
 
                 //Add to library
                 testsInfo.Add(i, tmpDict);
@@ -85,11 +90,26 @@ namespace SimplePM_Server
             //Завершаем чтение потока
             dataReader.Close();
 
+            //Создаём новую конфигурацию запуска процесса
+            ProcessStartInfo startInfo = new ProcessStartInfo(exeFileUrl);
+
+            //Перенаправляем потоки
+            startInfo.RedirectStandardInput = true;
+            startInfo.RedirectStandardOutput = true;
+            startInfo.RedirectStandardError = true;
+
+            //Запрещаем показ приложения на экран компа
+            startInfo.ErrorDialog = false;
+            startInfo.UseShellExecute = false;
+            startInfo.CreateNoWindow = true;
+            startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+
             //Объявление необходимых переменных для тестирования
             //пользовательской программы
             ulong testId;
             string input, output;
             int timeLimit;
+            long memoryLimit;
 
             for (i=1; i<=testsInfo.Count; i++)
             {
@@ -98,21 +118,10 @@ namespace SimplePM_Server
                 input = testsInfo[i]["input"].ToString();
                 output = testsInfo[i]["output"].ToString();
                 timeLimit = int.Parse(testsInfo[i]["timeLimit"]);
+                memoryLimit = long.Parse(testsInfo[i]["memoryLimit"]);
 
-                //Объявляем дескриптор процесса и его стартовой информации
+                //Объявляем дескриптор процесса
                 Process problemProc = new Process();
-                ProcessStartInfo startInfo = new ProcessStartInfo(exeFileUrl);
-
-                //Перенаправляем потоки
-                startInfo.RedirectStandardInput = true;
-                startInfo.RedirectStandardOutput = true;
-                startInfo.RedirectStandardError = true;
-
-                //Запрещаем показ приложения на экран компа
-                startInfo.ErrorDialog = false;
-                startInfo.UseShellExecute = false;
-                startInfo.CreateNoWindow = true;
-                startInfo.WindowStyle = ProcessWindowStyle.Minimized;
 
                 //Указываем интересующую нас конфигурацию тестирования
                 problemProc.StartInfo = startInfo;
@@ -124,6 +133,8 @@ namespace SimplePM_Server
                 problemProc.StandardInput.WriteLine(input);
                 problemProc.StandardInput.Flush();
                 problemProc.StandardInput.Close();
+
+                //Проверяем процесс на использованную память
 
                 //Ждём завершения, максимум X миллимекунд
                 problemProc.WaitForExit(timeLimit);
@@ -144,6 +155,11 @@ namespace SimplePM_Server
                         //Ошибка при тесте!
                         _problemTestingResult += 'E';
                     }
+                    /*else if (problemProc.PeakVirtualMemorySize64 > memoryLimit)
+                    {
+                        //Процесс израсходовал слишком много физической памяти!
+                        _problemTestingResult += 'M';
+                    }*/
                     else
                     {
                         //Ошибок при тесте не выявлено, но вы держитесь!
@@ -191,8 +207,8 @@ namespace SimplePM_Server
             //Обновляем количество баллов и рейтинг пользователя
             //для этого вызываем пользовательские процедуры mysql,
             //созданные как раз для этих нужд
-            new MySqlCommand("CALL updateBCount(" + userId + ")", connection);
-            new MySqlCommand("CALL updateRating(" + userId + ")", connection);
+            new MySqlCommand("CALL updateBCount(" + userId + ")", connection).ExecuteNonQuery();
+            new MySqlCommand("CALL updateRating(" + userId + ")", connection).ExecuteNonQuery();
         }
     }
 }
