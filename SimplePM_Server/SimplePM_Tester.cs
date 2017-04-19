@@ -24,19 +24,14 @@ namespace SimplePM_Server
             this.problemDifficulty = problemDifficulty;
             this.userId = userId;
         }
+        
+        public void DebugTest()
+        {
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool Wow64DisableWow64FsRedirection(ref IntPtr ptr);
-
-        //TODO: Написать отладку приложения
-        public void DebugTest() { }
+        }
 
         public void ReleaseTest()
         {
-            //throw new Exception(exeFileUrl);
-            //IntPtr t = new IntPtr();
-            //Wow64DisableWow64FsRedirection(ref t);
-
             //Запрос на выборку из БД
             string querySelect = "SELECT * FROM `spm_problems_tests` WHERE `problemId` = '" + problemId.ToString() + "' ORDER BY `id` ASC;";
 
