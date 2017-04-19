@@ -27,12 +27,52 @@ namespace SimplePM_Server
         
         public void DebugTest()
         {
+            //Запрос на выборку авторского решения из БД
+            string querySelect = "SELECT * FROM `spm_problems_ready` WHERE `problemId` = '" + problemId.ToString() + "' ORDER BY `id` ASC LIMIT 1;";
 
+            //Дескрипторы временных таблиц выборки из БД
+            MySqlCommand cmdSelect = new MySqlCommand(querySelect, connection);
+            MySqlDataReader dataReader = cmdSelect.ExecuteReader();
+
+            //Переменная результата выполнения всех тестов
+            string _problemTestingResult = "";
+            int _problemPassedTests = 0;
+
+            Dictionary<string, string> authorCodeInfo = new Dictionary<string, string>();
+            
+            while (dataReader.Read())
+            {
+                Dictionary<string, string> tmpDict = new Dictionary<string, string>();
+
+                //Add to library
+                authorCodeInfo.Add(
+                    "id",
+                    HttpUtility.HtmlDecode(dataReader["id"].ToString())
+                );
+                authorCodeInfo.Add(
+                    "problemId",
+                    HttpUtility.HtmlDecode(dataReader["problemId"].ToString())
+                );
+                authorCodeInfo.Add(
+                    "code",
+                    HttpUtility.HtmlDecode(dataReader["code"].ToString())
+                );
+            }
+
+            if (authorCodeInfo.Count == 3)
+            {
+
+            }
+            else
+            {
+                string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'waiting', `hasError` = false WHERE `submissionId` = '" + submissionId + "' LIMIT 1;";
+                new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+            }
         }
 
         public void ReleaseTest()
         {
-            //Запрос на выборку из БД
+            //Запрос на выборку всех тестов данной программы из БД
             string querySelect = "SELECT * FROM `spm_problems_tests` WHERE `problemId` = '" + problemId.ToString() + "' ORDER BY `id` ASC;";
 
             //Дескрипторы временных таблиц выборки из БД
