@@ -1,21 +1,34 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Web;
 using System.Runtime.InteropServices;
+using IniParser.Model;
 
 namespace SimplePM_Server
 {
     class SimplePM_Tester
     {
         private MySqlConnection connection;
-        private string exeFileUrl;
-        private ulong problemId, submissionId,userId;
+        private string exeFileUrl, customTestInput;
+        private ulong problemId, submissionId, userId;
         private float problemDifficulty;
+        private IniData sConfig;
 
-        public SimplePM_Tester(MySqlConnection connection, string exeFileUrl, ulong problemId, ulong submissionId, float problemDifficulty, ulong userId)
+        /// <summary>
+        /// Класс тестирования пользовательских решений
+        /// </summary>
+        /// <param name="connection">Дескриптор подключения к БД</param>
+        /// <param name="exeFileUrl">Адрес исполняемого файла пользовательской программы</param>
+        /// <param name="problemId">Идентификатор задачи</param>
+        /// <param name="submissionId">Идентификатор запроса на проверку</param>
+        /// <param name="problemDifficulty">Сложность задачи (для расчёта полученных баллов и рейтинга)</param>
+        /// <param name="userId">Идентификатор пользователя, отправившего запрос на проверку</param>
+        /// <param name="sConfig">Дескриптор файла конфигурации SimplePM_Server</param>
+        public SimplePM_Tester(MySqlConnection connection, string exeFileUrl, ulong problemId, ulong submissionId, float problemDifficulty, ulong userId, IniData sConfig = null, string customTestInput = null)
         {
             this.connection = connection;
             this.exeFileUrl = exeFileUrl;
@@ -23,6 +36,8 @@ namespace SimplePM_Server
             this.submissionId = submissionId;
             this.problemDifficulty = problemDifficulty;
             this.userId = userId;
+            this.sConfig = sConfig;
+            this.customTestInput = customTestInput;
         }
         
         public void DebugTest()
@@ -34,25 +49,23 @@ namespace SimplePM_Server
             MySqlCommand cmdSelect = new MySqlCommand(querySelect, connection);
             MySqlDataReader dataReader = cmdSelect.ExecuteReader();
 
-            //Переменная результата выполнения всех тестов
-            string _problemTestingResult = "";
-            int _problemPassedTests = 0;
-
+            //Создаём словарь значений элемента авторского решения
             Dictionary<string, string> authorCodeInfo = new Dictionary<string, string>();
-            
+            //Читаем полученные данные
             while (dataReader.Read())
             {
-                Dictionary<string, string> tmpDict = new Dictionary<string, string>();
 
-                //Add to library
+                //Идентификатор авторского решения
                 authorCodeInfo.Add(
                     "id",
                     HttpUtility.HtmlDecode(dataReader["id"].ToString())
                 );
+                //Идентификатор задачи
                 authorCodeInfo.Add(
                     "problemId",
                     HttpUtility.HtmlDecode(dataReader["problemId"].ToString())
                 );
+                //Бинарный (исполняемый) код авторского решения
                 authorCodeInfo.Add(
                     "code",
                     HttpUtility.HtmlDecode(dataReader["code"].ToString())
@@ -61,6 +74,17 @@ namespace SimplePM_Server
 
             if (authorCodeInfo.Count == 3)
             {
+                //Полный путь к временному (исполняемому) файлу авторского решения программы
+                string authorCodePath = sConfig["Program"]["tempPath"] + "authorCode_" + submissionId + ".exe";
+                //Создаём файл и перехватываем поток инъекции в файл данных
+                StreamWriter writer = File.CreateText(authorCodePath);
+                //Запись бинарного кода программы в файл исполняемого авторского решения
+                writer.WriteLine(authorCodeInfo["code"]);
+                //Записы данных в файл
+                writer.Flush();
+                //Закрываем поток
+                writer.Close();
+
 
             }
             else
