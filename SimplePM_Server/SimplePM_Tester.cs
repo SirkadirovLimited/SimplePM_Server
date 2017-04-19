@@ -84,6 +84,11 @@ namespace SimplePM_Server
                 writer.Flush();
                 //Закрываем поток
                 writer.Close();
+                
+                //Запрос на выборку авторского решения из БД
+                querySelect = "SELECT `debugTimeLimit` FROM `spm_problems` WHERE `id` = '" + problemId.ToString() + "' ORDER BY `id` ASC LIMIT 1;";
+                
+                ulong debugTimeLimit = (ulong)new MySqlCommand(querySelect, connection).ExecuteScalar();
 
 
             }
@@ -169,6 +174,7 @@ namespace SimplePM_Server
             string input, output;
             int timeLimit;
             long memoryLimit;
+            string standartErrorOutputText = null;
 
             for (i=1; i<=testsInfo.Count; i++)
             {
@@ -203,13 +209,22 @@ namespace SimplePM_Server
                     //Процесс не завершил свою работу
                     //Исключение: времени не хватило!
                     problemProc.Kill();
+                    //Методом научного тыка было выявлено, что необходимо 10 мс чтобы программа
+                    //корректно завершила свою работу
                     Thread.Sleep(10);
                     _problemTestingResult += 'T';
                 }
                 else
                 {
                     //Проверка на "вшивость"
-                    if (problemProc.StandardError.ReadToEnd().Length > 0)
+                    string currentErrors = problemProc.StandardError.ReadToEnd();
+                    problemProc.StandardError.Close();
+
+                    //Добавляем ошибки текущего теста в список всех ошибок
+                    if (currentErrors.Length > 0)
+                        standartErrorOutputText += currentErrors;
+
+                    if (currentErrors.Length > 0)
                     {
                         //Ошибка при тесте!
                         _problemTestingResult += 'E';
@@ -259,6 +274,7 @@ namespace SimplePM_Server
             //ОТПРАВКА РЕЗУЛЬТАТОВ ТЕСТИРОВАНИЯ НА СЕРВЕР БД
             //В ТАБЛИЦУ РЕЗУЛЬТАТОВ (`spm_submissions`)
             string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready'," +
+                                                              "`errorOutput` = '" + standartErrorOutputText + "'," +
                                                               "`result` = '" + _problemTestingResult + "', " +
                                                               "`b` = '" + _bResult.ToString() + "' " +
                                  "WHERE `submissionId` = '" + submissionId.ToString() + "' LIMIT 1;";
