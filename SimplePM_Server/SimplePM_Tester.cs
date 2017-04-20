@@ -39,7 +39,49 @@ namespace SimplePM_Server
             this.sConfig = sConfig;
             this.customTestInput = customTestInput;
         }
-        
+
+        #region ИСПОЛЬЗУЕМЫЕ ФУНКЦИИ
+
+        private string getNormalizedOutputText(StreamReader outputReader)
+        {
+            //Создаём переменную, которая будет содержать весь выходной поток
+            //авторского решения поставленной задачи
+            string _output = "";
+            //Создаём временную переменную текущей строки вывода
+            string curLine = "";
+
+            while (!outputReader.EndOfStream)
+            {
+                //Получаем содержимое текущей строки
+                curLine = outputReader.ReadLine();
+
+                //Убираем переводы на новую строку
+                curLine = curLine.Replace("\n", "");
+                //Убираем все начальные и конечные пробелы
+                curLine = curLine.Trim(' ');
+
+                if (curLine.Length > 0)
+                {
+                    //Добавляем перевод на новую строку (если, конечно, это не первая строка)
+                    if (_output.Length > 0)
+                        curLine = "\n" + curLine;
+                }
+
+                //Дозаписываем данные в переменную выходного потока приложения
+                _output += curLine;
+            }
+
+            //Убираем конечный перевод строки, он нам не нужен.
+            //if (_output.EndsWith("\n"))
+            //    _output = _output.Substring(0, _output.LastIndexOf("\n"));
+
+            return _output;
+        }
+
+        #endregion
+
+        #region РЕГИОН ДЕБАГГЕРНЫХ ФУНКЦИЙ И МЕТОДОВ
+
         public void DebugTest()
         {
             //Запрос на выборку авторского решения из БД
@@ -85,19 +127,128 @@ namespace SimplePM_Server
                 //Закрываем поток
                 writer.Close();
                 
-                //Запрос на выборку авторского решения из БД
+                //Запрос на выборку Debug Time Limit из базы данных MySQL
                 querySelect = "SELECT `debugTimeLimit` FROM `spm_problems` WHERE `id` = '" + problemId.ToString() + "' ORDER BY `id` ASC LIMIT 1;";
-                
                 ulong debugTimeLimit = (ulong)new MySqlCommand(querySelect, connection).ExecuteScalar();
 
+                //То же самое, только для MEMORY LIMIT
+                querySelect = "SELECT `debugMemoryLimit` FROM `spm_problems` WHERE `id` = '" + problemId.ToString() + "' ORDER BY `id` ASC LIMIT 1;";
+                ulong debugMemoryLimit = (ulong)new MySqlCommand(querySelect, connection).ExecuteScalar();
 
+                #region PROCESS START INFO CONFIGURATION
+                //Создаём новую конфигурацию запуска процесса
+                ProcessStartInfo startInfo = new ProcessStartInfo();
+
+                //Перенаправляем потоки
+                startInfo.RedirectStandardInput = true;
+                startInfo.RedirectStandardOutput = true;
+                startInfo.RedirectStandardError = true;
+
+                //Запрещаем показ приложения на экран компа
+                startInfo.ErrorDialog = false;
+                startInfo.UseShellExecute = false;
+                startInfo.CreateNoWindow = true;
+                startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+                #endregion
+
+                /*
+                 * ЗАПУСК ПРОЦЕССА АВТОРСКОГО РЕШЕНИЯ
+                 */
+
+                //Объявляем дескриптор процесса
+                Process authorProblemProc = new Process();
+
+                //Указываем полный путь к исполняемому файлу
+                startInfo.FileName = authorCodePath;
+
+                //Указываем интересующую нас конфигурацию тестирования
+                authorProblemProc.StartInfo = startInfo;
+
+                //Запускаем процесс
+                authorProblemProc.Start();
+
+                //Инъекция входного потока
+                authorProblemProc.StandardInput.WriteLine(customTestInput);
+                authorProblemProc.StandardInput.Flush();
+                authorProblemProc.StandardInput.Close();
+
+                //Проверяем процесс на использованную память
+
+                new Thread(() =>
+                {
+                    while (!authorProblemProc.HasExited)
+                    {
+                        if ((ulong)authorProblemProc.PeakWorkingSet64 > debugMemoryLimit)
+                            authorProblemProc.Kill();
+                    }
+                }).Start();
+
+                //Ждём завершения, максимум X миллимекунд
+                authorProblemProc.WaitForExit((int)debugTimeLimit);
+
+                if (!authorProblemProc.HasExited)
+                    authorProblemProc.Kill();
+
+                string _authorOutput = getNormalizedOutputText(authorProblemProc.StandardOutput);
+
+                /*
+                 * ЗАПУСК ПРОЦЕССА ПОЛЬЗОВАТЕЛЬСКОГО РЕШЕНИЯ
+                 */
+
+                //Объявляем дескриптор процесса
+                Process userProblemProc = new Process();
+
+                //Указываем полный путь к исполняемому файлу
+                startInfo.FileName = exeFileUrl;
+
+                //Указываем интересующую нас конфигурацию тестирования
+                userProblemProc.StartInfo = startInfo;
+
+                //Запускаем процесс
+                authorProblemProc.Start();
+
+                //Инъекция входного потока
+                userProblemProc.StandardInput.WriteLine(customTestInput);
+                userProblemProc.StandardInput.Flush();
+                userProblemProc.StandardInput.Close();
+
+                //Проверяем процесс на использованную память
+
+                new Thread(() =>
+                {
+                    while (!userProblemProc.HasExited)
+                    {
+                        if ((ulong)userProblemProc.PeakWorkingSet64 > debugMemoryLimit)
+                            userProblemProc.Kill();
+                    }
+                }).Start();
+
+                //Ждём завершения, максимум X миллимекунд
+                userProblemProc.WaitForExit((int)debugTimeLimit);
+
+                if (!userProblemProc.HasExited)
+                    userProblemProc.Kill();
+
+                string _userOutput = getNormalizedOutputText(userProblemProc.StandardOutput);
+
+                //Пытаемся удалить временный файл авторского решения поставленной задачи
+                try
+                {
+                    File.Delete(authorCodePath);
+                }
+                catch (Exception) { }
             }
             else
             {
+                //Произошла ошибка, мы не в теме; Наша хата з краю, нічого не знаю!
                 string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'waiting', `hasError` = false WHERE `submissionId` = '" + submissionId + "' LIMIT 1;";
                 new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
             }
         }
+
+        #endregion
+
+        #region РЕГИОН РЕЛИЗНЫХ ФУНКЦИЙ И МЕТОДОВ
 
         public void ReleaseTest()
         {
@@ -154,6 +305,7 @@ namespace SimplePM_Server
             //Завершаем чтение потока
             dataReader.Close();
 
+            #region PROCESS START INFO CONFIGURATION
             //Создаём новую конфигурацию запуска процесса
             ProcessStartInfo startInfo = new ProcessStartInfo(exeFileUrl);
 
@@ -167,6 +319,7 @@ namespace SimplePM_Server
             startInfo.UseShellExecute = false;
             startInfo.CreateNoWindow = true;
             startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            #endregion
 
             //Объявление необходимых переменных для тестирования
             //пользовательской программы
@@ -181,7 +334,7 @@ namespace SimplePM_Server
                 //Присвоение переменных данных теста для быстрого доступа
                 testId = ulong.Parse(testsInfo[i]["testId"]);
                 input = testsInfo[i]["input"].ToString();
-                output = testsInfo[i]["output"].ToString();
+                output = testsInfo[i]["output"].ToString().Replace("\r\n", "\n");
                 timeLimit = int.Parse(testsInfo[i]["timeLimit"]);
                 memoryLimit = long.Parse(testsInfo[i]["memoryLimit"]);
 
@@ -237,9 +390,11 @@ namespace SimplePM_Server
                     else
                     {
                         //Ошибок при тесте не выявлено, но вы держитесь!
-                        string pOut = problemProc.StandardOutput.ReadToEnd();
+
+                        //Читаем выходной поток приложения
+                        string pOut = getNormalizedOutputText(problemProc.StandardOutput);
+
                         //Добавляем результат
-                        //Console.WriteLine("'" + pOut + "'");
                         if (output == pOut)
                         {
                             _problemTestingResult += '+';
@@ -276,7 +431,7 @@ namespace SimplePM_Server
             string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready'," +
                                                               "`errorOutput` = '" + standartErrorOutputText + "'," +
                                                               "`result` = '" + _problemTestingResult + "', " +
-                                                              "`b` = '" + _bResult.ToString() + "' " +
+                                                              "`b` = '" + _bResult.ToString().Replace(',', '.') + "' " +
                                  "WHERE `submissionId` = '" + submissionId.ToString() + "' LIMIT 1;";
             new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
             //Обновляем количество баллов и рейтинг пользователя
@@ -285,5 +440,8 @@ namespace SimplePM_Server
             new MySqlCommand("CALL updateBCount(" + userId + ")", connection).ExecuteNonQuery(); //кол-во баллов
             new MySqlCommand("CALL updateRating(" + userId + ")", connection).ExecuteNonQuery(); //кол-во рейтинга
         }
+
+        #endregion
+
     }
 }
