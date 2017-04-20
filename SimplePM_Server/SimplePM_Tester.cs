@@ -393,13 +393,15 @@ namespace SimplePM_Server
 
                         //Читаем выходной поток приложения
                         string pOut = getNormalizedOutputText(problemProc.StandardOutput);
-
+                        //Console.WriteLine(problemProc.ExitCode);
                         //Добавляем результат
                         if (output == pOut)
                         {
                             _problemTestingResult += '+';
                             _problemPassedTests++;
                         }
+                        else if (problemProc.ExitCode != 0)
+                            _problemTestingResult += 'R';
                         else
                             _problemTestingResult += '-';
                     }
