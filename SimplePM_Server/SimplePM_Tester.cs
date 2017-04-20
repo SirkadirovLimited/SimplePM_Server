@@ -119,33 +119,33 @@ namespace SimplePM_Server
             {
                 Dictionary<string, string> tmpDict = new Dictionary<string, string>();
 
-                //Test id
+                //Идентификатор теста
                 tmpDict.Add(
                     "testId",
                     HttpUtility.HtmlDecode(dataReader["id"].ToString())
                 );
-                //Input
+                //Входной поток
                 tmpDict.Add(
                     "input",
                     HttpUtility.HtmlDecode(dataReader["input"].ToString())
                 );
-                //Output
+                //Выходной поток
                 tmpDict.Add(
                     "output",
                     HttpUtility.HtmlDecode(dataReader["output"].ToString())
                 );
-                //Time limit
+                //Лимит по времени
                 tmpDict.Add(
                     "timeLimit",
                     HttpUtility.HtmlDecode(dataReader["timeLimit"].ToString())
                 );
-                //Memory limit
+                //Лимит по памяти
                 tmpDict.Add(
                     "memoryLimit",
                     HttpUtility.HtmlDecode(dataReader["memoryLimit"].ToString())
                 );
 
-                //Add to library
+                //Добавляем в словарь
                 testsInfo.Add(i, tmpDict);
 
                 i++;
@@ -282,8 +282,8 @@ namespace SimplePM_Server
             //Обновляем количество баллов и рейтинг пользователя
             //для этого вызываем пользовательские процедуры mysql,
             //созданные как раз для этих нужд
-            new MySqlCommand("CALL updateBCount(" + userId + ")", connection).ExecuteNonQuery();
-            new MySqlCommand("CALL updateRating(" + userId + ")", connection).ExecuteNonQuery();
+            new MySqlCommand("CALL updateBCount(" + userId + ")", connection).ExecuteNonQuery(); //кол-во баллов
+            new MySqlCommand("CALL updateRating(" + userId + ")", connection).ExecuteNonQuery(); //кол-во рейтинга
         }
     }
 }
