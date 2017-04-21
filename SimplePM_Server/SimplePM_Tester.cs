@@ -7,6 +7,7 @@ using System.Threading;
 using System.Web;
 using System.Runtime.InteropServices;
 using IniParser.Model;
+using System.Text;
 
 namespace SimplePM_Server
 {
@@ -93,6 +94,9 @@ namespace SimplePM_Server
 
             //Создаём словарь значений элемента авторского решения
             Dictionary<string, string> authorCodeInfo = new Dictionary<string, string>();
+            //Создаём переменную, в которой будем хранить бинарный код запускаемого авторского решения
+            byte[] _authorProblemCode = null;
+
             //Читаем полученные данные
             while (dataReader.Read())
             {
@@ -108,32 +112,35 @@ namespace SimplePM_Server
                     HttpUtility.HtmlDecode(dataReader["problemId"].ToString())
                 );
                 //Бинарный (исполняемый) код авторского решения
-                authorCodeInfo.Add(
-                    "code",
-                    HttpUtility.HtmlDecode(dataReader["code"].ToString())
-                );
+                _authorProblemCode = (byte[])dataReader["code"];
             }
 
-            if (authorCodeInfo.Count == 3)
+            dataReader.Close();
+
+            if (authorCodeInfo.Count > 0)
             {
                 //Полный путь к временному (исполняемому) файлу авторского решения программы
                 string authorCodePath = sConfig["Program"]["tempPath"] + "authorCode_" + submissionId + ".exe";
-                //Создаём файл и перехватываем поток инъекции в файл данных
-                StreamWriter writer = File.CreateText(authorCodePath);
-                //Запись бинарного кода программы в файл исполняемого авторского решения
-                writer.WriteLine(authorCodeInfo["code"]);
-                //Записы данных в файл
-                writer.Flush();
-                //Закрываем поток
-                writer.Close();
                 
+                //Создаём файл и перехватываем поток инъекции в файл данных
+                BinaryWriter binWriter = new BinaryWriter(new FileStream(authorCodePath, FileMode.Create));
+
+                //Запись бинарного кода программы в файл исполняемого авторского решения
+                binWriter.Write(_authorProblemCode);
+
+                //Записы данных в файл
+                binWriter.Flush();
+
+                //Закрываем поток
+                binWriter.Close();
+
                 //Запрос на выборку Debug Time Limit из базы данных MySQL
                 querySelect = "SELECT `debugTimeLimit` FROM `spm_problems` WHERE `id` = '" + problemId.ToString() + "' ORDER BY `id` ASC LIMIT 1;";
-                ulong debugTimeLimit = (ulong)new MySqlCommand(querySelect, connection).ExecuteScalar();
+                ulong debugTimeLimit = Convert.ToUInt64(new MySqlCommand(querySelect, connection).ExecuteScalar());
 
                 //То же самое, только для MEMORY LIMIT
                 querySelect = "SELECT `debugMemoryLimit` FROM `spm_problems` WHERE `id` = '" + problemId.ToString() + "' ORDER BY `id` ASC LIMIT 1;";
-                ulong debugMemoryLimit = (ulong)new MySqlCommand(querySelect, connection).ExecuteScalar();
+                ulong debugMemoryLimit = Convert.ToUInt64(new MySqlCommand(querySelect, connection).ExecuteScalar());
 
                 #region PROCESS START INFO CONFIGURATION
                 //Создаём новую конфигурацию запуска процесса
@@ -152,6 +159,14 @@ namespace SimplePM_Server
                 #endregion
 
                 /*
+                 * ОБЪЯВЛЕНИЕ НЕОБХОДИМЫХ ПЕРЕМЕННЫХ
+                 */
+
+                string _authorOutput, _userOutput;
+                char _debugTestingResult = '+';
+                int _userProblemExitCode = 0;
+
+                /*
                  * ЗАПУСК ПРОЦЕССА АВТОРСКОГО РЕШЕНИЯ
                  */
 
@@ -168,28 +183,30 @@ namespace SimplePM_Server
                 authorProblemProc.Start();
 
                 //Инъекция входного потока
-                authorProblemProc.StandardInput.WriteLine(customTestInput);
-                authorProblemProc.StandardInput.Flush();
-                authorProblemProc.StandardInput.Close();
+                authorProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
+                authorProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
+                authorProblemProc.StandardInput.Close(); //закрываем поток
 
                 //Проверяем процесс на использованную память
-
                 new Thread(() =>
                 {
                     while (!authorProblemProc.HasExited)
                     {
-                        if ((ulong)authorProblemProc.PeakWorkingSet64 > debugMemoryLimit)
-                            authorProblemProc.Kill();
+                        //Проверка на превышение лимита памяти
+                        if ((ulong)authorProblemProc.PeakWorkingSet64 > debugMemoryLimit) //Лимит памяти превышен
+                            authorProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
                     }
                 }).Start();
 
                 //Ждём завершения, максимум X миллимекунд
                 authorProblemProc.WaitForExit((int)debugTimeLimit);
 
+                //Если процесс не завершил свою работу - убиваем его
                 if (!authorProblemProc.HasExited)
                     authorProblemProc.Kill();
 
-                string _authorOutput = getNormalizedOutputText(authorProblemProc.StandardOutput);
+                //Получаем обработанный выходной поток авторского решения
+                _authorOutput = getNormalizedOutputText(authorProblemProc.StandardOutput);
 
                 /*
                  * ЗАПУСК ПРОЦЕССА ПОЛЬЗОВАТЕЛЬСКОГО РЕШЕНИЯ
@@ -208,28 +225,40 @@ namespace SimplePM_Server
                 authorProblemProc.Start();
 
                 //Инъекция входного потока
-                userProblemProc.StandardInput.WriteLine(customTestInput);
-                userProblemProc.StandardInput.Flush();
-                userProblemProc.StandardInput.Close();
+                userProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
+                userProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
+                userProblemProc.StandardInput.Close(); //закрываем поток
 
                 //Проверяем процесс на использованную память
-
                 new Thread(() =>
                 {
                     while (!userProblemProc.HasExited)
                     {
+                        //Проверка на превышение лимита памяти
                         if ((ulong)userProblemProc.PeakWorkingSet64 > debugMemoryLimit)
-                            userProblemProc.Kill();
+                        {
+                            //Лимит памяти превышен
+                            userProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
+                            _debugTestingResult = 'M'; //устанавливаем преждевременный результат тестирования
+                        }
                     }
                 }).Start();
 
                 //Ждём завершения, максимум X миллимекунд
                 userProblemProc.WaitForExit((int)debugTimeLimit);
 
+                //Если процесс не завершил свою работу - убиваем его
                 if (!userProblemProc.HasExited)
+                {
                     userProblemProc.Kill();
+                    _debugTestingResult = 'T';
+                }
 
-                string _userOutput = getNormalizedOutputText(userProblemProc.StandardOutput);
+                //Получаем обработанный выходной поток пользовательского решения
+                _userOutput = getNormalizedOutputText(userProblemProc.StandardOutput);
+
+                //Получаем exitcode пользовательского приложения
+                _userProblemExitCode = userProblemProc.ExitCode;
 
                 //Пытаемся удалить временный файл авторского решения поставленной задачи
                 try
@@ -237,6 +266,25 @@ namespace SimplePM_Server
                     File.Delete(authorCodePath);
                 }
                 catch (Exception) { }
+
+                //Устанавливаем результат отладочного тестирования.
+                //В случае преждевременного результата ничего не делаем
+                if (_debugTestingResult == '+')
+                {
+                    if (_authorOutput == _userOutput)
+                        _debugTestingResult = '+';
+                    else
+                        _debugTestingResult = '-';
+                }
+
+                string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready'," +
+                                                              "`errorOutput` = null," +
+                                                              "`result` = '" + _debugTestingResult + "', " +
+                                                              "`b` = '0' " +
+                                                              "`output` = '" + _userOutput + "' " +
+                                                              "`exitcodes` = '" + _userProblemExitCode + "' " +
+                                     "WHERE `submissionId` = '" + submissionId.ToString() + "' LIMIT 1;";
+                new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
             }
             else
             {
@@ -382,11 +430,6 @@ namespace SimplePM_Server
                         //Ошибка при тесте!
                         _problemTestingResult += 'E';
                     }
-                    /*else if (problemProc.PeakVirtualMemorySize64 > memoryLimit)
-                    {
-                        //Процесс израсходовал слишком много физической памяти!
-                        _problemTestingResult += 'M';
-                    }*/
                     else
                     {
                         //Ошибок при тесте не выявлено, но вы держитесь!

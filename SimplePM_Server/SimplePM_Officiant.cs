@@ -97,7 +97,17 @@ namespace SimplePM_Server
                         break;
                     //Отладка программы по пользовательскому тесту
                     case "debug":
-
+                        //Запускаем тестирование программы
+                        new SimplePM_Tester(
+                            connection, //дескриптор соединения с БД
+                            cResult.exe_fullname, //полный путь к исполняемому файлу
+                            ulong.Parse(submissionInfo["problemId"].ToString()), //идентификатор задачи
+                            ulong.Parse(submissionInfo["submissionId"].ToString()), //идентификатор запроса на отправку
+                            float.Parse(submissionInfo["difficulty"]), //сложность поставленной задачи
+                            ulong.Parse(submissionInfo["userId"]), //идентификатор пользователя
+                            sConfig, //дескриптор конфигурационного файла сервера
+                            submissionInfo["customTest"] //собственный тест пользователя
+                        ).DebugTest();
                         break;
                     //Отправка решения задачи
                     case "release":
