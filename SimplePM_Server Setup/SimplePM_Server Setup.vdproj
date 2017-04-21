@@ -682,7 +682,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SimplePM_Server"
         "ProductCode" = "8:{0A62D997-23A0-488A-AAAB-C863B60A74C1}"
-        "PackageCode" = "8:{1EE8162F-08BA-4B81-8492-5F2390718560}"
+        "PackageCode" = "8:{824D9F16-AA4D-4DF0-91D2-D518F9C33D33}"
         "UpgradeCode" = "8:{C135D8AA-0BE3-473F-AFE0-464D690A4742}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1155,7 +1155,7 @@
                             "ContextData" = "8:4;True=4;False=0"
                             "Attributes" = "3:0"
                             "Setting" = "3:0"
-                            "Value" = "3:4"
+                            "Value" = "3:0"
                             "DefaultValue" = "3:4"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -1369,67 +1369,6 @@
                             }
                         }
                     }
-                    "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_53BEA5F2A0C74D979BC0E523AB79AF6F"
-                    {
-                    "Sequence" = "3:310"
-                    "DisplayName" = "8:Сведения о пользователе"
-                    "UseDynamicProperties" = "11:TRUE"
-                    "IsDependency" = "11:FALSE"
-                    "SourcePath" = "8:<VsdDialogDir>\\VsdCustomerInfoDlg.wid"
-                        "Properties"
-                        {
-                            "BannerBitmap"
-                            {
-                            "Name" = "8:BannerBitmap"
-                            "DisplayName" = "8:#1001"
-                            "Description" = "8:#1101"
-                            "Type" = "3:8"
-                            "ContextData" = "8:Bitmap"
-                            "Attributes" = "3:4"
-                            "Setting" = "3:1"
-                            "UsePlugInResources" = "11:TRUE"
-                            }
-                            "Serial"
-                            {
-                            "Name" = "8:Serial"
-                            "DisplayName" = "8:#1004"
-                            "Description" = "8:#1104"
-                            "Type" = "3:3"
-                            "ContextData" = "8:"
-                            "Attributes" = "3:2"
-                            "Setting" = "3:1"
-                            "Value" = "8:<###-%%%%%%%>"
-                            "DefaultValue" = "8:<###-%%%%%%%>"
-                            "UsePlugInResources" = "11:TRUE"
-                            }
-                            "ShowOrg"
-                            {
-                            "Name" = "8:ShowOrg"
-                            "DisplayName" = "8:#1006"
-                            "Description" = "8:#1106"
-                            "Type" = "3:5"
-                            "ContextData" = "8:1;True=1;False=0"
-                            "Attributes" = "3:0"
-                            "Setting" = "3:0"
-                            "Value" = "3:1"
-                            "DefaultValue" = "3:1"
-                            "UsePlugInResources" = "11:TRUE"
-                            }
-                            "ShowSerial"
-                            {
-                            "Name" = "8:ShowSerial"
-                            "DisplayName" = "8:#1005"
-                            "Description" = "8:#1105"
-                            "Type" = "3:5"
-                            "ContextData" = "8:1;True=1;False=0"
-                            "Attributes" = "3:0"
-                            "Setting" = "3:0"
-                            "Value" = "3:0"
-                            "DefaultValue" = "3:0"
-                            "UsePlugInResources" = "11:TRUE"
-                            }
-                        }
-                    }
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_6035A17B5EAC44B2A35B44BB38640DCD"
                     {
                     "Sequence" = "3:600"
@@ -1529,7 +1468,7 @@
                             "ContextData" = "8:4;True=4;False=0"
                             "Attributes" = "3:0"
                             "Setting" = "3:0"
-                            "Value" = "3:4"
+                            "Value" = "3:0"
                             "DefaultValue" = "3:4"
                             "UsePlugInResources" = "11:TRUE"
                             }
