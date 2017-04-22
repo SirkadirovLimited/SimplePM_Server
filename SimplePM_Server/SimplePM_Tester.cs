@@ -222,7 +222,7 @@ namespace SimplePM_Server
                 userProblemProc.StartInfo = startInfo;
 
                 //Запускаем процесс
-                authorProblemProc.Start();
+                userProblemProc.Start();
 
                 //Инъекция входного потока
                 userProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
@@ -277,11 +277,13 @@ namespace SimplePM_Server
                         _debugTestingResult = '-';
                 }
 
-                string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready'," +
-                                                              "`errorOutput` = null," +
+                _userOutput = HttpUtility.HtmlEncode(_userOutput);
+
+                string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready', " +
+                                                              "`errorOutput` = null, " +
                                                               "`result` = '" + _debugTestingResult + "', " +
-                                                              "`b` = '0' " +
-                                                              "`output` = '" + _userOutput + "' " +
+                                                              "`b` = '0', " +
+                                                              "`output` = '" + _userOutput + "', " +
                                                               "`exitcodes` = '" + _userProblemExitCode + "' " +
                                      "WHERE `submissionId` = '" + submissionId.ToString() + "' LIMIT 1;";
                 new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
