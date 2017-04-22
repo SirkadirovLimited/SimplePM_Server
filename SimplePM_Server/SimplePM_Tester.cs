@@ -162,7 +162,7 @@ namespace SimplePM_Server
                  * ОБЪЯВЛЕНИЕ НЕОБХОДИМЫХ ПЕРЕМЕННЫХ
                  */
 
-                string _authorOutput, _userOutput;
+                string _authorOutput = "", _userOutput = "";
                 char _debugTestingResult = '+';
                 int _userProblemExitCode = 0;
 
@@ -179,23 +179,31 @@ namespace SimplePM_Server
                 //Указываем интересующую нас конфигурацию тестирования
                 authorProblemProc.StartInfo = startInfo;
 
-                //Запускаем процесс
-                authorProblemProc.Start();
+                try
+                {
+                    //Запускаем процесс
+                    authorProblemProc.Start();
 
-                //Инъекция входного потока
-                authorProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
-                authorProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
-                authorProblemProc.StandardInput.Close(); //закрываем поток
+                    //Инъекция входного потока
+                    authorProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
+                    authorProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
+                    authorProblemProc.StandardInput.Close(); //закрываем поток
+                }
+                catch (Exception) { }
 
                 //Проверяем процесс на использованную память
                 new Thread(() =>
                 {
-                    while (!authorProblemProc.HasExited)
+                    try
                     {
-                        //Проверка на превышение лимита памяти
-                        if ((ulong)authorProblemProc.PeakWorkingSet64 > debugMemoryLimit) //Лимит памяти превышен
-                            authorProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
+                        while (!authorProblemProc.HasExited)
+                        {
+                            //Проверка на превышение лимита памяти
+                            if ((ulong)authorProblemProc.PeakWorkingSet64 > debugMemoryLimit) //Лимит памяти превышен
+                                authorProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
+                        }
                     }
+                    catch (Exception) { }
                 }).Start();
 
                 //Ждём завершения, максимум X миллимекунд
@@ -220,62 +228,83 @@ namespace SimplePM_Server
 
                 //Указываем интересующую нас конфигурацию тестирования
                 userProblemProc.StartInfo = startInfo;
+                
+                try
+                {
+                    //Запускаем процесс
+                    userProblemProc.Start();
 
-                //Запускаем процесс
-                userProblemProc.Start();
+                    //Инъекция входного потока
+                    userProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
+                    userProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
+                    userProblemProc.StandardInput.Close(); //закрываем поток
+                }
+                catch (Exception)
+                {
+                    //Произошла ошибка при выполнении программы.
+                    //Будем считать, что это всё из-за превышения лимита памяти.
+                    //(Надо ж как-то выкрутиться!)
 
-                //Инъекция входного потока
-                userProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
-                userProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
-                userProblemProc.StandardInput.Close(); //закрываем поток
+                    _debugTestingResult = 'M';
+                }
 
                 //Проверяем процесс на использованную память
                 new Thread(() =>
                 {
-                    while (!userProblemProc.HasExited)
+                    try
                     {
-                        //Проверка на превышение лимита памяти
-                        if ((ulong)userProblemProc.PeakWorkingSet64 > debugMemoryLimit)
+                        while (!userProblemProc.HasExited)
                         {
-                            //Лимит памяти превышен
-                            userProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
-                            _debugTestingResult = 'M'; //устанавливаем преждевременный результат тестирования
+                            //Проверка на превышение лимита памяти
+                            if ((ulong)userProblemProc.PeakWorkingSet64 > debugMemoryLimit)
+                            {
+                                //Лимит памяти превышен
+                                userProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
+                                _debugTestingResult = 'M'; //устанавливаем преждевременный результат тестирования
+                            }
                         }
                     }
+                    catch (Exception) { }
                 }).Start();
 
-                //Ждём завершения, максимум X миллимекунд
-                userProblemProc.WaitForExit((int)debugTimeLimit);
-
-                //Если процесс не завершил свою работу - убиваем его
-                if (!userProblemProc.HasExited)
-                {
-                    userProblemProc.Kill();
-                    _debugTestingResult = 'T';
-                }
-
-                //Получаем обработанный выходной поток пользовательского решения
-                _userOutput = getNormalizedOutputText(userProblemProc.StandardOutput);
-
-                //Получаем exitcode пользовательского приложения
-                _userProblemExitCode = userProblemProc.ExitCode;
-
-                //Пытаемся удалить временный файл авторского решения поставленной задачи
                 try
                 {
-                    File.Delete(authorCodePath);
+
+                    //Ждём завершения, максимум X миллимекунд
+                    userProblemProc.WaitForExit((int)debugTimeLimit);
+
+                    //Если процесс не завершил свою работу - убиваем его
+                    if (!userProblemProc.HasExited)
+                    {
+                        userProblemProc.Kill();
+                        _debugTestingResult = 'T';
+                    }
+
+                    //Получаем обработанный выходной поток пользовательского решения
+                    _userOutput = getNormalizedOutputText(userProblemProc.StandardOutput);
+
+                    //Получаем exitcode пользовательского приложения
+                    _userProblemExitCode = userProblemProc.ExitCode;
+
+                    //Пытаемся удалить временный файл авторского решения поставленной задачи
+                    try
+                    {
+                        File.Delete(authorCodePath);
+                    }
+                    catch (Exception) { }
+
+                    //Устанавливаем результат отладочного тестирования.
+                    //В случае преждевременного результата ничего не делаем
+                    if (_debugTestingResult == '+')
+                    {
+                        if (_authorOutput == _userOutput)
+                            _debugTestingResult = '+';
+                        else
+                            _debugTestingResult = '-';
+                    }
+
                 }
                 catch (Exception) { }
-
-                //Устанавливаем результат отладочного тестирования.
-                //В случае преждевременного результата ничего не делаем
-                if (_debugTestingResult == '+')
-                {
-                    if (_authorOutput == _userOutput)
-                        _debugTestingResult = '+';
-                    else
-                        _debugTestingResult = '-';
-                }
 
                 _userOutput = HttpUtility.HtmlEncode(_userOutput);
 
@@ -378,6 +407,7 @@ namespace SimplePM_Server
             int timeLimit;
             long memoryLimit;
             string standartErrorOutputText = null;
+            bool preResultGiven = false;
 
             for (i=1; i<=testsInfo.Count; i++)
             {
@@ -393,66 +423,107 @@ namespace SimplePM_Server
 
                 //Указываем интересующую нас конфигурацию тестирования
                 problemProc.StartInfo = startInfo;
+                
+                try
+                {
+                    //Запускаем процесс
+                    problemProc.Start();
 
-                //Запускаем процесс
-                problemProc.Start();
+                    //Инъекция входного потока
+                    problemProc.StandardInput.WriteLine(input);
+                    problemProc.StandardInput.Flush();
+                    problemProc.StandardInput.Close();
+                }
+                catch (Exception)
+                {
+                    //Произошла ошибка при выполнении программы.
+                    //Будем считать, что это всё из-за превышения лимита памяти.
+                    //(Надо ж как-то выкрутиться!)
 
-                //Инъекция входного потока
-                problemProc.StandardInput.WriteLine(input);
-                problemProc.StandardInput.Flush();
-                problemProc.StandardInput.Close();
+                    _problemTestingResult += "M";
+                    preResultGiven = true;
+                }
 
                 //Проверяем процесс на использованную память
-
-                //Ждём завершения, максимум X миллимекунд
-                problemProc.WaitForExit(timeLimit);
-
-                if (!problemProc.HasExited)
+                new Thread(() =>
                 {
-                    //Процесс не завершил свою работу
-                    //Исключение: времени не хватило!
-                    problemProc.Kill();
-                    //Методом научного тыка было выявлено, что необходимо 10 мс чтобы программа
-                    //корректно завершила свою работу
-                    Thread.Sleep(10);
-                    _problemTestingResult += 'T';
-                }
-                else
-                {
-                    //Проверка на "вшивость"
-                    string currentErrors = problemProc.StandardError.ReadToEnd();
-                    problemProc.StandardError.Close();
 
-                    //Добавляем ошибки текущего теста в список всех ошибок
-                    if (currentErrors.Length > 0)
-                        standartErrorOutputText += currentErrors;
-
-                    if (currentErrors.Length > 0)
+                    try
                     {
-                        //Ошибка при тесте!
-                        _problemTestingResult += 'E';
-                    }
-                    else
-                    {
-                        //Ошибок при тесте не выявлено, но вы держитесь!
-
-                        //Читаем выходной поток приложения
-                        string pOut = getNormalizedOutputText(problemProc.StandardOutput);
-                        //Console.WriteLine(problemProc.ExitCode);
-                        //Добавляем результат
-                        if (output == pOut)
+                        while (!problemProc.HasExited)
                         {
-                            _problemTestingResult += '+';
-                            _problemPassedTests++;
+                            //Проверка на превышение лимита памяти
+                            if (problemProc.PeakWorkingSet64 > memoryLimit)
+                            {
+                                //Лимит памяти превышен
+                                problemProc.Kill(); //завершаем работу процесса в принудительном порядке
+                                _problemTestingResult += "M"; //устанавливаем преждевременный результат тестирования
+                                preResultGiven = true; //указываем, что выдали преждевременный результат тестирования
+                            }
                         }
-                        else if (problemProc.ExitCode != 0)
-                            _problemTestingResult += 'R';
+                    }
+                    catch (Exception) { }
+
+                }).Start();
+                
+                try
+                {
+                    //Ждём завершения, максимум X миллимекунд
+                    problemProc.WaitForExit(timeLimit);
+                }
+                catch (Exception) { }
+
+                //Проверка на досрочный результат проверки
+                if (!preResultGiven)
+                {
+
+                    if (!problemProc.HasExited)
+                    {
+                        //Процесс не завершил свою работу
+                        //Исключение: времени не хватило!
+                        problemProc.Kill();
+                        //Методом научного тыка было выявлено, что необходимо 10 мс чтобы программа
+                        //корректно завершила свою работу
+                        Thread.Sleep(10);
+                        _problemTestingResult += 'T';
+                    }
+                    else if (problemProc.HasExited)
+                    {
+                        //Проверка на "вшивость"
+                        string currentErrors = problemProc.StandardError.ReadToEnd();
+                        problemProc.StandardError.Close();
+
+                        //Добавляем ошибки текущего теста в список всех ошибок
+                        if (currentErrors.Length > 0)
+                            standartErrorOutputText += currentErrors;
+
+                        if (currentErrors.Length > 0)
+                        {
+                            //Ошибка при тесте!
+                            _problemTestingResult += 'E';
+                        }
                         else
-                            _problemTestingResult += '-';
+                        {
+                            //Ошибок при тесте не выявлено, но вы держитесь!
+
+                            //Читаем выходной поток приложения
+                            string pOut = getNormalizedOutputText(problemProc.StandardOutput);
+                            //Console.WriteLine(problemProc.ExitCode);
+                            //Добавляем результат
+                            if (output == pOut)
+                            {
+                                _problemTestingResult += '+';
+                                _problemPassedTests++;
+                            }
+                            else if (problemProc.ExitCode != 0)
+                                _problemTestingResult += 'R';
+                            else
+                                _problemTestingResult += '-';
+                        }
+
                     }
 
                 }
-
             }
 
             //Объявляем переменную численного результата тестирования

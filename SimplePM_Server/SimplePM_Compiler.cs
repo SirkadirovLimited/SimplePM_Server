@@ -59,7 +59,7 @@ namespace SimplePM_Server
             Process fpcProc = new Process();
             
             //Устанавливаем информацию о старте процесса
-            ProcessStartInfo pStartInfo = new ProcessStartInfo(sConfig["Compilers"]["freepascal_location"], " -ve -vw -vi -vb " + fileLocation);
+            ProcessStartInfo pStartInfo = new ProcessStartInfo(sConfig["Compilers"]["freepascal_location"], " -Twin64 -ve -vw -vi -vb " + fileLocation);
             //Никаких ошибок, я сказал!
             pStartInfo.ErrorDialog = false;
             //Минимизируем его, ибо не достоен он почестей!
