@@ -206,6 +206,8 @@ namespace SimplePM_Server
             Console.WriteLine("MySQl connection timeout: " + db.ConnectionTimeout);
             Console.WriteLine();
 
+            Thread.Sleep(1000);
+
             //Возвращаем дескриптор подключения к базе данных
             return db;
         }

@@ -8,6 +8,7 @@ using System.Web;
 using System.Runtime.InteropServices;
 using IniParser.Model;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SimplePM_Server
 {
@@ -86,7 +87,7 @@ namespace SimplePM_Server
         public void DebugTest()
         {
             //Запрос на выборку авторского решения из БД
-            string querySelect = "SELECT * FROM `spm_problems_ready` WHERE `problemId` = '" + problemId.ToString() + "' ORDER BY `id` ASC LIMIT 1;";
+            string querySelect = "SELECT * FROM `spm_problems_ready` WHERE `problemId` = '" + problemId.ToString() + "' ORDER BY `problemId` ASC LIMIT 1;";
 
             //Дескрипторы временных таблиц выборки из БД
             MySqlCommand cmdSelect = new MySqlCommand(querySelect, connection);
@@ -100,19 +101,13 @@ namespace SimplePM_Server
             //Читаем полученные данные
             while (dataReader.Read())
             {
-
-                //Идентификатор авторского решения
-                authorCodeInfo.Add(
-                    "id",
-                    HttpUtility.HtmlDecode(dataReader["id"].ToString())
-                );
                 //Идентификатор задачи
                 authorCodeInfo.Add(
                     "problemId",
                     HttpUtility.HtmlDecode(dataReader["problemId"].ToString())
                 );
                 //Бинарный (исполняемый) код авторского решения
-                _authorProblemCode = (byte[])dataReader["code"];
+                _authorProblemCode = (byte[])dataReader["execFile"];
             }
 
             dataReader.Close();
@@ -342,8 +337,10 @@ namespace SimplePM_Server
             string _problemTestingResult = "";
             int _problemPassedTests = 0;
 
+            //Объявляем словарь информации о тестах
             Dictionary<int, Dictionary<string, string>> testsInfo = new Dictionary<int, Dictionary<string, string>>();
             
+            //Производим выборку полученных результатов из временной таблицы на сервере MySQL
             int i = 1;
             while (dataReader.Read())
             {
@@ -378,6 +375,7 @@ namespace SimplePM_Server
                 //Добавляем в словарь
                 testsInfo.Add(i, tmpDict);
 
+                //Увеличиваем индекс текущего теста на единицу
                 i++;
             }
 
@@ -402,12 +400,12 @@ namespace SimplePM_Server
 
             //Объявление необходимых переменных для тестирования
             //пользовательской программы
-            ulong testId;
-            string input, output;
-            int timeLimit;
-            long memoryLimit;
-            string standartErrorOutputText = null;
-            bool preResultGiven = false;
+            ulong testId; //идентификатор теста
+            string input, output; //входной и выходной потоки теста
+            int timeLimit; //лимит времени теста
+            long memoryLimit; //лимит памяти теста
+            string standartErrorOutputText = null; //переменная стандартного потока ошибок
+            bool preResultGiven = false; //служебная переменная для определения предопределённого результата
 
             for (i=1; i<=testsInfo.Count; i++)
             {
@@ -430,9 +428,9 @@ namespace SimplePM_Server
                     problemProc.Start();
 
                     //Инъекция входного потока
-                    problemProc.StandardInput.WriteLine(input);
-                    problemProc.StandardInput.Flush();
-                    problemProc.StandardInput.Close();
+                    problemProc.StandardInput.WriteLine(input); //добавляем текст во входной поток
+                    problemProc.StandardInput.Flush(); //производим запись во входной поток и последующую очистку буфера
+                    problemProc.StandardInput.Close(); //закрываем запись входного потока
                 }
                 catch (Exception)
                 {
@@ -447,7 +445,7 @@ namespace SimplePM_Server
                 //Проверяем процесс на использованную память
                 new Thread(() =>
                 {
-
+                    //Для обеспечения безопасности
                     try
                     {
                         while (!problemProc.HasExited)
@@ -552,14 +550,84 @@ namespace SimplePM_Server
                                                               "`b` = '" + _bResult.ToString().Replace(',', '.') + "' " +
                                  "WHERE `submissionId` = '" + submissionId.ToString() + "' LIMIT 1;";
             new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+
+            #region Установка авторского решения
+
+            //Составляем SQL запрос на выборку из записи запроса на проверку 
+            querySelect = "SELECT `setAsAuthorSolution` FROM `spm_submissions` WHERE `submissionId` = '" + submissionId + "' LIMIT 1;";
+            //Получаем результат выполнения запроса
+            bool setAsAuthorSolution = Convert.ToBoolean(new MySqlCommand(querySelect, connection).ExecuteScalar());
+
+            //Проверка на запрос установить ткущее решение как авторское
+            if (setAsAuthorSolution)
+            {
+                //Составляем запрос на выборку из БД решения задачи и язык её решения по текущей попытке
+                querySelect = "SELECT `problemCode`, `codeLang` FROM `spm_submissions` WHERE `submissionId` = '" + submissionId + "' LIMIT 1;";
+                //Получаем результат выполнения запроса
+                dataReader = new MySqlCommand(querySelect, connection).ExecuteReader();
+                if (dataReader.Read())
+                {
+                    try
+                    {
+                        //Исходный код авторского решения
+                        string problemCode = dataReader["problemCode"].ToString();
+                        //Язык написания авторского решения
+                        string problemLang = dataReader["codeLang"].ToString();
+
+                        //ПОЛУЧЕНИЕ БИНАРНОГО КОДА АВТОРСКОГО РЕШЕНИЯ
+
+                        //Создаём экземпляр бинарного смотрителя
+                        BinaryReader binReader = new BinaryReader(new FileStream(exeFileUrl, FileMode.Open));
+                        //Читаем весь бинарный код до конца файла в строку, полученную строку
+                        //форматируем, чтобы не допустить "ломание" запроса к базе данных MySQL
+                        //string problemBinCode = Encoding.UTF8.GetString(binReader.ReadBytes(Convert.ToInt32(binReader.BaseStream.Length)));
+                        byte[] problemBinCode = binReader.ReadBytes((int)binReader.BaseStream.Length);
+                        //problemBinCode = HttpUtility.HtmlEncode(problemBinCode);
+                        //Освобождаем ресурсы, используемые потоком
+                        binReader.Dispose();
+                        //Закрываем поток
+                        binReader.Close();
+
+                        //Закрываем соединение с базой данных (временное).
+                        //Временные таблицы, расположенные на MySQL сервере, при этом удаляются.
+                        dataReader.Close();
+
+                        //Формируем запрос на добавление/обновление авторского
+                        //решения для данной задачи.
+
+                        queryUpdate = "INSERT INTO " + //создание записи авторского решения
+                                                "`spm_problems_ready`" +
+                                             "SET" +
+                                                "`problemId` = '" + problemId + "', " +
+                                                "`execFile` = @problemBinCode, " +
+                                                "`codeLang` = '" + problemLang + "', " +
+                                                "`code` = '" + problemCode + "' " +
+                                             "ON DUPLICATE KEY UPDATE" + //обновление существующей записи авторского решения
+                                                "`execFile` = @problemBinCode, " +
+                                                "`codeLang` = '" + problemLang + "', " +
+                                                "`code` = '" + problemCode + "' " +
+                                             ";";
+
+                        MySqlCommand insertCmd = new MySqlCommand(queryUpdate, connection);
+                        insertCmd.Parameters.AddWithValue("@problemBinCode", problemBinCode);
+                        //Выполняем запрос к базе данных на добавление/обновление
+                        //авторского решения для данной задачи.
+                        insertCmd.ExecuteNonQuery();
+                    }
+                    catch (Exception) { }
+                }
+                else
+                    dataReader.Close();
+            }
+
+            #endregion
+
             //Обновляем количество баллов и рейтинг пользователя
             //для этого вызываем пользовательские процедуры mysql,
             //созданные как раз для этих нужд
-            new MySqlCommand("CALL updateBCount(" + userId + ")", connection).ExecuteNonQuery(); //кол-во баллов
-            new MySqlCommand("CALL updateRating(" + userId + ")", connection).ExecuteNonQuery(); //кол-во рейтинга
+            new MySqlCommand("CALL updateBCount(" + userId + "); CALL updateRating(" + userId + ")", connection).ExecuteNonQuery();
         }
 
         #endregion
-
     }
 }
