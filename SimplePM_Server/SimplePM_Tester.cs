@@ -601,15 +601,16 @@ namespace SimplePM_Server
                                                 "`problemId` = '" + problemId + "', " +
                                                 "`execFile` = @problemBinCode, " +
                                                 "`codeLang` = '" + problemLang + "', " +
-                                                "`code` = '" + problemCode + "' " +
+                                                "`code` = @problemCode " +
                                              "ON DUPLICATE KEY UPDATE" + //обновление существующей записи авторского решения
                                                 "`execFile` = @problemBinCode, " +
                                                 "`codeLang` = '" + problemLang + "', " +
-                                                "`code` = '" + problemCode + "' " +
+                                                "`code` = @problemCode " +
                                              ";";
 
                         MySqlCommand insertCmd = new MySqlCommand(queryUpdate, connection);
                         insertCmd.Parameters.AddWithValue("@problemBinCode", problemBinCode);
+                        insertCmd.Parameters.AddWithValue("@problemCode", problemCode);
                         //Выполняем запрос к базе данных на добавление/обновление
                         //авторского решения для данной задачи.
                         insertCmd.ExecuteNonQuery();
