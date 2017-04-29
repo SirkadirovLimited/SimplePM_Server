@@ -93,12 +93,12 @@ namespace SimplePM_Server
             
             //Добавляю основной поток
             new Thread(() => {
-                //Получаем дескриптор соединения с базой данных
-                MySqlConnection conn = startMysqlConnection(sConfig);
                 while (true)
                 {
                     try
                     {
+                        //Получаем дескриптор соединения с базой данных
+                        MySqlConnection conn = startMysqlConnection(sConfig);
                         //Защита от перегрузки сервера
                         if (_customersCount < _maxCustomersCount)
                             getSubIdAndRunCompile(conn);
@@ -184,6 +184,8 @@ namespace SimplePM_Server
                     _customersCount--;
                 }
 
+                connection.Close();
+
             }).Start();
         }
 
@@ -199,12 +201,6 @@ namespace SimplePM_Server
                 ";Charset=" + sConfig["Database"]["db_chst"] + ";"
             );
             db.Open();
-            //Отображаем краткую (и никому не нужную) информацию о подключении
-            Console.WriteLine("\n█ Database connection established successfully! █");
-            Console.WriteLine("MySQL server version: " + db.ServerVersion);
-            Console.WriteLine("Database name: " + db.Database);
-            Console.WriteLine("MySQl connection timeout: " + db.ConnectionTimeout);
-            Console.WriteLine();
 
             Thread.Sleep(1000);
 

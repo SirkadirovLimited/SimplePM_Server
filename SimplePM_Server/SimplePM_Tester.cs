@@ -273,6 +273,7 @@ namespace SimplePM_Server
                     {
                         userProblemProc.Kill();
                         _debugTestingResult = 'T';
+                        _userOutput = "--- TIME LIMIT ---";
                     }
 
                     //Получаем обработанный выходной поток пользовательского решения
@@ -406,6 +407,7 @@ namespace SimplePM_Server
             long memoryLimit; //лимит памяти теста
             string standartErrorOutputText = null; //переменная стандартного потока ошибок
             bool preResultGiven = false; //служебная переменная для определения предопределённого результата
+            string _exitcodes = "|"; //переменная кодов выхода
 
             for (i=1; i<=testsInfo.Count; i++)
             {
@@ -521,6 +523,8 @@ namespace SimplePM_Server
 
                     }
 
+                    _exitcodes += problemProc.ExitCode + "|";
+
                 }
             }
 
@@ -544,12 +548,18 @@ namespace SimplePM_Server
             
             //ОТПРАВКА РЕЗУЛЬТАТОВ ТЕСТИРОВАНИЯ НА СЕРВЕР БД
             //В ТАБЛИЦУ РЕЗУЛЬТАТОВ (`spm_submissions`)
-            string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready'," +
-                                                              "`errorOutput` = '" + standartErrorOutputText + "'," +
-                                                              "`result` = '" + _problemTestingResult + "', " +
-                                                              "`b` = '" + _bResult.ToString().Replace(',', '.') + "' " +
+            string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready', " +
+                                                              "`errorOutput` = @errorOutput, " +
+                                                              "`result` = @result, " +
+                                                              "`exitcodes` = @exitcodes, " +
+                                                              "`b` = @b " +
                                  "WHERE `submissionId` = '" + submissionId.ToString() + "' LIMIT 1;";
-            new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+            MySqlCommand cmdUpd = new MySqlCommand(queryUpdate, connection);
+            cmdUpd.Parameters.AddWithValue("@errorOutput", standartErrorOutputText);
+            cmdUpd.Parameters.AddWithValue("@result", _problemTestingResult);
+            cmdUpd.Parameters.AddWithValue("@exitcodes", _exitcodes);
+            cmdUpd.Parameters.AddWithValue("@b", _bResult);
+            cmdUpd.ExecuteNonQuery();
 
             #region Установка авторского решения
 
