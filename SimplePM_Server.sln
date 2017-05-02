@@ -9,6 +9,10 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SimplePM_Server Setup", "Si
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		AppVeyor|Any CPU = AppVeyor|Any CPU
+		AppVeyor|x32 = AppVeyor|x32
+		AppVeyor|x64 = AppVeyor|x64
+		AppVeyor|x86 = AppVeyor|x86
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x32 = Debug|x32
 		Debug|x64 = Debug|x64
@@ -17,12 +21,13 @@ Global
 		Release|x32 = Release|x32
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-		Setup|Any CPU = Setup|Any CPU
-		Setup|x32 = Setup|x32
-		Setup|x64 = Setup|x64
-		Setup|x86 = Setup|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{94AF3181-17F8-4CC3-945C-CF911824B91C}.AppVeyor|Any CPU.ActiveCfg = AppVeyor|x64
+		{94AF3181-17F8-4CC3-945C-CF911824B91C}.AppVeyor|x32.ActiveCfg = AppVeyor|x64
+		{94AF3181-17F8-4CC3-945C-CF911824B91C}.AppVeyor|x64.ActiveCfg = AppVeyor|x64
+		{94AF3181-17F8-4CC3-945C-CF911824B91C}.AppVeyor|x64.Build.0 = AppVeyor|x64
+		{94AF3181-17F8-4CC3-945C-CF911824B91C}.AppVeyor|x86.ActiveCfg = AppVeyor|x64
 		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Debug|x32.ActiveCfg = Debug|x64
 		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Debug|x64.ActiveCfg = Debug|x64
@@ -33,14 +38,12 @@ Global
 		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Release|x64.ActiveCfg = Release|x64
 		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Release|x64.Build.0 = Release|x64
 		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Release|x86.ActiveCfg = Release|x64
-		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Setup|Any CPU.ActiveCfg = Release|x64
-		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Setup|Any CPU.Build.0 = Release|x64
-		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Setup|x32.ActiveCfg = Release|x64
-		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Setup|x32.Build.0 = Release|x64
-		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Setup|x64.ActiveCfg = Release|x64
-		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Setup|x64.Build.0 = Release|x64
-		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Setup|x86.ActiveCfg = Release|x64
-		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Setup|x86.Build.0 = Release|x64
+		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.AppVeyor|Any CPU.ActiveCfg = AppVeyor
+		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.AppVeyor|x32.ActiveCfg = AppVeyor
+		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.AppVeyor|x32.Build.0 = AppVeyor
+		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.AppVeyor|x64.ActiveCfg = AppVeyor
+		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.AppVeyor|x86.ActiveCfg = AppVeyor
+		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.AppVeyor|x86.Build.0 = AppVeyor
 		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.Debug|Any CPU.ActiveCfg = Debug
 		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.Debug|x32.ActiveCfg = Debug
 		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.Debug|x64.ActiveCfg = Debug
@@ -49,13 +52,6 @@ Global
 		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.Release|x32.ActiveCfg = Release
 		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.Release|x64.ActiveCfg = Setup
 		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.Release|x86.ActiveCfg = Release
-		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.Setup|Any CPU.ActiveCfg = Setup
-		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.Setup|Any CPU.Build.0 = Setup
-		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.Setup|x32.ActiveCfg = Setup
-		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.Setup|x32.Build.0 = Setup
-		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.Setup|x64.ActiveCfg = Setup
-		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.Setup|x86.ActiveCfg = Setup
-		{B723E8BD-0ABB-42A4-8A4E-AE03337448B8}.Setup|x86.Build.0 = Setup
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

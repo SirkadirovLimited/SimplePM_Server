@@ -34,13 +34,7 @@
         "Entry"
         {
         "MsmKey" = "8:_2E546729FCB12998A4B090CB551EC281"
-        "OwnerKey" = "8:_D45B56A0625C54752DD79FBD98B1764B"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_2E546729FCB12998A4B090CB551EC281"
-        "OwnerKey" = "8:_D02B4AEB7D6DA32CE251A16A760D94BF"
+        "OwnerKey" = "8:_9CD4782D95C2D9132DC419775B3D460E"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -52,7 +46,13 @@
         "Entry"
         {
         "MsmKey" = "8:_2E546729FCB12998A4B090CB551EC281"
-        "OwnerKey" = "8:_9CD4782D95C2D9132DC419775B3D460E"
+        "OwnerKey" = "8:_D02B4AEB7D6DA32CE251A16A760D94BF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_2E546729FCB12998A4B090CB551EC281"
+        "OwnerKey" = "8:_D45B56A0625C54752DD79FBD98B1764B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -130,43 +130,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_EB1661B7F5FFBBFBE9B915A1A20FF8DA"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_5FDE4B43319F254910A815A3D8775F90"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_D45B56A0625C54752DD79FBD98B1764B"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_D02B4AEB7D6DA32CE251A16A760D94BF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_10AFAFB35D6941249C3529218ED7589A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_9CD4782D95C2D9132DC419775B3D460E"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_2E546729FCB12998A4B090CB551EC281"
+        "OwnerKey" = "8:_0DA941FB51DB285AE1EE9C0603ABEF27"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -178,12 +142,80 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_0DA941FB51DB285AE1EE9C0603ABEF27"
+        "OwnerKey" = "8:_2E546729FCB12998A4B090CB551EC281"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_9CD4782D95C2D9132DC419775B3D460E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_10AFAFB35D6941249C3529218ED7589A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_D02B4AEB7D6DA32CE251A16A760D94BF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_D45B56A0625C54752DD79FBD98B1764B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_5FDE4B43319F254910A815A3D8775F90"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_EB1661B7F5FFBBFBE9B915A1A20FF8DA"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
     "Configurations"
     {
+        "AppVeyor"
+        {
+        "DisplayName" = "8:AppVeyor"
+        "IsDebugOnly" = "11:FALSE"
+        "IsReleaseOnly" = "11:FALSE"
+        "OutputFilename" = "8:AppVeyor\\SimplePM_Server Setup.msi"
+        "PackageFilesAs" = "3:2"
+        "PackageFileSize" = "3:-2147483648"
+        "CabType" = "3:1"
+        "Compression" = "3:2"
+        "SignOutput" = "11:FALSE"
+        "CertificateFile" = "8:"
+        "PrivateKeyFile" = "8:"
+        "TimeStampServer" = "8:"
+        "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.6.1"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.6.1 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.6.1"
+                    }
+                }
+            }
+        }
         "Debug"
         {
         "DisplayName" = "8:Debug"
@@ -206,6 +238,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.6.1"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.6.1 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.6.1"
+                    }
+                }
             }
         }
         "Release"
@@ -307,11 +347,6 @@
             "AssemblyAsmDisplayName" = "8:System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
                 "ScatterAssemblies"
                 {
-                    "_0DA941FB51DB285AE1EE9C0603ABEF27"
-                    {
-                    "Name" = "8:System.Net.Http.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:System.Net.Http.dll"
             "TargetName" = "8:"
@@ -338,11 +373,6 @@
             "AssemblyAsmDisplayName" = "8:MySql.Data.Entity.EF6, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_10AFAFB35D6941249C3529218ED7589A"
-                    {
-                    "Name" = "8:MySql.Data.Entity.EF6.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:MySql.Data.Entity.EF6.dll"
             "TargetName" = "8:"
@@ -369,11 +399,6 @@
             "AssemblyAsmDisplayName" = "8:MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_2E546729FCB12998A4B090CB551EC281"
-                    {
-                    "Name" = "8:MySql.Data.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:MySql.Data.dll"
             "TargetName" = "8:"
@@ -400,11 +425,6 @@
             "AssemblyAsmDisplayName" = "8:INIFileParser, Version=2.4.0.0, Culture=neutral, PublicKeyToken=79af7b307b65cf3c, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_5FDE4B43319F254910A815A3D8775F90"
-                    {
-                    "Name" = "8:INIFileParser.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:INIFileParser.dll"
             "TargetName" = "8:"
@@ -431,11 +451,6 @@
             "AssemblyAsmDisplayName" = "8:MySql.Data.Entity.EF5, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_9CD4782D95C2D9132DC419775B3D460E"
-                    {
-                    "Name" = "8:MySql.Data.Entity.EF5.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:MySql.Data.Entity.EF5.dll"
             "TargetName" = "8:"
@@ -462,11 +477,6 @@
             "AssemblyAsmDisplayName" = "8:System.Windows, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
                 "ScatterAssemblies"
                 {
-                    "_A4555C5626BC98B696A70B0E226AAB37"
-                    {
-                    "Name" = "8:System.Windows.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:System.Windows.dll"
             "TargetName" = "8:"
@@ -513,11 +523,6 @@
             "AssemblyAsmDisplayName" = "8:MySql.Fabric.Plugin, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_D02B4AEB7D6DA32CE251A16A760D94BF"
-                    {
-                    "Name" = "8:MySql.Fabric.Plugin.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:MySql.Fabric.Plugin.dll"
             "TargetName" = "8:"
@@ -564,11 +569,6 @@
             "AssemblyAsmDisplayName" = "8:MySql.Web, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_D45B56A0625C54752DD79FBD98B1764B"
-                    {
-                    "Name" = "8:MySql.Web.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:MySql.Web.dll"
             "TargetName" = "8:"
@@ -635,11 +635,6 @@
             "AssemblyAsmDisplayName" = "8:NBug, Version=1.2.0.0, Culture=neutral, PublicKeyToken=a4292a325f69b123, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_EB1661B7F5FFBBFBE9B915A1A20FF8DA"
-                    {
-                    "Name" = "8:NBug.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:NBug.dll"
             "TargetName" = "8:"
@@ -1593,7 +1588,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_5F430C9C64CA480C892B2A294F4A20CA"
             {
-            "SourcePath" = "8:..\\SimplePM_Server\\obj\\x64\\Release\\SimplePM_Server.exe"
+            "SourcePath" = "8:..\\SimplePM_Server\\obj\\x64\\AppVeyor\\SimplePM_Server.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_99FF7EE46C8E43719041F4A47431B563"
