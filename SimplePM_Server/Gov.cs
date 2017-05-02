@@ -55,27 +55,6 @@ namespace SimplePM_Server
             AppDomain.CurrentDomain.UnhandledException += NBug.Handler.UnhandledException;
         }
 
-        /// <summary>
-        /// Процедура отображает информацию о компиляторах
-        /// </summary>
-        /// <param name="sConfig">Дескриптор конфигурационного файла</param>
-        public static void viewCompilersInfo(IniData sConfig)
-        {
-            Console.WriteLine("\n█ Compilers information █");
-            //Free Pascal
-            Console.WriteLine("Free Pascal: " + sConfig["Compilers"]["freepascal_enabled"] + ", <" + sConfig["Compilers"]["freepascal_location"] + ">");
-            //CSharp
-            Console.WriteLine("CSharp: " + sConfig["Compilers"]["csharp_enabled"] + ", <" + sConfig["Compilers"]["csharp_location"] + ">");
-            //Cpp
-            Console.WriteLine("CPP: " + sConfig["Compilers"]["cpp_enabled"] + ", <" + sConfig["Compilers"]["cpp_location"] + ">");
-            //C
-            Console.WriteLine("C: " + sConfig["Compilers"]["c_enabled"] + ", <" + sConfig["Compilers"]["c_location"] + ">");
-            //Python
-            Console.WriteLine("Python: " + sConfig["Compilers"]["python_enabled"] + ", <" + sConfig["Compilers"]["python_location"] + ">");
-            //Lua
-            Console.WriteLine("Lua: " + sConfig["Compilers"]["lua_enabled"] + ", <" + sConfig["Compilers"]["lua_location"] + ">");
-        }
-
         static void Main(string[] args)
         {
             //Устанавливаем "улавливатель исключений"
@@ -87,9 +66,6 @@ namespace SimplePM_Server
             //Открываем конфигурационный файл для чтения
             FileIniDataParser iniParser = new FileIniDataParser();
             sConfig = iniParser.ReadFile("server_config.ini", Encoding.UTF8);
-
-            //Показать информацию о компиляторах
-            viewCompilersInfo(sConfig);
             
             //Добавляю основной поток
             new Thread(() => {
@@ -202,7 +178,7 @@ namespace SimplePM_Server
             );
             db.Open();
 
-            Thread.Sleep(1000);
+            //Thread.Sleep();
 
             //Возвращаем дескриптор подключения к базе данных
             return db;
