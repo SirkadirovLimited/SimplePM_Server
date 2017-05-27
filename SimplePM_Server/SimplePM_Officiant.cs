@@ -59,7 +59,7 @@ namespace SimplePM_Server
             codeWriter.Close();
 
             //Объявляем экземпляр класса компиляции
-            SimplePM_Compiler compiler = new SimplePM_Compiler(sConfig, ulong.Parse(submissionInfo["submissionId"]), fileExt);
+            SimplePM_Compiler compiler = new SimplePM_Compiler(ref sConfig, ulong.Parse(submissionInfo["submissionId"]), fileExt);
             //Объявляем переменную результата компиляции
             SimplePM_Compiler.CompilerResult cResult;
 
@@ -92,34 +92,34 @@ namespace SimplePM_Server
                 {
                     //Проверка синтаксиса
                     case "syntax":
+
                         queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready' WHERE `submissionId` = '" + submissionInfo["submissionId"].ToString() + "' LIMIT 1;";
                         new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+
                         break;
                     //Отладка программы по пользовательскому тесту
                     case "debug":
+
                         //Запускаем тестирование программы
                         new SimplePM_Tester(
-                            connection, //дескриптор соединения с БД
-                            cResult.exe_fullname, //полный путь к исполняемому файлу
-                            ulong.Parse(submissionInfo["problemId"].ToString()), //идентификатор задачи
-                            ulong.Parse(submissionInfo["submissionId"].ToString()), //идентификатор запроса на отправку
-                            float.Parse(submissionInfo["difficulty"]), //сложность поставленной задачи
-                            ulong.Parse(submissionInfo["userId"]), //идентификатор пользователя
-                            sConfig, //дескриптор конфигурационного файла сервера
-                            submissionInfo["customTest"] //собственный тест пользователя
+                            ref connection, //дескриптор соединения с БД
+                            ref cResult.exe_fullname, //полный путь к исполняемому файлу
+                            ref submissionInfo, //информация о запросе на тестирование
+                            ref sConfig //дескриптор конфигурационного файла сервера
                         ).DebugTest();
+
                         break;
                     //Отправка решения задачи
                     case "release":
+
                         //Запускаем тестирование программы
                         new SimplePM_Tester(
-                            connection, //дескриптор соединения с БД
-                            cResult.exe_fullname, //полный путь к исполняемому файлу
-                            ulong.Parse( submissionInfo["problemId"].ToString() ), //идентификатор задачи
-                            ulong.Parse( submissionInfo["submissionId"].ToString() ), //идентификатор запроса на отправку
-                            float.Parse( submissionInfo["difficulty"] ), //сложность поставленной задачи
-                            ulong.Parse(submissionInfo["userId"]) //идентификатор пользователя
+                            ref connection, //дескриптор соединения с БД
+                            ref cResult.exe_fullname, //полный путь к исполняемому файлу
+                            ref submissionInfo, //информация о запросе на тестирование
+                            ref sConfig
                         ).ReleaseTest();
+
                         break;
                 }
             }

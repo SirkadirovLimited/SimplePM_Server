@@ -15,6 +15,7 @@ namespace SimplePM_Server
     class SimplePM_Tester
     {
         private MySqlConnection connection;
+        private Dictionary<string, string> submissionInfo;
         private string exeFileUrl, customTestInput;
         private ulong problemId, submissionId, userId;
         private float problemDifficulty;
@@ -25,21 +26,31 @@ namespace SimplePM_Server
         /// </summary>
         /// <param name="connection">Дескриптор подключения к БД</param>
         /// <param name="exeFileUrl">Адрес исполняемого файла пользовательской программы</param>
-        /// <param name="problemId">Идентификатор задачи</param>
-        /// <param name="submissionId">Идентификатор запроса на проверку</param>
-        /// <param name="problemDifficulty">Сложность задачи (для расчёта полученных баллов и рейтинга)</param>
-        /// <param name="userId">Идентификатор пользователя, отправившего запрос на проверку</param>
+        /// <param name="submissionInfo">Все данные о пользовательском запросе на компиляцию</param>
         /// <param name="sConfig">Дескриптор файла конфигурации SimplePM_Server</param>
-        public SimplePM_Tester(MySqlConnection connection, string exeFileUrl, ulong problemId, ulong submissionId, float problemDifficulty, ulong userId, IniData sConfig = null, string customTestInput = null)
+        public SimplePM_Tester(ref MySqlConnection connection, ref string exeFileUrl, ref Dictionary<string, string> submissionInfo, ref IniData sConfig)
         {
+            //Database connection
             this.connection = connection;
+            //Excutable file url
             this.exeFileUrl = exeFileUrl;
-            this.problemId = problemId;
-            this.submissionId = submissionId;
-            this.problemDifficulty = problemDifficulty;
-            this.userId = userId;
+            //Submission information
+            this.submissionInfo = submissionInfo;
+            //Problem ID
+            problemId = ulong.Parse(submissionInfo["problemId"]);
+            //Submission ID
+            submissionId = ulong.Parse(submissionInfo["submissionId"]);
+            //Problem difficulty
+            problemDifficulty = float.Parse(submissionInfo["difficulty"]);
+            //User ID
+            userId = ulong.Parse(submissionInfo["userId"]);
+            //Configuration file reader pointer
             this.sConfig = sConfig;
-            this.customTestInput = customTestInput;
+            //Custom test checker
+            if (submissionInfo.ContainsKey("customTest"))
+                customTestInput = submissionInfo["customTest"];
+            else
+                customTestInput = null;
         }
 
         #region ИСПОЛЬЗУЕМЫЕ ФУНКЦИИ
@@ -423,7 +434,7 @@ namespace SimplePM_Server
 
                 //Указываем интересующую нас конфигурацию тестирования
                 problemProc.StartInfo = startInfo;
-                
+
                 try
                 {
                     //Запускаем процесс
@@ -465,7 +476,7 @@ namespace SimplePM_Server
                     catch (Exception) { }
 
                 }).Start();
-                
+
                 try
                 {
                     //Ждём завершения, максимум X миллимекунд
@@ -554,11 +565,14 @@ namespace SimplePM_Server
                                                               "`exitcodes` = @exitcodes, " +
                                                               "`b` = @b " +
                                  "WHERE `submissionId` = '" + submissionId.ToString() + "' LIMIT 1;";
+            //Создаём запрос к базе данных MySql
             MySqlCommand cmdUpd = new MySqlCommand(queryUpdate, connection);
+            //Безопасно добавляем отправляемые данные
             cmdUpd.Parameters.AddWithValue("@errorOutput", standartErrorOutputText);
             cmdUpd.Parameters.AddWithValue("@result", _problemTestingResult);
             cmdUpd.Parameters.AddWithValue("@exitcodes", _exitcodes);
             cmdUpd.Parameters.AddWithValue("@b", _bResult);
+            //Выполняем запрос
             cmdUpd.ExecuteNonQuery();
 
             #region Установка авторского решения
@@ -619,8 +633,10 @@ namespace SimplePM_Server
                                              ";";
 
                         MySqlCommand insertCmd = new MySqlCommand(queryUpdate, connection);
+
                         insertCmd.Parameters.AddWithValue("@problemBinCode", problemBinCode);
                         insertCmd.Parameters.AddWithValue("@problemCode", problemCode);
+
                         //Выполняем запрос к базе данных на добавление/обновление
                         //авторского решения для данной задачи.
                         insertCmd.ExecuteNonQuery();
@@ -636,7 +652,10 @@ namespace SimplePM_Server
             //Обновляем количество баллов и рейтинг пользователя
             //для этого вызываем пользовательские процедуры mysql,
             //созданные как раз для этих нужд
-            new MySqlCommand("CALL updateBCount(" + userId + "); CALL updateRating(" + userId + ")", connection).ExecuteNonQuery();
+            //P.S. но делаем это в том случае, если попытка была
+            //произведена не во время олимпиады и не во время урока
+            if (ulong.Parse(submissionInfo["classworkId"]) == 0 && ulong.Parse(submissionInfo["olympId"]) == 0)
+                new MySqlCommand("CALL updateBCount(" + userId + "); CALL updateRating(" + userId + ")", connection).ExecuteNonQuery();
         }
 
         #endregion

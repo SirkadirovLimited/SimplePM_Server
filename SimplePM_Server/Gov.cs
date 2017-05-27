@@ -126,6 +126,8 @@ namespace SimplePM_Server
                 while (dataReader.Read())
                 {
                     submissionInfo["submissionId"] = dataReader["submissionId"].ToString(); //идентификатор
+                    submissionInfo["classworkId"] = dataReader["classworkId"].ToString(); //идентификатор урока
+                    submissionInfo["olympId"] = dataReader["olympId"].ToString(); //идентификатор олимпиады
                     submissionInfo["codeLang"] = dataReader["codeLang"].ToString(); //язык исходного кода
                     submissionInfo["userId"] = dataReader["userId"].ToString(); //идентификатор пользователя
                     submissionInfo["problemId"] = dataReader["problemId"].ToString(); //идентификатор задачи
@@ -177,8 +179,6 @@ namespace SimplePM_Server
                 ";Charset=" + sConfig["Database"]["db_chst"] + ";"
             );
             db.Open();
-
-            //Thread.Sleep();
 
             //Возвращаем дескриптор подключения к базе данных
             return db;

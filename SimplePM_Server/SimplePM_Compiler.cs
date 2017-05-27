@@ -18,7 +18,7 @@ namespace SimplePM_Server
         private string fileLocation, fileExt; //полный путь к файлу и его расширение
         private IniData sConfig; //дескриптор конфигурационного файла
 
-        public SimplePM_Compiler(IniData sConfig, ulong submissionId, string fileExt)
+        public SimplePM_Compiler(ref IniData sConfig, ulong submissionId, string fileExt)
         {
             //Проверяем на ошибки
             if (string.IsNullOrEmpty(fileExt) || string.IsNullOrWhiteSpace(fileExt))
