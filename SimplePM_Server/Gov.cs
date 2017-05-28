@@ -27,8 +27,8 @@ namespace SimplePM_Server
     class Gov
     {
         //Текущее количество подсоединённых пользователей
-        public static int _customersCount = 0;
-        public static int _maxCustomersCount = 10;
+        public static ulong _customersCount = 0;
+        public static ulong _maxCustomersCount = 10;
         
         //Объявляем дескриптор конфигурационного файла
         public static IniData sConfig;
@@ -46,8 +46,8 @@ namespace SimplePM_Server
             
             //Устанавливаем место хранения архивов, содержащих информацию об ошибке
             NBug.Settings.StoragePath = NBug.Enums.StoragePath.CurrentDirectory;
-            //Устанавливаем полный показ сведений об исключении
-            NBug.Settings.UIMode = NBug.Enums.UIMode.Full;
+            //Устанавливаем нулевой показ сведений об исключении
+            NBug.Settings.UIMode = NBug.Enums.UIMode.None;
             //Устанавливаем провайдера форм
             NBug.Settings.UIProvider = NBug.Enums.UIProvider.WinForms;
 
@@ -66,6 +66,7 @@ namespace SimplePM_Server
             //Открываем конфигурационный файл для чтения
             FileIniDataParser iniParser = new FileIniDataParser();
             sConfig = iniParser.ReadFile("server_config.ini", Encoding.UTF8);
+            _maxCustomersCount = ulong.Parse(sConfig["Connection"]["maxConnectedClients"]);
             
             //Добавляю основной поток
             new Thread(() => {
