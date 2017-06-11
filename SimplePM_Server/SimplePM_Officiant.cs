@@ -38,6 +38,9 @@ namespace SimplePM_Server
                 case Submission.SubmissionLanguage.freepascal:
                     submissionInfo["problemCode"].Replace("uses", "");
                     break;
+                case Submission.SubmissionLanguage.lua:
+
+                    break;
                 default:
                     return;
             }
@@ -70,19 +73,45 @@ namespace SimplePM_Server
                     //Запускаем компилятор
                     cResult = compiler.startFreepascalCompiler();
                     break;
+                case Submission.SubmissionLanguage.lua:
+                    //LUA файлам не требуется компиляция
+                    //но для обратной совместимости функцию вкатать нужно
+                    cResult = compiler.startLuaCompiler();
+                    break;
                 default:
                     return;
             }
 
             //Записываем в базу данных сообщение компилятора
-            string queryUpdate = "UPDATE `spm_submissions` SET `compiler_text` = '" + cResult.compilerMessage + "' WHERE `submissionId` = '" + submissionInfo["submissionId"] + "' LIMIT 1;";
+            string queryUpdate = $@"
+                UPDATE 
+                    `spm_submissions` 
+                SET 
+                    `compiler_text` = '{cResult.compilerMessage}' 
+                WHERE 
+                    `submissionId` = '{submissionInfo["submissionId"]}' 
+                LIMIT 
+                    1
+                ;
+            ";
             new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
 
             //Проверяем на наличие ошибок компиляции
             if (cResult.hasErrors)
             {
                 //Ошибка компиляции, записываем это в БД
-                queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready', `hasError` = true WHERE `submissionId` = '" + submissionInfo["submissionId"] + "' LIMIT 1;";
+                queryUpdate = $@"
+                    UPDATE 
+                        `spm_submissions` 
+                    SET 
+                        `status` = 'ready', 
+                        `hasError` = true 
+                    WHERE 
+                        `submissionId` = '{submissionInfo["submissionId"]}' 
+                    LIMIT 
+                        1
+                    ;
+                ";
                 new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
             }
             else
@@ -93,13 +122,22 @@ namespace SimplePM_Server
                     //Проверка синтаксиса
                     case "syntax":
 
-                        queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready' WHERE `submissionId` = '" + submissionInfo["submissionId"].ToString() + "' LIMIT 1;";
+                        queryUpdate = $@"
+                            UPDATE 
+                                `spm_submissions` 
+                            SET 
+                                `status` = 'ready' 
+                            WHERE 
+                                `submissionId` = '{submissionInfo["submissionId"].ToString()}' 
+                            LIMIT 
+                                1
+                            ;
+                        ";
                         new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
 
                         break;
                     //Отладка программы по пользовательскому тесту
                     case "debug":
-
                         //Запускаем тестирование программы
                         new SimplePM_Tester(
                             ref connection, //дескриптор соединения с БД
@@ -107,7 +145,6 @@ namespace SimplePM_Server
                             ref submissionInfo, //информация о запросе на тестирование
                             ref sConfig //дескриптор конфигурационного файла сервера
                         ).DebugTest();
-
                         break;
                     //Отправка решения задачи
                     case "release":

@@ -8,6 +8,7 @@ using IniParser.Model;
 using System.IO;
 //Безопасность
 using System.Web;
+using System.Text;
 
 namespace SimplePM_Server
 {
@@ -15,7 +16,7 @@ namespace SimplePM_Server
     {
         //Объявление необходимых переменных
         private ulong submissionId; //идентификатор запроса
-        private string fileLocation, fileExt; //полный путь к файлу и его расширение
+        private string fileLocation; //полный путь к файлу и его расширение
         private IniData sConfig; //дескриптор конфигурационного файла
 
         public SimplePM_Compiler(ref IniData sConfig, ulong submissionId, string fileExt)
@@ -55,36 +56,11 @@ namespace SimplePM_Server
         /// <returns>Возвращает результат компиляции</returns>
         public CompilerResult startFreepascalCompiler()
         {
-            //Создаём новый экземпляр процесса компилятора
-            Process fpcProc = new Process();
-            
-            //Устанавливаем информацию о старте процесса
-            ProcessStartInfo pStartInfo = new ProcessStartInfo(sConfig["Compilers"]["freepascal_location"], " -Twin64 -ve -vw -vi -vb " + fileLocation);
-            //Никаких ошибок, я сказал!
-            pStartInfo.ErrorDialog = false;
-            //Минимизируем его, ибо не достоен он почестей!
-            pStartInfo.WindowStyle = ProcessWindowStyle.Minimized;
-            //Перехватываем выходной поток
-            pStartInfo.RedirectStandardOutput = true;
-            //Для перехвата делаем процесс демоном
-            pStartInfo.UseShellExecute = false;
-
-            //Устанавливаем информацию о старте процесса в дескриптор процесса компилятора
-            fpcProc.StartInfo = pStartInfo;
-            //Запускаем процесс компилятора
-            fpcProc.Start();
-            
-            //Получаем выходной поток компилятора
-            StreamReader reader = fpcProc.StandardOutput;
-
-            //Ожидаем завершение процесса компилятора
-            fpcProc.WaitForExit();
-
-            //Объявляем переменную результата компиляции
-            CompilerResult result = new CompilerResult();
-            //Получаем результат выполнения компилятора и записываем
-            //его в переменную сообщения компилятора
-            result.compilerMessage = HttpUtility.HtmlEncode(reader.ReadToEnd());
+            //Запуск компилятора с заранее определёнными аргументами
+            CompilerResult result = runCompiler(
+                sConfig["Compilers"]["freepascal_location"],
+                "-Twin64 -ve -vw -vi -vb " + fileLocation
+            );
 
             //Получаем полный путь к временному файлу, созданному при компиляции
             string oFileLocation = sConfig["Program"]["tempPath"] + submissionId + ".o";
@@ -97,6 +73,67 @@ namespace SimplePM_Server
 
             //Возвращаем результат компиляции
             return returnCompilerResult(result);
+        }
+
+        public CompilerResult startLuaCompiler()
+        {
+            //Делаем преждевременные выводы
+            //прям как некоторые девушки
+            //ибо Lua файлы не нуждаются в компиляции
+            //(по крайней мере на данный момент)
+
+            CompilerResult result = new CompilerResult()
+            {
+                //ошибок нет - но вы держитесь
+                hasErrors = false,
+                //что дали - то и скинул
+                exe_fullname = fileLocation,
+                //хз зачем, но надо
+                compilerMessage = Encoding.UTF8.GetString(Properties.Resources.noCompilerRequired)
+            };
+
+            //Возвращаем результат фальш-компиляции
+            return result;
+        }
+
+        private CompilerResult runCompiler(string compilerFullName, string compilerArgs)
+        {
+            //Создаём новый экземпляр процесса компилятора
+            Process cplProc = new Process();
+
+            //Устанавливаем информацию о старте процесса
+            ProcessStartInfo pStartInfo = new ProcessStartInfo(compilerFullName, compilerArgs)
+            {
+                //Никаких ошибок, я сказал!
+                ErrorDialog = false,
+                //Минимизируем его, ибо не достоен он почестей!
+                WindowStyle = ProcessWindowStyle.Minimized,
+                //Перехватываем выходной поток
+                RedirectStandardOutput = true,
+                //Для перехвата делаем процесс демоном
+                UseShellExecute = false
+            };
+
+            //Устанавливаем информацию о старте процесса в дескриптор процесса компилятора
+            cplProc.StartInfo = pStartInfo;
+            //Запускаем процесс компилятора
+            cplProc.Start();
+
+            //Получаем выходной поток компилятора
+            StreamReader reader = cplProc.StandardOutput;
+
+            //Ожидаем завершение процесса компилятора
+            cplProc.WaitForExit();
+
+            //Объявляем переменную результата компиляции
+            CompilerResult result = new CompilerResult()
+            {
+                //Получаем результат выполнения компилятора и записываем
+                //его в переменную сообщения компилятора
+                compilerMessage = HttpUtility.HtmlEncode(reader.ReadToEnd())
+            };
+
+            return result;
         }
 
         /// <summary>

@@ -49,7 +49,7 @@ namespace SimplePM_Server
             //Устанавливаем нулевой показ сведений об исключении
             NBug.Settings.UIMode = NBug.Enums.UIMode.None;
             //Устанавливаем провайдера форм
-            NBug.Settings.UIProvider = NBug.Enums.UIProvider.WinForms;
+            NBug.Settings.UIProvider = NBug.Enums.UIProvider.Auto;
 
             //Устанавливаем обработчик необработанных исключений
             AppDomain.CurrentDomain.UnhandledException += NBug.Handler.UnhandledException;
@@ -94,10 +94,7 @@ namespace SimplePM_Server
         {
             Console.Title = "SimplePM_Server";
             
-            Console.WriteLine("█ SimplePM_Server");
-            Console.WriteLine("█ Copyright (C) 2017, Kadirov Yurij. All rights are reserved.");
-            Console.WriteLine("█ Official website: www.sirkadirov.com");
-            Console.WriteLine("█ Support email: admin@sirkadirov.com");
+            Console.WriteLine(Encoding.UTF8.GetString(Properties.Resources.consoleHeader));
 
             Console.CursorSize = 100;
             Console.CursorVisible = false;
@@ -112,7 +109,19 @@ namespace SimplePM_Server
             new Thread(() =>
             {
 
-                string querySelect = "SELECT * FROM `spm_submissions` WHERE `status` = 'waiting' ORDER BY `submissionId` ASC LIMIT 1;";
+                string querySelect = @"
+                    SELECT 
+                        * 
+                    FROM 
+                        `spm_submissions` 
+                    WHERE 
+                        `status` = 'waiting' 
+                    ORDER BY 
+                        `submissionId` ASC 
+                    LIMIT 
+                        1
+                    ;
+                ";
 
                 //Объявляем словарь, который будет содержать информацию о запросе
                 Dictionary<string, string> submissionInfo = new Dictionary<string, string>();
@@ -149,7 +158,17 @@ namespace SimplePM_Server
                     submissionInfo["difficulty"] = cmdGetProblemDifficulty.ExecuteScalar().ToString();
 
                     //Устанавливаем статус запроса на "в обработке"
-                    string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'processing' WHERE `submissionId` = '" + submissionInfo["submissionId"] + "' LIMIT 1;";
+                    string queryUpdate = $@"
+                        UPDATE 
+                            `spm_submissions` 
+                        SET 
+                            `status` = 'processing' 
+                        WHERE 
+                            `submissionId` = '{submissionInfo["submissionId"]}'
+                        LIMIT 
+                            1
+                        ;
+                    ";
                     new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
                     _customersCount++;
 
