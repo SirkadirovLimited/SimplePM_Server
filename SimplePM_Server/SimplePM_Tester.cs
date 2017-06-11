@@ -81,10 +81,6 @@ namespace SimplePM_Server
                 _output += curLine;
             }
 
-            //Убираем конечный перевод строки, он нам не нужен.
-            //if (_output.EndsWith("\n"))
-            //    _output = _output.Substring(0, _output.LastIndexOf("\n"));
-
             return _output;
         }
 
@@ -95,7 +91,19 @@ namespace SimplePM_Server
         public void DebugTest()
         {
             //Запрос на выборку авторского решения из БД
-            string querySelect = "SELECT * FROM `spm_problems_ready` WHERE `problemId` = '" + problemId.ToString() + "' ORDER BY `problemId` ASC LIMIT 1;";
+            string querySelect = $@"
+                SELECT 
+                    * 
+                FROM 
+                    `spm_problems_ready` 
+                WHERE 
+                    `problemId` = '{problemId.ToString()}' 
+                ORDER BY 
+                    `problemId` ASC 
+                LIMIT 
+                    1
+                ;
+            ";
 
             //Дескрипторы временных таблиц выборки из БД
             MySqlCommand cmdSelect = new MySqlCommand(querySelect, connection);
@@ -124,7 +132,7 @@ namespace SimplePM_Server
             {
                 //Полный путь к временному (исполняемому) файлу авторского решения программы
                 string authorCodePath = sConfig["Program"]["tempPath"] + "authorCode_" + submissionId + ".exe";
-                
+
                 //Создаём файл и перехватываем поток инъекции в файл данных
                 BinaryWriter binWriter = new BinaryWriter(new FileStream(authorCodePath, FileMode.Create));
 
@@ -138,27 +146,54 @@ namespace SimplePM_Server
                 binWriter.Close();
 
                 //Запрос на выборку Debug Time Limit из базы данных MySQL
-                querySelect = "SELECT `debugTimeLimit` FROM `spm_problems` WHERE `id` = '" + problemId.ToString() + "' ORDER BY `id` ASC LIMIT 1;";
+                querySelect = $@"
+                    SELECT 
+                        `debugTimeLimit` 
+                    FROM 
+                        `spm_problems` 
+                    WHERE 
+                        `id` = '{problemId.ToString()}' 
+                    ORDER BY 
+                        `id` ASC 
+                    LIMIT 
+                        1
+                    ;
+                ";
                 ulong debugTimeLimit = Convert.ToUInt64(new MySqlCommand(querySelect, connection).ExecuteScalar());
 
                 //То же самое, только для MEMORY LIMIT
-                querySelect = "SELECT `debugMemoryLimit` FROM `spm_problems` WHERE `id` = '" + problemId.ToString() + "' ORDER BY `id` ASC LIMIT 1;";
+                querySelect = $@"
+                    SELECT 
+                        `debugMemoryLimit` 
+                    FROM 
+                        `spm_problems` 
+                    WHERE 
+                        `id` = '{problemId.ToString()}' 
+                    ORDER BY 
+                        `id` ASC 
+                    LIMIT 
+                        1
+                    ;
+                ";
                 ulong debugMemoryLimit = Convert.ToUInt64(new MySqlCommand(querySelect, connection).ExecuteScalar());
 
                 #region PROCESS START INFO CONFIGURATION
                 //Создаём новую конфигурацию запуска процесса
-                ProcessStartInfo startInfo = new ProcessStartInfo();
+                ProcessStartInfo startInfo = new ProcessStartInfo()
+                {
+                    //Перенаправляем потоки
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
 
-                //Перенаправляем потоки
-                startInfo.RedirectStandardInput = true;
-                startInfo.RedirectStandardOutput = true;
-                startInfo.RedirectStandardError = true;
+                    //Запрещаем показ приложения на экран компа
+                    ErrorDialog = false,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    Verb = "open",
+                    WindowStyle = ProcessWindowStyle.Minimized
+                };
 
-                //Запрещаем показ приложения на экран компа
-                startInfo.ErrorDialog = false;
-                startInfo.UseShellExecute = false;
-                startInfo.CreateNoWindow = true;
-                startInfo.WindowStyle = ProcessWindowStyle.Minimized;
                 #endregion
 
                 /*
@@ -227,11 +262,21 @@ namespace SimplePM_Server
                 Process userProblemProc = new Process();
 
                 //Указываем полный путь к исполняемому файлу
-                startInfo.FileName = exeFileUrl;
+                switch (Path.GetExtension(exeFileUrl))
+                {
+                    case ".lua":
+                        startInfo.FileName = sConfig["Compilers"]["lua_location"];
+                        startInfo.Arguments = exeFileUrl;
+                        break;
+                    default:
+                        startInfo.FileName = exeFileUrl;
+                        startInfo.Arguments = "";
+                        break;
+                }
 
                 //Указываем интересующую нас конфигурацию тестирования
                 userProblemProc.StartInfo = startInfo;
-                
+
                 try
                 {
                     //Запускаем процесс
@@ -242,13 +287,13 @@ namespace SimplePM_Server
                     userProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
                     userProblemProc.StandardInput.Close(); //закрываем поток
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     //Произошла ошибка при выполнении программы.
                     //Будем считать, что это всё из-за превышения лимита памяти.
                     //(Надо ж как-то выкрутиться!)
-
-                    _debugTestingResult = 'M';
+                    System.Windows.Forms.MessageBox.Show(ex.HResult.ToString());
+                    _debugTestingResult = 'C';
                 }
 
                 //Проверяем процесс на использованную память
@@ -285,7 +330,9 @@ namespace SimplePM_Server
                     }
 
                     //Получаем обработанный выходной поток пользовательского решения
-                    _userOutput = getNormalizedOutputText(userProblemProc.StandardOutput);
+                    //но только в случае, когда приложение завершило свою работу самопроизвольно
+                    if (_userOutput.Length == 0)
+                        _userOutput = getNormalizedOutputText(userProblemProc.StandardOutput);
 
                     //Получаем exitcode пользовательского приложения
                     _userProblemExitCode = userProblemProc.ExitCode;
@@ -312,19 +359,39 @@ namespace SimplePM_Server
 
                 _userOutput = HttpUtility.HtmlEncode(_userOutput);
 
-                string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready', " +
-                                                              "`errorOutput` = null, " +
-                                                              "`result` = '" + _debugTestingResult + "', " +
-                                                              "`b` = '0', " +
-                                                              "`output` = '" + _userOutput + "', " +
-                                                              "`exitcodes` = '" + _userProblemExitCode + "' " +
-                                     "WHERE `submissionId` = '" + submissionId.ToString() + "' LIMIT 1;";
+                string queryUpdate = $@"
+                    UPDATE 
+                        `spm_submissions` 
+                    SET 
+                        `status` = 'ready', 
+                        `errorOutput` = null, 
+                        `result` = '{_debugTestingResult}', 
+                        `b` = '0', 
+                        `output` = '{_userOutput}', 
+                        `exitcodes` = '{_userProblemExitCode}' 
+                    WHERE 
+                        `submissionId` = '{submissionId.ToString()}' 
+                    LIMIT 
+                        1
+                    ;
+                ";
                 new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
             }
             else
             {
                 //Произошла ошибка, мы не в теме; Наша хата з краю, нічого не знаю!
-                string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'waiting', `hasError` = false WHERE `submissionId` = '" + submissionId + "' LIMIT 1;";
+                string queryUpdate = $@"
+                    UPDATE 
+                        `spm_submissions` 
+                    SET 
+                        `status` = 'waiting', 
+                        `hasError` = false 
+                    WHERE 
+                        `submissionId` = '{submissionId}' 
+                    LIMIT 
+                        1
+                    ;
+                ";
                 new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
             }
         }
@@ -336,7 +403,17 @@ namespace SimplePM_Server
         public void ReleaseTest()
         {
             //Запрос на выборку всех тестов данной программы из БД
-            string querySelect = "SELECT * FROM `spm_problems_tests` WHERE `problemId` = '" + problemId.ToString() + "' ORDER BY `id` ASC;";
+            string querySelect = $@"
+                SELECT 
+                    * 
+                FROM 
+                    `spm_problems_tests`
+                WHERE 
+                    `problemId` = '{problemId.ToString()}' 
+                ORDER BY 
+                    `id` ASC
+                ;
+            ";
 
             //Дескрипторы временных таблиц выборки из БД
             MySqlCommand cmdSelect = new MySqlCommand(querySelect, connection);
@@ -353,33 +430,35 @@ namespace SimplePM_Server
             int i = 1;
             while (dataReader.Read())
             {
-                Dictionary<string, string> tmpDict = new Dictionary<string, string>();
+                Dictionary<string, string> tmpDict = new Dictionary<string, string>
+                {
 
-                //Идентификатор теста
-                tmpDict.Add(
-                    "testId",
-                    HttpUtility.HtmlDecode(dataReader["id"].ToString())
-                );
-                //Входной поток
-                tmpDict.Add(
-                    "input",
-                    HttpUtility.HtmlDecode(dataReader["input"].ToString())
-                );
-                //Выходной поток
-                tmpDict.Add(
-                    "output",
-                    HttpUtility.HtmlDecode(dataReader["output"].ToString())
-                );
-                //Лимит по времени
-                tmpDict.Add(
-                    "timeLimit",
-                    HttpUtility.HtmlDecode(dataReader["timeLimit"].ToString())
-                );
-                //Лимит по памяти
-                tmpDict.Add(
-                    "memoryLimit",
-                    HttpUtility.HtmlDecode(dataReader["memoryLimit"].ToString())
-                );
+                    //Идентификатор теста
+                    {
+                        "testId",
+                        HttpUtility.HtmlDecode(dataReader["id"].ToString())
+                    },
+                    //Входной поток
+                    {
+                        "input",
+                        HttpUtility.HtmlDecode(dataReader["input"].ToString())
+                    },
+                    //Выходной поток
+                    {
+                        "output",
+                        HttpUtility.HtmlDecode(dataReader["output"].ToString())
+                    },
+                    //Лимит по времени
+                    {
+                        "timeLimit",
+                        HttpUtility.HtmlDecode(dataReader["timeLimit"].ToString())
+                    },
+                    //Лимит по памяти
+                    {
+                        "memoryLimit",
+                        HttpUtility.HtmlDecode(dataReader["memoryLimit"].ToString())
+                    }
+                };
 
                 //Добавляем в словарь
                 testsInfo.Add(i, tmpDict);
@@ -393,18 +472,33 @@ namespace SimplePM_Server
 
             #region PROCESS START INFO CONFIGURATION
             //Создаём новую конфигурацию запуска процесса
-            ProcessStartInfo startInfo = new ProcessStartInfo(exeFileUrl);
+            ProcessStartInfo startInfo = new ProcessStartInfo()
+            {
+                //Перенаправляем потоки
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
 
-            //Перенаправляем потоки
-            startInfo.RedirectStandardInput = true;
-            startInfo.RedirectStandardOutput = true;
-            startInfo.RedirectStandardError = true;
+                //Запрещаем исполнение приложения в графическом режиме
+                ErrorDialog = false,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Minimized,
+            };
 
-            //Запрещаем показ приложения на экран компа
-            startInfo.ErrorDialog = false;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            //Устанавливаем информацию о запускаемом файле
+            switch (Path.GetExtension(exeFileUrl))
+            {
+                case ".lua":
+                    startInfo.FileName = sConfig["Compilers"]["lua_location"];
+                    startInfo.Arguments = exeFileUrl;
+                    break;
+                default:
+                    startInfo.FileName = exeFileUrl;
+                    startInfo.Arguments = "";
+                    break;
+            }
+
             #endregion
 
             //Объявление необходимых переменных для тестирования
@@ -427,10 +521,11 @@ namespace SimplePM_Server
                 memoryLimit = long.Parse(testsInfo[i]["memoryLimit"]);
 
                 //Объявляем дескриптор процесса
-                Process problemProc = new Process();
-
-                //Указываем интересующую нас конфигурацию тестирования
-                problemProc.StartInfo = startInfo;
+                Process problemProc = new Process()
+                {
+                    //Указываем интересующую нас конфигурацию тестирования
+                    StartInfo = startInfo
+                };
 
                 try
                 {
@@ -556,12 +651,21 @@ namespace SimplePM_Server
             
             //ОТПРАВКА РЕЗУЛЬТАТОВ ТЕСТИРОВАНИЯ НА СЕРВЕР БД
             //В ТАБЛИЦУ РЕЗУЛЬТАТОВ (`spm_submissions`)
-            string queryUpdate = "UPDATE `spm_submissions` SET `status` = 'ready', " +
-                                                              "`errorOutput` = @errorOutput, " +
-                                                              "`result` = @result, " +
-                                                              "`exitcodes` = @exitcodes, " +
-                                                              "`b` = @b " +
-                                 "WHERE `submissionId` = '" + submissionId.ToString() + "' LIMIT 1;";
+            string queryUpdate = @"
+                UPDATE 
+                    `spm_submissions` 
+                SET 
+                    `status` = 'ready', 
+                    `errorOutput` = @errorOutput, 
+                    `result` = @result, 
+                    `exitcodes` = @exitcodes, 
+                    `b` = @b 
+                WHERE 
+                    `submissionId` = @submId 
+                LIMIT 
+                    1
+                ;
+            ";
             //Создаём запрос к базе данных MySql
             MySqlCommand cmdUpd = new MySqlCommand(queryUpdate, connection);
             //Безопасно добавляем отправляемые данные
@@ -569,13 +673,24 @@ namespace SimplePM_Server
             cmdUpd.Parameters.AddWithValue("@result", _problemTestingResult);
             cmdUpd.Parameters.AddWithValue("@exitcodes", _exitcodes);
             cmdUpd.Parameters.AddWithValue("@b", _bResult);
+            cmdUpd.Parameters.AddWithValue("@submId", submissionId.ToString());
             //Выполняем запрос
             cmdUpd.ExecuteNonQuery();
 
             #region Установка авторского решения
 
             //Составляем SQL запрос на выборку из записи запроса на проверку 
-            querySelect = "SELECT `setAsAuthorSolution` FROM `spm_submissions` WHERE `submissionId` = '" + submissionId + "' LIMIT 1;";
+            querySelect = $@"
+                SELECT 
+                    `setAsAuthorSolution` 
+                FROM 
+                    `spm_submissions` 
+                WHERE 
+                    `submissionId` = '{submissionId}' 
+                LIMIT 
+                    1
+                ;
+            ";
             //Получаем результат выполнения запроса
             bool setAsAuthorSolution = Convert.ToBoolean(new MySqlCommand(querySelect, connection).ExecuteScalar());
 
@@ -583,7 +698,18 @@ namespace SimplePM_Server
             if (setAsAuthorSolution)
             {
                 //Составляем запрос на выборку из БД решения задачи и язык её решения по текущей попытке
-                querySelect = "SELECT `problemCode`, `codeLang` FROM `spm_submissions` WHERE `submissionId` = '" + submissionId + "' LIMIT 1;";
+                querySelect = $@"
+                    SELECT 
+                        `problemCode`, 
+                        `codeLang` 
+                    FROM 
+                        `spm_submissions` 
+                    WHERE 
+                        `submissionId` = '{submissionId}' 
+                    LIMIT 
+                        1
+                    ;
+                ";
                 //Получаем результат выполнения запроса
                 dataReader = new MySqlCommand(querySelect, connection).ExecuteReader();
                 if (dataReader.Read())
@@ -616,18 +742,20 @@ namespace SimplePM_Server
                         //Формируем запрос на добавление/обновление авторского
                         //решения для данной задачи.
 
-                        queryUpdate = "INSERT INTO " + //создание записи авторского решения
-                                                "`spm_problems_ready`" +
-                                             "SET" +
-                                                "`problemId` = '" + problemId + "', " +
-                                                "`execFile` = @problemBinCode, " +
-                                                "`codeLang` = '" + problemLang + "', " +
-                                                "`code` = @problemCode " +
-                                             "ON DUPLICATE KEY UPDATE" + //обновление существующей записи авторского решения
-                                                "`execFile` = @problemBinCode, " +
-                                                "`codeLang` = '" + problemLang + "', " +
-                                                "`code` = @problemCode " +
-                                             ";";
+                        queryUpdate = $@"
+                            INSERT INTO 
+                                `spm_problems_ready` 
+                            SET 
+                                `problemId` = '{problemId}', 
+                                `execFile` = @problemBinCode, 
+                                `codeLang` = '{problemLang}', 
+                                `code` = @problemCode 
+                            ON DUPLICATE KEY UPDATE 
+                                `execFile` = @problemBinCode,
+                                `codeLang` = '{problemLang}', 
+                                `code` = @problemCode
+                            ;
+                        ";
 
                         MySqlCommand insertCmd = new MySqlCommand(queryUpdate, connection);
 
