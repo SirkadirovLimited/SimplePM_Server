@@ -61,22 +61,53 @@ namespace SimplePM_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized string similar to █ SimplePM_Server
+        ///█ Copyright (C) 2017, Kadirov Yurij. All rights are reserved.
+        ///█ Official website: www.sirkadirov.com
+        ///█ Support email: admin@sirkadirov.com.
         /// </summary>
-        internal static byte[] consoleHeader {
+        internal static string consoleHeader {
             get {
-                object obj = ResourceManager.GetObject("consoleHeader", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("consoleHeader", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized string similar to &lt;Project DefaultTargets = &quot;Compile&quot; xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot; &gt;
+        ///	
+        ///	&lt;PropertyGroup&gt;
+        ///		&lt;appname&gt;[SPM|SUBMISSION_FILE_NAME]&lt;/appname&gt;
+        ///    &lt;/PropertyGroup&gt;
+        ///	
+        ///	&lt;ItemGroup&gt;
+        ///		&lt;CSFile Include = &quot;[SPM|SUBMISSION_FILE_NAME].cs&quot;/&gt;
+        ///		
+        ///		&lt;Reference Include=&quot;System.dll&quot;/&gt;
+        ///		&lt;Reference Include=&quot;System.Text.dll&quot;/&gt;
+        ///		&lt;Reference Include=&quot;System.Collections.dll&quot;/&gt;
+        ///	&lt;/ItemGroup&gt;
+        ///	
+        ///	&lt;Target Name = &quot;Compile&quot;&gt;
+        ///		
+        ///		&lt;CSC
+        ///			Sources = &quot;@(CSFile)&quot;
+        ///			OutputAssembly = &quot;$(appname).e [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static byte[] noCompilerRequired {
+        internal static string msbuild_csharp_tpl {
             get {
-                object obj = ResourceManager.GetObject("noCompilerRequired", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("msbuild_csharp_tpl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SimplePM
+        ///========
+        ///For programming language you selected
+        ///there is no need to use compiler!.
+        /// </summary>
+        internal static string noCompilerRequired {
+            get {
+                return ResourceManager.GetString("noCompilerRequired", resourceCulture);
             }
         }
     }

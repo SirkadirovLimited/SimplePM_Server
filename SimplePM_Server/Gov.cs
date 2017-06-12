@@ -80,7 +80,7 @@ namespace SimplePM_Server
                         if (_customersCount < _maxCustomersCount)
                             getSubIdAndRunCompile(conn);
                     }
-                    catch (Exception) { }
+                    catch (Exception) {  }
                     //Ожидание нескольких мс чтобы повторить запрос заново
                     Thread.Sleep(sleepTime);
                 }
@@ -94,7 +94,7 @@ namespace SimplePM_Server
         {
             Console.Title = "SimplePM_Server";
             
-            Console.WriteLine(Encoding.UTF8.GetString(Properties.Resources.consoleHeader));
+            Console.WriteLine(Properties.Resources.consoleHeader);
 
             Console.CursorSize = 100;
             Console.CursorVisible = false;

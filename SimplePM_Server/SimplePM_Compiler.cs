@@ -89,11 +89,50 @@ namespace SimplePM_Server
                 //что дали - то и скинул
                 exe_fullname = fileLocation,
                 //хз зачем, но надо
-                compilerMessage = Encoding.UTF8.GetString(Properties.Resources.noCompilerRequired)
+                compilerMessage = Properties.Resources.noCompilerRequired
             };
 
             //Возвращаем результат фальш-компиляции
             return result;
+        }
+
+        public CompilerResult startCSharpCompiler()
+        {
+            //Генерируем файл конфигурации MSBuild
+            string msbuildConfigFileLocation = sConfig["Program"]["tempPath"] + submissionId + ".csproj";
+
+            File.WriteAllText(
+                //путь к записываемому файлу
+                msbuildConfigFileLocation,
+                //записываемые данные
+                Properties.Resources.msbuild_csharp_tpl
+                .Replace(
+                    "[SPM|SUBMISSION_FILE_NAME]",
+                    submissionId.ToString()
+                )
+                .Replace(
+                    "[SPM|TMP_PATH]",
+                    sConfig["Program"]["tempPath"]
+                ),
+                //Юра любит UTF8. Будь как Юра.
+                Encoding.UTF8
+            );
+
+            //Запуск компилятора с заранее определёнными аргументами
+            CompilerResult result = runCompiler(
+                sConfig["Compilers"]["msbuild_location"],
+                msbuildConfigFileLocation + ""
+            );
+
+            //Удаляем временные файлы
+            try
+            {
+                File.Delete(msbuildConfigFileLocation);
+            }
+            catch (Exception) {  }
+
+            //Возвращаем результат компиляции
+            return returnCompilerResult(result);
         }
 
         private CompilerResult runCompiler(string compilerFullName, string compilerArgs)
