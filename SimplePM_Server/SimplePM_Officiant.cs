@@ -42,7 +42,7 @@ namespace SimplePM_Server
 
                     break;
                 default:
-                    return;
+                    break;
             }
 
             //Определяем расширение файла
@@ -78,9 +78,17 @@ namespace SimplePM_Server
                     //но для обратной совместимости функцию вкатать нужно
                     cResult = compiler.startLuaCompiler();
                     break;
+                case Submission.SubmissionLanguage.csharp:
+                    //Запускаем компилятор
+                    cResult = compiler.startCSharpCompiler();
+                    break;
                 default:
-                    return;
+                    cResult = new SimplePM_Compiler.CompilerResult();
+                    cResult.hasErrors = true;
+                    cResult.compilerMessage = "Language not supported!";
+                    break;
             }
+            
 
             //Записываем в базу данных сообщение компилятора
             string queryUpdate = $@"

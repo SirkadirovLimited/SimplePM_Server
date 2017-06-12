@@ -1,0 +1,24 @@
+<Project DefaultTargets = "Compile" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" >
+	
+	<PropertyGroup>
+		<appname>[SPM|SUBMISSION_FILE_NAME]</appname>
+    </PropertyGroup>
+	
+	<ItemGroup>
+		<CSFile Include = "[SPM|SUBMISSION_FILE_NAME].cs"/>
+		
+		<Reference Include="System.dll"/>
+		<Reference Include="System.Text.dll"/>
+		<Reference Include="System.Collections.dll"/>
+	</ItemGroup>
+	
+	<Target Name = "Compile">
+		
+		<CSC
+			Sources = "@(CSFile)"
+			OutputAssembly = "$(appname).exe"
+			TargetType="exe">
+		</CSC>
+		
+	</Target>
+</Project>
