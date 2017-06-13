@@ -121,6 +121,9 @@
   <data name="consoleHeader" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\consoleHeader.pdat;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="csharp_includes" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\csharp_includes.pdat;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="msbuild_csharp_tpl" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\msbuild_csharp_tpl.pdat;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>

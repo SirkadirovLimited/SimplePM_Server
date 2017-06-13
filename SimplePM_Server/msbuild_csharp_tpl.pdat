@@ -6,10 +6,6 @@
 	
 	<ItemGroup>
 		<CSFile Include = "[SPM|SUBMISSION_FILE_NAME].cs"/>
-		
-		<Reference Include="System.dll"/>
-		<Reference Include="System.Text.dll"/>
-		<Reference Include="System.Collections.dll"/>
 	</ItemGroup>
 	
 	<Target Name = "Compile">

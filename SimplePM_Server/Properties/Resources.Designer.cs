@@ -73,6 +73,17 @@ namespace SimplePM_Server.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Text;
+        ///using System.Collections;.
+        /// </summary>
+        internal static string csharp_includes {
+            get {
+                return ResourceManager.GetString("csharp_includes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;Project DefaultTargets = &quot;Compile&quot; xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot; &gt;
         ///	
         ///	&lt;PropertyGroup&gt;
@@ -81,17 +92,18 @@ namespace SimplePM_Server.Properties {
         ///	
         ///	&lt;ItemGroup&gt;
         ///		&lt;CSFile Include = &quot;[SPM|SUBMISSION_FILE_NAME].cs&quot;/&gt;
-        ///		
-        ///		&lt;Reference Include=&quot;System.dll&quot;/&gt;
-        ///		&lt;Reference Include=&quot;System.Text.dll&quot;/&gt;
-        ///		&lt;Reference Include=&quot;System.Collections.dll&quot;/&gt;
         ///	&lt;/ItemGroup&gt;
         ///	
         ///	&lt;Target Name = &quot;Compile&quot;&gt;
         ///		
         ///		&lt;CSC
         ///			Sources = &quot;@(CSFile)&quot;
-        ///			OutputAssembly = &quot;$(appname).e [rest of string was truncated]&quot;;.
+        ///			OutputAssembly = &quot;$(appname).exe&quot;
+        ///			TargetType=&quot;exe&quot;&gt;
+        ///		&lt;/CSC&gt;
+        ///		
+        ///	&lt;/Target&gt;
+        ///&lt;/Project&gt;.
         /// </summary>
         internal static string msbuild_csharp_tpl {
             get {

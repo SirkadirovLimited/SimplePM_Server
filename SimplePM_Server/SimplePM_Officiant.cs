@@ -23,7 +23,6 @@ namespace SimplePM_Server
             this.sConfig = sConfig;
             this.submissionInfo = submissionInfo;
         }
-
         /// <summary>
         /// Процедура, которая отвечает за обработку пользовательского запроса
         /// </summary>
@@ -36,10 +35,23 @@ namespace SimplePM_Server
             switch (codeLang)
             {
                 case Submission.SubmissionLanguage.freepascal:
-                    submissionInfo["problemCode"].Replace("uses", "");
+                    submissionInfo["problemCode"] = submissionInfo["problemCode"]
+                        .Replace("uses", "");
                     break;
                 case Submission.SubmissionLanguage.lua:
-
+                    
+                    break;
+                case Submission.SubmissionLanguage.csharp:
+                    //Очистка запрещённых слов
+                    submissionInfo["problemCode"] = submissionInfo["problemCode"]
+                        .Replace("using", "")
+                        .Replace("IO", "")
+                        .Replace("Net", "")
+                        .Replace("DllImport", "")
+                        .Replace("System", "")
+                        .Replace("Microsoft", "Sirkadirov");
+                    submissionInfo["problemCode"] = Properties.Resources.csharp_includes
+                        + "\n" + submissionInfo["problemCode"];
                     break;
                 default:
                     break;
@@ -124,56 +136,90 @@ namespace SimplePM_Server
             }
             else
             {
-                //Выполняем различные действия в зависимости от теста
-                switch (submissionInfo["testType"])
+                try
                 {
-                    //Проверка синтаксиса
-                    case "syntax":
+                    //Выполняем различные действия в зависимости от теста
+                    switch (submissionInfo["testType"])
+                    {
+                        //Проверка синтаксиса
+                        case "syntax":
 
-                        queryUpdate = $@"
-                            UPDATE 
-                                `spm_submissions` 
-                            SET 
-                                `status` = 'ready' 
-                            WHERE 
-                                `submissionId` = '{submissionInfo["submissionId"].ToString()}' 
-                            LIMIT 
-                                1
-                            ;
-                        ";
-                        new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+                            queryUpdate = $@"
+                                UPDATE 
+                                    `spm_submissions` 
+                                SET 
+                                    `status` = 'ready' 
+                                WHERE 
+                                    `submissionId` = '{submissionInfo["submissionId"].ToString()}' 
+                                LIMIT 
+                                    1
+                                ;
+                            ";
+                            new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
 
-                        break;
-                    //Отладка программы по пользовательскому тесту
-                    case "debug":
-                        //Запускаем тестирование программы
-                        new SimplePM_Tester(
-                            ref connection, //дескриптор соединения с БД
-                            ref cResult.exe_fullname, //полный путь к исполняемому файлу
-                            ref submissionInfo, //информация о запросе на тестирование
-                            ref sConfig //дескриптор конфигурационного файла сервера
-                        ).DebugTest();
-                        break;
-                    //Отправка решения задачи
-                    case "release":
+                            break;
+                        //Отладка программы по пользовательскому тесту
+                        case "debug":
+                            //Запускаем тестирование программы
+                            new SimplePM_Tester(
+                                ref connection, //дескриптор соединения с БД
+                                ref cResult.exe_fullname, //полный путь к исполняемому файлу
+                                ref submissionInfo, //информация о запросе на тестирование
+                                ref sConfig //дескриптор конфигурационного файла сервера
+                            ).DebugTest();
+                            break;
+                        //Отправка решения задачи
+                        case "release":
 
-                        //Запускаем тестирование программы
-                        new SimplePM_Tester(
-                            ref connection, //дескриптор соединения с БД
-                            ref cResult.exe_fullname, //полный путь к исполняемому файлу
-                            ref submissionInfo, //информация о запросе на тестирование
-                            ref sConfig
-                        ).ReleaseTest();
+                            //Запускаем тестирование программы
+                            new SimplePM_Tester(
+                                ref connection, //дескриптор соединения с БД
+                                ref cResult.exe_fullname, //полный путь к исполняемому файлу
+                                ref submissionInfo, //информация о запросе на тестирование
+                                ref sConfig
+                            ).ReleaseTest();
 
-                        break;
+                            break;
+                    }
                 }
+                catch (Exception)
+                {
+                    //Вызываем сборщика мусора
+                    clearCache(cResult.exe_fullname, fileLocation);
+
+                    //Делаем так, чтобы несчастливую отправку обрабатывал
+                    //кто-то другой, но только не мы (а может и мы, но позже)
+                    queryUpdate = $@"
+                        UPDATE 
+                            `spm_submissions` 
+                        SET 
+                            `status` = 'waiting' 
+                        WHERE 
+                            `submissionId` = '{submissionInfo["submissionId"].ToString()}' 
+                        LIMIT 
+                            1
+                        ;
+                    ";
+                    new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+
+                    //Выходим
+                    return;
+                }
+                
             }
 
+            //Вызываем сборщика мусора
+            clearCache(cResult.exe_fullname, fileLocation);
+        }
+
+        private void clearCache(string exe_fullname, string fileLocation)
+        {
             //Очищаем папку экзешников от мусора
             try
             {
-                File.Delete(cResult.exe_fullname);
+                File.Delete(exe_fullname);
                 File.Delete(fileLocation);
+                GC.Collect(2, GCCollectionMode.Optimized);
             }
             catch (Exception) { }
         }

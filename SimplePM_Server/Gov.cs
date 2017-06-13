@@ -1,5 +1,6 @@
 ﻿/*
  * Copyright (C) 2017, Kadirov Yurij.
+ * All rights are reserved.
  * Licensed under CC BY-NC-SA 4.0 license.
  * 
  * @Author: Kadirov Yurij
@@ -153,7 +154,17 @@ namespace SimplePM_Server
                 if (submissionInfo.Count > 0)
                 {
                     //Получаем сложность поставленной задачи
-                    string queryGetDifficulty = "SELECT `difficulty` FROM `spm_problems` WHERE `id` = '" + submissionInfo["problemId"] + "' LIMIT 1;";
+                    string queryGetDifficulty = $@"
+                        SELECT 
+                            `difficulty` 
+                        FROM 
+                            `spm_problems` 
+                        WHERE 
+                            `id` = '{submissionInfo["problemId"]}' 
+                        LIMIT 
+                            1
+                        ;
+                    ";
                     MySqlCommand cmdGetProblemDifficulty = new MySqlCommand(queryGetDifficulty, connection);
                     submissionInfo["difficulty"] = cmdGetProblemDifficulty.ExecuteScalar().ToString();
 
@@ -192,11 +203,13 @@ namespace SimplePM_Server
             //Подключаемся к базе данных на удалённом
             //MySQL сервере и получаем дескриптор подключения к ней
             MySqlConnection db = new MySqlConnection(
-                "server=" + sConfig["Database"]["db_host"] +
-                ";uid=" + sConfig["Database"]["db_user"] +
-                ";pwd=" + sConfig["Database"]["db_pass"] +
-                ";database=" + sConfig["Database"]["db_name"] +
-                ";Charset=" + sConfig["Database"]["db_chst"] + ";"
+                $@"
+                    server={sConfig["Database"]["db_host"]};
+                    uid={sConfig["Database"]["db_user"]};
+                    pwd={sConfig["Database"]["db_pass"]};
+                    database={sConfig["Database"]["db_name"]};
+                    Charset={sConfig["Database"]["db_chst"]}
+                "
             );
             db.Open();
 
