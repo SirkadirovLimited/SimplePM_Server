@@ -779,8 +779,8 @@ namespace SimplePM_Server
             //созданные как раз для этих нужд
             //P.S. но делаем это в том случае, если попытка была
             //произведена не во время олимпиады и не во время урока
-            if (ulong.Parse(submissionInfo["classworkId"]) == 0 && ulong.Parse(submissionInfo["olympId"]) == 0)
-                new MySqlCommand("CALL updateBCount(" + userId + "); CALL updateRating(" + userId + ")", connection).ExecuteNonQuery();
+            //if (ulong.Parse(submissionInfo["classworkId"]) == 0 && ulong.Parse(submissionInfo["olympId"]) == 0)
+            //    new MySqlCommand("CALL updateBCount(" + userId + "); CALL updateRating(" + userId + ")", connection).ExecuteNonQuery();
         }
 
         #endregion

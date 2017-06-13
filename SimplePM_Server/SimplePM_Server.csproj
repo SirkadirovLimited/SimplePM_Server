@@ -114,6 +114,9 @@
     <Reference Include="NBug, Version=1.2.0.0, Culture=neutral, PublicKeyToken=a4292a325f69b123, processorArchitecture=MSIL">
       <HintPath>..\packages\NBug.1.2.2\lib\net40-client\NBug.dll</HintPath>
     </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.10\lib\net45\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -154,6 +157,7 @@
     </EmbeddedResource>
     <None Include="App.config" />
     <EmbeddedResource Include="consoleHeader.pdat" />
+    <None Include="csharp_includes.pdat" />
     <None Include="msbuild_csharp_tpl.pdat" />
     <None Include="noCompilerRequired.pdat" />
     <None Include="packages.config" />
