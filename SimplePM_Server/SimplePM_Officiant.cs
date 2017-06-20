@@ -1,5 +1,17 @@
-﻿//Основа
+﻿/*
+ * Copyright (C) 2017, Kadirov Yurij.
+ * All rights are reserved.
+ * Licensed under CC BY-NC-SA 4.0 license.
+ * 
+ * @Author: Kadirov Yurij
+ * @Website: https://sirkadirov.com/
+ * @Email: admin@sirkadirov.com
+ * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
+ */
+
+//Основа
 using System;
+//Подключаем коллекции
 using System.Collections.Generic;
 //Подключение к БД
 using MySql.Data.MySqlClient;
@@ -7,11 +19,17 @@ using MySql.Data.MySqlClient;
 using IniParser.Model;
 //Работа с файлами
 using System.IO;
+//Журнал событий
+using NLog;
 
 namespace SimplePM_Server
 {
     class SimplePM_Officiant
     {
+        //Объявляем переменную указателя на менеджер журнала собылий
+        //и присваиваем ей указатель на журнал событий текущего класса
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         //Объявляем необходимые переменные
         private MySqlConnection connection; //дескриптор соединения с БД
         private Dictionary<string, string> submissionInfo; //словарь информации о запросе
@@ -29,36 +47,10 @@ namespace SimplePM_Server
         public void serveSubmission()
         {
             //Определяем язык написания пользовательской программы
-            Submission.SubmissionLanguage codeLang = Submission.getCodeLanguageByName(submissionInfo["codeLang"]);
-
-            //Сводим на нет все попытки "подлома"
-            switch (codeLang)
-            {
-                case Submission.SubmissionLanguage.freepascal:
-                    submissionInfo["problemCode"] = submissionInfo["problemCode"]
-                        .Replace("uses", "");
-                    break;
-                case Submission.SubmissionLanguage.lua:
-                    
-                    break;
-                case Submission.SubmissionLanguage.csharp:
-                    //Очистка запрещённых слов
-                    submissionInfo["problemCode"] = submissionInfo["problemCode"]
-                        .Replace("using", "")
-                        .Replace("IO", "")
-                        .Replace("Net", "")
-                        .Replace("DllImport", "")
-                        .Replace("System", "")
-                        .Replace("Microsoft", "Sirkadirov");
-                    submissionInfo["problemCode"] = Properties.Resources.csharp_includes
-                        + "\n" + submissionInfo["problemCode"];
-                    break;
-                default:
-                    break;
-            }
+            SimplePM_Submission.SubmissionLanguage codeLang = SimplePM_Submission.getCodeLanguageByName(submissionInfo["codeLang"]);
 
             //Определяем расширение файла
-            string fileExt = "." + Submission.getExtByLang(codeLang);
+            string fileExt = "." + SimplePM_Submission.getExtByLang(codeLang);
             //Определяем полный путь к файлу
             string fileLocation = sConfig["Program"]["tempPath"] + submissionInfo["submissionId"] + fileExt;
 
@@ -81,16 +73,20 @@ namespace SimplePM_Server
             //Запускаем определённый компилятор в зависимости от языка решения задачи
             switch (codeLang)
             {
-                case Submission.SubmissionLanguage.freepascal:
+                case SimplePM_Submission.SubmissionLanguage.freepascal:
                     //Запускаем компилятор
                     cResult = compiler.startFreepascalCompiler();
                     break;
-                case Submission.SubmissionLanguage.lua:
+                case SimplePM_Submission.SubmissionLanguage.lua:
                     //LUA файлам не требуется компиляция
                     //но для обратной совместимости функцию вкатать нужно
                     cResult = compiler.startLuaCompiler();
                     break;
-                case Submission.SubmissionLanguage.csharp:
+                case SimplePM_Submission.SubmissionLanguage.csharp:
+                    //Запускаем компилятор
+                    cResult = compiler.startCSharpCompiler();
+                    break;
+                case SimplePM_Submission.SubmissionLanguage.python:
                     //Запускаем компилятор
                     cResult = compiler.startCSharpCompiler();
                     break;

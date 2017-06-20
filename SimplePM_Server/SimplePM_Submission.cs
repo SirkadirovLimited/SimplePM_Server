@@ -1,8 +1,21 @@
-﻿
+﻿/*
+ * Copyright (C) 2017, Kadirov Yurij.
+ * All rights are reserved.
+ * Licensed under CC BY-NC-SA 4.0 license.
+ * 
+ * @Author: Kadirov Yurij
+ * @Website: https://sirkadirov.com/
+ * @Email: admin@sirkadirov.com
+ * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
+ */
+
 namespace SimplePM_Server
 {
-    class Submission
+    class SimplePM_Submission
     {
+        /// <summary>
+        /// Submission type
+        /// </summary>
         public enum SubmissionType
         {
             unset = 0,
@@ -10,6 +23,10 @@ namespace SimplePM_Server
             debug = 4,
             release = 8
         }
+
+        /// <summary>
+        /// Submission's programming language
+        /// </summary>
         public enum SubmissionLanguage
         {
             unset,
@@ -22,6 +39,11 @@ namespace SimplePM_Server
             java
         }
 
+        /// <summary>
+        /// With this function you can get code language enum by string
+        /// </summary>
+        /// <param name="codeLang">name of programming language</param>
+        /// <returns></returns>
         public static SubmissionLanguage getCodeLanguageByName(string codeLang)
         {
             switch (codeLang)
@@ -45,6 +67,12 @@ namespace SimplePM_Server
             }
         }
 
+        /// <summary>
+        /// With this function you can get file extension by submission's 
+        /// programming language
+        /// </summary>
+        /// <param name="lang">Submission's programming language</param>
+        /// <returns></returns>
         public static string getExtByLang(SubmissionLanguage lang)
         {
             switch (lang)

@@ -1,4 +1,15 @@
-﻿//Основа
+﻿/*
+ * Copyright (C) 2017, Kadirov Yurij.
+ * All rights are reserved.
+ * Licensed under CC BY-NC-SA 4.0 license.
+ * 
+ * @Author: Kadirov Yurij
+ * @Website: https://sirkadirov.com/
+ * @Email: admin@sirkadirov.com
+ * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
+ */
+
+//Основа
 using System;
 //Работа с процессами
 using System.Diagnostics;
@@ -9,11 +20,17 @@ using System.IO;
 //Безопасность
 using System.Web;
 using System.Text;
+//Журнал событий
+using NLog;
 
 namespace SimplePM_Server
 {
     class SimplePM_Compiler
     {
+        //Объявляем переменную указателя на менеджер журнала собылий
+        //и присваиваем ей указатель на журнал событий текущего класса
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         //Объявление необходимых переменных
         private ulong submissionId; //идентификатор запроса
         private string fileLocation; //полный путь к файлу и его расширение
@@ -77,9 +94,13 @@ namespace SimplePM_Server
 
         public CompilerResult startLuaCompiler()
         {
+            return startNoCompiler();
+        }
+
+        private CompilerResult startNoCompiler()
+        {
             //Делаем преждевременные выводы
             //прям как некоторые девушки
-            //ибо Lua файлы не нуждаются в компиляции
             //(по крайней мере на данный момент)
 
             CompilerResult result = new CompilerResult()
