@@ -1,22 +1,49 @@
-﻿using MySql.Data.MySqlClient;
+﻿/*
+ * Copyright (C) 2017, Kadirov Yurij.
+ * All rights are reserved.
+ * Licensed under CC BY-NC-SA 4.0 license.
+ * 
+ * @Author: Kadirov Yurij
+ * @Website: https://sirkadirov.com/
+ * @Email: admin@sirkadirov.com
+ * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
+ */
+
+//Основа
 using System;
+//Работа с файловой системой
 using System.IO;
+//Подключаем коллекции
 using System.Collections.Generic;
+//Работа с процессами
 using System.Diagnostics;
+//Работа с потоками
 using System.Threading;
+using System.Threading.Tasks;
+//Безопасность
 using System.Web;
+//Подключение к MySQL серверу
+using MySql.Data.MySqlClient;
+//Парсер конфигурационного файла
 using IniParser.Model;
+//Журнал событий
+using NLog;
 
 namespace SimplePM_Server
 {
     class SimplePM_Tester
     {
-        private MySqlConnection connection;
-        private Dictionary<string, string> submissionInfo;
-        private string exeFileUrl, customTestInput;
-        private ulong problemId, submissionId, userId;
-        private float problemDifficulty;
-        private IniData sConfig;
+        //Объявляем переменную указателя на менеджер журнала собылий
+        //и присваиваем ей указатель на журнал событий текущего класса
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        //Объявление используемых переменных
+        private MySqlConnection connection; // дескриптор соединения с БД
+        private Dictionary<string, string> submissionInfo; // информация о запросе на проверку
+        private string exeFileUrl, customTestInput; // какие-то параметры
+        private ulong problemId, submissionId, userId; // ещё какие-то параметы
+        private float problemDifficulty; // сложность задачи
+        private IniData sConfig; // дескриптор конфигурационного файла сервера
 
         /// <summary>
         /// Класс тестирования пользовательских решений
@@ -52,6 +79,12 @@ namespace SimplePM_Server
 
         #region ИСПОЛЬЗУЕМЫЕ ФУНКЦИИ
 
+        /// <summary>
+        /// Функция позволяет "нормализировать" выходные данные указанного потока. Возвращает 
+        /// "нормализированный" вариант вывода указанного потока
+        /// </summary>
+        /// <param name="outputReader">Поток, выходные данные которого требуется "нормализировать"</param>
+        /// <returns></returns>
         private string getNormalizedOutputText(StreamReader outputReader)
         {
             //Создаём переменную, которая будет содержать весь выходной поток
@@ -82,6 +115,41 @@ namespace SimplePM_Server
             }
 
             return _output;
+        }
+
+        /// <summary>
+        /// Функция позволяет указать, каким образом запускать ту или инную программу 
+        /// либо исполняемый файл, который не подлежит компиляции
+        /// </summary>
+        /// <param name="startInfo">Указатель на информацию о запуске приложения</param>
+        private void SetExecInfoByFileExt(ref ProcessStartInfo startInfo, string filePath = null)
+        {
+            if (filePath == null)
+                filePath = exeFileUrl;
+
+            switch (Path.GetExtension(filePath))
+            {
+                //Lua
+                case ".lua":
+                    startInfo.FileName = sConfig["Compilers"]["lua_location"];
+                    startInfo.Arguments = filePath;
+                    break;
+                //Python
+                case ".py":
+                    startInfo.FileName = sConfig["Compilers"]["python_location"];
+                    startInfo.Arguments = filePath;
+                    break;
+                //PHP
+                case ".php":
+                    startInfo.FileName = sConfig["Compilers"]["php_location"];
+                    startInfo.Arguments = filePath;
+                    break;
+                //Executable files
+                default:
+                    startInfo.FileName = filePath;
+                    startInfo.Arguments = "";
+                    break;
+            }
         }
 
         #endregion
@@ -214,6 +282,9 @@ namespace SimplePM_Server
                 //Указываем полный путь к исполняемому файлу
                 startInfo.FileName = authorCodePath;
 
+                //Устанавливаем информацию о запускаемом файле
+                SetExecInfoByFileExt(ref startInfo, authorCodePath);
+
                 //Указываем интересующую нас конфигурацию тестирования
                 authorProblemProc.StartInfo = startInfo;
 
@@ -230,7 +301,7 @@ namespace SimplePM_Server
                 catch (Exception) { }
 
                 //Проверяем процесс на использованную память
-                new Thread(() =>
+                new Task(() =>
                 {
                     try
                     {
@@ -261,18 +332,8 @@ namespace SimplePM_Server
                 //Объявляем дескриптор процесса
                 Process userProblemProc = new Process();
 
-                //Указываем полный путь к исполняемому файлу
-                switch (Path.GetExtension(exeFileUrl))
-                {
-                    case ".lua":
-                        startInfo.FileName = sConfig["Compilers"]["lua_location"];
-                        startInfo.Arguments = exeFileUrl;
-                        break;
-                    default:
-                        startInfo.FileName = exeFileUrl;
-                        startInfo.Arguments = "";
-                        break;
-                }
+                //Устанавливаем информацию о запускаемом файле
+                SetExecInfoByFileExt(ref startInfo);
 
                 //Указываем интересующую нас конфигурацию тестирования
                 userProblemProc.StartInfo = startInfo;
@@ -297,7 +358,7 @@ namespace SimplePM_Server
                 }
 
                 //Проверяем процесс на использованную память
-                new Thread(() =>
+                new Task(() =>
                 {
                     try
                     {
@@ -425,39 +486,18 @@ namespace SimplePM_Server
 
             //Объявляем словарь информации о тестах
             Dictionary<int, Dictionary<string, string>> testsInfo = new Dictionary<int, Dictionary<string, string>>();
-            
+
             //Производим выборку полученных результатов из временной таблицы на сервере MySQL
             int i = 1;
             while (dataReader.Read())
             {
                 Dictionary<string, string> tmpDict = new Dictionary<string, string>
                 {
-
-                    //Идентификатор теста
-                    {
-                        "testId",
-                        HttpUtility.HtmlDecode(dataReader["id"].ToString())
-                    },
-                    //Входной поток
-                    {
-                        "input",
-                        HttpUtility.HtmlDecode(dataReader["input"].ToString())
-                    },
-                    //Выходной поток
-                    {
-                        "output",
-                        HttpUtility.HtmlDecode(dataReader["output"].ToString())
-                    },
-                    //Лимит по времени
-                    {
-                        "timeLimit",
-                        HttpUtility.HtmlDecode(dataReader["timeLimit"].ToString())
-                    },
-                    //Лимит по памяти
-                    {
-                        "memoryLimit",
-                        HttpUtility.HtmlDecode(dataReader["memoryLimit"].ToString())
-                    }
+                    { "testId", HttpUtility.HtmlDecode(dataReader["id"].ToString()) }, //Идентификатор теста
+                    { "input", HttpUtility.HtmlDecode(dataReader["input"].ToString()) }, //Входной поток
+                    { "output", HttpUtility.HtmlDecode(dataReader["output"].ToString()) }, //Выходной поток
+                    { "timeLimit", HttpUtility.HtmlDecode(dataReader["timeLimit"].ToString()) }, //Лимит по времени
+                    { "memoryLimit", HttpUtility.HtmlDecode(dataReader["memoryLimit"].ToString()) } //Лимит по памяти
                 };
 
                 //Добавляем в словарь
@@ -487,17 +527,7 @@ namespace SimplePM_Server
             };
 
             //Устанавливаем информацию о запускаемом файле
-            switch (Path.GetExtension(exeFileUrl))
-            {
-                case ".lua":
-                    startInfo.FileName = sConfig["Compilers"]["lua_location"];
-                    startInfo.Arguments = exeFileUrl;
-                    break;
-                default:
-                    startInfo.FileName = exeFileUrl;
-                    startInfo.Arguments = "";
-                    break;
-            }
+            SetExecInfoByFileExt(ref startInfo);
 
             #endregion
 
@@ -511,7 +541,7 @@ namespace SimplePM_Server
             bool preResultGiven = false; //служебная переменная для определения предопределённого результата
             string _exitcodes = "|"; //переменная кодов выхода
 
-            for (i=1; i<=testsInfo.Count; i++)
+            for (i = 1; i <= testsInfo.Count; i++)
             {
                 //Присвоение переменных данных теста для быстрого доступа
                 testId = ulong.Parse(testsInfo[i]["testId"]);
@@ -548,7 +578,7 @@ namespace SimplePM_Server
                 }
 
                 //Проверяем процесс на использованную память
-                new Thread(() =>
+                new Task(() =>
                 {
                     //Для обеспечения безопасности
                     try
@@ -611,7 +641,6 @@ namespace SimplePM_Server
 
                             //Читаем выходной поток приложения
                             string pOut = getNormalizedOutputText(problemProc.StandardOutput);
-                            //Console.WriteLine(problemProc.ExitCode);
                             //Добавляем результат
                             if (output == pOut)
                             {
@@ -626,6 +655,8 @@ namespace SimplePM_Server
 
                     }
 
+                    //Добавляем конечную палку для правильности
+                    //последующих парсингов
                     _exitcodes += problemProc.ExitCode + "|";
 
                 }
@@ -645,10 +676,13 @@ namespace SimplePM_Server
 
                 //Вычисляем полученный балл за решение задачи
                 //на основе количества пройденных тестов
-                _bResult = (_problemPassedTests / testsInfo.Count) * problemDifficulty;
+
+                int testsCount = (testsInfo.Count == 0 ? 1 : testsInfo.Count);
+
+                _bResult = (_problemPassedTests / testsCount) * problemDifficulty;
             }
             catch (Exception) { _bResult = problemDifficulty; _problemTestingResult = "+"; }
-            
+
             //ОТПРАВКА РЕЗУЛЬТАТОВ ТЕСТИРОВАНИЯ НА СЕРВЕР БД
             //В ТАБЛИЦУ РЕЗУЛЬТАТОВ (`spm_submissions`)
             string queryUpdate = @"
@@ -727,9 +761,7 @@ namespace SimplePM_Server
                         BinaryReader binReader = new BinaryReader(new FileStream(exeFileUrl, FileMode.Open));
                         //Читаем весь бинарный код до конца файла в строку, полученную строку
                         //форматируем, чтобы не допустить "ломание" запроса к базе данных MySQL
-                        //string problemBinCode = Encoding.UTF8.GetString(binReader.ReadBytes(Convert.ToInt32(binReader.BaseStream.Length)));
                         byte[] problemBinCode = binReader.ReadBytes((int)binReader.BaseStream.Length);
-                        //problemBinCode = HttpUtility.HtmlEncode(problemBinCode);
                         //Освобождаем ресурсы, используемые потоком
                         binReader.Dispose();
                         //Закрываем поток
@@ -779,8 +811,8 @@ namespace SimplePM_Server
             //созданные как раз для этих нужд
             //P.S. но делаем это в том случае, если попытка была
             //произведена не во время олимпиады и не во время урока
-            //if (ulong.Parse(submissionInfo["classworkId"]) == 0 && ulong.Parse(submissionInfo["olympId"]) == 0)
-            //    new MySqlCommand("CALL updateBCount(" + userId + "); CALL updateRating(" + userId + ")", connection).ExecuteNonQuery();
+            if (ulong.Parse(submissionInfo["classworkId"]) == 0 && ulong.Parse(submissionInfo["olympId"]) == 0)
+                new MySqlCommand($"CALL updateBCount({userId}); CALL updateRating({userId})", connection).ExecuteNonQuery();
         }
 
         #endregion

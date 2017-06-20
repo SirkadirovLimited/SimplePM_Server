@@ -6,15 +6,18 @@
  * @Author: Kadirov Yurij
  * @Website: https://sirkadirov.com/
  * @Email: admin@sirkadirov.com
- * @Repo: http://spm.sirkadirov.com/
+ * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
 //Основа
 using System;
+//Подключаем коллекции
 using System.Collections.Generic;
+//Работа с текстом
 using System.Text;
 //Многопоточность
 using System.Threading;
+using System.Threading.Tasks;
 //Подключение к MySQL серверу
 using MySql.Data.MySqlClient;
 //Парсер конфигурационного файла
@@ -22,11 +25,18 @@ using IniParser;
 using IniParser.Model;
 //Для безопасности
 using System.Web;
+//Журнал событий
+using NLog;
+using NLog.Config;
 
 namespace SimplePM_Server
 {
-    class Gov
+    class SimplePM_Worker
     {
+        //Объявляем переменную указателя на менеджер журнала собылий
+        //и присваиваем ей указатель на журнал событий текущего класса
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         //Текущее количество подсоединённых пользователей
         public static ulong _customersCount = 0;
         public static ulong _maxCustomersCount = 10;
@@ -54,8 +64,18 @@ namespace SimplePM_Server
 
             //Устанавливаем обработчик необработанных исключений
             AppDomain.CurrentDomain.UnhandledException += NBug.Handler.UnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += ExceptionEventLogger;
         }
 
+        private static void ExceptionEventLogger(object sender, UnhandledExceptionEventArgs e)
+        {
+            logger.Fatal(e.ExceptionObject);
+        }
+
+        /// <summary>
+        /// Основная функция, которая запускается при старте программы.
+        /// </summary>
+        /// <param name="args">Аргументы программы</param>
         static void Main(string[] args)
         {
             //Устанавливаем "улавливатель исключений"
@@ -67,25 +87,37 @@ namespace SimplePM_Server
             //Открываем конфигурационный файл для чтения
             FileIniDataParser iniParser = new FileIniDataParser();
             sConfig = iniParser.ReadFile("server_config.ini", Encoding.UTF8);
+
+            //Конфигурируем журнал событий (библиотека NLog)
+            //
+            try
+            {
+                LogManager.Configuration = new XmlLoggingConfiguration(sConfig["Program"]["NLogConfig_path"]);
+            }
+            catch (Exception) { /* Deal with it */ }
+
+            //Получаем информацию с конфигурационного файла
+            //для некоторых переменных
             _maxCustomersCount = ulong.Parse(sConfig["Connection"]["maxConnectedClients"]);
-            
-            //Добавляю основной поток
-            new Thread(() => {
-                while (true)
+            sleepTime = int.Parse(sConfig["Connection"]["check_timeout"]);
+
+            //Основной цикл программы
+            while (true)
+            {
+                try
                 {
-                    try
-                    {
-                        //Получаем дескриптор соединения с базой данных
-                        MySqlConnection conn = startMysqlConnection(sConfig);
-                        //Защита от перегрузки сервера
-                        if (_customersCount < _maxCustomersCount)
-                            getSubIdAndRunCompile(conn);
-                    }
-                    catch (Exception) {  }
-                    //Ожидание нескольких мс чтобы повторить запрос заново
-                    Thread.Sleep(sleepTime);
+                    //Получаем дескриптор соединения с базой данных
+                    MySqlConnection conn = startMysqlConnection(sConfig);
+
+                    //Защита от перегрузки сервера
+                    if (_customersCount < _maxCustomersCount)
+                        getSubIdAndRunCompile(conn);
                 }
-            }).Start();
+                catch (Exception) { }
+
+                //Ожидание нескольких мс чтобы повторить запрос заново
+                Thread.Sleep(sleepTime);
+            }
         }
 
         /// <summary>
@@ -93,21 +125,22 @@ namespace SimplePM_Server
         /// </summary>
         private static void generateProgramHeader()
         {
+            //Установка заголовка приложения
             Console.Title = "SimplePM_Server";
-            
+            //Выводим на экран информацию о приложении
             Console.WriteLine(Properties.Resources.consoleHeader);
-
-            Console.CursorSize = 100;
+            //Отключаем показ курсора и возможность ввода
             Console.CursorVisible = false;
         }
 
         /// <summary>
-        /// Процедура отвечает за получение информации о запросе на тестирование пользовательского решения программы и начало её компиляции
+        /// Процедура отвечает за получение информации о запросе на тестирование пользовательского решения программы и 
+        /// передачу управления специально созданному классу официанта. Для всего этого выделяется отдельная "задача" (Task)
         /// </summary>
         /// <param name="connection">Дескриптор соединения с базой данных</param>
         public static void getSubIdAndRunCompile(MySqlConnection connection)
         {
-            new Thread(() =>
+            new Task(() =>
             {
 
                 string querySelect = @"
