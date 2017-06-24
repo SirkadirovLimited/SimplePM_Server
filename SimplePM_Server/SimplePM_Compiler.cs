@@ -27,14 +27,19 @@ namespace SimplePM_Server
 {
     class SimplePM_Compiler
     {
+        ///////////////////////////////////////////////////
+        // РАЗДЕЛ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ
+        ///////////////////////////////////////////////////
+
         //Объявляем переменную указателя на менеджер журнала собылий
         //и присваиваем ей указатель на журнал событий текущего класса
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        //Объявление необходимых переменных
         private ulong submissionId; //идентификатор запроса
         private string fileLocation; //полный путь к файлу и его расширение
         private IniData sConfig; //дескриптор конфигурационного файла
+
+        ///////////////////////////////////////////////////
 
         public SimplePM_Compiler(ref IniData sConfig, ulong submissionId, string fileExt)
         {
@@ -92,12 +97,7 @@ namespace SimplePM_Server
             return returnCompilerResult(result);
         }
 
-        public CompilerResult startLuaCompiler()
-        {
-            return startNoCompiler();
-        }
-
-        private CompilerResult startNoCompiler()
+        public CompilerResult startNoCompiler()
         {
             //Делаем преждевременные выводы
             //прям как некоторые девушки

@@ -26,14 +26,19 @@ namespace SimplePM_Server
 {
     class SimplePM_Officiant
     {
+        ///////////////////////////////////////////////////
+        // РАЗДЕЛ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ
+        ///////////////////////////////////////////////////
+
         //Объявляем переменную указателя на менеджер журнала собылий
         //и присваиваем ей указатель на журнал событий текущего класса
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        //Объявляем необходимые переменные
         private MySqlConnection connection; //дескриптор соединения с БД
         private Dictionary<string, string> submissionInfo; //словарь информации о запросе
         private IniData sConfig; //дескриптор конфигурационного файла
+
+        ///////////////////////////////////////////////////
 
         public SimplePM_Officiant(MySqlConnection connection, IniData sConfig, Dictionary<string, string> submissionInfo)
         {
@@ -41,6 +46,7 @@ namespace SimplePM_Server
             this.sConfig = sConfig;
             this.submissionInfo = submissionInfo;
         }
+
         /// <summary>
         /// Процедура, которая отвечает за обработку пользовательского запроса
         /// </summary>
@@ -48,6 +54,10 @@ namespace SimplePM_Server
         {
             //Определяем язык написания пользовательской программы
             SimplePM_Submission.SubmissionLanguage codeLang = SimplePM_Submission.getCodeLanguageByName(submissionInfo["codeLang"]);
+
+            ///////////////////////////////////////////////////
+            // РАБОТА С ФАЙЛОМ ИСХОДНОГО КОДА
+            ///////////////////////////////////////////////////
 
             //Определяем расширение файла
             string fileExt = "." + SimplePM_Submission.getExtByLang(codeLang);
@@ -70,35 +80,46 @@ namespace SimplePM_Server
             //Объявляем переменную результата компиляции
             SimplePM_Compiler.CompilerResult cResult;
 
-            //Запускаем определённый компилятор в зависимости от языка решения задачи
+            ///////////////////////////////////////////////////
+            // ЗАПУСК СПЕЦИФИЧЕСКОГО КОМПИЛЯТОРА В ЗАВИСИМОСТИ
+            // ОТ ЯЗЫКА РЕШЕНИЯ ЗАДАЧИ
+            ///////////////////////////////////////////////////
+
             switch (codeLang)
             {
+                /*   COMPILERS REQUIRED   */
                 case SimplePM_Submission.SubmissionLanguage.freepascal:
                     //Запускаем компилятор
                     cResult = compiler.startFreepascalCompiler();
-                    break;
-                case SimplePM_Submission.SubmissionLanguage.lua:
-                    //LUA файлам не требуется компиляция
-                    //но для обратной совместимости функцию вкатать нужно
-                    cResult = compiler.startLuaCompiler();
                     break;
                 case SimplePM_Submission.SubmissionLanguage.csharp:
                     //Запускаем компилятор
                     cResult = compiler.startCSharpCompiler();
                     break;
-                case SimplePM_Submission.SubmissionLanguage.python:
-                    //Запускаем компилятор
-                    cResult = compiler.startCSharpCompiler();
+                
+                /*   NO COMPILERS REQUIRED   */
+                case SimplePM_Submission.SubmissionLanguage.lua:
+                    //LUA файлам не требуется компиляция
+                    //но для обратной совместимости функцию вкатать нужно
+                    cResult = compiler.startNoCompiler();
                     break;
+                case SimplePM_Submission.SubmissionLanguage.python:
+                    //PYTHON файлам не требуется компиляция
+                    //но для обратной совместимости функцию вкатать нужно
+                    cResult = compiler.startNoCompiler();
+                    break;
+
+                /*   LANGUAGE NOT SUPPORTED BY SYSTEM   */
                 default:
                     cResult = new SimplePM_Compiler.CompilerResult();
                     cResult.hasErrors = true;
-                    cResult.compilerMessage = "Language not supported!";
+                    cResult.compilerMessage = "Language not supported by SimplePM!";
                     break;
             }
-            
 
-            //Записываем в базу данных сообщение компилятора
+            ///////////////////////////////////////////////////
+            // Записываем в базу данных сообщение компилятора
+            ///////////////////////////////////////////////////
             string queryUpdate = $@"
                 UPDATE 
                     `spm_submissions` 
@@ -112,7 +133,10 @@ namespace SimplePM_Server
             ";
             new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
 
-            //Проверяем на наличие ошибок компиляции
+            ///////////////////////////////////////////////////
+            // ПРОВЕРКА НА НАЛИЧИЕ ОШИБОК ПРИ КОМПИЛЯЦИИ
+            ///////////////////////////////////////////////////
+
             if (cResult.hasErrors)
             {
                 //Ошибка компиляции, записываем это в БД
@@ -134,7 +158,11 @@ namespace SimplePM_Server
             {
                 try
                 {
-                    //Выполняем различные действия в зависимости от теста
+                    ///////////////////////////////////////////////////
+                    // ВЫПОЛНЯЕМ РАЗЛИЧНЫЕ ДЕЙСТВИЯ В ЗАВИСИМОСТИ ОТ
+                    // ТИПА ПРОВЕРКИ РЕШЕНИЯ ПОСТАВЛЕННОЙ ЗАДАЧИ
+                    ///////////////////////////////////////////////////
+
                     switch (submissionInfo["testType"])
                     {
                         //Проверка синтаксиса
@@ -163,6 +191,7 @@ namespace SimplePM_Server
                                 ref submissionInfo, //информация о запросе на тестирование
                                 ref sConfig //дескриптор конфигурационного файла сервера
                             ).DebugTest();
+
                             break;
                         //Отправка решения задачи
                         case "release":
@@ -177,12 +206,14 @@ namespace SimplePM_Server
 
                             break;
                     }
+
+                    ///////////////////////////////////////////////////
                 }
+                ///////////////////////////////////////////////////
+                // ДЕЙСТВИЯ В СЛУЧАЕ ОШИБКИ СЕРВЕРА ПРОВЕРКИ
+                ///////////////////////////////////////////////////
                 catch (Exception)
                 {
-                    //Вызываем сборщика мусора
-                    clearCache(cResult.exe_fullname, fileLocation);
-
                     //Делаем так, чтобы несчастливую отправку обрабатывал
                     //кто-то другой, но только не мы (а может и мы, но позже)
                     queryUpdate = $@"
@@ -197,6 +228,9 @@ namespace SimplePM_Server
                         ;
                     ";
                     new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+
+                    //Вызываем сборщика мусора
+                    clearCache(cResult.exe_fullname, fileLocation);
 
                     //Выходим
                     return;
