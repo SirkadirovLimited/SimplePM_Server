@@ -51,11 +51,61 @@ namespace SimplePM_Server
         //Устанавливаем время ожидания
         private static int sleepTime = 1000;
 
+        //Список поддерживаемых языков программирования
+        //для использования в выборочных SQL запросах
+        private static string[] enabledLangsList;
+        private static string enabledLangs;
+
+        ///////////////////////////////////////////////////
+        // ФУНКЦИЯ, ГЕНЕРИРУЮЩАЯ СТРОКУ, СОДЕРЖАЩУЮ
+        // СПИСОК ПОДДЕРЖИВАЕМЫХ ЭКЗЕМПЛЯТОМ СЕРВЕРА
+        // ЯЗЫКОВ ПРОГРАММИРОВАНИЯ
         ///////////////////////////////////////////////////
 
-        /// <summary>
-        /// Процедура, отвечающая за установку и настройку "отлавливателя исключений"
-        /// </summary>
+        private static void GenerateEnabledLangsList()
+        {
+            /* Инициализируем массив строк */
+            enabledLangsList = new string[ sConfig["EnabledCompilers"].Count];
+
+            /* Объявляем необходимые переменные */
+            int i = 0;
+
+            /* Добавляем элементы в массив */
+            //Pascal (Free Pascal, Object Pascal, etc.)
+            if (sConfig["EnabledCompilers"].ContainsKey("freepascal"))
+                enabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["freepascal"] + "'";
+            // C#
+            if (sConfig["EnabledCompilers"].ContainsKey("csharp"))
+                enabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["csharp"] + "'";
+            // C++
+            if (sConfig["EnabledCompilers"].ContainsKey("cpp"))
+                enabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["cpp"] + "'";
+            // C
+            if (sConfig["EnabledCompilers"].ContainsKey("c"))
+                enabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["c"] + "'";
+            // Lua
+            if (sConfig["EnabledCompilers"].ContainsKey("lua"))
+                enabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["lua"] + "'";
+            // Python
+            if (sConfig["EnabledCompilers"].ContainsKey("python"))
+                enabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["python"] + "'";
+            // PHP
+            if (sConfig["EnabledCompilers"].ContainsKey("php"))
+                enabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["php"] + "'";
+            // Java
+            if (sConfig["EnabledCompilers"].ContainsKey("java"))
+                enabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["java"] + "'";
+
+            enabledLangs = string.Join(", ", enabledLangsList);
+
+            Console.WriteLine("Enabled languages: " + enabledLangs);
+        }
+        
+        ///////////////////////////////////////////////////
+        // ФУНКЦИЯ, ОТВЕЧАЮЩАЯ ЗА УСТАНОВКУ УЛАВЛИВАТЕЛЯ
+        // КРИТИЧЕСКИХ ИСКЛЮЧЕНИЙ СЕРВЕРА
+        ///////////////////////////////////////////////////
+
         private static void setExceptionHandler()
         {
             //Когда подключён дебагер - не тревожить, в инном случае жаловаться пользователю
@@ -73,17 +123,26 @@ namespace SimplePM_Server
             AppDomain.CurrentDomain.UnhandledException += ExceptionEventLogger;
         }
 
+        ///////////////////////////////////////////////////
+        // ФУНКЦИЯ EVENT-ЛОГГЕРА НЕУЛОВЛЕННЫХ ИСКЛЮЧЕНИЙ
+        ///////////////////////////////////////////////////
+
         private static void ExceptionEventLogger(object sender, UnhandledExceptionEventArgs e)
         {
             logger.Fatal(e.ExceptionObject);
         }
 
-        /// <summary>
-        /// Основная функция, которая запускается при старте программы.
-        /// </summary>
-        /// <param name="args">Аргументы программы</param>
+        ///////////////////////////////////////////////////
+        // АВТОМАТИЧЕСКИ ЗАПУСКАЕМАЯ ПРИ
+        // СТАРТЕ ПРОГРАММЫ ФУНКЦИЯ
+        ///////////////////////////////////////////////////
+
         static void Main(string[] args)
         {
+            ///////////////////////////////////////////////////
+            // ИНИЦИАЛИЗАЦИЯ СЕРВЕРНЫХ ПОДСИСТЕМ И ПРОЧИЙ ХЛАМ
+            ///////////////////////////////////////////////////
+
             //Устанавливаем "улавливатель исключений"
             setExceptionHandler();
 
@@ -95,7 +154,6 @@ namespace SimplePM_Server
             sConfig = iniParser.ReadFile("server_config.ini", Encoding.UTF8);
 
             //Конфигурируем журнал событий (библиотека NLog)
-            //
             try
             {
                 LogManager.Configuration = new XmlLoggingConfiguration(sConfig["Program"]["NLogConfig_path"]);
@@ -107,7 +165,15 @@ namespace SimplePM_Server
             _maxCustomersCount = ulong.Parse(sConfig["Connection"]["maxConnectedClients"]);
             sleepTime = int.Parse(sConfig["Connection"]["check_timeout"]);
 
-            //Основной цикл программы
+            // Вызываем функцию получения строчного списка
+            // поддерживаемых языков программирования данным
+            // экземплятор сервера SimplePM_Server
+            GenerateEnabledLangsList();
+
+            ///////////////////////////////////////////////////
+            // ОСНОВНОЙ ЦИКЛ ПРОГРАММЫ
+            ///////////////////////////////////////////////////
+
             while (true)
             {
                 try
@@ -121,14 +187,18 @@ namespace SimplePM_Server
                 }
                 catch (Exception) { }
 
-                //Ожидание нескольких мс чтобы повторить запрос заново
+                //Ожидание для уменьшения нагрузки на сервер
                 Thread.Sleep(sleepTime);
             }
+
+            ///////////////////////////////////////////////////
+
         }
 
-        /// <summary>
-        /// Процедура отвечает за первоначальную настройку окна консоли SimplePM_Server
-        /// </summary>
+        ///////////////////////////////////////////////////
+        // ПЕРВОНАЧАЛЬНАЯ НАСТРОЙКА ОКНА КОНСОЛИ
+        ///////////////////////////////////////////////////
+
         private static void generateProgramHeader()
         {
             //Установка заголовка приложения
@@ -139,23 +209,24 @@ namespace SimplePM_Server
             Console.CursorVisible = false;
         }
 
-        /// <summary>
-        /// Процедура отвечает за получение информации о запросе на тестирование пользовательского решения программы и 
-        /// передачу управления специально созданному классу официанта. Для всего этого выделяется отдельная "задача" (Task)
-        /// </summary>
-        /// <param name="connection">Дескриптор соединения с базой данных</param>
+        ///////////////////////////////////////////////////
+        // ОБРАБОТКА ЗАПРОСОВ НА ПРОВЕРКУ РЕШЕНИЙ
+        ///////////////////////////////////////////////////
+
         public static void getSubIdAndRunCompile(MySqlConnection connection)
         {
             new Task(() =>
             {
 
-                string querySelect = @"
+                string querySelect = $@"
                     SELECT 
                         * 
                     FROM 
                         `spm_submissions` 
                     WHERE 
                         `status` = 'waiting' 
+                    AND 
+                        `codeLang` IN ({enabledLangs})
                     ORDER BY 
                         `submissionId` ASC 
                     LIMIT 

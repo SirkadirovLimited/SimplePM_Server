@@ -99,16 +99,12 @@ namespace SimplePM_Server
                 
                 /*   NO COMPILERS REQUIRED   */
                 case SimplePM_Submission.SubmissionLanguage.lua:
-                    //LUA файлам не требуется компиляция
-                    //но для обратной совместимости функцию вкатать нужно
-                    cResult = compiler.startNoCompiler();
-                    break;
                 case SimplePM_Submission.SubmissionLanguage.python:
-                    //PYTHON файлам не требуется компиляция
+                case SimplePM_Submission.SubmissionLanguage.php:
+                    //Некоторым файлам не требуется компиляция
                     //но для обратной совместимости функцию вкатать нужно
                     cResult = compiler.startNoCompiler();
                     break;
-
                 /*   LANGUAGE NOT SUPPORTED BY SYSTEM   */
                 default:
                     cResult = new SimplePM_Compiler.CompilerResult();

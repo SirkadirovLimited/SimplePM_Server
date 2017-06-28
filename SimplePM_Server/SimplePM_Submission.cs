@@ -13,9 +13,10 @@ namespace SimplePM_Server
 {
     class SimplePM_Submission
     {
-        /// <summary>
-        /// Submission type
-        /// </summary>
+        ///////////////////////////////////////////////////
+        // SUBMISSION TYPE
+        ///////////////////////////////////////////////////
+
         public enum SubmissionType
         {
             unset = 0,
@@ -24,9 +25,10 @@ namespace SimplePM_Server
             release = 8
         }
 
-        /// <summary>
-        /// Submission's programming language
-        /// </summary>
+        ///////////////////////////////////////////////////
+        // SUBMISSION'S PROGRAMMING LANGUAGE
+        ///////////////////////////////////////////////////
+
         public enum SubmissionLanguage
         {
             unset,
@@ -36,14 +38,14 @@ namespace SimplePM_Server
             c,
             python,
             lua,
-            java
+            java,
+            php
         }
 
-        /// <summary>
-        /// With this function you can get code language enum by string
-        /// </summary>
-        /// <param name="codeLang">name of programming language</param>
-        /// <returns></returns>
+        ///////////////////////////////////////////////////
+        // GET LANGUAGE ENUM BY STRING NAME
+        ///////////////////////////////////////////////////
+
         public static SubmissionLanguage getCodeLanguageByName(string codeLang)
         {
             switch (codeLang)
@@ -62,17 +64,17 @@ namespace SimplePM_Server
                     return SubmissionLanguage.lua;
                 case "java":
                     return SubmissionLanguage.java;
+                case "php":
+                    return SubmissionLanguage.php;
                 default:
                     return SubmissionLanguage.unset;
             }
         }
 
-        /// <summary>
-        /// With this function you can get file extension by submission's 
-        /// programming language
-        /// </summary>
-        /// <param name="lang">Submission's programming language</param>
-        /// <returns></returns>
+        ///////////////////////////////////////////////////
+        // GET FILE EXTENSION BY PROGRAMMING LANGUAGE
+        ///////////////////////////////////////////////////
+
         public static string getExtByLang(SubmissionLanguage lang)
         {
             switch (lang)
@@ -89,11 +91,15 @@ namespace SimplePM_Server
                     return "py";
                 case SubmissionLanguage.lua:
                     return "lua";
+                case SubmissionLanguage.php:
+                    return "php";
                 case SubmissionLanguage.java:
                     return "java";
                 default:
                     return "txt";
             }
         }
+
+        ///////////////////////////////////////////////////
     }
 }
