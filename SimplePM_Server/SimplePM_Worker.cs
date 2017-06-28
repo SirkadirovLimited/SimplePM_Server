@@ -106,7 +106,7 @@ namespace SimplePM_Server
         // КРИТИЧЕСКИХ ИСКЛЮЧЕНИЙ СЕРВЕРА
         ///////////////////////////////////////////////////
 
-        private static void setExceptionHandler()
+        private static void SetExceptionHandler()
         {
             //Когда подключён дебагер - не тревожить, в инном случае жаловаться пользователю
             NBug.Settings.ReleaseMode = true;
@@ -144,7 +144,7 @@ namespace SimplePM_Server
             ///////////////////////////////////////////////////
 
             //Устанавливаем "улавливатель исключений"
-            setExceptionHandler();
+            SetExceptionHandler();
 
             //Генерирую "шапку" консоли сервера
             generateProgramHeader();
@@ -179,7 +179,7 @@ namespace SimplePM_Server
                 try
                 {
                     //Получаем дескриптор соединения с базой данных
-                    MySqlConnection conn = startMysqlConnection(sConfig);
+                    MySqlConnection conn = StartMysqlConnection(sConfig);
 
                     //Защита от перегрузки сервера
                     if (_customersCount < _maxCustomersCount)
@@ -215,9 +215,11 @@ namespace SimplePM_Server
 
         public static void getSubIdAndRunCompile(MySqlConnection connection)
         {
+            //Создаём новую задачу, без неё - никак!
             new Task(() =>
             {
 
+                //Формируем запрос на выборку
                 string querySelect = $@"
                     SELECT 
                         * 
@@ -296,7 +298,7 @@ namespace SimplePM_Server
                     //Зовём официанта-шляпочника
                     //уж он знает, что делать в таких вот ситуациях
                     SimplePM_Officiant officiant = new SimplePM_Officiant(connection, sConfig, submissionInfo);
-                    officiant.serveSubmission();
+                    officiant.ServeSubmission();
 
                     //Уменьшаем количество текущих соединений
                     //чтобы другие соединения были возможны.
@@ -308,7 +310,11 @@ namespace SimplePM_Server
             }).Start();
         }
 
-        public static MySqlConnection startMysqlConnection(IniData sConfig)
+        ///////////////////////////////////////////////////
+        // ФУНКЦИЯ, ИНИЦИАЛИЗИРУЮЩАЯ СОЕДИНЕНИЕ С БД
+        ///////////////////////////////////////////////////
+
+        public static MySqlConnection StartMysqlConnection(IniData sConfig)
         {
             //Подключаемся к базе данных на удалённом
             //MySQL сервере и получаем дескриптор подключения к ней
@@ -326,5 +332,8 @@ namespace SimplePM_Server
             //Возвращаем дескриптор подключения к базе данных
             return db;
         }
+
+        ///////////////////////////////////////////////////
+
     }
 }

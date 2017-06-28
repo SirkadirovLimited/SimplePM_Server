@@ -39,6 +39,8 @@ namespace SimplePM_Server
         private IniData sConfig; //дескриптор конфигурационного файла
 
         ///////////////////////////////////////////////////
+        // КОНСТРУКТОР КЛАССА ОФФИЦИАНТА
+        ///////////////////////////////////////////////////
 
         public SimplePM_Officiant(MySqlConnection connection, IniData sConfig, Dictionary<string, string> submissionInfo)
         {
@@ -47,10 +49,11 @@ namespace SimplePM_Server
             this.submissionInfo = submissionInfo;
         }
 
-        /// <summary>
-        /// Процедура, которая отвечает за обработку пользовательского запроса
-        /// </summary>
-        public void serveSubmission()
+        ///////////////////////////////////////////////////
+        // ПРОЦЕДУРА, СЕРВЕРУЮЩАЯ ЗАПРОС НА ТЕСТИРОВАНИЕ
+        ///////////////////////////////////////////////////
+
+        public void ServeSubmission()
         {
             //Определяем язык написания пользовательской программы
             SimplePM_Submission.SubmissionLanguage codeLang = SimplePM_Submission.getCodeLanguageByName(submissionInfo["codeLang"]);
@@ -90,11 +93,11 @@ namespace SimplePM_Server
                 /*   COMPILERS REQUIRED   */
                 case SimplePM_Submission.SubmissionLanguage.freepascal:
                     //Запускаем компилятор
-                    cResult = compiler.startFreepascalCompiler();
+                    cResult = compiler.StartFreepascalCompiler();
                     break;
                 case SimplePM_Submission.SubmissionLanguage.csharp:
                     //Запускаем компилятор
-                    cResult = compiler.startCSharpCompiler();
+                    cResult = compiler.StartCSharpCompiler();
                     break;
                 
                 /*   NO COMPILERS REQUIRED   */
@@ -103,7 +106,7 @@ namespace SimplePM_Server
                 case SimplePM_Submission.SubmissionLanguage.php:
                     //Некоторым файлам не требуется компиляция
                     //но для обратной совместимости функцию вкатать нужно
-                    cResult = compiler.startNoCompiler();
+                    cResult = compiler.StartNoCompiler();
                     break;
                 /*   LANGUAGE NOT SUPPORTED BY SYSTEM   */
                 default:
@@ -226,7 +229,7 @@ namespace SimplePM_Server
                     new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
 
                     //Вызываем сборщика мусора
-                    clearCache(cResult.exe_fullname, fileLocation);
+                    ClearCache(cResult.exe_fullname, fileLocation);
 
                     //Выходим
                     return;
@@ -235,10 +238,15 @@ namespace SimplePM_Server
             }
 
             //Вызываем сборщика мусора
-            clearCache(cResult.exe_fullname, fileLocation);
+            ClearCache(cResult.exe_fullname, fileLocation);
         }
 
-        private void clearCache(string exe_fullname, string fileLocation)
+        ///////////////////////////////////////////////////
+        // ПРОЦЕДУРА ОЧИСТКИ КЭША, ОСВОБОЖДЕНИЯ ПАМЯТИ
+        // А ТАКЖЕ УДАЛЕНИЯ ВРЕМЕННЫХ ФАЙЛОВ
+        ///////////////////////////////////////////////////
+
+        private void ClearCache(string exe_fullname, string fileLocation)
         {
             //Очищаем папку экзешников от мусора
             try
@@ -249,5 +257,7 @@ namespace SimplePM_Server
             }
             catch (Exception) { }
         }
+        
+        ///////////////////////////////////////////////////
     }
 }

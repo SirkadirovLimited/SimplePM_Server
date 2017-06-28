@@ -40,6 +40,8 @@ namespace SimplePM_Server
         private IniData sConfig; //дескриптор конфигурационного файла
 
         ///////////////////////////////////////////////////
+        // КОНСТРУКТОР КЛАССА КОМПИЛЯТОРОВ
+        ///////////////////////////////////////////////////
 
         public SimplePM_Compiler(ref IniData sConfig, ulong submissionId, string fileExt)
         {
@@ -62,9 +64,10 @@ namespace SimplePM_Server
             this.submissionId = submissionId;
         }
 
-        /// <summary>
-        /// Класс результата компиляции
-        /// </summary>
+        ///////////////////////////////////////////////////
+        // КЛАСС РЕЗУЛЬТАТА КОМПИЛЯЦИИ
+        ///////////////////////////////////////////////////
+
         public class CompilerResult
         {
             public bool hasErrors = false;
@@ -72,14 +75,14 @@ namespace SimplePM_Server
             public string compilerMessage = null;
         }
 
-        /// <summary>
-        /// Компилятор Free Pascal и других паскалеподобных существ
-        /// </summary>
-        /// <returns>Возвращает результат компиляции</returns>
-        public CompilerResult startFreepascalCompiler()
+        ///////////////////////////////////////////////////
+        // PASCAL COMPILER (MIXED)
+        ///////////////////////////////////////////////////
+
+        public CompilerResult StartFreepascalCompiler()
         {
             //Запуск компилятора с заранее определёнными аргументами
-            CompilerResult result = runCompiler(
+            CompilerResult result = RunCompiler(
                 sConfig["Compilers"]["freepascal_location"],
                 "-Twin64 -ve -vw -vi -vb " + fileLocation
             );
@@ -94,10 +97,15 @@ namespace SimplePM_Server
             catch (Exception) { }
 
             //Возвращаем результат компиляции
-            return returnCompilerResult(result);
+            return ReturnCompilerResult(result);
         }
 
-        public CompilerResult startNoCompiler()
+        ///////////////////////////////////////////////////
+        // СПЕЦИАЛЬНО ДЛЯ НЕКОМПИЛИРУЕМЫХ ЯЗЫКОВ
+        // ПРОГРАММИРОВАНИЯ (ТАКИХ КАК LUA, PYTHON И ДР.)
+        ///////////////////////////////////////////////////
+
+        public CompilerResult StartNoCompiler()
         {
             //Делаем преждевременные выводы
             //прям как некоторые девушки
@@ -117,7 +125,11 @@ namespace SimplePM_Server
             return result;
         }
 
-        public CompilerResult startCSharpCompiler()
+        ///////////////////////////////////////////////////
+        // КОМПИЛЯТОР ДЛЯ ЯЗЫКА ПРОГРАММИРОВАНИЯ C#
+        ///////////////////////////////////////////////////
+
+        public CompilerResult StartCSharpCompiler()
         {
             //Генерируем файл конфигурации MSBuild
             string msbuildConfigFileLocation = sConfig["Program"]["tempPath"] + submissionId + ".csproj";
@@ -140,7 +152,7 @@ namespace SimplePM_Server
             );
 
             //Запуск компилятора с заранее определёнными аргументами
-            CompilerResult result = runCompiler(
+            CompilerResult result = RunCompiler(
                 sConfig["Compilers"]["msbuild_location"],
                 msbuildConfigFileLocation + ""
             );
@@ -153,10 +165,15 @@ namespace SimplePM_Server
             catch (Exception) {  }
 
             //Возвращаем результат компиляции
-            return returnCompilerResult(result);
+            return ReturnCompilerResult(result);
         }
 
-        private CompilerResult runCompiler(string compilerFullName, string compilerArgs)
+        ///////////////////////////////////////////////////
+        // ФУНКЦИЯ ЗАПУСКА ПРОЦЕССА СТАНДАРТИЗИРОВАННОГО
+        // КОНСОЛЬНОГО КОМПИЛЯТОРА (МУЛЬТИЮЗ)
+        ///////////////////////////////////////////////////
+
+        private CompilerResult RunCompiler(string compilerFullName, string compilerArgs)
         {
             //Создаём новый экземпляр процесса компилятора
             Process cplProc = new Process();
@@ -196,12 +213,11 @@ namespace SimplePM_Server
             return result;
         }
 
-        /// <summary>
-        /// Функция, возвращающая информацию о результате компиляции
-        /// </summary>
-        /// <param name="temporaryResult">Переменная временного результата компиляции</param>
-        /// <returns></returns>
-        private CompilerResult returnCompilerResult(CompilerResult temporaryResult)
+        ///////////////////////////////////////////////////
+        // ОКОНЧАТЕЛЬНАЯ ВЫДАЧА РЕЗУЛЬТАТОВ КОМПИЛЯЦИИ
+        ///////////////////////////////////////////////////
+
+        private CompilerResult ReturnCompilerResult(CompilerResult temporaryResult)
         {
             //Получаем полный путь к исполняемому файлу
             string exeLocation = sConfig["Program"]["tempPath"] + submissionId.ToString() + ".exe";
