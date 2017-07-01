@@ -108,18 +108,7 @@ namespace SimplePM_Server
 
         private static void SetExceptionHandler()
         {
-            //Когда подключён дебагер - не тревожить, в инном случае жаловаться пользователю
-            NBug.Settings.ReleaseMode = true;
-            
-            //Устанавливаем место хранения архивов, содержащих информацию об ошибке
-            NBug.Settings.StoragePath = NBug.Enums.StoragePath.CurrentDirectory;
-            //Устанавливаем нулевой показ сведений об исключении
-            NBug.Settings.UIMode = NBug.Enums.UIMode.None;
-            //Устанавливаем провайдера форм
-            NBug.Settings.UIProvider = NBug.Enums.UIProvider.Auto;
-
             //Устанавливаем обработчик необработанных исключений
-            AppDomain.CurrentDomain.UnhandledException += NBug.Handler.UnhandledException;
             AppDomain.CurrentDomain.UnhandledException += ExceptionEventLogger;
         }
 
@@ -137,7 +126,7 @@ namespace SimplePM_Server
         // СТАРТЕ ПРОГРАММЫ ФУНКЦИЯ
         ///////////////////////////////////////////////////
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             ///////////////////////////////////////////////////
             // ИНИЦИАЛИЗАЦИЯ СЕРВЕРНЫХ ПОДСИСТЕМ И ПРОЧИЙ ХЛАМ
@@ -147,7 +136,7 @@ namespace SimplePM_Server
             SetExceptionHandler();
 
             //Генерирую "шапку" консоли сервера
-            generateProgramHeader();
+            GenerateProgramHeader();
             
             //Открываем конфигурационный файл для чтения
             FileIniDataParser iniParser = new FileIniDataParser();
@@ -183,9 +172,10 @@ namespace SimplePM_Server
 
                     //Защита от перегрузки сервера
                     if (_customersCount < _maxCustomersCount)
-                        getSubIdAndRunCompile(conn);
+                        GetSubIdAndRunCompile(conn);
                 }
-                catch (Exception) { }
+                //В случае ошибки передаём информацию о ней логгеру событий
+                catch (Exception ex) { logger.Error(ex); }
 
                 //Ожидание для уменьшения нагрузки на сервер
                 Thread.Sleep(sleepTime);
@@ -199,7 +189,7 @@ namespace SimplePM_Server
         // ПЕРВОНАЧАЛЬНАЯ НАСТРОЙКА ОКНА КОНСОЛИ
         ///////////////////////////////////////////////////
 
-        private static void generateProgramHeader()
+        private static void GenerateProgramHeader()
         {
             //Установка заголовка приложения
             Console.Title = "SimplePM_Server";
@@ -213,7 +203,7 @@ namespace SimplePM_Server
         // ОБРАБОТКА ЗАПРОСОВ НА ПРОВЕРКУ РЕШЕНИЙ
         ///////////////////////////////////////////////////
 
-        public static void getSubIdAndRunCompile(MySqlConnection connection)
+        public static void GetSubIdAndRunCompile(MySqlConnection connection)
         {
             //Создаём новую задачу, без неё - никак!
             new Task(() =>

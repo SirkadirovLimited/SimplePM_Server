@@ -56,14 +56,14 @@ namespace SimplePM_Server
         public void ServeSubmission()
         {
             //Определяем язык написания пользовательской программы
-            SimplePM_Submission.SubmissionLanguage codeLang = SimplePM_Submission.getCodeLanguageByName(submissionInfo["codeLang"]);
+            SimplePM_Submission.SubmissionLanguage codeLang = SimplePM_Submission.GetCodeLanguageByName(submissionInfo["codeLang"]);
 
             ///////////////////////////////////////////////////
             // РАБОТА С ФАЙЛОМ ИСХОДНОГО КОДА
             ///////////////////////////////////////////////////
 
             //Определяем расширение файла
-            string fileExt = "." + SimplePM_Submission.getExtByLang(codeLang);
+            string fileExt = "." + SimplePM_Submission.GetExtByLang(codeLang);
             //Определяем полный путь к файлу
             string fileLocation = sConfig["Program"]["tempPath"] + submissionInfo["submissionId"] + fileExt;
 

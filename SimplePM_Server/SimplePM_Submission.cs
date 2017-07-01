@@ -46,7 +46,7 @@ namespace SimplePM_Server
         // GET LANGUAGE ENUM BY STRING NAME
         ///////////////////////////////////////////////////
 
-        public static SubmissionLanguage getCodeLanguageByName(string codeLang)
+        public static SubmissionLanguage GetCodeLanguageByName(string codeLang)
         {
             switch (codeLang)
             {
@@ -75,7 +75,7 @@ namespace SimplePM_Server
         // GET FILE EXTENSION BY PROGRAMMING LANGUAGE
         ///////////////////////////////////////////////////
 
-        public static string getExtByLang(SubmissionLanguage lang)
+        public static string GetExtByLang(SubmissionLanguage lang)
         {
             switch (lang)
             {
