@@ -308,12 +308,15 @@ namespace SimplePM_Server
                     //Запускаем процесс
                     authorProblemProc.Start();
 
+                    //Устанавливаем наивысший приоритет процесса
+                    authorProblemProc.PriorityClass = ProcessPriorityClass.RealTime;
+
                     //Инъекция входного потока
                     authorProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
                     authorProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
                     authorProblemProc.StandardInput.Close(); //закрываем поток
                 }
-                catch (Exception) { }
+                catch (Exception) {  }
 
                 ///////////////////////////////////////////////////
                 // КОНТРОЛЬ ИСПОЛЬЗУЕМОЙ ПРОЦЕССОМ ПАМЯТИ
@@ -361,16 +364,18 @@ namespace SimplePM_Server
                     //Запускаем процесс
                     userProblemProc.Start();
 
+                    //Устанавливаем наивысший приоритет процесса
+                    userProblemProc.PriorityClass = ProcessPriorityClass.RealTime;
+
                     //Инъекция входного потока
                     userProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
                     userProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
                     userProblemProc.StandardInput.Close(); //закрываем поток
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     //Произошла ошибка при выполнении программы
                     //В этом, скорее всего, виноват компилятор.
-                    System.Windows.Forms.MessageBox.Show(ex.HResult.ToString());
                     _debugTestingResult = 'C';
                 }
 
@@ -403,10 +408,8 @@ namespace SimplePM_Server
                 {
 
                     //Ждём завершения, максимум X миллимекунд
-                    userProblemProc.WaitForExit((int)debugTimeLimit);
-
                     //Если процесс не завершил свою работу - убиваем его
-                    if (!userProblemProc.HasExited)
+                    if (!userProblemProc.WaitForExit((int)debugTimeLimit))
                     {
                         userProblemProc.Kill();
                         _debugTestingResult = 'T';
@@ -431,15 +434,10 @@ namespace SimplePM_Server
                     //Устанавливаем результат отладочного тестирования.
                     //В случае преждевременного результата ничего не делаем
                     if (_debugTestingResult == '+')
-                    {
-                        if (_authorOutput == _userOutput)
-                            _debugTestingResult = '+';
-                        else
-                            _debugTestingResult = '-';
-                    }
+                        _debugTestingResult = (_authorOutput == _userOutput ? '+' : '-');
 
                 }
-                catch (Exception) { }
+                catch (Exception) {  }
 
                 ///////////////////////////////////////////////////
                 // ПОЛУЧЕНИЕ ВЫХОДНОГО ПОТОКА
@@ -617,6 +615,9 @@ namespace SimplePM_Server
                     //Запускаем процесс
                     problemProc.Start();
 
+                    //Устанавливаем наивысший приоритет процесса
+                    problemProc.PriorityClass = ProcessPriorityClass.RealTime;
+
                     //Инъекция входного потока
                     problemProc.StandardInput.WriteLine(input); //добавляем текст во входной поток
                     problemProc.StandardInput.Flush(); //производим запись во входной поток и последующую очистку буфера
@@ -658,19 +659,13 @@ namespace SimplePM_Server
                 ///////////////////////////////////////////////////
                 // ОЖИДАНИЕ ЗАВЕРШЕНИЯ ПОЛЬЗОВАТЕЛЬСКОЙ ПРОГРАММЫ
                 ///////////////////////////////////////////////////
-
-                try
-                {
-                    //Ждём завершения, максимум X миллимекунд
-                    problemProc.WaitForExit(timeLimit);
-                }
-                catch (Exception) { }
-
+                
                 //Проверка на досрочный результат проверки
                 if (!preResultGiven)
                 {
 
-                    if (!problemProc.HasExited)
+                    //Ждём завершения, максимум X миллимекунд
+                    if (!problemProc.WaitForExit(timeLimit))
                     {
                         //Процесс не завершил свою работу
                         //Исключение: времени не хватило!
@@ -680,7 +675,7 @@ namespace SimplePM_Server
                         Thread.Sleep(10);
                         _problemTestingResult += 'T';
                     }
-                    else if (problemProc.HasExited)
+                    else
                     {
                         //Проверка на "вшивость"
                         string currentErrors = problemProc.StandardError.ReadToEnd();
@@ -737,7 +732,7 @@ namespace SimplePM_Server
             ///////////////////////////////////////////////////
 
             //Объявляем переменную численного результата тестирования
-            float _bResult = 0;
+            float _bResult;
 
             try
             {
