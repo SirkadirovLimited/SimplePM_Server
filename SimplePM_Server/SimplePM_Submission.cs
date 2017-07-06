@@ -8,13 +8,21 @@
  * @Email: admin@sirkadirov.com
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
+/*! \file */
 
 namespace SimplePM_Server
 {
+    /*
+     * \brief
+     * Класс содержит enum-ы и функции, которые
+     * применяются к пользовательским запросам
+     * на тестирование решений задач.
+     */
+
     class SimplePM_Submission
     {
         ///////////////////////////////////////////////////
-        // SUBMISSION TYPE
+        /// Тип запроса на тестирование
         ///////////////////////////////////////////////////
 
         public enum SubmissionType
@@ -26,7 +34,8 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        // SUBMISSION'S PROGRAMMING LANGUAGE
+        /// Язык программирования, на котором
+        /// было написано решение
         ///////////////////////////////////////////////////
 
         public enum SubmissionLanguage
@@ -43,7 +52,8 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        // GET LANGUAGE ENUM BY STRING NAME
+        /// Функция возвращает enum языка программирования
+        /// по его текстовому названию
         ///////////////////////////////////////////////////
 
         public static SubmissionLanguage GetCodeLanguageByName(string codeLang)
@@ -72,7 +82,9 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        // GET FILE EXTENSION BY PROGRAMMING LANGUAGE
+        /// Функция возвращает расширение файла
+        /// исходного кода программы по имени
+        /// языка программирования
         ///////////////////////////////////////////////////
 
         public static string GetExtByLang(SubmissionLanguage lang)

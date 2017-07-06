@@ -8,6 +8,7 @@
  * @Email: admin@sirkadirov.com
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
+/*! \file */
 
 //Основа
 using System;
@@ -31,26 +32,37 @@ using NLog;
 
 namespace SimplePM_Server
 {
+    /*!
+     * \brief
+     * Класс тестирования пользовательских решений
+     * задач по программированию
+     */
+
     class SimplePM_Tester
     {
         ///////////////////////////////////////////////////
         // РАЗДЕЛ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ
         ///////////////////////////////////////////////////
+        
+        /*!
+            Объявляем переменную указателя на менеджер журнала собылий
+            и присваиваем ей указатель на журнал событий текущего класса
+        */
+        public static Logger logger = LogManager.GetCurrentClassLogger();
 
-        //Объявляем переменную указателя на менеджер журнала собылий
-        //и присваиваем ей указатель на журнал событий текущего класса
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
-        private MySqlConnection connection; // дескриптор соединения с БД
-        private Dictionary<string, string> submissionInfo; // информация о запросе на проверку
-        private string exeFileUrl, customTestInput; // какие-то параметры
-        private ulong problemId, submissionId, userId; // ещё какие-то параметы
-        private float problemDifficulty; // сложность задачи
-        private IniData sConfig; // дескриптор конфигурационного файла сервера
+        public MySqlConnection connection; //!< Дескриптор соединения с БД
+        public Dictionary<string, string> submissionInfo; //!< Информация о запросе на проверку
+        public string exeFileUrl; //!< Полный путь к исполняемому файлу
+        public string customTestInput; //!< Кастомный тест, введённый пользователем
+        public ulong problemId; //!< Идентификатор задачи
+        public ulong submissionId; //!< Идентификатор запроса на компиляцию
+        public ulong userId; //!< Идентификатор пользователя
+        public float problemDifficulty; //!<  Сложность задачи
+        public IniData sConfig; //!<  Дескриптор конфигурационного файла сервера
 
         ///////////////////////////////////////////////////
-        // КОНСТРУКТОР КЛАССА ТЕСТИРОВАНИЯ
-        // ПОЛЬЗОВАТЕЛЬСКИХ РЕШЕНИЙ ЗАДАЧ
+        /// Функция-конструктор класса тестирования
+        /// пользовательских решений задач
         ///////////////////////////////////////////////////
 
         public SimplePM_Tester(ref MySqlConnection connection, ref string exeFileUrl, ref Dictionary<string, string> submissionInfo, ref IniData sConfig)
@@ -81,10 +93,10 @@ namespace SimplePM_Server
         #region ИСПОЛЬЗУЕМЫЕ ФУНКЦИИ
 
         ///////////////////////////////////////////////////
-        // ФУНКЦИЯ НОРМАЛИЗАЦИИ ДАННЫХ ВЫХОДНЫХ ПОТОКОВ
-        // ПОЛЬЗОВАТЕЛЬСКИХ И АВТОРСКИХ РЕШЕНИЙ ЗАДАЧ
+        /// ФУНКЦИЯ НОРМАЛИЗАЦИИ ДАННЫХ ВЫХОДНЫХ ПОТОКОВ
+        /// ПОЛЬЗОВАТЕЛЬСКИХ И АВТОРСКИХ РЕШЕНИЙ ЗАДАЧ
         ///////////////////////////////////////////////////
-        private string getNormalizedOutputText(StreamReader outputReader)
+        public string GetNormalizedOutputText(StreamReader outputReader)
         {
             //Создаём переменную, которая будет содержать весь выходной поток
             //авторского решения поставленной задачи
@@ -117,10 +129,10 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        // ФУНКЦИЯ КОНФИГУРАЦИИ ЗАПУСКА ПРИЛОЖЕНИЙ В
-        // ЗАВИСИМОСТИ ОТ ИХ ТИПА ИСПОЛНЕНИЯ
+        /// ФУНКЦИЯ КОНФИГУРАЦИИ ЗАПУСКА ПРИЛОЖЕНИЙ В
+        /// ЗАВИСИМОСТИ ОТ ИХ ТИПА ИСПОЛНЕНИЯ
         ///////////////////////////////////////////////////
-        private void SetExecInfoByFileExt(ref ProcessStartInfo startInfo, string filePath = null)
+        public void SetExecInfoByFileExt(ref ProcessStartInfo startInfo, string filePath = null)
         {
             if (filePath == null)
                 filePath = exeFileUrl;
@@ -153,10 +165,10 @@ namespace SimplePM_Server
         #endregion
 
         ///////////////////////////////////////////////////
-        // DEBUG-ТЕСТИРОВАНИЕ ПОЛЬЗОВАТЕЛЬСКИХ РЕШЕНИЙ
+        /// Функция, отвечающая за отладочное тестирование
+        /// пользовательских решений задач
         ///////////////////////////////////////////////////
-
-        #region РЕГИОН ДЕБАГГЕРНЫХ ФУНКЦИЙ И МЕТОДОВ
+        
         public void DebugTest()
         {
             ///////////////////////////////////////////////////
@@ -344,7 +356,7 @@ namespace SimplePM_Server
                     authorProblemProc.Kill();
 
                 //Получаем обработанный выходной поток авторского решения
-                _authorOutput = getNormalizedOutputText(authorProblemProc.StandardOutput);
+                _authorOutput = GetNormalizedOutputText(authorProblemProc.StandardOutput);
 
                 ///////////////////////////////////////////////////
                 // ЗАПУСК ПРОЦЕССА ПОЛЬЗОВАТЕЛЬСКОГО РЕШЕНИЯ
@@ -419,7 +431,7 @@ namespace SimplePM_Server
                     //Получаем обработанный выходной поток пользовательского решения
                     //но только в случае, когда приложение завершило свою работу самопроизвольно
                     if (_userOutput.Length == 0)
-                        _userOutput = getNormalizedOutputText(userProblemProc.StandardOutput);
+                        _userOutput = GetNormalizedOutputText(userProblemProc.StandardOutput);
 
                     //Получаем exitcode пользовательского приложения
                     _userProblemExitCode = userProblemProc.ExitCode;
@@ -490,13 +502,12 @@ namespace SimplePM_Server
                 new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
             }
         }
-        #endregion
         
         ///////////////////////////////////////////////////
-        // RELEASE-ТЕСТИРОВАНИЕ ПОЛЬЗОВАТЕЛЬСКИХ РЕШЕНИЙ
+        /// Функция, отвечающая за релизное тестирование
+        /// пользовательских решений задач
         ///////////////////////////////////////////////////
-
-        #region РЕГИОН РЕЛИЗНЫХ ФУНКЦИЙ И МЕТОДОВ
+        
         public void ReleaseTest()
         {
             ///////////////////////////////////////////////////
@@ -695,7 +706,7 @@ namespace SimplePM_Server
                             //Ошибок при тесте не выявлено, но вы держитесь!
 
                             //Читаем выходной поток приложения
-                            string pOut = getNormalizedOutputText(problemProc.StandardOutput);
+                            string pOut = GetNormalizedOutputText(problemProc.StandardOutput);
                             //Добавляем результат
                             if (output == pOut)
                             {
@@ -899,6 +910,6 @@ namespace SimplePM_Server
 
             ///////////////////////////////////////////////////
         }
-        #endregion
+
     }
 }

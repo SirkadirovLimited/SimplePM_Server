@@ -8,6 +8,7 @@
  * @Email: admin@sirkadirov.com
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
+/*! \file */
 
 //Основа
 using System;
@@ -24,22 +25,34 @@ using NLog;
 
 namespace SimplePM_Server
 {
+    /*!
+     * \brief
+     * Класс официанта, который занимается
+     * обработкой пользовательских запросов
+     * на тестирование решений задач по
+     * программированию.
+     */
+
     class SimplePM_Officiant
     {
         ///////////////////////////////////////////////////
         // РАЗДЕЛ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ
         ///////////////////////////////////////////////////
+        
+        /*!
+            Объявляем переменную указателя на менеджер журнала собылий
+            и присваиваем ей указатель на журнал событий текущего класса
+        */
+        public static Logger logger = LogManager.GetCurrentClassLogger();
 
-        //Объявляем переменную указателя на менеджер журнала собылий
-        //и присваиваем ей указатель на журнал событий текущего класса
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
-        private MySqlConnection connection; //дескриптор соединения с БД
-        private Dictionary<string, string> submissionInfo; //словарь информации о запросе
-        private IniData sConfig; //дескриптор конфигурационного файла
+        public MySqlConnection connection; //!< Дескриптор соединения с БД
+        public Dictionary<string, string> submissionInfo; //!< Словарь информации о запросе
+        public IniData sConfig; //!< Дескриптор конфигурационного файла
 
         ///////////////////////////////////////////////////
-        // КОНСТРУКТОР КЛАССА ОФФИЦИАНТА
+        /// Функция-конструктор официанта, обрабатывающего
+        /// пользовательский запрос на тестирование
+        /// решения поставленной задачи.
         ///////////////////////////////////////////////////
 
         public SimplePM_Officiant(MySqlConnection connection, IniData sConfig, Dictionary<string, string> submissionInfo)
@@ -50,7 +63,11 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        // ПРОЦЕДУРА, СЕРВЕРУЮЩАЯ ЗАПРОС НА ТЕСТИРОВАНИЕ
+        /// Функция серверует запрос на тестирование,
+        /// контролирует работу компиляторов и
+        /// тестировщиков. Всё необходимое для работы
+        /// функции изымается из глобальных переменных
+        /// класса SimplePM_Officiant (текущего).
         ///////////////////////////////////////////////////
 
         public void ServeSubmission()
@@ -111,8 +128,8 @@ namespace SimplePM_Server
                 /*   LANGUAGE NOT SUPPORTED BY SYSTEM   */
                 default:
                     cResult = new SimplePM_Compiler.CompilerResult();
-                    cResult.hasErrors = true;
-                    cResult.compilerMessage = "Language not supported by SimplePM!";
+                    cResult.HasErrors = true;
+                    cResult.CompilerMessage = "Language not supported by SimplePM!";
                     break;
             }
 
@@ -123,7 +140,7 @@ namespace SimplePM_Server
                 UPDATE 
                     `spm_submissions` 
                 SET 
-                    `compiler_text` = '{cResult.compilerMessage}' 
+                    `compiler_text` = '{cResult.CompilerMessage}' 
                 WHERE 
                     `submissionId` = '{submissionInfo["submissionId"]}' 
                 LIMIT 
@@ -136,7 +153,7 @@ namespace SimplePM_Server
             // ПРОВЕРКА НА НАЛИЧИЕ ОШИБОК ПРИ КОМПИЛЯЦИИ
             ///////////////////////////////////////////////////
 
-            if (cResult.hasErrors)
+            if (cResult.HasErrors)
             {
                 //Ошибка компиляции, записываем это в БД
                 queryUpdate = $@"
@@ -186,7 +203,7 @@ namespace SimplePM_Server
                             //Запускаем тестирование программы
                             new SimplePM_Tester(
                                 ref connection, //дескриптор соединения с БД
-                                ref cResult.exe_fullname, //полный путь к исполняемому файлу
+                                ref cResult.ExeFullname, //полный путь к исполняемому файлу
                                 ref submissionInfo, //информация о запросе на тестирование
                                 ref sConfig //дескриптор конфигурационного файла сервера
                             ).DebugTest();
@@ -198,7 +215,7 @@ namespace SimplePM_Server
                             //Запускаем тестирование программы
                             new SimplePM_Tester(
                                 ref connection, //дескриптор соединения с БД
-                                ref cResult.exe_fullname, //полный путь к исполняемому файлу
+                                ref cResult.ExeFullname, //полный путь к исполняемому файлу
                                 ref submissionInfo, //информация о запросе на тестирование
                                 ref sConfig
                             ).ReleaseTest();
@@ -229,7 +246,7 @@ namespace SimplePM_Server
                     new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
 
                     //Вызываем сборщика мусора
-                    ClearCache(cResult.exe_fullname, fileLocation);
+                    ClearCache(cResult.ExeFullname, fileLocation);
 
                     //Выходим
                     return;
@@ -238,15 +255,17 @@ namespace SimplePM_Server
             }
 
             //Вызываем сборщика мусора
-            ClearCache(cResult.exe_fullname, fileLocation);
+            ClearCache(cResult.ExeFullname, fileLocation);
         }
 
         ///////////////////////////////////////////////////
-        // ПРОЦЕДУРА ОЧИСТКИ КЭША, ОСВОБОЖДЕНИЯ ПАМЯТИ
-        // А ТАКЖЕ УДАЛЕНИЯ ВРЕМЕННЫХ ФАЙЛОВ
+        /// Функция очищает кэш, временные файлы и
+        /// совершает вызов системного сборщика мусора.
+        /// Используется для экономии оперативной памяти
+        /// сервера, на котором работает SimplePM_Server.
         ///////////////////////////////////////////////////
 
-        private void ClearCache(string exe_fullname, string fileLocation)
+        public void ClearCache(string exe_fullname, string fileLocation)
         {
             //Очищаем папку экзешников от мусора
             try

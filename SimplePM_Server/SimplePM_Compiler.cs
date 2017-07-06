@@ -8,6 +8,7 @@
  * @Email: admin@sirkadirov.com
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
+/*! \file */
 
 //Основа
 using System;
@@ -25,22 +26,33 @@ using NLog;
 
 namespace SimplePM_Server
 {
+    /*!
+     * \brief
+     * Класс компиляции пользовательских решений
+     * задач по программированию. Функции в классе
+     * вызывается функциями класса-официанта
+     */
+
     class SimplePM_Compiler
     {
         ///////////////////////////////////////////////////
         // РАЗДЕЛ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ
         ///////////////////////////////////////////////////
 
-        //Объявляем переменную указателя на менеджер журнала собылий
-        //и присваиваем ей указатель на журнал событий текущего класса
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        /*!
+            Объявляем переменную указателя на менеджер журнала собылий
+            и присваиваем ей указатель на журнал событий текущего класса
+        */
+        public static Logger logger = LogManager.GetCurrentClassLogger();
 
-        private ulong submissionId; //идентификатор запроса
-        private string fileLocation; //полный путь к файлу и его расширение
-        private IniData sConfig; //дескриптор конфигурационного файла
+        public ulong submissionId; //!< Идентификатор запроса
+        public string fileLocation; //!< Полный путь к файлу и его расширение
+        public IniData sConfig; //!< Дескриптор конфигурационного файла
 
         ///////////////////////////////////////////////////
-        // КОНСТРУКТОР КЛАССА КОМПИЛЯТОРОВ
+        /// Функция-конструктор класса компиляции
+        /// пользовательских решений задач по
+        /// программированию.
         ///////////////////////////////////////////////////
 
         public SimplePM_Compiler(ref IniData sConfig, ulong submissionId, string fileExt)
@@ -65,18 +77,21 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        // КЛАСС РЕЗУЛЬТАТА КОМПИЛЯЦИИ
+        /// \brief Класс результата компиляции. Используется для
+        /// хранения и передачи информации о результате
+        /// компиляции пользовательского решения
+        /// поставленной задачи.
         ///////////////////////////////////////////////////
 
         public class CompilerResult
         {
-            public bool hasErrors = false;
-            public string exe_fullname = null;
-            public string compilerMessage = null;
+            public bool HasErrors; //!< Найдены ли ошибки в синтаксисе
+            public string ExeFullname; //!< Полное имя исполняемого файла
+            public string CompilerMessage; //!< Сообщение компилятора
         }
 
         ///////////////////////////////////////////////////
-        // PASCAL COMPILER (MIXED)
+        /// PASCAL COMPILER (MIXED)
         ///////////////////////////////////////////////////
 
         public CompilerResult StartFreepascalCompiler()
@@ -101,8 +116,8 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        // СПЕЦИАЛЬНО ДЛЯ НЕКОМПИЛИРУЕМЫХ ЯЗЫКОВ
-        // ПРОГРАММИРОВАНИЯ (ТАКИХ КАК LUA, PYTHON И ДР.)
+        /// СПЕЦИАЛЬНО ДЛЯ НЕКОМПИЛИРУЕМЫХ ЯЗЫКОВ
+        /// ПРОГРАММИРОВАНИЯ (ТАКИХ КАК LUA, PYTHON И ДР.)
         ///////////////////////////////////////////////////
 
         public CompilerResult StartNoCompiler()
@@ -114,11 +129,11 @@ namespace SimplePM_Server
             CompilerResult result = new CompilerResult()
             {
                 //ошибок нет - но вы держитесь
-                hasErrors = false,
+                HasErrors = false,
                 //что дали - то и скинул
-                exe_fullname = fileLocation,
+                ExeFullname = fileLocation,
                 //хз зачем, но надо
-                compilerMessage = Properties.Resources.noCompilerRequired
+                CompilerMessage = Properties.Resources.noCompilerRequired
             };
 
             //Возвращаем результат фальш-компиляции
@@ -126,7 +141,7 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        // КОМПИЛЯТОР ДЛЯ ЯЗЫКА ПРОГРАММИРОВАНИЯ C#
+        /// КОМПИЛЯТОР ДЛЯ ЯЗЫКА ПРОГРАММИРОВАНИЯ C#
         ///////////////////////////////////////////////////
 
         public CompilerResult StartCSharpCompiler()
@@ -169,8 +184,8 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        // ФУНКЦИЯ ЗАПУСКА ПРОЦЕССА СТАНДАРТИЗИРОВАННОГО
-        // КОНСОЛЬНОГО КОМПИЛЯТОРА (МУЛЬТИЮЗ)
+        /// ФУНКЦИЯ ЗАПУСКА ПРОЦЕССА СТАНДАРТИЗИРОВАННОГО
+        /// КОНСОЛЬНОГО КОМПИЛЯТОРА (МУЛЬТИЮЗ)
         ///////////////////////////////////////////////////
 
         private CompilerResult RunCompiler(string compilerFullName, string compilerArgs)
@@ -207,27 +222,27 @@ namespace SimplePM_Server
             {
                 //Получаем результат выполнения компилятора и записываем
                 //его в переменную сообщения компилятора
-                compilerMessage = HttpUtility.HtmlEncode(reader.ReadToEnd())
+                CompilerMessage = HttpUtility.HtmlEncode(reader.ReadToEnd())
             };
 
             return result;
         }
 
         ///////////////////////////////////////////////////
-        // ОКОНЧАТЕЛЬНАЯ ВЫДАЧА РЕЗУЛЬТАТОВ КОМПИЛЯЦИИ
+        /// ОКОНЧАТЕЛЬНАЯ ВЫДАЧА РЕЗУЛЬТАТОВ КОМПИЛЯЦИИ
         ///////////////////////////////////////////////////
 
         private CompilerResult ReturnCompilerResult(CompilerResult temporaryResult)
         {
             //Получаем полный путь к исполняемому файлу
             string exeLocation = sConfig["Program"]["tempPath"] + submissionId.ToString() + ".exe";
-            temporaryResult.exe_fullname = exeLocation;
+            temporaryResult.ExeFullname = exeLocation;
 
             //Проверяем на наличие исполняемого файла
             if (File.Exists(exeLocation))
-                temporaryResult.hasErrors = false;
+                temporaryResult.HasErrors = false;
             else
-                temporaryResult.hasErrors = true;
+                temporaryResult.HasErrors = true;
 
             //Возвращаем результат компиляции
             return temporaryResult;
