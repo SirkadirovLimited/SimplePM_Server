@@ -190,7 +190,7 @@ namespace SimplePM_Server
                                 SET 
                                     `status` = 'ready' 
                                 WHERE 
-                                    `submissionId` = '{submissionInfo["submissionId"].ToString()}' 
+                                    `submissionId` = '{submissionInfo["submissionId"]}' 
                                 LIMIT 
                                     1
                                 ;
@@ -238,7 +238,7 @@ namespace SimplePM_Server
                         SET 
                             `status` = 'waiting' 
                         WHERE 
-                            `submissionId` = '{submissionInfo["submissionId"].ToString()}' 
+                            `submissionId` = '{submissionInfo["submissionId"]}' 
                         LIMIT 
                             1
                         ;

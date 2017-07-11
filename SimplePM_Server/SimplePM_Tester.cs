@@ -295,7 +295,7 @@ namespace SimplePM_Server
                 // ОБЪЯВЛЕНИЕ НЕОБХОДИМЫХ ПЕРЕМЕННЫХ
                 ///////////////////////////////////////////////////
 
-                string _authorOutput = "", _userOutput = "";
+                string _authorOutput, _userOutput = "";
                 char _debugTestingResult = '+';
                 int _userProblemExitCode = 0;
                 
@@ -593,7 +593,7 @@ namespace SimplePM_Server
 
             //Объявление необходимых переменных для тестирования
             //пользовательской программы
-            ulong testId; //идентификатор теста
+            //ulong testId; //идентификатор теста
             string input, output; //входной и выходной потоки теста
             int timeLimit; //лимит времени теста
             long memoryLimit; //лимит памяти теста
@@ -604,9 +604,9 @@ namespace SimplePM_Server
             for (i = 1; i <= testsInfo.Count; i++)
             {
                 //Присвоение переменных данных теста для быстрого доступа
-                testId = ulong.Parse(testsInfo[i]["testId"]);
-                input = testsInfo[i]["input"].ToString();
-                output = testsInfo[i]["output"].ToString().Replace("\r\n", "\n");
+                //testId = ulong.Parse(testsInfo[i]["testId"]);
+                input = testsInfo[i]["input"];
+                output = testsInfo[i]["output"].Replace("\r\n", "\n");
                 timeLimit = int.Parse(testsInfo[i]["timeLimit"]);
                 memoryLimit = long.Parse(testsInfo[i]["memoryLimit"]);
 
