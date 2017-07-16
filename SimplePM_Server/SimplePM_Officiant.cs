@@ -108,19 +108,19 @@ namespace SimplePM_Server
             switch (codeLang)
             {
                 /*   COMPILERS REQUIRED   */
-                case SimplePM_Submission.SubmissionLanguage.freepascal:
+                case SimplePM_Submission.SubmissionLanguage.Freepascal:
                     //Запускаем компилятор
                     cResult = compiler.StartFreepascalCompiler();
                     break;
-                case SimplePM_Submission.SubmissionLanguage.csharp:
+                case SimplePM_Submission.SubmissionLanguage.CSharp:
                     //Запускаем компилятор
                     cResult = compiler.StartCSharpCompiler();
                     break;
                 
                 /*   NO COMPILERS REQUIRED   */
-                case SimplePM_Submission.SubmissionLanguage.lua:
-                case SimplePM_Submission.SubmissionLanguage.python:
-                case SimplePM_Submission.SubmissionLanguage.php:
+                case SimplePM_Submission.SubmissionLanguage.Lua:
+                case SimplePM_Submission.SubmissionLanguage.Python:
+                case SimplePM_Submission.SubmissionLanguage.PHP:
                     //Некоторым файлам не требуется компиляция
                     //но для обратной совместимости функцию вкатать нужно
                     cResult = compiler.StartNoCompiler();
@@ -251,7 +251,7 @@ namespace SimplePM_Server
                     //Выходим
                     return;
                 }
-                
+
             }
 
             //Вызываем сборщика мусора

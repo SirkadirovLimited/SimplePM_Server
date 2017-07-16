@@ -21,17 +21,6 @@ namespace SimplePM_Server
 
     class SimplePM_Submission
     {
-        ///////////////////////////////////////////////////
-        /// Тип запроса на тестирование
-        ///////////////////////////////////////////////////
-
-        public enum SubmissionType
-        {
-            unset = 0,
-            syntax = 2,
-            debug = 4,
-            release = 8
-        }
 
         ///////////////////////////////////////////////////
         /// Язык программирования, на котором
@@ -40,15 +29,15 @@ namespace SimplePM_Server
 
         public enum SubmissionLanguage
         {
-            unset,
-            freepascal,
-            csharp,
-            cpp,
-            c,
-            python,
-            lua,
-            java,
-            php
+            Unset,
+            Freepascal,
+            CSharp,
+            Cpp,
+            C,
+            Python,
+            Lua,
+            Java,
+            PHP
         }
 
         ///////////////////////////////////////////////////
@@ -61,23 +50,23 @@ namespace SimplePM_Server
             switch (codeLang)
             {
                 case "freepascal":
-                    return SubmissionLanguage.freepascal;
+                    return SubmissionLanguage.Freepascal;
                 case "csharp":
-                    return SubmissionLanguage.csharp;
+                    return SubmissionLanguage.CSharp;
                 case "cpp":
-                    return SubmissionLanguage.cpp;
+                    return SubmissionLanguage.Cpp;
                 case "c":
-                    return SubmissionLanguage.c;
+                    return SubmissionLanguage.C;
                 case "python":
-                    return SubmissionLanguage.python;
+                    return SubmissionLanguage.Python;
                 case "lua":
-                    return SubmissionLanguage.lua;
+                    return SubmissionLanguage.Lua;
                 case "java":
-                    return SubmissionLanguage.java;
+                    return SubmissionLanguage.Java;
                 case "php":
-                    return SubmissionLanguage.php;
+                    return SubmissionLanguage.PHP;
                 default:
-                    return SubmissionLanguage.unset;
+                    return SubmissionLanguage.Unset;
             }
         }
 
@@ -91,21 +80,21 @@ namespace SimplePM_Server
         {
             switch (lang)
             {
-                case SubmissionLanguage.freepascal:
+                case SubmissionLanguage.Freepascal:
                     return "pas";
-                case SubmissionLanguage.csharp:
+                case SubmissionLanguage.CSharp:
                     return "cs";
-                case SubmissionLanguage.cpp:
+                case SubmissionLanguage.Cpp:
                     return "cpp";
-                case SubmissionLanguage.c:
+                case SubmissionLanguage.C:
                     return "c";
-                case SubmissionLanguage.python:
+                case SubmissionLanguage.Python:
                     return "py";
-                case SubmissionLanguage.lua:
+                case SubmissionLanguage.Lua:
                     return "lua";
-                case SubmissionLanguage.php:
+                case SubmissionLanguage.PHP:
                     return "php";
-                case SubmissionLanguage.java:
+                case SubmissionLanguage.Java:
                     return "java";
                 default:
                     return "txt";

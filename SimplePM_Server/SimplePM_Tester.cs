@@ -93,8 +93,8 @@ namespace SimplePM_Server
         #region ИСПОЛЬЗУЕМЫЕ ФУНКЦИИ
 
         ///////////////////////////////////////////////////
-        /// ФУНКЦИЯ НОРМАЛИЗАЦИИ ДАННЫХ ВЫХОДНЫХ ПОТОКОВ
-        /// ПОЛЬЗОВАТЕЛЬСКИХ И АВТОРСКИХ РЕШЕНИЙ ЗАДАЧ
+        /// Функция "нормализует" выходные данные потока
+        /// для дальнейшего анализа.
         ///////////////////////////////////////////////////
         public string GetNormalizedOutputText(StreamReader outputReader)
         {
@@ -129,8 +129,9 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        /// ФУНКЦИЯ КОНФИГУРАЦИИ ЗАПУСКА ПРИЛОЖЕНИЙ В
-        /// ЗАВИСИМОСТИ ОТ ИХ ТИПА ИСПОЛНЕНИЯ
+        /// Функция определяет необходимые действия при
+        /// запуске процесса пользовательского или
+        /// авторского решения задачи.
         ///////////////////////////////////////////////////
         public void SetExecInfoByFileExt(ref ProcessStartInfo startInfo, string filePath = null)
         {
@@ -162,13 +163,54 @@ namespace SimplePM_Server
             }
         }
 
+        ///////////////////////////////////////////////////
+        /// Функция создаёт задание, которое через
+        /// короткий промежуток времени проверяет
+        /// процесс на превышение лимита процессорного
+        /// времени, и в случае обнаружения такого
+        /// превышения вызывает функцию (метод), который
+        /// передаётся в аргументах данной функции.
+        ///////////////////////////////////////////////////
+
+        void ProcessorTimeLimitCheck(Process proc, Action doProcessorTimeLimit, int timeLimit)
+        {
+            //Создаём и сразу же запускаем новую задачу
+            new Task(() =>
+            {
+                //Ловим непредвиденные исключения
+                try
+                {
+                    //Повторяем действия пока процесс не закончил свою работу
+                    while (!proc.HasExited)
+                    {
+                        //Очищаем кеш и получаем обновлённые значения
+                        proc.Refresh();
+
+                        //Обновляем переменную типа TimeSpan для удобства
+                        TimeSpan pts = proc.TotalProcessorTime;
+
+                        //Проверяем процесс на превышение лимита процессорного времени
+                        bool checker = pts.Milliseconds > timeLimit;
+                        checker = checker || pts.Minutes > 0;
+                        checker = checker || pts.Hours > 0;
+                        checker = checker || pts.Days > 0;
+
+                        //В случае превышения лимита запускаем пользовательский метод
+                        if (checker)
+                            doProcessorTimeLimit();
+                    }
+                }
+                catch (Exception) { /* Deal with it */ }
+            }).Start();
+        }
+
         #endregion
 
         ///////////////////////////////////////////////////
         /// Функция, отвечающая за отладочное тестирование
         /// пользовательских решений задач
         ///////////////////////////////////////////////////
-        
+
         public void DebugTest()
         {
             ///////////////////////////////////////////////////
@@ -199,7 +241,7 @@ namespace SimplePM_Server
             //Создаём словарь значений элемента авторского решения
             Dictionary<string, string> authorCodeInfo = new Dictionary<string, string>();
             //Создаём переменную, в которой будем хранить бинарный код запускаемого авторского решения
-            byte[] _authorProblemCode = null;
+            byte[] authorProblemCode = null;
 
             //Читаем полученные данные
             while (dataReader.Read())
@@ -210,12 +252,12 @@ namespace SimplePM_Server
                     HttpUtility.HtmlDecode(dataReader["problemId"].ToString())
                 );
                 //Бинарный (исполняемый) код авторского решения
-                _authorProblemCode = (byte[])dataReader["execFile"];
+                authorProblemCode = (byte[])dataReader["execFile"];
             }
 
             dataReader.Close();
 
-            if (authorCodeInfo.Count > 0)
+            if (authorCodeInfo.Count > 0 && authorProblemCode != null)
             {
                 ///////////////////////////////////////////////////
                 // РАБОТА С ФАЙЛОВОЙ СИСТЕМОЙ
@@ -228,7 +270,7 @@ namespace SimplePM_Server
                 BinaryWriter binWriter = new BinaryWriter(new FileStream(authorCodePath, FileMode.Create));
 
                 //Запись бинарного кода программы в файл исполняемого авторского решения
-                binWriter.Write(_authorProblemCode);
+                binWriter.Write(authorProblemCode);
 
                 //Записы данных в файл
                 binWriter.Flush();
@@ -247,7 +289,7 @@ namespace SimplePM_Server
                     FROM 
                         `spm_problems` 
                     WHERE 
-                        `id` = '{problemId.ToString()}' 
+                        `id` = '{problemId}' 
                     ORDER BY 
                         `id` ASC 
                     LIMIT 
@@ -263,7 +305,7 @@ namespace SimplePM_Server
                     FROM 
                         `spm_problems` 
                     WHERE 
-                        `id` = '{problemId.ToString()}' 
+                        `id` = '{problemId}' 
                     ORDER BY 
                         `id` ASC 
                     LIMIT 
@@ -295,9 +337,9 @@ namespace SimplePM_Server
                 // ОБЪЯВЛЕНИЕ НЕОБХОДИМЫХ ПЕРЕМЕННЫХ
                 ///////////////////////////////////////////////////
 
-                string _authorOutput, _userOutput = "";
-                char _debugTestingResult = '+';
-                int _userProblemExitCode = 0;
+                string authorOutput = "", userOutput = "";
+                char debugTestingResult = '+';
+                int userProblemExitCode = 0;
                 
                 ///////////////////////////////////////////////////
                 // ЗАПУСК ПРОЦЕССА АВТОРСКОГО РЕШЕНИЯ
@@ -348,15 +390,24 @@ namespace SimplePM_Server
                     catch (Exception) { }
                 }).Start();
 
-                //Ждём завершения, максимум X миллимекунд
-                authorProblemProc.WaitForExit((int)debugTimeLimit);
+                ///////////////////////////////////////////////////
+                // ОГРАНИЧЕНИЕ ИСПОЛЬЗУЕМОГО ПРОЦЕССОРНОГО ВРЕМЕНИ
+                ///////////////////////////////////////////////////
 
+                void OnProcessorTimeLimit_APP()
+                {
+                    authorProblemProc.Kill();
+                }
+
+                ProcessorTimeLimitCheck(authorProblemProc, OnProcessorTimeLimit_APP, (int)debugTimeLimit);
+
+                //Ждём завершения, максимум X миллимекунд
                 //Если процесс не завершил свою работу - убиваем его
-                if (!authorProblemProc.HasExited)
+                if (!authorProblemProc.WaitForExit(int.Parse(sConfig["UserProc"]["maxProcessTime"])))
                     authorProblemProc.Kill();
 
                 //Получаем обработанный выходной поток авторского решения
-                _authorOutput = GetNormalizedOutputText(authorProblemProc.StandardOutput);
+                authorOutput = GetNormalizedOutputText(authorProblemProc.StandardOutput);
 
                 ///////////////////////////////////////////////////
                 // ЗАПУСК ПРОЦЕССА ПОЛЬЗОВАТЕЛЬСКОГО РЕШЕНИЯ
@@ -388,7 +439,7 @@ namespace SimplePM_Server
                 {
                     //Произошла ошибка при выполнении программы
                     //В этом, скорее всего, виноват компилятор.
-                    _debugTestingResult = 'C';
+                    debugTestingResult = 'C';
                 }
 
                 ///////////////////////////////////////////////////
@@ -405,7 +456,7 @@ namespace SimplePM_Server
                             {
                                 //Лимит памяти превышен
                                 userProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
-                                _debugTestingResult = 'M'; //устанавливаем преждевременный результат тестирования
+                                debugTestingResult = 'M'; //устанавливаем преждевременный результат тестирования
                             }
                         }
                     }
@@ -413,28 +464,41 @@ namespace SimplePM_Server
                 }).Start();
 
                 ///////////////////////////////////////////////////
-                // ПОЛУЧЕНИЕ РЕЗУЛЬТАТОВ ТЕСТИРОВАНИЯ
+                // ОГРАНИЧЕНИЕ ИСПОЛЬЗУЕМОГО ПРОЦЕССОРНОГО ВРЕМЕНИ
                 ///////////////////////////////////////////////////
 
+                void OnProcessorTimeLimit()
+                {
+                    userProblemProc.Kill();
+                    debugTestingResult = 'T';
+                    userOutput = "--- PROCESSOR TIME LIMIT ---";
+                }
+
+                ProcessorTimeLimitCheck(userProblemProc, OnProcessorTimeLimit, (int)debugTimeLimit);
+
+                ///////////////////////////////////////////////////
+                // ПОЛУЧЕНИЕ РЕЗУЛЬТАТОВ ТЕСТИРОВАНИЯ
+                ///////////////////////////////////////////////////
+                
                 try
                 {
 
                     //Ждём завершения, максимум X миллимекунд
                     //Если процесс не завершил свою работу - убиваем его
-                    if (!userProblemProc.WaitForExit((int)debugTimeLimit))
+                    if (!userProblemProc.WaitForExit(int.Parse(sConfig["UserProc"]["maxProcessTime"])))
                     {
                         userProblemProc.Kill();
-                        _debugTestingResult = 'T';
-                        _userOutput = "--- TIME LIMIT ---";
+                        debugTestingResult = 'T';
+                        userOutput = "--- PROGRAM TIME LIMIT ---";
                     }
 
                     //Получаем обработанный выходной поток пользовательского решения
                     //но только в случае, когда приложение завершило свою работу самопроизвольно
-                    if (_userOutput.Length == 0)
-                        _userOutput = GetNormalizedOutputText(userProblemProc.StandardOutput);
+                    if (userOutput.Length == 0)
+                        userOutput = GetNormalizedOutputText(userProblemProc.StandardOutput);
 
                     //Получаем exitcode пользовательского приложения
-                    _userProblemExitCode = userProblemProc.ExitCode;
+                    userProblemExitCode = userProblemProc.ExitCode;
 
                     //Пытаемся удалить временный файл авторского решения поставленной задачи
                     try
@@ -445,8 +509,8 @@ namespace SimplePM_Server
 
                     //Устанавливаем результат отладочного тестирования.
                     //В случае преждевременного результата ничего не делаем
-                    if (_debugTestingResult == '+')
-                        _debugTestingResult = (_authorOutput == _userOutput ? '+' : '-');
+                    if (debugTestingResult == '+')
+                        debugTestingResult = (authorOutput == userOutput ? '+' : '-');
 
                 }
                 catch (Exception) {  }
@@ -456,7 +520,7 @@ namespace SimplePM_Server
                 // ПОЛЬЗОВАТЕЛЬСКОЙ ПРОГРАММЫ
                 ///////////////////////////////////////////////////
 
-                _userOutput = HttpUtility.HtmlEncode(_userOutput);
+                userOutput = HttpUtility.HtmlEncode(userOutput);
 
                 ///////////////////////////////////////////////////
                 // СОХРАНЯЕМ ИНФОРМАЦИЮ О РЕЗУЛЬТАТЕ ТЕСТИРОВАНИЯ
@@ -469,10 +533,10 @@ namespace SimplePM_Server
                     SET 
                         `status` = 'ready', 
                         `errorOutput` = null, 
-                        `result` = '{_debugTestingResult}', 
+                        `result` = '{debugTestingResult}', 
                         `b` = '0', 
-                        `output` = '{_userOutput}', 
-                        `exitcodes` = '{_userProblemExitCode}' 
+                        `output` = '{userOutput}', 
+                        `exitcodes` = '{userProblemExitCode}' 
                     WHERE 
                         `submissionId` = '{submissionId.ToString()}' 
                     LIMIT 
@@ -668,15 +732,30 @@ namespace SimplePM_Server
                 }).Start();
 
                 ///////////////////////////////////////////////////
+                // ОГРАНИЧЕНИЕ ИСПОЛЬЗУЕМОГО ПРОЦЕССОРНОГО ВРЕМЕНИ
+                ///////////////////////////////////////////////////
+
+                void OnProcessorTimeLimit()
+                {
+                    problemProc.Kill();
+                    _problemTestingResult += 'T';
+                }
+
+                ProcessorTimeLimitCheck(problemProc, OnProcessorTimeLimit, timeLimit);
+
+                //Ждём завершения, максимум X миллимекунд
+                //Если процесс не завершил свою работу - убиваем его
+
+                ///////////////////////////////////////////////////
                 // ОЖИДАНИЕ ЗАВЕРШЕНИЯ ПОЛЬЗОВАТЕЛЬСКОЙ ПРОГРАММЫ
                 ///////////////////////////////////////////////////
-                
+
                 //Проверка на досрочный результат проверки
                 if (!preResultGiven)
                 {
 
                     //Ждём завершения, максимум X миллимекунд
-                    if (!problemProc.WaitForExit(timeLimit))
+                    if (!problemProc.WaitForExit(int.Parse(sConfig["UserProc"]["maxProcessTime"])))
                     {
                         //Процесс не завершил свою работу
                         //Исключение: времени не хватило!
