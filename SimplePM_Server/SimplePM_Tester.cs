@@ -382,6 +382,9 @@ namespace SimplePM_Server
                     {
                         while (!authorProblemProc.HasExited)
                         {
+                            //Очищаем кеш и получаем обновлённые значения
+                            authorProblemProc.Refresh();
+
                             //Проверка на превышение лимита памяти
                             if ((ulong)authorProblemProc.PeakWorkingSet64 > debugMemoryLimit) //Лимит памяти превышен
                                 authorProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
@@ -451,6 +454,9 @@ namespace SimplePM_Server
                     {
                         while (!userProblemProc.HasExited)
                         {
+                            //Очищаем кеш и получаем обновлённые значения
+                            userProblemProc.Refresh();
+
                             //Проверка на превышение лимита памяти
                             if ((ulong)userProblemProc.PeakWorkingSet64 > debugMemoryLimit)
                             {
@@ -717,6 +723,9 @@ namespace SimplePM_Server
                     {
                         while (!problemProc.HasExited)
                         {
+                            //Очищаем кеш и получаем обновлённые значения
+                            problemProc.Refresh();
+
                             //Проверка на превышение лимита памяти
                             if (problemProc.PeakWorkingSet64 > memoryLimit)
                             {
