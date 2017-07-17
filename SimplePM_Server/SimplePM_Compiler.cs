@@ -62,13 +62,13 @@ namespace SimplePM_Server
                 throw new ArgumentNullException("fileExt", "File extension error!");
 
             //Устанавливаем полный путь программы
-            fileLocation = sConfig["Program"]["tempPath"] + submissionId.ToString() + fileExt;
+            fileLocation = sConfig["Program"]["tempPath"] + submissionId + fileExt;
 
             //Ещё кое-что проверяем на ошибки
             if (submissionId <= 0)
                 throw new ArgumentNullException("submissionId", "Submission ID invalid!");
             if (string.IsNullOrEmpty(fileLocation) || string.IsNullOrWhiteSpace(fileLocation) || !File.Exists(fileLocation))
-                throw new ArgumentNullException("fileLocation", "File not found!");
+                throw new FileNotFoundException("File not found!", "fileLocation");
 
             //Присваиваем глобальным для класса переменным
             //значения локальных переменных конструктора класса
@@ -91,7 +91,9 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        /// PASCAL COMPILER (MIXED)
+        /// Компилятор языка программирования Pascal
+        /// и его диалектов (Free Pascal, Object Pascal,
+        /// Delphi, etc.)
         ///////////////////////////////////////////////////
 
         public CompilerResult StartFreepascalCompiler()
@@ -99,7 +101,7 @@ namespace SimplePM_Server
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = RunCompiler(
                 sConfig["Compilers"]["freepascal_location"],
-                "-Twin64 -ve -vw -vi -vb " + fileLocation
+                "-ve -vw -vi -vb \"" + fileLocation + "\""
             );
 
             //Получаем полный путь к временному файлу, созданному при компиляции
@@ -116,8 +118,8 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        /// СПЕЦИАЛЬНО ДЛЯ НЕКОМПИЛИРУЕМЫХ ЯЗЫКОВ
-        /// ПРОГРАММИРОВАНИЯ (ТАКИХ КАК LUA, PYTHON И ДР.)
+        /// Функция для некомпилируемых скриптов.
+        /// Сама по себе является заглушкой-безделушкой.
         ///////////////////////////////////////////////////
 
         public CompilerResult StartNoCompiler()
@@ -141,7 +143,10 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        /// КОМПИЛЯТОР ДЛЯ ЯЗЫКА ПРОГРАММИРОВАНИЯ C#
+        /// Функция, вызывающая компилятор языка
+        /// программирования C# либо Mono/C# и
+        /// возвращает результат компиляции
+        /// пользовательской программы.
         ///////////////////////////////////////////////////
 
         public CompilerResult StartCSharpCompiler()
@@ -169,7 +174,7 @@ namespace SimplePM_Server
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = RunCompiler(
                 sConfig["Compilers"]["msbuild_location"],
-                msbuildConfigFileLocation + ""
+                msbuildConfigFileLocation
             );
 
             //Удаляем временные файлы
@@ -184,11 +189,56 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        /// ФУНКЦИЯ ЗАПУСКА ПРОЦЕССА СТАНДАРТИЗИРОВАННОГО
-        /// КОНСОЛЬНОГО КОМПИЛЯТОРА (МУЛЬТИЮЗ)
+        /// Функция вызывает компилятор языка
+        /// программирования C++ и возвращает результат
+        /// компиляции пользовательской программы.
         ///////////////////////////////////////////////////
 
-        private CompilerResult RunCompiler(string compilerFullName, string compilerArgs)
+        public CompilerResult StartCppCompiler()
+        {
+            //Будущее местонахождение исполняемого файла
+            string exeLocation = sConfig["Program"]["tempPath"] + submissionId + "." + sConfig["UserProc"]["exeFileExt"];
+            
+            //Запуск компилятора с заранее определёнными аргументами
+            CompilerResult result = RunCompiler(
+                sConfig["Compilers"]["gpp_location"],
+                fileLocation + " -o " + exeLocation
+            );
+            
+            //Возвращаем результат компиляции
+            return ReturnCompilerResult(result);
+        }
+
+        ///////////////////////////////////////////////////
+        /// Функция вызывает компилятор языка
+        /// программирования C и возвращает результат
+        /// компиляции пользовательской программы.
+        ///////////////////////////////////////////////////
+
+        public CompilerResult StartCCompiler()
+        {
+            //Будущее местонахождение исполняемого файла
+            string exeLocation = sConfig["Program"]["tempPath"] + submissionId + "." + sConfig["UserProc"]["exeFileExt"];
+
+            //Запуск компилятора с заранее определёнными аргументами
+            CompilerResult result = RunCompiler(
+                sConfig["Compilers"]["gcc_location"],
+                fileLocation + " -o " + exeLocation
+            );
+
+            //Возвращаем результат компиляции
+            return ReturnCompilerResult(result);
+        }
+
+        ///////////////////////////////////////////////////
+        /// Функция запускает компилятор определённого
+        /// языка программирования с указанными
+        /// параметрами. В аргументах получает полный
+        /// путь к компилятору а также аргументы.
+        /// Возвращает информацию о результате компиляции.
+        ///////////////////////////////////////////////////
+
+        public CompilerResult RunCompiler(string compilerFullName, string compilerArgs)
         {
             //Создаём новый экземпляр процесса компилятора
             Process cplProc = new Process();
@@ -202,18 +252,26 @@ namespace SimplePM_Server
                 WindowStyle = ProcessWindowStyle.Minimized,
                 //Перехватываем выходной поток
                 RedirectStandardOutput = true,
+                //Перехватываем поток ошибок
+                RedirectStandardError = true,
                 //Для перехвата делаем процесс демоном
                 UseShellExecute = false
             };
-
+            
             //Устанавливаем информацию о старте процесса в дескриптор процесса компилятора
             cplProc.StartInfo = pStartInfo;
+            
             //Запускаем процесс компилятора
             cplProc.Start();
-
+            
             //Получаем выходной поток компилятора
-            StreamReader reader = cplProc.StandardOutput;
+            string standartOutput = cplProc.StandardOutput.ReadToEnd();
+            string standartError = cplProc.StandardError.ReadToEnd();
 
+            //Если выходной поток компилятора пуст, заполняем его не нужным барахлом
+            if (standartOutput.Length == 0)
+                standartOutput = Properties.Resources.consoleHeader;
+            
             //Ожидаем завершение процесса компилятора
             cplProc.WaitForExit();
 
@@ -222,27 +280,26 @@ namespace SimplePM_Server
             {
                 //Получаем результат выполнения компилятора и записываем
                 //его в переменную сообщения компилятора
-                CompilerMessage = HttpUtility.HtmlEncode(reader.ReadToEnd())
+                CompilerMessage = HttpUtility.HtmlEncode(standartOutput + "\n" + standartError)
             };
 
+            //Возвращаем результат компиляции
             return result;
         }
 
         ///////////////////////////////////////////////////
-        /// ОКОНЧАТЕЛЬНАЯ ВЫДАЧА РЕЗУЛЬТАТОВ КОМПИЛЯЦИИ
+        /// Функция, завершающая генерацию результата
+        /// компиляции пользовательского приложения.
         ///////////////////////////////////////////////////
 
-        private CompilerResult ReturnCompilerResult(CompilerResult temporaryResult)
+        public CompilerResult ReturnCompilerResult(CompilerResult temporaryResult)
         {
             //Получаем полный путь к исполняемому файлу
-            string exeLocation = sConfig["Program"]["tempPath"] + submissionId.ToString() + ".exe";
+            string exeLocation = sConfig["Program"]["tempPath"] + submissionId + "." + sConfig["UserProc"]["exeFileExt"];
             temporaryResult.ExeFullname = exeLocation;
 
             //Проверяем на наличие исполняемого файла
-            if (File.Exists(exeLocation))
-                temporaryResult.HasErrors = false;
-            else
-                temporaryResult.HasErrors = true;
+            temporaryResult.HasErrors = !File.Exists(exeLocation);
 
             //Возвращаем результат компиляции
             return temporaryResult;

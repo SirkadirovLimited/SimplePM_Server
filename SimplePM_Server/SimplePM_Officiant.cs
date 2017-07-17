@@ -109,14 +109,22 @@ namespace SimplePM_Server
             {
                 /*   COMPILERS REQUIRED   */
                 case SimplePM_Submission.SubmissionLanguage.Freepascal:
-                    //Запускаем компилятор
+                    //Запускаем компилятор Pascal
                     cResult = compiler.StartFreepascalCompiler();
                     break;
                 case SimplePM_Submission.SubmissionLanguage.CSharp:
-                    //Запускаем компилятор
+                    //Запускаем компилятор C#
                     cResult = compiler.StartCSharpCompiler();
                     break;
-                
+                case SimplePM_Submission.SubmissionLanguage.C:
+                    //Запускаем компилятор C
+                    cResult = compiler.StartCCompiler();
+                    break;
+                case SimplePM_Submission.SubmissionLanguage.Cpp:
+                    //Запускаем компилятор C++
+                    cResult = compiler.StartCppCompiler();
+                    break;
+
                 /*   NO COMPILERS REQUIRED   */
                 case SimplePM_Submission.SubmissionLanguage.Lua:
                 case SimplePM_Submission.SubmissionLanguage.Python:
@@ -125,6 +133,7 @@ namespace SimplePM_Server
                     //но для обратной совместимости функцию вкатать нужно
                     cResult = compiler.StartNoCompiler();
                     break;
+                
                 /*   LANGUAGE NOT SUPPORTED BY SYSTEM   */
                 default:
                     cResult = new SimplePM_Compiler.CompilerResult();
@@ -132,7 +141,6 @@ namespace SimplePM_Server
                     cResult.CompilerMessage = "Language not supported by SimplePM!";
                     break;
             }
-
             ///////////////////////////////////////////////////
             // Записываем в базу данных сообщение компилятора
             ///////////////////////////////////////////////////
@@ -225,9 +233,11 @@ namespace SimplePM_Server
 
                     ///////////////////////////////////////////////////
                 }
+
                 ///////////////////////////////////////////////////
                 // ДЕЙСТВИЯ В СЛУЧАЕ ОШИБКИ СЕРВЕРА ПРОВЕРКИ
                 ///////////////////////////////////////////////////
+                
                 catch (Exception)
                 {
                     //Делаем так, чтобы несчастливую отправку обрабатывал
