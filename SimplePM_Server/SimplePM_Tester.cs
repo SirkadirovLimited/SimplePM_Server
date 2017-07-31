@@ -847,7 +847,14 @@ namespace SimplePM_Server
 
                 int testsCount = (testsInfo.Count == 0 ? 1 : testsInfo.Count);
 
-                _bResult = (_problemPassedTests / testsCount) * problemDifficulty;
+                //Вычисляем зачисляемые за решение задачи
+                //баллы, метод вычисления выбираем в
+                //зависимости от типа запроса
+
+                if (ulong.Parse(submissionInfo["olympId"]) > 0)
+                    _bResult = (float)_problemPassedTests / testsCount * problemDifficulty;
+                else
+                    _bResult = _problemPassedTests == testsCount ? problemDifficulty : 0;
             }
             catch (Exception) { _bResult = problemDifficulty; _problemTestingResult = "+"; }
 
