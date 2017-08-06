@@ -189,12 +189,14 @@ namespace SimplePM_Server
                         //Обновляем переменную типа TimeSpan для удобства
                         TimeSpan pts = proc.TotalProcessorTime;
 
+                        //PerformanceCounter percCounter = new PerformanceCounter("Process", "% Processor Time", proc.ProcessName);
+
                         //Проверяем процесс на превышение лимита процессорного времени
                         bool checker = pts.Milliseconds > timeLimit;
                         checker = checker || pts.Minutes > 0;
                         checker = checker || pts.Hours > 0;
                         checker = checker || pts.Days > 0;
-
+                        
                         //В случае превышения лимита запускаем пользовательский метод
                         if (checker)
                             doProcessorTimeLimit();
@@ -545,7 +547,7 @@ namespace SimplePM_Server
                     //Устанавливаем результат отладочного тестирования.
                     //В случае преждевременного результата ничего не делаем
                     if (debugTestingResult == '+')
-                        debugTestingResult = (authorOutput == userOutput ? '+' : '-');
+                        debugTestingResult = (userProblemExitCode == 0 && authorOutput == userOutput) ? '+' : '-';
 
                 }
                 catch (Exception) {  }
@@ -632,7 +634,6 @@ namespace SimplePM_Server
             MySqlDataReader dataReader = cmdSelect.ExecuteReader();
 
             //Переменная результата выполнения всех тестов
-            string _problemTestingResult = "";
             int _problemPassedTests = 0;
 
             //Объявляем словарь информации о тестах
@@ -697,8 +698,10 @@ namespace SimplePM_Server
             int timeLimit; //лимит времени теста
             long memoryLimit; //лимит памяти теста
             string standartErrorOutputText = null; //переменная стандартного потока ошибок
-            bool preResultGiven = false; //служебная переменная для определения предопределённого результата
             string _exitcodes = "|"; //переменная кодов выхода
+            long exitcodesSum = 0;
+            bool preResultGiven = false; //служебная переменная для определения предопределённого результата
+            string[] testingResults = new string[testsInfo.Count]; //переменная, хранящая информацию о пройденных тестах
 
             for (i = 1; i <= testsInfo.Count; i++)
             {
@@ -708,6 +711,7 @@ namespace SimplePM_Server
                 output = testsInfo[i]["output"].Replace("\r\n", "\n");
                 timeLimit = int.Parse(testsInfo[i]["timeLimit"]);
                 memoryLimit = long.Parse(testsInfo[i]["memoryLimit"]);
+                preResultGiven = false;
 
                 //Объявляем дескриптор процесса
                 Process problemProc = new Process()
@@ -743,9 +747,11 @@ namespace SimplePM_Server
                     //Произошла ошибка при выполнении программы.
                     //Виноват, как всегда, компилятор!
 
-                    _problemTestingResult += "C";
+                    testingResults[i-1] = "C";
                     preResultGiven = true;
                 }
+
+                
 
                 ///////////////////////////////////////////////////
                 // КОНТРОЛЬ ИСПОЛЬЗУЕМОЙ ПРОЦЕССОМ ПАМЯТИ
@@ -765,7 +771,8 @@ namespace SimplePM_Server
                             {
                                 //Лимит памяти превышен
                                 problemProc.Kill(); //завершаем работу процесса в принудительном порядке
-                                _problemTestingResult += "M"; //устанавливаем преждевременный результат тестирования
+
+                                testingResults[i - 1] = "M"; //устанавливаем преждевременный результат тестирования
                                 preResultGiven = true; //указываем, что выдали преждевременный результат тестирования
                             }
                         }
@@ -781,7 +788,9 @@ namespace SimplePM_Server
                 void OnProcessorTimeLimit()
                 {
                     problemProc.Kill();
-                    _problemTestingResult += 'T';
+
+                    preResultGiven = true;
+                    testingResults[i - 1] = "T";
                 }
 
                 ProcessorTimeLimitCheck(problemProc, OnProcessorTimeLimit, timeLimit);
@@ -796,17 +805,18 @@ namespace SimplePM_Server
                 //Проверка на досрочный результат проверки
                 if (!preResultGiven)
                 {
-
                     //Ждём завершения, максимум X миллимекунд
                     if (!problemProc.WaitForExit(int.Parse(sConfig["UserProc"]["maxProcessTime"])))
                     {
                         //Процесс не завершил свою работу
                         //Исключение: времени не хватило!
                         problemProc.Kill();
+
                         //Методом научного тыка было выявлено, что необходимо 10 мс чтобы программа
                         //корректно завершила свою работу
                         Thread.Sleep(10);
-                        _problemTestingResult += 'T';
+
+                        testingResults[i - 1] = "T";
                     }
                     else
                     {
@@ -821,7 +831,7 @@ namespace SimplePM_Server
                         if (currentErrors.Length > 0)
                         {
                             //Ошибка при тесте!
-                            _problemTestingResult += 'E';
+                            testingResults[i - 1] = "E";
                         }
                         else
                         {
@@ -830,15 +840,16 @@ namespace SimplePM_Server
                             //Читаем выходной поток приложения
                             string pOut = GetNormalizedOutputText(problemProc.StandardOutput);
                             //Добавляем результат
-                            if (output == pOut)
+                            
+                            if (problemProc.ExitCode != 0)
+                                testingResults[i - 1] = "R";
+                            else if (output == pOut)
                             {
-                                _problemTestingResult += '+';
+                                testingResults[i - 1] = "+";
                                 _problemPassedTests++;
                             }
-                            else if (problemProc.ExitCode != 0)
-                                _problemTestingResult += 'R';
                             else
-                                _problemTestingResult += '-';
+                                testingResults[i - 1] = "-";
                         }
 
                     }
@@ -846,6 +857,11 @@ namespace SimplePM_Server
                     //Добавляем конечную палку для правильности
                     //последующих парсингов
                     _exitcodes += problemProc.ExitCode + "|";
+
+                    //Вычисляем сумму абсолютных значений кодов выхода
+                    //для последующей проверки на ошибочность решения
+
+                    exitcodesSum += Math.Abs(problemProc.ExitCode);
 
                 }
 
@@ -869,11 +885,12 @@ namespace SimplePM_Server
 
             try
             {
+
                 //Тестов нет, но вы держитесь!
-                if (_problemTestingResult.Length <= 0)
+                if (testsInfo.Count <= 0)
                 {
-                    _problemTestingResult = "+";
-                    _problemPassedTests = 1;
+                    testingResults = new string[] { "C" };
+                    _problemPassedTests = 0;
                 }
 
                 //Вычисляем полученный балл за решение задачи
@@ -885,12 +902,18 @@ namespace SimplePM_Server
                 //баллы, метод вычисления выбираем в
                 //зависимости от типа запроса
 
-                if (ulong.Parse(submissionInfo["olympId"]) > 0)
-                    _bResult = (float)_problemPassedTests / testsCount * problemDifficulty;
+                if (exitcodesSum == 0)
+                {
+                    if (ulong.Parse(submissionInfo["olympId"]) > 0)
+                        _bResult = (float) _problemPassedTests / testsCount * problemDifficulty;
+                    else
+                        _bResult = _problemPassedTests == testsCount ? problemDifficulty : 0;
+                }
                 else
-                    _bResult = _problemPassedTests == testsCount ? problemDifficulty : 0;
+                    _bResult = 0;
+
             }
-            catch (Exception) { _bResult = problemDifficulty; _problemTestingResult = "+"; }
+            catch (Exception) { _bResult = 0; testingResults = new string[] { "-" }; }
 
             ///////////////////////////////////////////////////
             // ОТПРАВКА РЕЗУЛЬТАТОВ ТЕСТИРОВАНИЯ В БД
@@ -915,7 +938,7 @@ namespace SimplePM_Server
             MySqlCommand cmdUpd = new MySqlCommand(queryUpdate, connection);
             //Безопасно добавляем отправляемые данные
             cmdUpd.Parameters.AddWithValue("@errorOutput", standartErrorOutputText);
-            cmdUpd.Parameters.AddWithValue("@result", _problemTestingResult);
+            cmdUpd.Parameters.AddWithValue("@result", string.Join("", testingResults));
             cmdUpd.Parameters.AddWithValue("@exitcodes", _exitcodes);
             cmdUpd.Parameters.AddWithValue("@b", _bResult);
             cmdUpd.Parameters.AddWithValue("@submId", submissionId.ToString());
