@@ -18,7 +18,7 @@ using System.IO;
 using System.Collections.Generic;
 //Работа с процессами
 using System.Diagnostics;
-//Работа с потоками
+//Работа с потоками и задачами
 using System.Threading;
 using System.Threading.Tasks;
 //Безопасность
@@ -98,33 +98,33 @@ namespace SimplePM_Server
         ///////////////////////////////////////////////////
         public string GetNormalizedOutputText(StreamReader outputReader)
         {
+            
             //Создаём переменную, которая будет содержать весь выходной поток
             //авторского решения поставленной задачи
             string _output = "";
-            //Создаём временную переменную текущей строки вывода
-            string curLine = "";
-
+            
+            //Производим необходимые действия пока мы
+            //не достигли конца выходного потока
             while (!outputReader.EndOfStream)
             {
-                //Получаем содержимое текущей строки
-                curLine = outputReader.ReadLine();
+                
+                //Создаём временную переменную текущей строки вывода,
+                //получаем содержимое текущей строки
+                string curLine = outputReader.ReadLine();
 
-                //Убираем переводы на новую строку
-                curLine = curLine.Replace("\n", "");
                 //Убираем все начальные и конечные пробелы
-                curLine = curLine.Trim(' ');
-
-                if (curLine.Length > 0)
-                {
-                    //Добавляем перевод на новую строку (если, конечно, это не первая строка)
-                    if (_output.Length > 0)
-                        curLine = "\n" + curLine;
-                }
-
+                curLine = curLine.TrimEnd(' ');
+                
                 //Дозаписываем данные в переменную выходного потока приложения
-                _output += curLine;
+                _output += curLine + "\n";
+                
             }
 
+            //Удаляем последний искуственно
+            // созданный перевод на новую строку
+            _output = _output.Substring(0, _output.LastIndexOf('\n'));
+
+            //Возвращаем результат нормализации
             return _output;
         }
 
@@ -216,13 +216,20 @@ namespace SimplePM_Server
 
         void SetProcessRunAs(ref Process proc)
         {
+
+            //Проверяем, включена ли функция запуска
+            //пользовательских программ от имени инного пользователя
             if (sConfig["RunAs"]["enabled"] == "true")
             {
 
+                //Передаём имя пользователя
                 proc.StartInfo.UserName = sConfig["RunAs"]["accountLogin"];
+                //Передаём пароль пользователя в открытом виде
+                //(а почему бы и нет)
                 proc.StartInfo.PasswordInClearText = sConfig["RunAs"]["accountPassword"];
 
             }
+
         }
         
         #endregion
@@ -247,7 +254,7 @@ namespace SimplePM_Server
                 FROM 
                     `spm_problems_ready` 
                 WHERE 
-                    `problemId` = '{problemId.ToString()}' 
+                    `problemId` = '{problemId}' 
                 ORDER BY 
                     `problemId` ASC 
                 LIMIT 
@@ -276,10 +283,12 @@ namespace SimplePM_Server
                 authorProblemCode = (byte[])dataReader["execFile"];
             }
 
+            //Закрываем data reader
             dataReader.Close();
 
             if (authorCodeInfo.Count > 0 && authorProblemCode != null)
             {
+
                 ///////////////////////////////////////////////////
                 // РАБОТА С ФАЙЛОВОЙ СИСТЕМОЙ
                 ///////////////////////////////////////////////////
@@ -570,24 +579,37 @@ namespace SimplePM_Server
                     SET 
                         `status` = 'ready', 
                         `errorOutput` = null, 
-                        `result` = '{debugTestingResult}', 
+                        `result` = @result, 
                         `b` = '0', 
-                        `output` = '{userOutput}', 
-                        `exitcodes` = '{userProblemExitCode}' 
+                        `output` = @output, 
+                        `exitcodes` = @exitcodes 
                     WHERE 
-                        `submissionId` = '{submissionId.ToString()}' 
+                        `submissionId` = '{submissionId}' 
                     LIMIT 
                         1
                     ;
                 ";
-                new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+
+                //Создаём и инициализируем команду для сервера баз данных MySQL
+                MySqlCommand sendResultCmd = new MySqlCommand(queryUpdate, connection);
+
+                //Устанавливаем значения параметров
+                sendResultCmd.Parameters.AddWithValue("@output", userOutput);
+                sendResultCmd.Parameters.AddWithValue("@result", debugTestingResult);
+                sendResultCmd.Parameters.AddWithValue("@exitcodes", userProblemExitCode);
+
+                //Выполняем запрос не требуя ответа
+                sendResultCmd.ExecuteNonQuery();
+
             }
             else
             {
+
                 ///////////////////////////////////////////////////
                 // НАША ХАТА СКРАЮ - НІЧОГО НЕ ЗНАЮ!
                 ///////////////////////////////////////////////////
 
+                //Запрос на обновление данных в базе данных
                 string queryUpdate = $@"
                     UPDATE 
                         `spm_submissions` 
@@ -600,7 +622,10 @@ namespace SimplePM_Server
                         1
                     ;
                 ";
+
+                //Выполняем запрос, адресованный к серверу баз данных MySQL
                 new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+
             }
         }
         
@@ -623,7 +648,7 @@ namespace SimplePM_Server
                 FROM 
                     `spm_problems_tests`
                 WHERE 
-                    `problemId` = '{problemId.ToString()}' 
+                    `problemId` = '{problemId}' 
                 ORDER BY 
                     `id` ASC
                 ;
@@ -889,7 +914,7 @@ namespace SimplePM_Server
                 //Тестов нет, но вы держитесь!
                 if (testsInfo.Count <= 0)
                 {
-                    testingResults = new string[] { "C" };
+                    testingResults = new string[] {"C"};
                     _problemPassedTests = 0;
                 }
 
@@ -913,7 +938,15 @@ namespace SimplePM_Server
                     _bResult = 0;
 
             }
-            catch (Exception) { _bResult = 0; testingResults = new string[] { "-" }; }
+            catch (Exception)
+            {
+
+                //Устанавливаем полученные пользователем баллы
+                _bResult = 0;
+                //Устанавливаем результаты тестирования
+                testingResults = new string[] { "-" };
+
+            }
 
             ///////////////////////////////////////////////////
             // ОТПРАВКА РЕЗУЛЬТАТОВ ТЕСТИРОВАНИЯ В БД
