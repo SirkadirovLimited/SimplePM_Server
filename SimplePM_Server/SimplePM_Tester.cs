@@ -737,6 +737,7 @@ namespace SimplePM_Server
                 timeLimit = int.Parse(testsInfo[i]["timeLimit"]);
                 memoryLimit = long.Parse(testsInfo[i]["memoryLimit"]);
                 preResultGiven = false;
+                testingResults[i - 1] = null;
 
                 //Объявляем дескриптор процесса
                 Process problemProc = new Process()
@@ -860,21 +861,33 @@ namespace SimplePM_Server
                         }
                         else
                         {
-                            //Ошибок при тесте не выявлено, но вы держитесь!
+
+                            /* Ошибок при тесте не выявлено, но вы держитесь! */
 
                             //Читаем выходной поток приложения
                             string pOut = GetNormalizedOutputText(problemProc.StandardOutput);
-                            //Добавляем результат
-                            
-                            if (problemProc.ExitCode != 0)
-                                testingResults[i - 1] = "R";
-                            else if (output == pOut)
+
+                            //Устанавливаем результат прохождения теста
+                            //(если, конечно, уже не вынесен предварительный результат)
+                            if (testingResults[i - 1] == null)
                             {
-                                testingResults[i - 1] = "+";
-                                _problemPassedTests++;
+
+                                if (problemProc.ExitCode != 0) //код выхода не нуль
+                                {
+                                    testingResults[i - 1] = "R";
+                                }
+                                else if (output == pOut) //выходные потоки равны
+                                {
+                                    testingResults[i - 1] = "+";
+                                    _problemPassedTests++;
+                                }
+                                else //тест не пройден
+                                {
+                                    testingResults[i - 1] = "-";
+                                }
+
                             }
-                            else
-                                testingResults[i - 1] = "-";
+                            
                         }
 
                     }
