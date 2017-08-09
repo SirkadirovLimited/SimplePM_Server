@@ -148,6 +148,10 @@ namespace SimplePM_Server
                     //Запускаем компилятор C++
                     cResult = compiler.StartCppCompiler();
                     break;
+                case SimplePM_Submission.SubmissionLanguage.Java:
+                    //Запускаем компилятор Java
+                    cResult = compiler.StartJavaCompiler();
+                    break;
 
                 /*   ДЛЯ РАБОТЫ ПРОГРАММЫ НЕ ТРЕБУЕТСЯ КОМПИЛЯЦИЯ   */
                 case SimplePM_Submission.SubmissionLanguage.Lua:

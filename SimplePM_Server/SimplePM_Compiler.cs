@@ -274,17 +274,50 @@ namespace SimplePM_Server
 
         public CompilerResult StartJavaCompiler()
         {
-            //Будущее местонахождение исполняемого файла
-            string exeLocation = GenerateExeFileLocation(fileLocation, submissionId.ToString(), "class");
 
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = RunCompiler(
-                sConfig["Compilers"]["java_location"],
-                fileLocation + " -o " + exeLocation
+                sConfig["Compilers"]["javac_location"],
+                fileLocation
             );
+
+            //Для отлавливания всевозможных ошибок
+            //создаём их улавливатель.
+            //Он также поможет отловить пользовательские
+            //ошибки в связи с незнанием правил использования
+            //автоматизированной системы проверки решений SimplePM.
+            try
+            {
+                //Получаем информацию о файле исходного кода
+                FileInfo fileInfo = new FileInfo(fileLocation);
+
+                //Ищем все файлы с расширением class в текущей директории
+                FileInfo[] filesSearch = fileInfo.Directory.GetFiles("*.class");
+
+                //Если классов больше одного - значит пользователь
+                //не читал правила работы с системой. Воспринимаем
+                //это как ошибку при компиляции, выбрасывая исключение
+                if (filesSearch.Length > 1)
+                    throw new OverflowException();
+
+                //Получаем полный путь к исполняемому файлу
+                string exeFullName = filesSearch[0].FullName;
+
+                //Присваиваем переменным класса результата компиляции
+                //необходимые для тестирования значения.
+                result.ExeFullname = exeFullName; // полный путь к исполняемому файлу
+                result.HasErrors = false; // ошибок при компиляции не выявлено
+            }
+            catch (Exception)
+            {
+                //В случае любой ошибки считаем что она
+                //произошла по прямой вине пользователя.
+                result.HasErrors = true;
+            }
 
             //Возвращаем результат компиляции
             return ReturnCompilerResult(result);
+
         }
 
         ///////////////////////////////////////////////////
@@ -320,7 +353,10 @@ namespace SimplePM_Server
             
             //Запускаем процесс компилятора
             cplProc.Start();
-            
+
+            //Ожидаем завершение процесса компилятора
+            cplProc.WaitForExit();
+
             //Получаем выходной поток компилятора
             string standartOutput = cplProc.StandardOutput.ReadToEnd();
             string standartError = cplProc.StandardError.ReadToEnd();
@@ -328,9 +364,6 @@ namespace SimplePM_Server
             //Если выходной поток компилятора пуст, заполняем его не нужным барахлом
             if (standartOutput.Length == 0)
                 standartOutput = Properties.Resources.consoleHeader;
-            
-            //Ожидаем завершение процесса компилятора
-            cplProc.WaitForExit();
 
             //Объявляем переменную результата компиляции
             CompilerResult result = new CompilerResult()
@@ -351,9 +384,13 @@ namespace SimplePM_Server
 
         public CompilerResult ReturnCompilerResult(CompilerResult temporaryResult)
         {
-
-            //Проверяем на наличие исполняемого файла
-            temporaryResult.HasErrors = !File.Exists(temporaryResult.ExeFullname);
+            //Проверяем результат компиляции
+            //на предопределённость наличия ошибки
+            if (!temporaryResult.HasErrors)
+            {
+                //Проверяем на наличие исполняемого файла
+                temporaryResult.HasErrors = !File.Exists(temporaryResult.ExeFullname);
+            }
 
             //Возвращаем результат компиляции
             return temporaryResult;

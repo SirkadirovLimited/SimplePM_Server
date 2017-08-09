@@ -150,6 +150,11 @@ namespace SimplePM_Server
                     startInfo.FileName = sConfig["Compilers"]["python_location"];
                     startInfo.Arguments = filePath;
                     break;
+                //Java
+                case ".java":
+                    startInfo.FileName = sConfig["Compilers"]["java_location"];
+                    startInfo.Arguments = filePath;
+                    break;
                 //PHP
                 case ".php":
                     startInfo.FileName = sConfig["Compilers"]["php_location"];
