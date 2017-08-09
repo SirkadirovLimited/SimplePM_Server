@@ -54,19 +54,13 @@ namespace SimplePM_Server
         /// пользовательских решений задач по
         /// программированию.
         ///////////////////////////////////////////////////
-
-        public SimplePM_Compiler(ref IniData sConfig, ulong submissionId, string fileExt)
+        public SimplePM_Compiler(ref IniData sConfig, ulong submissionId, string fileLocation)
         {
-            //Проверяем на ошибки
-            if (string.IsNullOrEmpty(fileExt) || string.IsNullOrWhiteSpace(fileExt))
-                throw new ArgumentNullException("fileExt", "File extension error!");
-
-            //Устанавливаем полный путь программы
-            fileLocation = sConfig["Program"]["tempPath"] + submissionId + fileExt;
 
             //Ещё кое-что проверяем на ошибки
             if (submissionId <= 0)
-                throw new ArgumentNullException("submissionId", "Submission ID invalid!");
+                throw new ArgumentNullException(nameof(submissionId));
+
             if (string.IsNullOrEmpty(fileLocation) || string.IsNullOrWhiteSpace(fileLocation) || !File.Exists(fileLocation))
                 throw new FileNotFoundException("File not found!", "fileLocation");
 
@@ -74,13 +68,15 @@ namespace SimplePM_Server
             //значения локальных переменных конструктора класса
             this.sConfig = sConfig;
             this.submissionId = submissionId;
+            this.fileLocation = fileLocation;
+
         }
 
         ///////////////////////////////////////////////////
-        /// \brief Класс результата компиляции. Используется для
-        /// хранения и передачи информации о результате
-        /// компиляции пользовательского решения
-        /// поставленной задачи.
+        /// \brief Класс результата компиляции.
+        /// Используется для хранения и передачи
+        /// информации о результате компиляции
+        /// пользовательского решения поставленной задачи.
         ///////////////////////////////////////////////////
 
         public class CompilerResult
@@ -91,6 +87,31 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
+        /// Функция, возвращающая сгенерированный путь
+        /// к исполняемому файлу решения задачи.
+        ///////////////////////////////////////////////////
+
+        public string GenerateExeFileLocation(string srcFileLocation, string currentSubmissionId, string outFileExt = null)
+        {
+
+            //Получаем путь родительской директории файла исходного кода
+            string parentDirectoryFullName = new FileInfo(srcFileLocation).DirectoryName + @"\";
+            
+            //Формируем начальный путь исполняемого файла
+            string exePath = parentDirectoryFullName + currentSubmissionId;
+
+            //В случае, если расширение исполняемого
+            //файла в данной ОС не нулевое,
+            //добавляем его к имени файла.
+            if (!String.IsNullOrWhiteSpace(outFileExt))
+                exePath += '.' + outFileExt;
+            
+            //Возвращаем результат
+            return exePath;
+
+        }
+
+        ///////////////////////////////////////////////////
         /// Компилятор языка программирования Pascal
         /// и его диалектов (Free Pascal, Object Pascal,
         /// Delphi, etc.)
@@ -98,11 +119,18 @@ namespace SimplePM_Server
 
         public CompilerResult StartFreepascalCompiler()
         {
+
+            //Будущее местонахождение исполняемого файла
+            string exeLocation = GenerateExeFileLocation(fileLocation, submissionId.ToString(), sConfig["UserProc"]["exeFileExt"]);
+
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = RunCompiler(
                 sConfig["Compilers"]["freepascal_location"],
                 "-ve -vw -vi -vb \"" + fileLocation + "\""
             );
+
+            //Передаём полный путь к исполняемому файлу
+            result.ExeFullname = exeLocation;
 
             //Получаем полный путь к временному файлу, созданному при компиляции
             string oFileLocation = sConfig["Program"]["tempPath"] + submissionId + ".o";
@@ -115,6 +143,7 @@ namespace SimplePM_Server
 
             //Возвращаем результат компиляции
             return ReturnCompilerResult(result);
+
         }
 
         ///////////////////////////////////////////////////
@@ -197,14 +226,17 @@ namespace SimplePM_Server
         public CompilerResult StartCppCompiler()
         {
             //Будущее местонахождение исполняемого файла
-            string exeLocation = sConfig["Program"]["tempPath"] + submissionId + "." + sConfig["UserProc"]["exeFileExt"];
-            
+            string exeLocation = GenerateExeFileLocation(fileLocation, submissionId.ToString(), sConfig["UserProc"]["exeFileExt"]);
+
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = RunCompiler(
                 sConfig["Compilers"]["gpp_location"],
                 fileLocation + " -o " + exeLocation
             );
-            
+
+            //Передаём полный путь к исполняемому файлу
+            result.ExeFullname = exeLocation;
+
             //Возвращаем результат компиляции
             return ReturnCompilerResult(result);
         }
@@ -218,11 +250,36 @@ namespace SimplePM_Server
         public CompilerResult StartCCompiler()
         {
             //Будущее местонахождение исполняемого файла
-            string exeLocation = sConfig["Program"]["tempPath"] + submissionId + "." + sConfig["UserProc"]["exeFileExt"];
+            string exeLocation = GenerateExeFileLocation(fileLocation, submissionId.ToString(), sConfig["UserProc"]["exeFileExt"]);
 
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = RunCompiler(
                 sConfig["Compilers"]["gcc_location"],
+                fileLocation + " -o " + exeLocation
+            );
+
+            //Передаём полный путь к исполняемому файлу
+            result.ExeFullname = exeLocation;
+
+            //Возвращаем результат компиляции
+            return ReturnCompilerResult(result);
+        }
+
+        ///////////////////////////////////////////////////
+        /// Функция вызывает компилятор языка
+        /// программирования Java и возвращает результат
+        /// компиляции пользовательской программы.
+        /// (Находится на стадии реализации)
+        ///////////////////////////////////////////////////
+
+        public CompilerResult StartJavaCompiler()
+        {
+            //Будущее местонахождение исполняемого файла
+            string exeLocation = GenerateExeFileLocation(fileLocation, submissionId.ToString(), "class");
+
+            //Запуск компилятора с заранее определёнными аргументами
+            CompilerResult result = RunCompiler(
+                sConfig["Compilers"]["java_location"],
                 fileLocation + " -o " + exeLocation
             );
 
@@ -294,15 +351,13 @@ namespace SimplePM_Server
 
         public CompilerResult ReturnCompilerResult(CompilerResult temporaryResult)
         {
-            //Получаем полный путь к исполняемому файлу
-            string exeLocation = sConfig["Program"]["tempPath"] + submissionId + "." + sConfig["UserProc"]["exeFileExt"];
-            temporaryResult.ExeFullname = exeLocation;
 
             //Проверяем на наличие исполняемого файла
-            temporaryResult.HasErrors = !File.Exists(exeLocation);
+            temporaryResult.HasErrors = !File.Exists(temporaryResult.ExeFullname);
 
             //Возвращаем результат компиляции
             return temporaryResult;
+
         }
     }
 }

@@ -73,17 +73,6 @@ namespace SimplePM_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to using System;
-        ///using System.Text;
-        ///using System.Collections;.
-        /// </summary>
-        internal static string csharp_includes {
-            get {
-                return ResourceManager.GetString("csharp_includes", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to &lt;Project DefaultTargets = &quot;Compile&quot; xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot; &gt;
         ///	
         ///	&lt;PropertyGroup&gt;
@@ -112,10 +101,14 @@ namespace SimplePM_Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SimplePM
-        ///========
+        ///   Looks up a localized string similar to =====================================
+        ///SimplePM
+        ///=====================================
         ///For programming language you selected
-        ///there is no need to use compiler!.
+        ///there is no need to use compiler!
+        ///=====================================
+        ///You can check syntax in debug mode!
+        ///=====================================.
         /// </summary>
         internal static string noCompilerRequired {
             get {

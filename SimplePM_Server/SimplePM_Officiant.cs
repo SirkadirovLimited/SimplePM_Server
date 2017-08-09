@@ -63,6 +63,27 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
+        /// Функция, генерирующая случайный путь к файлу,
+        /// содержащему исходный код пользовательского
+        /// решения поставленной задачи. Можно
+        /// использовать данную функцию и в других целях.
+        ///////////////////////////////////////////////////
+
+        public string RandomGenSourceFileLocation(string submissionId, string fileExt)
+        {
+
+            //Генерируем имя директории
+            string directoryName = sConfig["Program"]["tempPath"] + @"\" + Path.GetRandomFileName() + submissionId + @"\";
+
+            //Создаём все необходимые каталоги
+            Directory.CreateDirectory(directoryName);
+
+            //Возвращаем результат работы функции
+            return directoryName + submissionId + fileExt;
+
+        }
+
+        ///////////////////////////////////////////////////
         /// Функция серверует запрос на тестирование,
         /// контролирует работу компиляторов и
         /// тестировщиков. Всё необходимое для работы
@@ -72,6 +93,7 @@ namespace SimplePM_Server
 
         public void ServeSubmission()
         {
+
             //Определяем язык написания пользовательской программы
             SimplePM_Submission.SubmissionLanguage codeLang = SimplePM_Submission.GetCodeLanguageByName(submissionInfo["codeLang"]);
 
@@ -82,7 +104,7 @@ namespace SimplePM_Server
             //Определяем расширение файла
             string fileExt = "." + SimplePM_Submission.GetExtByLang(codeLang);
             //Определяем полный путь к файлу
-            string fileLocation = sConfig["Program"]["tempPath"] + submissionInfo["submissionId"] + fileExt;
+            string fileLocation = RandomGenSourceFileLocation(submissionInfo["submissionId"], fileExt);
 
             //Создаём файл исходного кода
             StreamWriter codeWriter = File.CreateText(fileLocation);
@@ -96,7 +118,8 @@ namespace SimplePM_Server
             codeWriter.Close();
 
             //Объявляем экземпляр класса компиляции
-            SimplePM_Compiler compiler = new SimplePM_Compiler(ref sConfig, ulong.Parse(submissionInfo["submissionId"]), fileExt);
+            SimplePM_Compiler compiler = new SimplePM_Compiler(ref sConfig, ulong.Parse(submissionInfo["submissionId"]), fileLocation);
+
             //Объявляем переменную результата компиляции
             SimplePM_Compiler.CompilerResult cResult;
 
@@ -107,7 +130,8 @@ namespace SimplePM_Server
 
             switch (codeLang)
             {
-                /*   COMPILERS REQUIRED   */
+
+                /*   ДЛЯ РАБОТЫ ПРОГРАММЫ ТРЕБУЕТСЯ КОМПИЛЯЦИЯ   */
                 case SimplePM_Submission.SubmissionLanguage.Freepascal:
                     //Запускаем компилятор Pascal
                     cResult = compiler.StartFreepascalCompiler();
@@ -125,25 +149,33 @@ namespace SimplePM_Server
                     cResult = compiler.StartCppCompiler();
                     break;
 
-                /*   NO COMPILERS REQUIRED   */
+                /*   ДЛЯ РАБОТЫ ПРОГРАММЫ НЕ ТРЕБУЕТСЯ КОМПИЛЯЦИЯ   */
                 case SimplePM_Submission.SubmissionLanguage.Lua:
                 case SimplePM_Submission.SubmissionLanguage.Python:
                 case SimplePM_Submission.SubmissionLanguage.PHP:
+
                     //Некоторым файлам не требуется компиляция
                     //но для обратной совместимости функцию вкатать нужно
                     cResult = compiler.StartNoCompiler();
+
                     break;
                 
-                /*   LANGUAGE NOT SUPPORTED BY SYSTEM   */
+                /*   ЯЗЫК ПРОГРАММИРОВАНИЯ НЕ ПОДДЕРЖИВАЕТСЯ СИСТЕМОЙ   */
                 default:
-                    cResult = new SimplePM_Compiler.CompilerResult();
-                    cResult.HasErrors = true;
-                    cResult.CompilerMessage = "Language not supported by SimplePM!";
+
+                    cResult = new SimplePM_Compiler.CompilerResult()
+                    {
+                        HasErrors = true,
+                        CompilerMessage = "Language not supported by SimplePM!"
+                    };
+
                     break;
+                
             }
             ///////////////////////////////////////////////////
             // Записываем в базу данных сообщение компилятора
             ///////////////////////////////////////////////////
+            /// 
             string queryUpdate = $@"
                 UPDATE 
                     `spm_submissions` 
@@ -203,11 +235,13 @@ namespace SimplePM_Server
                                     1
                                 ;
                             ";
+
                             new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
 
                             break;
                         //Отладка программы по пользовательскому тесту
                         case "debug":
+
                             //Запускаем тестирование программы
                             new SimplePM_Tester(
                                 ref connection, //дескриптор соединения с БД
@@ -240,6 +274,7 @@ namespace SimplePM_Server
                 
                 catch (Exception)
                 {
+                    
                     //Делаем так, чтобы несчастливую отправку обрабатывал
                     //кто-то другой, но только не мы (а может и мы, но позже)
                     queryUpdate = $@"
@@ -260,12 +295,14 @@ namespace SimplePM_Server
 
                     //Выходим
                     return;
+
                 }
 
             }
 
             //Вызываем сборщика мусора
             ClearCache(cResult.ExeFullname, fileLocation);
+
         }
 
         ///////////////////////////////////////////////////
@@ -280,11 +317,15 @@ namespace SimplePM_Server
             //Очищаем папку экзешников от мусора
             try
             {
-                File.Delete(exe_fullname);
-                File.Delete(fileLocation);
+
+                //Удаляем каталог временных файлов
+                Directory.Delete(new FileInfo(fileLocation).DirectoryName, true);
+
+                //Вызываем сборщик мусора оптимизированным методом
                 GC.Collect(2, GCCollectionMode.Optimized);
+
             }
-            catch (Exception) { }
+            catch (Exception) {  }
         }
         
         ///////////////////////////////////////////////////
