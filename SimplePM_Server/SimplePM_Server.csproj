@@ -157,7 +157,6 @@
     </EmbeddedResource>
     <None Include="App.config" />
     <EmbeddedResource Include="consoleHeader.pdat" />
-    <None Include="msbuild_csharp_tpl.pdat" />
     <None Include="NLog.config">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

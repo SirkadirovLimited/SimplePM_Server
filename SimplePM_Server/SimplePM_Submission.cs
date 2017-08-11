@@ -12,6 +12,7 @@
 
 namespace SimplePM_Server
 {
+
     /*
      * \brief
      * Класс содержит enum-ы и функции, которые
@@ -29,6 +30,7 @@ namespace SimplePM_Server
 
         public enum SubmissionLanguage
         {
+
             Unset,
             Freepascal,
             CSharp,
@@ -38,6 +40,7 @@ namespace SimplePM_Server
             Lua,
             Java,
             PHP
+            
         }
 
         ///////////////////////////////////////////////////
@@ -47,6 +50,7 @@ namespace SimplePM_Server
 
         public static SubmissionLanguage GetCodeLanguageByName(string codeLang)
         {
+
             switch (codeLang)
             {
                 case "freepascal":
@@ -68,6 +72,7 @@ namespace SimplePM_Server
                 default:
                     return SubmissionLanguage.Unset;
             }
+
         }
 
         ///////////////////////////////////////////////////
@@ -78,6 +83,7 @@ namespace SimplePM_Server
 
         public static string GetExtByLang(SubmissionLanguage lang)
         {
+
             switch (lang)
             {
                 case SubmissionLanguage.Freepascal:
@@ -99,8 +105,11 @@ namespace SimplePM_Server
                 default:
                     return "txt";
             }
+
         }
 
         ///////////////////////////////////////////////////
+        
     }
+
 }

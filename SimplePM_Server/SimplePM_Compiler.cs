@@ -35,6 +35,7 @@ namespace SimplePM_Server
 
     class SimplePM_Compiler
     {
+
         ///////////////////////////////////////////////////
         // РАЗДЕЛ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ
         ///////////////////////////////////////////////////
@@ -54,13 +55,15 @@ namespace SimplePM_Server
         /// пользовательских решений задач по
         /// программированию.
         ///////////////////////////////////////////////////
+        
         public SimplePM_Compiler(ref IniData sConfig, ulong submissionId, string fileLocation)
         {
 
-            //Ещё кое-что проверяем на ошибки
+            //Проверяем submissionID на ошибки
             if (submissionId <= 0)
                 throw new ArgumentNullException(nameof(submissionId));
 
+            //Проверяем путь к исходному коду на ошибки
             if (string.IsNullOrEmpty(fileLocation) || string.IsNullOrWhiteSpace(fileLocation) || !File.Exists(fileLocation))
                 throw new FileNotFoundException("File not found!", "fileLocation");
 
@@ -132,15 +135,6 @@ namespace SimplePM_Server
             //Передаём полный путь к исполняемому файлу
             result.ExeFullname = exeLocation;
 
-            //Получаем полный путь к временному файлу, созданному при компиляции
-            string oFileLocation = sConfig["Program"]["tempPath"] + submissionId + ".o";
-            try
-            {
-                //Удаляем временный файл
-                File.Delete(oFileLocation);
-            }
-            catch (Exception) { }
-
             //Возвращаем результат компиляции
             return ReturnCompilerResult(result);
 
@@ -180,41 +174,22 @@ namespace SimplePM_Server
 
         public CompilerResult StartCSharpCompiler()
         {
-            //Генерируем файл конфигурации MSBuild
-            string msbuildConfigFileLocation = sConfig["Program"]["tempPath"] + submissionId + ".csproj";
 
-            File.WriteAllText(
-                //путь к записываемому файлу
-                msbuildConfigFileLocation,
-                //записываемые данные
-                Properties.Resources.msbuild_csharp_tpl
-                .Replace(
-                    "[SPM|SUBMISSION_FILE_NAME]",
-                    submissionId.ToString()
-                )
-                .Replace(
-                    "[SPM|TMP_PATH]",
-                    sConfig["Program"]["tempPath"]
-                ),
-                //Юра любит UTF8. Будь как Юра.
-                Encoding.UTF8
-            );
+            //Будущее местонахождение исполняемого файла
+            string exeLocation = GenerateExeFileLocation(fileLocation, submissionId.ToString(), "exe");
 
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = RunCompiler(
-                sConfig["Compilers"]["msbuild_location"],
-                msbuildConfigFileLocation
+                sConfig["Compilers"]["mcs_location"],
+                fileLocation
             );
 
-            //Удаляем временные файлы
-            try
-            {
-                File.Delete(msbuildConfigFileLocation);
-            }
-            catch (Exception) {  }
+            //Передаём полный путь к исполняемому файлу
+            result.ExeFullname = exeLocation;
 
             //Возвращаем результат компиляции
             return ReturnCompilerResult(result);
+
         }
 
         ///////////////////////////////////////////////////
@@ -225,6 +200,7 @@ namespace SimplePM_Server
 
         public CompilerResult StartCppCompiler()
         {
+
             //Будущее местонахождение исполняемого файла
             string exeLocation = GenerateExeFileLocation(fileLocation, submissionId.ToString(), sConfig["UserProc"]["exeFileExt"]);
 
@@ -239,6 +215,7 @@ namespace SimplePM_Server
 
             //Возвращаем результат компиляции
             return ReturnCompilerResult(result);
+
         }
 
         ///////////////////////////////////////////////////
@@ -249,6 +226,7 @@ namespace SimplePM_Server
 
         public CompilerResult StartCCompiler()
         {
+
             //Будущее местонахождение исполняемого файла
             string exeLocation = GenerateExeFileLocation(fileLocation, submissionId.ToString(), sConfig["UserProc"]["exeFileExt"]);
 
@@ -263,6 +241,7 @@ namespace SimplePM_Server
 
             //Возвращаем результат компиляции
             return ReturnCompilerResult(result);
+
         }
 
         ///////////////////////////////////////////////////
@@ -288,6 +267,7 @@ namespace SimplePM_Server
             //автоматизированной системы проверки решений SimplePM.
             try
             {
+
                 //Получаем информацию о файле исходного кода
                 FileInfo fileInfo = new FileInfo(fileLocation);
                 
@@ -300,12 +280,15 @@ namespace SimplePM_Server
 
                 //Ошибок не найдено!
                 result.HasErrors = false;
+
             }
             catch (Exception)
             {
+
                 //В случае любой ошибки считаем что она
                 //произошла по прямой вине пользователя.
                 result.HasErrors = true;
+
             }
 
             //Возвращаем результат компиляции
@@ -389,5 +372,8 @@ namespace SimplePM_Server
             return temporaryResult;
 
         }
+
+        ///////////////////////////////////////////////////
+
     }
 }

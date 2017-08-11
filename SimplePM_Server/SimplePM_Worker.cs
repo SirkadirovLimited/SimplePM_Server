@@ -32,6 +32,7 @@ using NLog.Config;
 
 namespace SimplePM_Server
 {
+
     /*!
      * \brief
      * Базовый класс сервера контролирует
@@ -43,6 +44,7 @@ namespace SimplePM_Server
 
     class SimplePM_Worker
     {
+
         ///////////////////////////////////////////////////
         // РАЗДЕЛ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ
         ///////////////////////////////////////////////////
@@ -76,6 +78,7 @@ namespace SimplePM_Server
 
         public static void GenerateEnabledLangsList()
         {
+
             /* Инициализируем массив строк */
             EnabledLangsList = new string[ sConfig["EnabledCompilers"].Count];
 
@@ -111,6 +114,7 @@ namespace SimplePM_Server
             EnabledLangs = string.Join(", ", EnabledLangsList);
 
             Console.WriteLine("Enabled languages: " + EnabledLangs);
+
         }
 
         ///////////////////////////////////////////////////
@@ -120,8 +124,10 @@ namespace SimplePM_Server
 
         public static void SetExceptionHandler()
         {
+
             //Устанавливаем обработчик необработанных исключений
             AppDomain.CurrentDomain.UnhandledException += ExceptionEventLogger;
+
         }
 
         ///////////////////////////////////////////////////
@@ -131,7 +137,10 @@ namespace SimplePM_Server
 
         public static void ExceptionEventLogger(object sender, UnhandledExceptionEventArgs e)
         {
+
+            //Записываем сообщение об ошибке в журнал событий
             logger.Fatal(e.ExceptionObject);
+
         }
 
         ///////////////////////////////////////////////////
@@ -141,6 +150,7 @@ namespace SimplePM_Server
 
         public static void Main(string[] args)
         {
+
             ///////////////////////////////////////////////////
             // ИНИЦИАЛИЗАЦИЯ СЕРВЕРНЫХ ПОДСИСТЕМ И ПРОЧИЙ ХЛАМ
             ///////////////////////////////////////////////////
@@ -153,6 +163,8 @@ namespace SimplePM_Server
             
             //Открываем конфигурационный файл для чтения
             FileIniDataParser iniParser = new FileIniDataParser();
+
+            //Присваиваем глобальной переменной sConfig дескриптор файла конфигурации
             sConfig = iniParser.ReadFile("server_config.ini", Encoding.UTF8);
 
             //Конфигурируем журнал событий (библиотека NLog)
@@ -178,20 +190,25 @@ namespace SimplePM_Server
 
             while (true)
             {
+
+                //Отлавливаем все ошибки
                 try
                 {
+
                     //Получаем дескриптор соединения с базой данных
                     MySqlConnection conn = StartMysqlConnection(sConfig);
 
                     //Защита от перегрузки сервера
                     if (_customersCount < _maxCustomersCount)
                         GetSubIdAndRunCompile(conn);
+
                 }
                 //В случае ошибки передаём информацию о ней логгеру событий
                 catch (Exception ex) { logger.Error(ex); }
 
                 //Ожидание для уменьшения нагрузки на сервер
                 Thread.Sleep(SleepTime);
+
             }
 
             ///////////////////////////////////////////////////
@@ -204,12 +221,16 @@ namespace SimplePM_Server
 
         public static void GenerateProgramHeader()
         {
+
             //Установка заголовка приложения
             Console.Title = "SimplePM_Server";
+
             //Выводим на экран информацию о приложении
             Console.WriteLine(Properties.Resources.consoleHeader);
+
             //Отключаем показ курсора и возможность ввода
             Console.CursorVisible = false;
+
         }
 
         ///////////////////////////////////////////////////
@@ -218,6 +239,7 @@ namespace SimplePM_Server
 
         public static void GetSubIdAndRunCompile(MySqlConnection connection)
         {
+            
             //Создаём новую задачу, без неё - никак!
             new Task(() =>
             {
@@ -268,6 +290,7 @@ namespace SimplePM_Server
                 //Производим проверку на успешное получение данных о запросе
                 if (submissionInfo.Count > 0)
                 {
+
                     //Получаем сложность поставленной задачи
                     string queryGetDifficulty = $@"
                         SELECT 
@@ -306,11 +329,14 @@ namespace SimplePM_Server
                     //Уменьшаем количество текущих соединений
                     //чтобы другие соединения были возможны.
                     _customersCount--;
+
                 }
 
+                //Закрываем соединение с БД
                 connection.Close();
 
             }).Start();
+
         }
 
         ///////////////////////////////////////////////////
@@ -322,6 +348,7 @@ namespace SimplePM_Server
 
         public static MySqlConnection StartMysqlConnection(IniData sConfig)
         {
+
             //Подключаемся к базе данных на удалённом
             //MySQL сервере и получаем дескриптор подключения к ней
             MySqlConnection db = new MySqlConnection(
@@ -337,9 +364,11 @@ namespace SimplePM_Server
 
             //Возвращаем дескриптор подключения к базе данных
             return db;
+
         }
 
         ///////////////////////////////////////////////////
 
     }
+
 }

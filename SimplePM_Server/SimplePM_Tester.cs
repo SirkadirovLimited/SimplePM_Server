@@ -32,6 +32,7 @@ using NLog;
 
 namespace SimplePM_Server
 {
+
     /*!
      * \brief
      * Класс тестирования пользовательских решений
@@ -67,27 +68,37 @@ namespace SimplePM_Server
 
         public SimplePM_Tester(ref MySqlConnection connection, ref string exeFileUrl, ref Dictionary<string, string> submissionInfo, ref IniData sConfig)
         {
+
             //Database connection
             this.connection = connection;
+
             //Excutable file url
             this.exeFileUrl = exeFileUrl;
+
             //Submission information
             this.submissionInfo = submissionInfo;
+
             //Problem ID
             problemId = ulong.Parse(submissionInfo["problemId"]);
+
             //Submission ID
             submissionId = ulong.Parse(submissionInfo["submissionId"]);
+
             //Problem difficulty
             problemDifficulty = float.Parse(submissionInfo["difficulty"]);
+
             //User ID
             userId = ulong.Parse(submissionInfo["userId"]);
+
             //Configuration file reader pointer
             this.sConfig = sConfig;
+
             //Custom test checker
             if (submissionInfo.ContainsKey("customTest"))
                 customTestInput = submissionInfo["customTest"];
             else
                 customTestInput = null;
+
         }
 
         #region ИСПОЛЬЗУЕМЫЕ ФУНКЦИИ
@@ -1153,4 +1164,5 @@ namespace SimplePM_Server
         }
 
     }
+
 }

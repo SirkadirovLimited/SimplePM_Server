@@ -35,6 +35,7 @@ namespace SimplePM_Server
 
     class SimplePM_Officiant
     {
+
         ///////////////////////////////////////////////////
         // РАЗДЕЛ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ
         ///////////////////////////////////////////////////
@@ -57,9 +58,11 @@ namespace SimplePM_Server
 
         public SimplePM_Officiant(MySqlConnection connection, IniData sConfig, Dictionary<string, string> submissionInfo)
         {
+
             this.connection = connection;
             this.sConfig = sConfig;
             this.submissionInfo = submissionInfo;
+
         }
 
         ///////////////////////////////////////////////////
@@ -176,10 +179,11 @@ namespace SimplePM_Server
                     break;
                 
             }
+
             ///////////////////////////////////////////////////
             // Записываем в базу данных сообщение компилятора
             ///////////////////////////////////////////////////
-            /// 
+            
             string queryUpdate = $@"
                 UPDATE 
                     `spm_submissions` 
@@ -216,8 +220,10 @@ namespace SimplePM_Server
             }
             else
             {
+
                 try
                 {
+
                     ///////////////////////////////////////////////////
                     // ВЫПОЛНЯЕМ РАЗЛИЧНЫЕ ДЕЙСТВИЯ В ЗАВИСИМОСТИ ОТ
                     // ТИПА ПРОВЕРКИ РЕШЕНИЯ ПОСТАВЛЕННОЙ ЗАДАЧИ
@@ -270,6 +276,7 @@ namespace SimplePM_Server
                     }
 
                     ///////////////////////////////////////////////////
+                    
                 }
 
                 ///////////////////////////////////////////////////
@@ -318,7 +325,9 @@ namespace SimplePM_Server
 
         public void ClearCache(string exe_fullname, string fileLocation)
         {
-            //Очищаем папку экзешников от мусора
+
+            //Очищаем папку экзешников от мусора.
+            //В случае ошибки ничего не делаем.
             try
             {
 
@@ -330,8 +339,10 @@ namespace SimplePM_Server
 
             }
             catch (Exception) {  }
+
         }
         
         ///////////////////////////////////////////////////
+        
     }
 }
