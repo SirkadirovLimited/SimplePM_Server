@@ -98,7 +98,7 @@ namespace SimplePM_Server
             string parentDirectoryFullName = new FileInfo(srcFileLocation).DirectoryName + @"\";
             
             //Формируем начальный путь исполняемого файла
-            string exePath = parentDirectoryFullName + currentSubmissionId;
+            string exePath = parentDirectoryFullName + 's' + currentSubmissionId;
 
             //В случае, если расширение исполняемого
             //файла в данной ОС не нулевое,
@@ -274,6 +274,14 @@ namespace SimplePM_Server
 
         public CompilerResult StartJavaCompiler()
         {
+            //Получаем полный исходный код решения
+            string fullSrc = File.ReadAllText(fileLocation);
+
+            //Производим замену имён главного класса на технические
+            fullSrc = fullSrc.Replace("MainClass", "s" + submissionId);
+
+            //Записываем изменённый исходный код решения
+            File.WriteAllText(fileLocation, fullSrc);
 
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = RunCompiler(

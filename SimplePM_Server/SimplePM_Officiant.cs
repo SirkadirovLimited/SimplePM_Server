@@ -79,7 +79,7 @@ namespace SimplePM_Server
             Directory.CreateDirectory(directoryName);
 
             //Возвращаем результат работы функции
-            return directoryName + submissionId + fileExt;
+            return directoryName + "s" + submissionId + fileExt;
 
         }
 

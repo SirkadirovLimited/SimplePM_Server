@@ -143,22 +143,31 @@ namespace SimplePM_Server
                 //Lua
                 case ".lua":
                     startInfo.FileName = sConfig["Compilers"]["lua_location"];
-                    startInfo.Arguments = filePath;
+                    startInfo.Arguments = '"' + filePath + '"';
                     break;
                 //Python
                 case ".py":
                     startInfo.FileName = sConfig["Compilers"]["python_location"];
-                    startInfo.Arguments = filePath;
+                    startInfo.Arguments = '"' + filePath + '"';
                     break;
                 //Java
-                case ".java":
+                case ".class":
+                    //Получаем информацию о файле
+                    FileInfo fileInfo = new FileInfo(filePath);
+
+                    //Устанавливаем рабочую папку процесса
+                    startInfo.WorkingDirectory = fileInfo.DirectoryName;
+
+                    //Устанавливаем имя файла пройесса
                     startInfo.FileName = sConfig["Compilers"]["java_location"];
-                    startInfo.Arguments = filePath;
+                    //Устанавливаем аргументы процесса
+                    startInfo.Arguments = "-d64 -cp . " + '"' + Path.GetFileNameWithoutExtension(fileInfo.Name) + '"';
+                    
                     break;
                 //PHP
                 case ".php":
                     startInfo.FileName = sConfig["Compilers"]["php_location"];
-                    startInfo.Arguments = filePath;
+                    startInfo.Arguments = '"' + filePath + '"';
                     break;
                 //Executable files
                 default:
@@ -373,9 +382,12 @@ namespace SimplePM_Server
                 ///////////////////////////////////////////////////
 
                 string authorOutput = "", userOutput = "";
+                string userErrorOutput = null;
                 char debugTestingResult = '+';
                 int userProblemExitCode = 0;
-                
+
+                #region Запуск авторского решения
+
                 ///////////////////////////////////////////////////
                 // ЗАПУСК ПРОЦЕССА АВТОРСКОГО РЕШЕНИЯ
                 ///////////////////////////////////////////////////
@@ -403,7 +415,7 @@ namespace SimplePM_Server
                     authorProblemProc.Start();
 
                     //Устанавливаем наивысший приоритет процесса
-                    authorProblemProc.PriorityClass = ProcessPriorityClass.RealTime;
+                    authorProblemProc.PriorityClass = ProcessPriorityClass.Normal;
 
                     //Инъекция входного потока
                     authorProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
@@ -452,6 +464,17 @@ namespace SimplePM_Server
                 //Получаем обработанный выходной поток авторского решения
                 authorOutput = GetNormalizedOutputText(authorProblemProc.StandardOutput);
 
+                //Пытаемся удалить временный файл авторского решения поставленной задачи
+                try
+                {
+                    File.Delete(authorCodePath);
+                }
+                catch (Exception) { }
+
+                #endregion
+
+                #region Запуск пользовательского решения
+
                 ///////////////////////////////////////////////////
                 // ЗАПУСК ПРОЦЕССА ПОЛЬЗОВАТЕЛЬСКОГО РЕШЕНИЯ
                 ///////////////////////////////////////////////////
@@ -476,7 +499,7 @@ namespace SimplePM_Server
                     userProblemProc.Start();
 
                     //Устанавливаем наивысший приоритет процесса
-                    userProblemProc.PriorityClass = ProcessPriorityClass.RealTime;
+                    userProblemProc.PriorityClass = ProcessPriorityClass.Normal;
 
                     //Инъекция входного потока
                     userProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
@@ -511,7 +534,7 @@ namespace SimplePM_Server
                             }
                         }
                     }
-                    catch (Exception) { }
+                    catch (Exception) {  }
                 }).Start();
 
                 ///////////////////////////////////////////////////
@@ -526,7 +549,7 @@ namespace SimplePM_Server
                 }
 
                 ProcessorTimeLimitCheck(userProblemProc, OnProcessorTimeLimit, (int)debugTimeLimit);
-
+                
                 ///////////////////////////////////////////////////
                 // ПОЛУЧЕНИЕ РЕЗУЛЬТАТОВ ТЕСТИРОВАНИЯ
                 ///////////////////////////////////////////////////
@@ -542,29 +565,43 @@ namespace SimplePM_Server
                         debugTestingResult = 'T';
                         userOutput = "--- PROGRAM TIME LIMIT ---";
                     }
-
-                    //Получаем обработанный выходной поток пользовательского решения
-                    //но только в случае, когда приложение завершило свою работу самопроизвольно
-                    if (userOutput.Length == 0)
-                        userOutput = GetNormalizedOutputText(userProblemProc.StandardOutput);
+                    
+                    //Если всё хорошо, получаем обработанный выходной поток пользовательского решения
+                    //но только в случае, когда приложение завершило свою работу самопроизвольно.
+                    //Если всё плохо - делаем userOutput пустым
+                    try
+                    {
+                        if (userOutput.Length == 0)
+                            userOutput = GetNormalizedOutputText(userProblemProc.StandardOutput);
+                    }
+                    catch (Exception)
+                    {
+                        userOutput = null;
+                    }
 
                     //Получаем exitcode пользовательского приложения
                     userProblemExitCode = userProblemProc.ExitCode;
 
-                    //Пытаемся удалить временный файл авторского решения поставленной задачи
-                    try
-                    {
-                        File.Delete(authorCodePath);
-                    }
-                    catch (Exception) { }
+                    //Получаем выходной поток ошибок пользовательского решения
+                    userErrorOutput = userProblemProc.StandardError.ReadToEnd();
 
                     //Устанавливаем результат отладочного тестирования.
                     //В случае преждевременного результата ничего не делаем
                     if (debugTestingResult == '+')
-                        debugTestingResult = (userProblemExitCode == 0 && authorOutput == userOutput) ? '+' : '-';
+                    {
+                        debugTestingResult =
+                        (
+                            userProblemExitCode == 0 &&
+                            authorOutput == userOutput &&
+                            String.IsNullOrWhiteSpace(userErrorOutput)
+                            ? '+' : '-'
+                        );
+                    }
 
                 }
-                catch (Exception) {  }
+                catch (Exception ex) {  }
+
+                #endregion
 
                 ///////////////////////////////////////////////////
                 // ПОЛУЧЕНИЕ ВЫХОДНОГО ПОТОКА
@@ -583,7 +620,7 @@ namespace SimplePM_Server
                         `spm_submissions` 
                     SET 
                         `status` = 'ready', 
-                        `errorOutput` = null, 
+                        `errorOutput` = @errorOutput, 
                         `result` = @result, 
                         `b` = '0', 
                         `output` = @output, 
@@ -600,6 +637,7 @@ namespace SimplePM_Server
 
                 //Устанавливаем значения параметров
                 sendResultCmd.Parameters.AddWithValue("@output", userOutput);
+                sendResultCmd.Parameters.AddWithValue("@errorOutput", userErrorOutput);
                 sendResultCmd.Parameters.AddWithValue("@result", debugTestingResult);
                 sendResultCmd.Parameters.AddWithValue("@exitcodes", userProblemExitCode);
 
@@ -766,7 +804,7 @@ namespace SimplePM_Server
                     problemProc.Start();
 
                     //Устанавливаем наивысший приоритет процесса
-                    problemProc.PriorityClass = ProcessPriorityClass.RealTime;
+                    problemProc.PriorityClass = ProcessPriorityClass.Normal;
 
                     //Инъекция входного потока
                     problemProc.StandardInput.WriteLine(input); //добавляем текст во входной поток
