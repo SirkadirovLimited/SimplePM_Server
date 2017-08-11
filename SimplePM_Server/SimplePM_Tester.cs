@@ -599,7 +599,7 @@ namespace SimplePM_Server
                     }
 
                 }
-                catch (Exception ex) {  }
+                catch (Exception) {  }
 
                 #endregion
 

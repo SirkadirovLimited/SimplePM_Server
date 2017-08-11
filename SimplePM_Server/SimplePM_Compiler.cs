@@ -274,15 +274,7 @@ namespace SimplePM_Server
 
         public CompilerResult StartJavaCompiler()
         {
-            //Получаем полный исходный код решения
-            string fullSrc = File.ReadAllText(fileLocation);
-
-            //Производим замену имён главного класса на технические
-            fullSrc = fullSrc.Replace("MainClass", "s" + submissionId);
-
-            //Записываем изменённый исходный код решения
-            File.WriteAllText(fileLocation, fullSrc);
-
+            
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = RunCompiler(
                 sConfig["Compilers"]["javac_location"],
@@ -298,23 +290,16 @@ namespace SimplePM_Server
             {
                 //Получаем информацию о файле исходного кода
                 FileInfo fileInfo = new FileInfo(fileLocation);
+                
+                //Указываем полный путь к главному исполняемому файлу
+                result.ExeFullname = fileInfo.DirectoryName + "\\MainClass.class";
 
-                //Ищем все файлы с расширением class в текущей директории
-                FileInfo[] filesSearch = fileInfo.Directory.GetFiles("*.class");
+                //Проверяем на существование главного класса
+                if (!File.Exists(result.ExeFullname))
+                    throw new FileNotFoundException();
 
-                //Если классов больше одного - значит пользователь
-                //не читал правила работы с системой. Воспринимаем
-                //это как ошибку при компиляции, выбрасывая исключение
-                if (filesSearch.Length > 1)
-                    throw new OverflowException();
-
-                //Получаем полный путь к исполняемому файлу
-                string exeFullName = filesSearch[0].FullName;
-
-                //Присваиваем переменным класса результата компиляции
-                //необходимые для тестирования значения.
-                result.ExeFullname = exeFullName; // полный путь к исполняемому файлу
-                result.HasErrors = false; // ошибок при компиляции не выявлено
+                //Ошибок не найдено!
+                result.HasErrors = false;
             }
             catch (Exception)
             {
