@@ -18,6 +18,7 @@ using System.IO;
 using System.Collections.Generic;
 //Работа с процессами
 using System.Diagnostics;
+using System.Text;
 //Работа с потоками и задачами
 using System.Threading;
 using System.Threading.Tasks;
@@ -266,16 +267,16 @@ namespace SimplePM_Server
 
         public void DebugTest()
         {
+
             ///////////////////////////////////////////////////
-            // ВРЕМЯ ИНТЕРЕСНЫХ ЗАПРОСОВ К БАЗЕ ДАННЫХ
-            // А ИМЕННО ВЫБОРКА АВТОРСКОГО РЕШЕНИЯ ЗАДАЧИ
-            // И ПРОЧЕЕ ВСЯКОЕ
+            // Выборка информации об авторском решении задачи
             ///////////////////////////////////////////////////
 
             //Запрос на выборку авторского решения из БД
             string querySelect = $@"
                 SELECT 
-                    * 
+                    `codeLang`, 
+                    `code` 
                 FROM 
                     `spm_problems_ready` 
                 WHERE 
@@ -290,51 +291,66 @@ namespace SimplePM_Server
             //Дескрипторы временных таблиц выборки из БД
             MySqlCommand cmdSelect = new MySqlCommand(querySelect, connection);
             MySqlDataReader dataReader = cmdSelect.ExecuteReader();
-
-            //Создаём словарь значений элемента авторского решения
-            Dictionary<string, string> authorCodeInfo = new Dictionary<string, string>();
-            //Создаём переменную, в которой будем хранить бинарный код запускаемого авторского решения
-            byte[] authorProblemCode = null;
+            
+            //Объявляем необходимые переменные
+            string authorProblemCode = null;
+            SimplePM_Submission.SubmissionLanguage authorProblemCodeLanguage = SimplePM_Submission.SubmissionLanguage.Unset;
 
             //Читаем полученные данные
             while (dataReader.Read())
             {
-                //Идентификатор задачи
-                authorCodeInfo.Add(
-                    "problemId",
-                    HttpUtility.HtmlDecode(dataReader["problemId"].ToString())
-                );
-                //Бинарный (исполняемый) код авторского решения
-                authorProblemCode = (byte[])dataReader["execFile"];
+                //Исходный код авторского решения
+                authorProblemCode = dataReader["code"].ToString();
+
+                //Язык авторского решения
+                authorProblemCodeLanguage = SimplePM_Submission.GetCodeLanguageByName(dataReader["codeLang"].ToString());
+
             }
 
             //Закрываем data reader
             dataReader.Close();
 
-            if (authorCodeInfo.Count > 0 && authorProblemCode != null)
+            //Проверка на наличие авторского решения задачи
+            if (authorProblemCode != null && authorProblemCodeLanguage != SimplePM_Submission.SubmissionLanguage.Unset)
             {
 
                 ///////////////////////////////////////////////////
-                // РАБОТА С ФАЙЛОВОЙ СИСТЕМОЙ
+                // Скачивание и компиляция авторского решения
                 ///////////////////////////////////////////////////
+                
+                //Определяем расширение файла
+                string authorFileExt = "." + SimplePM_Submission.GetExtByLang(authorProblemCodeLanguage);
 
-                //Полный путь к временному (исполняемому) файлу авторского решения программы
-                string authorCodePath = sConfig["Program"]["tempPath"] + "authorCode_" + submissionId + ".exe";
+                //Получаем случайный путь к директории авторского решения
+                string tmpAuthorDir = sConfig["Program"]["tempPath"] + @"\author\" + Path.GetRandomFileName() + @"\";
+                
+                //Создаём папку текущего авторского решения задачи
+                Directory.CreateDirectory(tmpAuthorDir);
 
-                //Создаём файл и перехватываем поток инъекции в файл данных
-                BinaryWriter binWriter = new BinaryWriter(new FileStream(authorCodePath, FileMode.Create));
+                //Определяем путь хранения файла исходного кода вторского решения
+                string tmpAuthorSrcLocation = tmpAuthorDir + "sa" + submissionId + authorFileExt;
+                
+                //Записываем исходный код авторского решения в заданный временный файл
+                File.WriteAllText(tmpAuthorSrcLocation, authorProblemCode, Encoding.UTF8);
 
-                //Запись бинарного кода программы в файл исполняемого авторского решения
-                binWriter.Write(authorProblemCode);
+                //Устанавливаем его аттрибуты
+                File.SetAttributes(tmpAuthorSrcLocation, FileAttributes.Temporary | FileAttributes.NotContentIndexed);
 
-                //Записы данных в файл
-                binWriter.Flush();
+                //Инициализируем экземпляр класса компилятора
+                SimplePM_Compiler compiler = new SimplePM_Compiler(ref sConfig, "a" + submissionId, tmpAuthorSrcLocation);
 
-                //Закрываем поток
-                binWriter.Close();
+                //Получаем структуру результата компиляции
+                SimplePM_Compiler.CompilerResult cResult = SimplePM_Compiler.ChooseCompilerAndRun(authorProblemCodeLanguage, compiler);
+
+                //В случае возникновения ошибки при компиляции
+                //авторского решения аварийно завершаем работу
+                if (cResult.HasErrors)
+                    throw new FileLoadException(cResult.ExeFullname);
+
+                string authorCodePath = cResult.ExeFullname;
 
                 ///////////////////////////////////////////////////
-                // ВРЕМЯ ИНТЕРЕСНЕНЬКИХ ЗАПРОСОВ К БАЗЕ ДАННЫХ
+                // Время запросов к базе данных системы
                 ///////////////////////////////////////////////////
 
                 //Запрос на выборку Debug Time Limit из базы данных MySQL
@@ -351,6 +367,7 @@ namespace SimplePM_Server
                         1
                     ;
                 ";
+
                 ulong debugTimeLimit = Convert.ToUInt64(new MySqlCommand(querySelect, connection).ExecuteScalar());
 
                 //То же самое, только для MEMORY LIMIT
@@ -367,6 +384,7 @@ namespace SimplePM_Server
                         1
                     ;
                 ";
+
                 ulong debugMemoryLimit = Convert.ToUInt64(new MySqlCommand(querySelect, connection).ExecuteScalar());
 
                 #region PROCESS START INFO CONFIGURATION
@@ -389,7 +407,7 @@ namespace SimplePM_Server
                 #endregion
 
                 ///////////////////////////////////////////////////
-                // ОБЪЯВЛЕНИЕ НЕОБХОДИМЫХ ПЕРЕМЕННЫХ
+                // Раздел объявления необходимых переменных
                 ///////////////////////////////////////////////////
 
                 string authorOutput = "", userOutput = "";
@@ -422,6 +440,7 @@ namespace SimplePM_Server
 
                 try
                 {
+
                     //Запускаем процесс
                     authorProblemProc.Start();
 
@@ -432,6 +451,7 @@ namespace SimplePM_Server
                     authorProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
                     authorProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
                     authorProblemProc.StandardInput.Close(); //закрываем поток
+
                 }
                 catch (Exception) {  }
 
@@ -441,6 +461,7 @@ namespace SimplePM_Server
 
                 new Task(() =>
                 {
+
                     try
                     {
                         while (!authorProblemProc.HasExited)
@@ -453,7 +474,8 @@ namespace SimplePM_Server
                                 authorProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
                         }
                     }
-                    catch (Exception) { }
+                    catch (Exception) {  }
+
                 }).Start();
 
                 ///////////////////////////////////////////////////
@@ -474,11 +496,14 @@ namespace SimplePM_Server
 
                 //Получаем обработанный выходной поток авторского решения
                 authorOutput = GetNormalizedOutputText(authorProblemProc.StandardOutput);
-
-                //Пытаемся удалить временный файл авторского решения поставленной задачи
+                
                 try
                 {
-                    File.Delete(authorCodePath);
+
+                    //Пытаемся удалить временные файлы
+                    //авторского решения поставленной задачи
+                    Directory.Delete(tmpAuthorDir, true);
+
                 }
                 catch (Exception) { }
 
@@ -506,6 +531,7 @@ namespace SimplePM_Server
 
                 try
                 {
+
                     //Запускаем процесс
                     userProblemProc.Start();
 
@@ -516,12 +542,15 @@ namespace SimplePM_Server
                     userProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
                     userProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
                     userProblemProc.StandardInput.Close(); //закрываем поток
+
                 }
                 catch (Exception)
                 {
+
                     //Произошла ошибка при выполнении программы
                     //В этом, скорее всего, виноват компилятор.
                     debugTestingResult = 'C';
+
                 }
 
                 ///////////////////////////////////////////////////
@@ -529,6 +558,7 @@ namespace SimplePM_Server
                 ///////////////////////////////////////////////////
                 new Task(() =>
                 {
+
                     try
                     {
                         while (!userProblemProc.HasExited)
@@ -546,6 +576,7 @@ namespace SimplePM_Server
                         }
                     }
                     catch (Exception) {  }
+
                 }).Start();
 
                 ///////////////////////////////////////////////////
@@ -622,8 +653,7 @@ namespace SimplePM_Server
                 userOutput = HttpUtility.HtmlEncode(userOutput);
 
                 ///////////////////////////////////////////////////
-                // СОХРАНЯЕМ ИНФОРМАЦИЮ О РЕЗУЛЬТАТЕ ТЕСТИРОВАНИЯ
-                // НА СЕРВЕРЕ БАЗ ДАННЫХ MYSQL
+                // Отправка результатов тестирования в базу данных
                 ///////////////////////////////////////////////////
 
                 string queryUpdate = $@"
@@ -655,12 +685,15 @@ namespace SimplePM_Server
                 //Выполняем запрос не требуя ответа
                 sendResultCmd.ExecuteNonQuery();
 
+                ///////////////////////////////////////////////////
+
             }
             else
             {
 
                 ///////////////////////////////////////////////////
-                // НАША ХАТА СКРАЮ - НІЧОГО НЕ ЗНАЮ!
+                // В случае отсутствия авторского решения
+                // возвращаем информацию об ошибке в базу данных
                 ///////////////////////////////////////////////////
 
                 //Запрос на обновление данных в базе данных
@@ -668,8 +701,9 @@ namespace SimplePM_Server
                     UPDATE 
                         `spm_submissions` 
                     SET 
-                        `status` = 'waiting', 
-                        `hasError` = false 
+                        `status` = 'ready', 
+                        `errorOutput` = 'ERR_NO_AUTHOR_SOLUTION', 
+                        `hasError` = true 
                     WHERE 
                         `submissionId` = '{submissionId}' 
                     LIMIT 
@@ -680,7 +714,10 @@ namespace SimplePM_Server
                 //Выполняем запрос, адресованный к серверу баз данных MySQL
                 new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
 
+                ///////////////////////////////////////////////////
+
             }
+
         }
         
         ///////////////////////////////////////////////////
@@ -690,6 +727,7 @@ namespace SimplePM_Server
         
         public void ReleaseTest()
         {
+
             ///////////////////////////////////////////////////
             // ВРЕМЯ ИНТЕРЕСНЕНЬКИХ ЗАПРОСОВ К БАЗЕ ДАННЫХ
             // А ИМЕННО ВЫБОРКА ИЗ БД ТЕСТОВ ЗАДАЧИ
@@ -720,15 +758,19 @@ namespace SimplePM_Server
 
             //Производим выборку полученных результатов из временной таблицы на сервере MySQL
             int i = 1;
+
             while (dataReader.Read())
             {
+
                 Dictionary<string, string> tmpDict = new Dictionary<string, string>
                 {
+
                     { "testId", HttpUtility.HtmlDecode(dataReader["id"].ToString()) }, //Идентификатор теста
                     { "input", HttpUtility.HtmlDecode(dataReader["input"].ToString()) }, //Входной поток
                     { "output", HttpUtility.HtmlDecode(dataReader["output"].ToString()) }, //Выходной поток
                     { "timeLimit", HttpUtility.HtmlDecode(dataReader["timeLimit"].ToString()) }, //Лимит по времени
                     { "memoryLimit", HttpUtility.HtmlDecode(dataReader["memoryLimit"].ToString()) } //Лимит по памяти
+
                 };
 
                 //Добавляем в словарь
@@ -736,6 +778,7 @@ namespace SimplePM_Server
 
                 //Увеличиваем индекс текущего теста на единицу
                 i++;
+
             }
 
             //Завершаем чтение потока
@@ -749,6 +792,7 @@ namespace SimplePM_Server
             //Создаём новую конфигурацию запуска процесса
             ProcessStartInfo startInfo = new ProcessStartInfo()
             {
+
                 //Перенаправляем потоки
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
@@ -758,7 +802,8 @@ namespace SimplePM_Server
                 ErrorDialog = false,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                WindowStyle = ProcessWindowStyle.Minimized,
+                WindowStyle = ProcessWindowStyle.Minimized
+
             };
 
             //Устанавливаем информацию о запускаемом файле
@@ -784,6 +829,7 @@ namespace SimplePM_Server
 
             for (i = 1; i <= testsInfo.Count; i++)
             {
+
                 //Присвоение переменных данных теста для быстрого доступа
                 //testId = ulong.Parse(testsInfo[i]["testId"]);
                 input = testsInfo[i]["input"];
@@ -824,20 +870,21 @@ namespace SimplePM_Server
                 }
                 catch (Exception)
                 {
+
                     //Произошла ошибка при выполнении программы.
                     //Виноват, как всегда, компилятор!
-
                     testingResults[i-1] = "C";
                     preResultGiven = true;
+
                 }
-
                 
-
                 ///////////////////////////////////////////////////
                 // КОНТРОЛЬ ИСПОЛЬЗУЕМОЙ ПРОЦЕССОМ ПАМЯТИ
                 ///////////////////////////////////////////////////
+                /// 
                 new Task(() =>
                 {
+
                     //Для обеспечения безопасности
                     try
                     {
@@ -867,17 +914,19 @@ namespace SimplePM_Server
 
                 void OnProcessorTimeLimit()
                 {
+
+                    //Убиваем процесс
                     problemProc.Kill();
 
+                    //Предварительный результат появился
                     preResultGiven = true;
+
+                    //Временной лимит превышен
                     testingResults[i - 1] = "T";
+
                 }
 
                 ProcessorTimeLimitCheck(problemProc, OnProcessorTimeLimit, timeLimit);
-
-                //Ждём завершения, максимум X миллимекунд
-                //Если процесс не завершил свою работу - убиваем его
-
                 ///////////////////////////////////////////////////
                 // ОЖИДАНИЕ ЗАВЕРШЕНИЯ ПОЛЬЗОВАТЕЛЬСКОЙ ПРОГРАММЫ
                 ///////////////////////////////////////////////////
@@ -885,6 +934,7 @@ namespace SimplePM_Server
                 //Проверка на досрочный результат проверки
                 if (!preResultGiven)
                 {
+
                     //Ждём завершения, максимум X миллимекунд
                     if (!problemProc.WaitForExit(int.Parse(sConfig["UserProc"]["maxProcessTime"])))
                     {
@@ -927,18 +977,14 @@ namespace SimplePM_Server
                             {
 
                                 if (problemProc.ExitCode != 0) //код выхода не нуль
-                                {
                                     testingResults[i - 1] = "R";
-                                }
                                 else if (output == pOut) //выходные потоки равны
                                 {
                                     testingResults[i - 1] = "+";
                                     _problemPassedTests++;
                                 }
                                 else //тест не пройден
-                                {
                                     testingResults[i - 1] = "-";
-                                }
 
                             }
                             
@@ -966,6 +1012,7 @@ namespace SimplePM_Server
                     problemProc.Kill();
                 }
                 catch (Exception) {  }
+
             }
 
             ///////////////////////////////////////////////////
@@ -1063,12 +1110,14 @@ namespace SimplePM_Server
                     1
                 ;
             ";
+
             //Получаем результат выполнения запроса
             bool setAsAuthorSolution = Convert.ToBoolean(new MySqlCommand(querySelect, connection).ExecuteScalar());
 
             //Проверка на запрос установить ткущее решение как авторское
             if (setAsAuthorSolution)
             {
+
                 //Составляем запрос на выборку из БД решения задачи и язык её решения по текущей попытке
                 querySelect = $@"
                     SELECT 
@@ -1082,29 +1131,21 @@ namespace SimplePM_Server
                         1
                     ;
                 ";
+
                 //Получаем результат выполнения запроса
                 dataReader = new MySqlCommand(querySelect, connection).ExecuteReader();
+
                 if (dataReader.Read())
                 {
+
                     try
                     {
+
                         //Исходный код авторского решения
                         string problemCode = dataReader["problemCode"].ToString();
                         //Язык написания авторского решения
                         string problemLang = dataReader["codeLang"].ToString();
-
-                        //ПОЛУЧЕНИЕ БИНАРНОГО КОДА АВТОРСКОГО РЕШЕНИЯ
-
-                        //Создаём экземпляр бинарного смотрителя
-                        BinaryReader binReader = new BinaryReader(new FileStream(exeFileUrl, FileMode.Open));
-                        //Читаем весь бинарный код до конца файла в строку, полученную строку
-                        //форматируем, чтобы не допустить "ломание" запроса к базе данных MySQL
-                        byte[] problemBinCode = binReader.ReadBytes((int)binReader.BaseStream.Length);
-                        //Освобождаем ресурсы, используемые потоком
-                        binReader.Dispose();
-                        //Закрываем поток
-                        binReader.Close();
-
+                        
                         //Закрываем соединение с базой данных (временное).
                         //Временные таблицы, расположенные на MySQL сервере, при этом удаляются.
                         dataReader.Close();
@@ -1117,29 +1158,30 @@ namespace SimplePM_Server
                                 `spm_problems_ready` 
                             SET 
                                 `problemId` = '{problemId}', 
-                                `execFile` = @problemBinCode, 
                                 `codeLang` = '{problemLang}', 
                                 `code` = @problemCode 
                             ON DUPLICATE KEY UPDATE 
-                                `execFile` = @problemBinCode,
                                 `codeLang` = '{problemLang}', 
                                 `code` = @problemCode
                             ;
                         ";
 
+                        //Создаём запрос
                         MySqlCommand insertCmd = new MySqlCommand(queryUpdate, connection);
 
-                        insertCmd.Parameters.AddWithValue("@problemBinCode", problemBinCode);
+                        //Добавляем параметры, которые требуется эскейпить
                         insertCmd.Parameters.AddWithValue("@problemCode", problemCode);
 
                         //Выполняем запрос к базе данных на добавление/обновление
                         //авторского решения для данной задачи.
                         insertCmd.ExecuteNonQuery();
+
                     }
                     catch (Exception) { }
+
                 }
                 else
-                    dataReader.Close();
+                    dataReader.Close(); // для безопасности разрываем соединение читателя с БД
             }
 
             #endregion
@@ -1150,6 +1192,7 @@ namespace SimplePM_Server
 
             try
             {
+
                 //Обновляем количество баллов и рейтинг пользователя
                 //для этого вызываем пользовательские процедуры mysql,
                 //созданные как раз для этих нужд
@@ -1157,11 +1200,15 @@ namespace SimplePM_Server
                 //произведена не во время олимпиады и не во время урока
                 if (ulong.Parse(submissionInfo["classworkId"]) == 0 && ulong.Parse(submissionInfo["olympId"]) == 0)
                     new MySqlCommand($"CALL updateBCount({userId}); CALL updateRating({userId})", connection).ExecuteNonQuery();
+
             }
             catch (Exception) {  }
 
             ///////////////////////////////////////////////////
+            
         }
+
+        ///////////////////////////////////////////////////
 
     }
 

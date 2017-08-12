@@ -20,7 +20,6 @@ using IniParser.Model;
 using System.IO;
 //Безопасность
 using System.Web;
-using System.Text;
 //Журнал событий
 using NLog;
 
@@ -46,7 +45,7 @@ namespace SimplePM_Server
         */
         public static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public ulong submissionId; //!< Идентификатор запроса
+        public string submissionId; //!< Идентификатор запроса
         public string fileLocation; //!< Полный путь к файлу и его расширение
         public IniData sConfig; //!< Дескриптор конфигурационного файла
 
@@ -56,13 +55,9 @@ namespace SimplePM_Server
         /// программированию.
         ///////////////////////////////////////////////////
         
-        public SimplePM_Compiler(ref IniData sConfig, ulong submissionId, string fileLocation)
+        public SimplePM_Compiler(ref IniData sConfig, string submissionId, string fileLocation)
         {
-
-            //Проверяем submissionID на ошибки
-            if (submissionId <= 0)
-                throw new ArgumentNullException(nameof(submissionId));
-
+            
             //Проверяем путь к исходному коду на ошибки
             if (string.IsNullOrEmpty(fileLocation) || string.IsNullOrWhiteSpace(fileLocation) || !File.Exists(fileLocation))
                 throw new FileNotFoundException("File not found!", "fileLocation");
@@ -72,6 +67,63 @@ namespace SimplePM_Server
             this.sConfig = sConfig;
             this.submissionId = submissionId;
             this.fileLocation = fileLocation;
+
+        }
+
+        ///////////////////////////////////////////////////
+        /// Функция, которая по enum-у выбирает и
+        /// запускает определённый компилятор, а также
+        /// возвращает результат компиляции.
+        ///////////////////////////////////////////////////
+
+        public static CompilerResult ChooseCompilerAndRun(SimplePM_Submission.SubmissionLanguage codeLang, SimplePM_Compiler compiler)
+        {
+
+            //В зависимости от языка программирования
+            //запускаем определённый компилятор
+            switch (codeLang)
+            {
+
+                /*   ДЛЯ РАБОТЫ ПРОГРАММЫ ТРЕБУЕТСЯ КОМПИЛЯЦИЯ   */
+                case SimplePM_Submission.SubmissionLanguage.Freepascal:
+                    //Запускаем компилятор Pascal
+                    return compiler.StartFreepascalCompiler();
+
+                case SimplePM_Submission.SubmissionLanguage.CSharp:
+                    //Запускаем компилятор C#
+                    return compiler.StartCSharpCompiler();
+
+                case SimplePM_Submission.SubmissionLanguage.C:
+                    //Запускаем компилятор C
+                    return compiler.StartCCompiler();
+
+                case SimplePM_Submission.SubmissionLanguage.Cpp:
+                    //Запускаем компилятор C++
+                    return compiler.StartCppCompiler();
+
+                case SimplePM_Submission.SubmissionLanguage.Java:
+                    //Запускаем компилятор Java
+                    return compiler.StartJavaCompiler();
+
+                /*   ДЛЯ РАБОТЫ ПРОГРАММЫ НЕ ТРЕБУЕТСЯ КОМПИЛЯЦИЯ   */
+                case SimplePM_Submission.SubmissionLanguage.Lua:
+                case SimplePM_Submission.SubmissionLanguage.Python:
+                case SimplePM_Submission.SubmissionLanguage.PHP:
+
+                    //Некоторым файлам не требуется компиляция
+                    //но для обратной совместимости функцию вкатать нужно
+                    return compiler.StartNoCompiler();
+
+                /*   ЯЗЫК ПРОГРАММИРОВАНИЯ НЕ ПОДДЕРЖИВАЕТСЯ СИСТЕМОЙ   */
+                default:
+
+                    return new CompilerResult
+                    {
+                        HasErrors = true, //Хьюстон, у нас проблема!
+                        CompilerMessage = "Language not supported by SimplePM!"
+                    };
+                
+            }
 
         }
 
@@ -124,7 +176,7 @@ namespace SimplePM_Server
         {
 
             //Будущее местонахождение исполняемого файла
-            string exeLocation = GenerateExeFileLocation(fileLocation, submissionId.ToString(), sConfig["UserProc"]["exeFileExt"]);
+            string exeLocation = GenerateExeFileLocation(fileLocation, submissionId, sConfig["UserProc"]["exeFileExt"]);
 
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = RunCompiler(
@@ -176,7 +228,7 @@ namespace SimplePM_Server
         {
 
             //Будущее местонахождение исполняемого файла
-            string exeLocation = GenerateExeFileLocation(fileLocation, submissionId.ToString(), "exe");
+            string exeLocation = GenerateExeFileLocation(fileLocation, submissionId, "exe");
 
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = RunCompiler(
@@ -202,7 +254,7 @@ namespace SimplePM_Server
         {
 
             //Будущее местонахождение исполняемого файла
-            string exeLocation = GenerateExeFileLocation(fileLocation, submissionId.ToString(), sConfig["UserProc"]["exeFileExt"]);
+            string exeLocation = GenerateExeFileLocation(fileLocation, submissionId, sConfig["UserProc"]["exeFileExt"]);
 
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = RunCompiler(
@@ -228,7 +280,7 @@ namespace SimplePM_Server
         {
 
             //Будущее местонахождение исполняемого файла
-            string exeLocation = GenerateExeFileLocation(fileLocation, submissionId.ToString(), sConfig["UserProc"]["exeFileExt"]);
+            string exeLocation = GenerateExeFileLocation(fileLocation, submissionId, sConfig["UserProc"]["exeFileExt"]);
 
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = RunCompiler(

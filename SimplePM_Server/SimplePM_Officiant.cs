@@ -111,74 +111,26 @@ namespace SimplePM_Server
 
             //Создаём файл исходного кода
             StreamWriter codeWriter = File.CreateText(fileLocation);
-
-            //Устанавливаем его аттрибуты
-            File.SetAttributes(fileLocation, FileAttributes.Temporary | FileAttributes.NotContentIndexed);
             
             //Записываем в него исходный код, очищаем буфер и закрываем поток записи
             codeWriter.WriteLine(submissionInfo["problemCode"]);
             codeWriter.Flush();
             codeWriter.Close();
 
+            //Устанавливаем его аттрибуты
+            File.SetAttributes(fileLocation, FileAttributes.Temporary | FileAttributes.NotContentIndexed);
+
             //Объявляем экземпляр класса компиляции
-            SimplePM_Compiler compiler = new SimplePM_Compiler(ref sConfig, ulong.Parse(submissionInfo["submissionId"]), fileLocation);
-
-            //Объявляем переменную результата компиляции
-            SimplePM_Compiler.CompilerResult cResult;
+            SimplePM_Compiler compiler = new SimplePM_Compiler(ref sConfig, submissionInfo["submissionId"], fileLocation);
 
             ///////////////////////////////////////////////////
-            // ЗАПУСК СПЕЦИФИЧЕСКОГО КОМПИЛЯТОРА В ЗАВИСИМОСТИ
-            // ОТ ЯЗЫКА РЕШЕНИЯ ЗАДАЧИ
+            // Вызываем функцию запуска компилятора для
+            // данного языка программирования.
+            // Функция возвращает информацию о результате
+            // компиляции пользовательской программы.
             ///////////////////////////////////////////////////
 
-            switch (codeLang)
-            {
-
-                /*   ДЛЯ РАБОТЫ ПРОГРАММЫ ТРЕБУЕТСЯ КОМПИЛЯЦИЯ   */
-                case SimplePM_Submission.SubmissionLanguage.Freepascal:
-                    //Запускаем компилятор Pascal
-                    cResult = compiler.StartFreepascalCompiler();
-                    break;
-                case SimplePM_Submission.SubmissionLanguage.CSharp:
-                    //Запускаем компилятор C#
-                    cResult = compiler.StartCSharpCompiler();
-                    break;
-                case SimplePM_Submission.SubmissionLanguage.C:
-                    //Запускаем компилятор C
-                    cResult = compiler.StartCCompiler();
-                    break;
-                case SimplePM_Submission.SubmissionLanguage.Cpp:
-                    //Запускаем компилятор C++
-                    cResult = compiler.StartCppCompiler();
-                    break;
-                case SimplePM_Submission.SubmissionLanguage.Java:
-                    //Запускаем компилятор Java
-                    cResult = compiler.StartJavaCompiler();
-                    break;
-
-                /*   ДЛЯ РАБОТЫ ПРОГРАММЫ НЕ ТРЕБУЕТСЯ КОМПИЛЯЦИЯ   */
-                case SimplePM_Submission.SubmissionLanguage.Lua:
-                case SimplePM_Submission.SubmissionLanguage.Python:
-                case SimplePM_Submission.SubmissionLanguage.PHP:
-
-                    //Некоторым файлам не требуется компиляция
-                    //но для обратной совместимости функцию вкатать нужно
-                    cResult = compiler.StartNoCompiler();
-
-                    break;
-                
-                /*   ЯЗЫК ПРОГРАММИРОВАНИЯ НЕ ПОДДЕРЖИВАЕТСЯ СИСТЕМОЙ   */
-                default:
-
-                    cResult = new SimplePM_Compiler.CompilerResult()
-                    {
-                        HasErrors = true,
-                        CompilerMessage = "Language not supported by SimplePM!"
-                    };
-
-                    break;
-                
-            }
+            SimplePM_Compiler.CompilerResult cResult = SimplePM_Compiler.ChooseCompilerAndRun(codeLang, compiler);
 
             ///////////////////////////////////////////////////
             // Записываем в базу данных сообщение компилятора
@@ -195,6 +147,7 @@ namespace SimplePM_Server
                     1
                 ;
             ";
+
             new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
 
             ///////////////////////////////////////////////////
@@ -203,6 +156,7 @@ namespace SimplePM_Server
 
             if (cResult.HasErrors)
             {
+
                 //Ошибка компиляции, записываем это в БД
                 queryUpdate = $@"
                     UPDATE 
@@ -216,7 +170,9 @@ namespace SimplePM_Server
                         1
                     ;
                 ";
+
                 new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+
             }
             else
             {
@@ -283,8 +239,9 @@ namespace SimplePM_Server
                 // ДЕЙСТВИЯ В СЛУЧАЕ ОШИБКИ СЕРВЕРА ПРОВЕРКИ
                 ///////////////////////////////////////////////////
                 
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Console.WriteLine(ex);
                     
                     //Делаем так, чтобы несчастливую отправку обрабатывал
                     //кто-то другой, но только не мы (а может и мы, но позже)
