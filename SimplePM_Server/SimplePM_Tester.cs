@@ -1,7 +1,7 @@
 ﻿/*
  * Copyright (C) 2017, Kadirov Yurij.
  * All rights are reserved.
- * Licensed under CC BY-NC-SA 4.0 license.
+ * Licensed under Apache License 2.0 + NON-COMMERCIAL license.
  * 
  * @Author: Kadirov Yurij
  * @Website: https://sirkadirov.com/
@@ -30,6 +30,8 @@ using MySql.Data.MySqlClient;
 using IniParser.Model;
 //Журнал событий
 using NLog;
+//Для использования плюшек
+using static SimplePM_Server.SimplePM_Submission;
 
 namespace SimplePM_Server
 {
@@ -145,25 +147,35 @@ namespace SimplePM_Server
         /// запуске процесса пользовательского или
         /// авторского решения задачи.
         ///////////////////////////////////////////////////
-        public void SetExecInfoByFileExt(ref ProcessStartInfo startInfo, string filePath = null)
+        public void SetExecInfoByFileExt(ref ProcessStartInfo startInfo, string filePath = null, SubmissionLanguage codeLanguage = SubmissionLanguage.Unset)
         {
+
+            //Путь к исполняемому файлу
             if (filePath == null)
                 filePath = exeFileUrl;
 
-            switch (Path.GetExtension(filePath))
+            //Язык решения задачи
+            if (codeLanguage == SubmissionLanguage.Unset)
+                codeLanguage = GetCodeLanguageByName(submissionInfo["codeLang"]);
+
+            //Выбор способа запуска от языка программирования попытки
+            switch (codeLanguage)
             {
+
                 //Lua
-                case ".lua":
+                case SubmissionLanguage.Lua:
                     startInfo.FileName = sConfig["Compilers"]["lua_location"];
                     startInfo.Arguments = '"' + filePath + '"';
                     break;
+
                 //Python
-                case ".py":
+                case SubmissionLanguage.Python:
                     startInfo.FileName = sConfig["Compilers"]["python_location"];
                     startInfo.Arguments = '"' + filePath + '"';
                     break;
+
                 //Java
-                case ".class":
+                case SubmissionLanguage.Java:
                     //Получаем информацию о файле
                     FileInfo fileInfo = new FileInfo(filePath);
 
@@ -174,19 +186,38 @@ namespace SimplePM_Server
                     startInfo.FileName = sConfig["Compilers"]["java_location"];
                     //Устанавливаем аргументы процесса
                     startInfo.Arguments = "-d64 -cp . " + '"' + Path.GetFileNameWithoutExtension(fileInfo.Name) + '"';
-                    
+
                     break;
+
                 //PHP
-                case ".php":
+                case SubmissionLanguage.PHP:
                     startInfo.FileName = sConfig["Compilers"]["php_location"];
                     startInfo.Arguments = '"' + filePath + '"';
                     break;
+
+                //MONO-C#
+                case SubmissionLanguage.CSharp:
+                    int platform = (int)Environment.OSVersion.Platform;
+                    if (platform == 4 || platform == 6 || platform == 128)
+                    {
+                        startInfo.FileName = sConfig["Compilers"]["mono_location"];
+                        startInfo.Arguments = '"' + filePath + '"';
+                    }
+                    else
+                    {
+                        startInfo.FileName = filePath;
+                        startInfo.Arguments = "";
+                    }
+                    break;
+
                 //Executable files
                 default:
                     startInfo.FileName = filePath;
                     startInfo.Arguments = "";
                     break;
+                
             }
+
         }
 
         ///////////////////////////////////////////////////
@@ -248,8 +279,12 @@ namespace SimplePM_Server
             if (sConfig["RunAs"]["enabled"] == "true")
             {
 
+                //Указываем, что будем запускать процесс от имени другого пользователя
+                proc.StartInfo.Verb = "runas";
+
                 //Передаём имя пользователя
                 proc.StartInfo.UserName = sConfig["RunAs"]["accountLogin"];
+
                 //Передаём пароль пользователя в открытом виде
                 //(а почему бы и нет)
                 proc.StartInfo.PasswordInClearText = sConfig["RunAs"]["accountPassword"];
@@ -294,16 +329,17 @@ namespace SimplePM_Server
             
             //Объявляем необходимые переменные
             string authorProblemCode = null;
-            SimplePM_Submission.SubmissionLanguage authorProblemCodeLanguage = SimplePM_Submission.SubmissionLanguage.Unset;
+            SubmissionLanguage authorProblemCodeLanguage = SubmissionLanguage.Unset;
 
             //Читаем полученные данные
             while (dataReader.Read())
             {
+
                 //Исходный код авторского решения
                 authorProblemCode = dataReader["code"].ToString();
 
                 //Язык авторского решения
-                authorProblemCodeLanguage = SimplePM_Submission.GetCodeLanguageByName(dataReader["codeLang"].ToString());
+                authorProblemCodeLanguage = GetCodeLanguageByName(dataReader["codeLang"].ToString());
 
             }
 
@@ -311,7 +347,7 @@ namespace SimplePM_Server
             dataReader.Close();
 
             //Проверка на наличие авторского решения задачи
-            if (authorProblemCode != null && authorProblemCodeLanguage != SimplePM_Submission.SubmissionLanguage.Unset)
+            if (authorProblemCode != null && authorProblemCodeLanguage != SubmissionLanguage.Unset)
             {
 
                 ///////////////////////////////////////////////////
@@ -319,7 +355,7 @@ namespace SimplePM_Server
                 ///////////////////////////////////////////////////
                 
                 //Определяем расширение файла
-                string authorFileExt = "." + SimplePM_Submission.GetExtByLang(authorProblemCodeLanguage);
+                string authorFileExt = "." + GetExtByLang(authorProblemCodeLanguage);
 
                 //Получаем случайный путь к директории авторского решения
                 string tmpAuthorDir = sConfig["Program"]["tempPath"] + @"\author\" + Path.GetRandomFileName() + @"\";
@@ -428,7 +464,7 @@ namespace SimplePM_Server
                 startInfo.FileName = authorCodePath;
 
                 //Устанавливаем информацию о запускаемом файле
-                SetExecInfoByFileExt(ref startInfo, authorCodePath);
+                SetExecInfoByFileExt(ref startInfo, authorCodePath, authorProblemCodeLanguage);
 
                 //Указываем интересующую нас конфигурацию тестирования
                 authorProblemProc.StartInfo = startInfo;
