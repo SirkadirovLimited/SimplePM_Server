@@ -61,6 +61,34 @@ namespace SimplePM_Server.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sorry, but your command caused an error(s), because:
+        ///a) Command not found
+        ///b) Running command thrown an exception.
+        /// </summary>
+        internal static string commanderError {
+            get {
+                return ResourceManager.GetString("commanderError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copyright (C) 2017, Kadirov Yurij. All rights are reserved.
+        ///Licensed under Apache License 2.0 + Non-commercial agreement.
+        ///
+        ///List of all supported commands:
+        ///[-help] - displays a list of all supported commands
+        ///[-setenvars] - create / update SimplePM_Server environment variables
+        ///[-birch]
+        ///
+        ///More commands coming soon..
+        /// </summary>
+        internal static string commanderHelp {
+            get {
+                return ResourceManager.GetString("commanderHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to █ SimplePM_Server
         ///█ Copyright (C) 2017, Kadirov Yurij. All rights are reserved.
         ///█ Official website: www.sirkadirov.com

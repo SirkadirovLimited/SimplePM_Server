@@ -241,22 +241,34 @@ namespace SimplePM_Server
                 
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex);
-                    
+
+                    //Записываем информацию об ошибке в лог сервера
+                    logger.Error(ex);
+
                     //Делаем так, чтобы несчастливую отправку обрабатывал
                     //кто-то другой, но только не мы (а может и мы, но позже)
                     queryUpdate = $@"
                         UPDATE 
                             `spm_submissions` 
                         SET 
-                            `status` = 'waiting' 
+                            `status` = 'ready', 
+                            `errorOutput` = @errorOutput, 
+                            `b` = '0'
                         WHERE 
                             `submissionId` = '{submissionInfo["submissionId"]}' 
                         LIMIT 
                             1
                         ;
                     ";
-                    new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+
+                    //Создаём команду
+                    MySqlCommand cmd = new MySqlCommand(queryUpdate, connection);
+
+                    //Устанавливаем значения параметров
+                    cmd.Parameters.AddWithValue("@output", ex);
+
+                    //Выполняем команду
+                    cmd.ExecuteNonQuery();
 
                     //Вызываем сборщика мусора
                     ClearCache(cResult.ExeFullname, fileLocation);

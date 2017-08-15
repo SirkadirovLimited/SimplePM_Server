@@ -67,7 +67,6 @@ namespace SimplePM_Server
 
         //Список поддерживаемых языков программирования
         //для использования в выборочных SQL запросах
-        public static string[] EnabledLangsList;
         public static string EnabledLangs;
 
         ///////////////////////////////////////////////////
@@ -79,42 +78,46 @@ namespace SimplePM_Server
         public static void GenerateEnabledLangsList()
         {
 
-            /* Инициализируем массив строк */
-            EnabledLangsList = new string[ sConfig["EnabledCompilers"].Count];
-
-            /* Объявляем необходимые переменные */
-            int i = 0;
+            /* Инициализируем список строк */
+            List<string> EnabledLangsList = new List<string>();
 
             /* Добавляем элементы в массив */
+
             //Pascal (Free Pascal, Object Pascal, etc.)
-            if (sConfig["EnabledCompilers"].ContainsKey("freepascal"))
-                EnabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["freepascal"] + "'";
+            if (sConfig["Compilers"].ContainsKey("freepascal"))
+                EnabledLangsList.Add("'" + sConfig["Compilers"]["freepascal"] + "'");
+            
             // C#
-            if (sConfig["EnabledCompilers"].ContainsKey("csharp"))
-                EnabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["csharp"] + "'";
+            if (sConfig["Compilers"].ContainsKey("csharp"))
+                EnabledLangsList.Add("'" + sConfig["Compilers"]["csharp"] + "'");
+            
             // C++
-            if (sConfig["EnabledCompilers"].ContainsKey("cpp"))
-                EnabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["cpp"] + "'";
+            if (sConfig["Compilers"].ContainsKey("cpp"))
+                EnabledLangsList.Add("'" + sConfig["Compilers"]["cpp"] + "'");
+            
             // C
-            if (sConfig["EnabledCompilers"].ContainsKey("c"))
-                EnabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["c"] + "'";
+            if (sConfig["Compilers"].ContainsKey("c"))
+                EnabledLangsList.Add("'" + sConfig["Compilers"]["c"] + "'");
+            
             // Lua
-            if (sConfig["EnabledCompilers"].ContainsKey("lua"))
-                EnabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["lua"] + "'";
+            if (sConfig["Compilers"].ContainsKey("lua"))
+                EnabledLangsList.Add("'" + sConfig["Compilers"]["lua"] + "'");
+            
             // Python
-            if (sConfig["EnabledCompilers"].ContainsKey("python"))
-                EnabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["python"] + "'";
+            if (sConfig["Compilers"].ContainsKey("python"))
+                EnabledLangsList.Add("'" + sConfig["Compilers"]["python"] + "'");
+            
             // PHP
-            if (sConfig["EnabledCompilers"].ContainsKey("php"))
-                EnabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["php"] + "'";
+            if (sConfig["Compilers"].ContainsKey("php"))
+                EnabledLangsList.Add("'" + sConfig["Compilers"]["php"] + "'");
+            
             // Java
-            if (sConfig["EnabledCompilers"].ContainsKey("java"))
-                EnabledLangsList[i++] = "'" + sConfig["LanguagesNaming"]["java"] + "'";
+            if (sConfig["Compilers"].ContainsKey("java"))
+                EnabledLangsList.Add("'" + sConfig["Compilers"]["java"] + "'");
 
+            //Формируем список доступных языков
             EnabledLangs = string.Join(", ", EnabledLangsList);
-
-            Console.WriteLine("Enabled languages: " + EnabledLangs);
-
+            
         }
 
         ///////////////////////////////////////////////////
@@ -185,7 +188,13 @@ namespace SimplePM_Server
             GenerateEnabledLangsList();
 
             ///////////////////////////////////////////////////
-            // ОСНОВНОЙ ЦИКЛ ПРОГРАММЫ
+            // ОБРАБОТКА АРГУМЕНТОВ
+            ///////////////////////////////////////////////////
+
+            new SimplePM_Commander().SplitArguments(args);
+
+            ///////////////////////////////////////////////////
+            // ОСНОВНОЙ ЦИКЛ СЕРВЕРА
             ///////////////////////////////////////////////////
 
             while (true)
@@ -194,7 +203,7 @@ namespace SimplePM_Server
                 //Отлавливаем все ошибки
                 try
                 {
-
+                
                     //Получаем дескриптор соединения с базой данных
                     MySqlConnection conn = StartMysqlConnection(sConfig);
 

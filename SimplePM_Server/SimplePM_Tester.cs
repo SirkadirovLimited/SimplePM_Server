@@ -18,6 +18,9 @@ using System.IO;
 using System.Collections.Generic;
 //Работа с процессами
 using System.Diagnostics;
+//Безопасная передача паролей
+using System.Security;
+//Работа с текстовыми данными
 using System.Text;
 //Работа с потоками и задачами
 using System.Threading;
@@ -135,8 +138,10 @@ namespace SimplePM_Server
             }
 
             //Удаляем последний искуственно
-            // созданный перевод на новую строку
-            _output = _output.Substring(0, _output.LastIndexOf('\n'));
+            //созданный перевод на новую строку
+            //но только в случае, если размер строки больше 0.
+            if (_output.Length > 0)
+                _output = _output.Substring(0, _output.LastIndexOf('\n'));
 
             //Возвращаем результат нормализации
             return _output;
@@ -279,15 +284,26 @@ namespace SimplePM_Server
             if (sConfig["RunAs"]["enabled"] == "true")
             {
 
-                //Указываем, что будем запускать процесс от имени другого пользователя
+                /* Указываем, что будем запускать процесс от имени другого пользователя */
                 proc.StartInfo.Verb = "runas";
 
-                //Передаём имя пользователя
+                /* Передаём имя пользователя */
                 proc.StartInfo.UserName = sConfig["RunAs"]["accountLogin"];
 
-                //Передаём пароль пользователя в открытом виде
-                //(а почему бы и нет)
-                proc.StartInfo.PasswordInClearText = sConfig["RunAs"]["accountPassword"];
+                /* Передаём, что необходимо вытянуть профайл из реестра */
+                proc.StartInfo.LoadUserProfile = true;
+
+                /* Передаём пароль пользователя */
+
+                //Создаём защищённую строку
+                SecureString encPassword = new SecureString();
+
+                //Добавляем данные в защищённую строку
+                foreach (char c in sConfig["RunAs"]["accountPassword"])
+                    encPassword.AppendChar(c);
+
+                //Устанавливаем пароль пользователя
+                proc.StartInfo.Password = encPassword;
 
             }
 
@@ -580,12 +596,13 @@ namespace SimplePM_Server
                     userProblemProc.StandardInput.Close(); //закрываем поток
 
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
 
                     //Произошла ошибка при выполнении программы
                     //В этом, скорее всего, виноват компилятор.
                     debugTestingResult = 'C';
+                    logger.Error(ex);
 
                 }
 
@@ -904,13 +921,14 @@ namespace SimplePM_Server
                     problemProc.StandardInput.Flush(); //производим запись во входной поток и последующую очистку буфера
                     problemProc.StandardInput.Close(); //закрываем запись входного потока
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-
+                    
                     //Произошла ошибка при выполнении программы.
                     //Виноват, как всегда, компилятор!
                     testingResults[i-1] = "C";
                     preResultGiven = true;
+                    logger.Error(ex);
 
                 }
                 
@@ -932,6 +950,9 @@ namespace SimplePM_Server
                             //Проверка на превышение лимита памяти
                             if (problemProc.PeakWorkingSet64 > memoryLimit)
                             {
+                                //Очищаем кеш и получаем обновлённые значения
+                                problemProc.Refresh();
+
                                 //Лимит памяти превышен
                                 problemProc.Kill(); //завершаем работу процесса в принудительном порядке
 
