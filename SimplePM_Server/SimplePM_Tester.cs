@@ -285,13 +285,13 @@ namespace SimplePM_Server
             {
 
                 /* Указываем, что будем запускать процесс от имени другого пользователя */
-                proc.StartInfo.Verb = "runas";
+                proc.StartInfo.Verb = "runasuser";
 
                 /* Передаём имя пользователя */
                 proc.StartInfo.UserName = sConfig["RunAs"]["accountLogin"];
 
                 /* Передаём, что необходимо вытянуть профайл из реестра */
-                proc.StartInfo.LoadUserProfile = true;
+                proc.StartInfo.LoadUserProfile = false;
 
                 /* Передаём пароль пользователя */
 
@@ -452,7 +452,6 @@ namespace SimplePM_Server
                     ErrorDialog = false,
                     UseShellExecute = false,
                     CreateNoWindow = true,
-                    Verb = "open",
                     WindowStyle = ProcessWindowStyle.Minimized
                 };
 
@@ -995,6 +994,7 @@ namespace SimplePM_Server
                     //Ждём завершения, максимум X миллимекунд
                     if (!problemProc.WaitForExit(int.Parse(sConfig["UserProc"]["maxProcessTime"])))
                     {
+
                         //Процесс не завершил свою работу
                         //Исключение: времени не хватило!
                         problemProc.Kill();
@@ -1003,17 +1003,20 @@ namespace SimplePM_Server
                         //корректно завершила свою работу
                         Thread.Sleep(10);
 
+                        //Устанавливаем результат теста
                         testingResults[i - 1] = "T";
+
                     }
                     else
                     {
+
                         //Проверка на "вшивость"
                         string currentErrors = problemProc.StandardError.ReadToEnd();
                         problemProc.StandardError.Close();
 
                         //Добавляем ошибки текущего теста в список всех ошибок
                         if (currentErrors.Length > 0)
-                            standartErrorOutputText += currentErrors;
+                            standartErrorOutputText += currentErrors + '\n';
 
                         if (currentErrors.Length > 0)
                         {
