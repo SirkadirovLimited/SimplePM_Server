@@ -173,12 +173,10 @@
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
 	  
-	  WARNING: COMMERCIAL USE OF THE PRODUCT IS DENIED!
-      ALL RIGHTS FOR THIS PRODUCT ARE RESERVED FOR Kadirov Yurij.
 
    END OF TERMS AND CONDITIONS
 
-   Copyright 2017 Kadirov Yurij
+   Copyright 2016 Kadirov Yurij
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
