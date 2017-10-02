@@ -236,36 +236,40 @@ namespace SimplePM_Server
 
         void ProcessorTimeLimitCheck(Process proc, Action doProcessorTimeLimit, int timeLimit)
         {
+
             //Создаём и сразу же запускаем новую задачу
             new Task(() =>
             {
+
                 //Ловим непредвиденные исключения
                 try
                 {
+
                     //Повторяем действия пока процесс не закончил свою работу
                     while (!proc.HasExited)
                     {
+
                         //Очищаем кеш и получаем обновлённые значения
                         proc.Refresh();
 
                         //Обновляем переменную типа TimeSpan для удобства
                         TimeSpan pts = proc.TotalProcessorTime;
 
-                        //PerformanceCounter percCounter = new PerformanceCounter("Process", "% Processor Time", proc.ProcessName);
-
                         //Проверяем процесс на превышение лимита процессорного времени
-                        bool checker = pts.Milliseconds > timeLimit;
-                        checker = checker || pts.Minutes > 0;
-                        checker = checker || pts.Hours > 0;
-                        checker = checker || pts.Days > 0;
-                        
+                        Console.WriteLine(pts.TotalMilliseconds);
+                        bool checker = (int)Math.Round(pts.TotalMilliseconds) > timeLimit;
+
                         //В случае превышения лимита запускаем пользовательский метод
                         if (checker)
                             doProcessorTimeLimit();
+                        
                     }
+
                 }
                 catch (Exception) { /* Deal with it */ }
+
             }).Start();
+
         }
 
         ///////////////////////////////////////////////////

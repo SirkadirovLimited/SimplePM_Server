@@ -57,13 +57,13 @@ namespace SimplePM_Server
 
         //Текущее количество подсоединённых пользователей
         public static ulong _customersCount = 0;
-        public static ulong _maxCustomersCount = 10;
+        public static ulong _maxCustomersCount = 80;
 
         //Объявляем дескриптор конфигурационного файла
         public static IniData sConfig;
 
         //Устанавливаем время ожидания
-        public static int SleepTime = 1000;
+        public static int SleepTime = 500;
 
         //Список поддерживаемых языков программирования
         //для использования в выборочных SQL запросах
