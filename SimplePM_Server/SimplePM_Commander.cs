@@ -25,7 +25,7 @@ namespace SimplePM_Server
             Объявляем переменную указателя на менеджер журнала собылий
             и присваиваем ей указатель на журнал событий текущего класса
         */
-        public static Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         ///////////////////////////////////////////////////
         /// Функция, обрабатывающая аргументы запуска

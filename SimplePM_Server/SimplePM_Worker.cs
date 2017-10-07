@@ -53,21 +53,21 @@ namespace SimplePM_Server
             Объявляем переменную указателя на менеджер журнала собылий
             и присваиваем ей указатель на журнал событий текущего класса
         */
-        public static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         //Текущее количество подсоединённых пользователей
-        public static ulong _customersCount = 0;
-        public static ulong _maxCustomersCount = 80;
+        private static ulong _customersCount = 0;
+        private static ulong _maxCustomersCount = 80;
 
         //Объявляем дескриптор конфигурационного файла
         public static IniData sConfig;
 
         //Устанавливаем время ожидания
-        public static int SleepTime = 500;
+        private static int SleepTime = 500;
 
         //Список поддерживаемых языков программирования
         //для использования в выборочных SQL запросах
-        public static string EnabledLangs;
+        private static string EnabledLangs;
 
         ///////////////////////////////////////////////////
         /// Функция генерирует строку из допустимых для
@@ -125,7 +125,7 @@ namespace SimplePM_Server
         /// непредвиденных исключений
         ///////////////////////////////////////////////////
 
-        public static void SetExceptionHandler()
+        private static void SetExceptionHandler()
         {
 
             //Устанавливаем обработчик необработанных исключений
@@ -138,7 +138,7 @@ namespace SimplePM_Server
         /// о необработанном фатальном исключении
         ///////////////////////////////////////////////////
 
-        public static void ExceptionEventLogger(object sender, UnhandledExceptionEventArgs e)
+        private static void ExceptionEventLogger(object sender, UnhandledExceptionEventArgs e)
         {
 
             //Записываем сообщение об ошибке в журнал событий

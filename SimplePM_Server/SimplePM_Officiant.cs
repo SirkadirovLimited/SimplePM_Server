@@ -39,16 +39,16 @@ namespace SimplePM_Server
         ///////////////////////////////////////////////////
         // РАЗДЕЛ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ
         ///////////////////////////////////////////////////
-        
+
         /*!
             Объявляем переменную указателя на менеджер журнала собылий
             и присваиваем ей указатель на журнал событий текущего класса
         */
-        public static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        public MySqlConnection connection; //!< Дескриптор соединения с БД
-        public Dictionary<string, string> submissionInfo; //!< Словарь информации о запросе
-        public IniData sConfig; //!< Дескриптор конфигурационного файла
+        private MySqlConnection connection; //!< Дескриптор соединения с БД
+        private Dictionary<string, string> submissionInfo; //!< Словарь информации о запросе
+        private IniData sConfig; //!< Дескриптор конфигурационного файла
 
         ///////////////////////////////////////////////////
         /// Функция-конструктор официанта, обрабатывающего

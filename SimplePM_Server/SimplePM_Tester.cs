@@ -50,22 +50,22 @@ namespace SimplePM_Server
         ///////////////////////////////////////////////////
         // РАЗДЕЛ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ
         ///////////////////////////////////////////////////
-        
+
         /*!
             Объявляем переменную указателя на менеджер журнала собылий
             и присваиваем ей указатель на журнал событий текущего класса
         */
-        public static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        public MySqlConnection connection; //!< Дескриптор соединения с БД
-        public Dictionary<string, string> submissionInfo; //!< Информация о запросе на проверку
-        public string exeFileUrl; //!< Полный путь к исполняемому файлу
-        public string customTestInput; //!< Кастомный тест, введённый пользователем
-        public ulong problemId; //!< Идентификатор задачи
-        public ulong submissionId; //!< Идентификатор запроса на компиляцию
-        public ulong userId; //!< Идентификатор пользователя
-        public float problemDifficulty; //!<  Сложность задачи
-        public IniData sConfig; //!<  Дескриптор конфигурационного файла сервера
+        private readonly MySqlConnection connection; //!< Дескриптор соединения с БД
+        private readonly Dictionary<string, string> submissionInfo; //!< Информация о запросе на проверку
+        private readonly string exeFileUrl; //!< Полный путь к исполняемому файлу
+        private readonly string customTestInput; //!< Кастомный тест, введённый пользователем
+        private readonly ulong problemId; //!< Идентификатор задачи
+        private readonly ulong submissionId; //!< Идентификатор запроса на компиляцию
+        private readonly ulong userId; //!< Идентификатор пользователя
+        private readonly float problemDifficulty; //!<  Сложность задачи
+        private IniData sConfig; //!<  Дескриптор конфигурационного файла сервера
 
         ///////////////////////////////////////////////////
         /// Функция-конструктор класса тестирования
@@ -100,10 +100,7 @@ namespace SimplePM_Server
             this.sConfig = sConfig;
 
             //Custom test checker
-            if (submissionInfo.ContainsKey("customTest"))
-                customTestInput = submissionInfo["customTest"];
-            else
-                customTestInput = null;
+            customTestInput = submissionInfo.ContainsKey("customTest") ? submissionInfo["customTest"] : null;
 
         }
 
@@ -256,7 +253,6 @@ namespace SimplePM_Server
                         TimeSpan pts = proc.TotalProcessorTime;
 
                         //Проверяем процесс на превышение лимита процессорного времени
-                        Console.WriteLine(pts.TotalMilliseconds);
                         bool checker = (int)Math.Round(pts.TotalMilliseconds) > timeLimit;
 
                         //В случае превышения лимита запускаем пользовательский метод
@@ -289,7 +285,7 @@ namespace SimplePM_Server
             {
 
                 /* Указываем, что будем запускать процесс от имени другого пользователя */
-                proc.StartInfo.Verb = "runasuser";
+                proc.StartInfo.Verb = "runas";
 
                 /* Передаём имя пользователя */
                 proc.StartInfo.UserName = sConfig["RunAs"]["accountLogin"];

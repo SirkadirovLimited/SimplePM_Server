@@ -43,11 +43,11 @@ namespace SimplePM_Server
             Объявляем переменную указателя на менеджер журнала собылий
             и присваиваем ей указатель на журнал событий текущего класса
         */
-        public static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        public string submissionId; //!< Идентификатор запроса
-        public string fileLocation; //!< Полный путь к файлу и его расширение
-        public IniData sConfig; //!< Дескриптор конфигурационного файла
+        private readonly string submissionId; //!< Идентификатор запроса
+        private readonly string fileLocation; //!< Полный путь к файлу и его расширение
+        private readonly IniData sConfig; //!< Дескриптор конфигурационного файла
 
         ///////////////////////////////////////////////////
         /// Функция-конструктор класса компиляции
