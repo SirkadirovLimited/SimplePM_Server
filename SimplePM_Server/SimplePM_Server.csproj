@@ -144,6 +144,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SimplePM_Commander.cs" />
+    <Compile Include="SimplePM_Exceptions.cs" />
     <Compile Include="SimplePM_Worker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimplePM_Compiler.cs" />

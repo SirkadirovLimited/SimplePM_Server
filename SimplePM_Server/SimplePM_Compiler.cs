@@ -32,7 +32,7 @@ namespace SimplePM_Server
      * вызывается функциями класса-официанта
      */
 
-    class SimplePM_Compiler
+    internal class SimplePM_Compiler
     {
 
         ///////////////////////////////////////////////////

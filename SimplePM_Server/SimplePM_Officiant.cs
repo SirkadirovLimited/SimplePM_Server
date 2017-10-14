@@ -33,7 +33,7 @@ namespace SimplePM_Server
      * программированию.
      */
 
-    class SimplePM_Officiant
+    internal class SimplePM_Officiant
     {
 
         ///////////////////////////////////////////////////
@@ -208,13 +208,66 @@ namespace SimplePM_Server
                         //Отладка программы по пользовательскому тесту
                         case "debug":
 
-                            //Запускаем тестирование программы
-                            new SimplePM_Tester(
-                                ref connection, //дескриптор соединения с БД
-                                ref cResult.ExeFullname, //полный путь к исполняемому файлу
-                                ref submissionInfo, //информация о запросе на тестирование
-                                ref sConfig //дескриптор конфигурационного файла сервера
-                            ).DebugTest();
+                            try
+                            {
+
+                                //Запускаем тестирование программы
+                                new SimplePM_Tester(
+                                    ref connection, //дескриптор соединения с БД
+                                    ref cResult.ExeFullname, //полный путь к исполняемому файлу
+                                    ref submissionInfo, //информация о запросе на тестирование
+                                    ref sConfig //дескриптор конфигурационного файла сервера
+                                ).DebugTest();
+
+                            }
+                            //Выполняем необходимые действия в случае,
+                            //когда авторское решение "ломается" при запуске или работе
+                            catch (SimplePM_Exceptions.AuthorSolutionRunningException)
+                            {
+
+                                //Запрос на обновление данных в базе данных
+                                queryUpdate = $@"
+                                UPDATE 
+                                    `spm_submissions` 
+                                    SET 
+                                        `status` = 'ready', 
+                                        `errorOutput` = 'ERR_AUTHOR_SOLUTION_CRASHED', 
+                                        `hasError` = true 
+                                    WHERE 
+                                        `submissionId` = '{submissionInfo["submissionId"]}' 
+                                    LIMIT 
+                                        1
+                                    ;
+                                ";
+
+                                //Выполняем запрос, адресованный к серверу баз данных MySQL
+                                new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+
+                            }
+                            //Выполняем необходимые действия в случае,
+                            //когда авторское решение для задачи не найдено
+                            catch (SimplePM_Exceptions.AuthorSolutionNotFoundException)
+                            {
+
+                                //Запрос на обновление данных в базе данных
+                                queryUpdate = $@"
+                                    UPDATE 
+                                        `spm_submissions` 
+                                    SET 
+                                        `status` = 'ready', 
+                                        `errorOutput` = 'ERR_NO_AUTHOR_SOLUTION', 
+                                        `hasError` = true 
+                                    WHERE 
+                                        `submissionId` = '{submissionInfo["submissionId"]}' 
+                                    LIMIT 
+                                        1
+                                    ;
+                                ";
+
+                                //Выполняем запрос, адресованный к серверу баз данных MySQL
+                                new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+
+                            }
 
                             break;
                         //Отправка решения задачи

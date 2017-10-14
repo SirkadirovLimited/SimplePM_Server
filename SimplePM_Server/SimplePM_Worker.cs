@@ -42,7 +42,7 @@ namespace SimplePM_Server
      * множество переменных и т.д.
      */
 
-    class SimplePM_Worker
+    public class SimplePM_Worker
     {
 
         ///////////////////////////////////////////////////
@@ -160,9 +160,6 @@ namespace SimplePM_Server
 
             //Устанавливаем "улавливатель исключений"
             SetExceptionHandler();
-
-            //Генерирую "шапку" консоли сервера
-            GenerateProgramHeader();
             
             //Открываем конфигурационный файл для чтения
             FileIniDataParser iniParser = new FileIniDataParser();
@@ -186,6 +183,9 @@ namespace SimplePM_Server
             // поддерживаемых языков программирования данным
             // экземплятор сервера SimplePM_Server
             GenerateEnabledLangsList();
+
+            //Генерирую "шапку" консоли сервера
+            GenerateProgramHeader();
 
             ///////////////////////////////////////////////////
             // ОБРАБОТКА АРГУМЕНТОВ

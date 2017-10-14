@@ -45,7 +45,7 @@ namespace SimplePM_Server
      * задач по программированию
      */
 
-    class SimplePM_Tester
+    internal class SimplePM_Tester
     {
         ///////////////////////////////////////////////////
         // РАЗДЕЛ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ
@@ -362,51 +362,53 @@ namespace SimplePM_Server
             //Закрываем data reader
             dataReader.Close();
 
-            //Проверка на наличие авторского решения задачи
-            if (authorProblemCode != null && authorProblemCodeLanguage != SubmissionLanguage.Unset)
-            {
+            /* ===== Проверка на наличие авторского решения задачи ==== */
+            if (authorProblemCode == null || authorProblemCodeLanguage == SubmissionLanguage.Unset)
+                throw new SimplePM_Exceptions.AuthorSolutionNotFoundException();
 
-                ///////////////////////////////////////////////////
-                // Скачивание и компиляция авторского решения
-                ///////////////////////////////////////////////////
-                
-                //Определяем расширение файла
-                string authorFileExt = "." + GetExtByLang(authorProblemCodeLanguage);
+            #region ПРОВЕРКА РЕШЕНИЯ
 
-                //Получаем случайный путь к директории авторского решения
-                string tmpAuthorDir = sConfig["Program"]["tempPath"] + @"\author\" + Path.GetRandomFileName() + @"\";
-                
-                //Создаём папку текущего авторского решения задачи
-                Directory.CreateDirectory(tmpAuthorDir);
+            ///////////////////////////////////////////////////
+            // Скачивание и компиляция авторского решения
+            ///////////////////////////////////////////////////
 
-                //Определяем путь хранения файла исходного кода вторского решения
-                string tmpAuthorSrcLocation = tmpAuthorDir + "sa" + submissionId + authorFileExt;
-                
-                //Записываем исходный код авторского решения в заданный временный файл
-                File.WriteAllText(tmpAuthorSrcLocation, authorProblemCode, Encoding.UTF8);
+            //Определяем расширение файла
+            string authorFileExt = "." + GetExtByLang(authorProblemCodeLanguage);
 
-                //Устанавливаем его аттрибуты
-                File.SetAttributes(tmpAuthorSrcLocation, FileAttributes.Temporary | FileAttributes.NotContentIndexed);
+            //Получаем случайный путь к директории авторского решения
+            string tmpAuthorDir = sConfig["Program"]["tempPath"] + @"\author\" + Path.GetRandomFileName() + @"\";
 
-                //Инициализируем экземпляр класса компилятора
-                SimplePM_Compiler compiler = new SimplePM_Compiler(ref sConfig, "a" + submissionId, tmpAuthorSrcLocation);
+            //Создаём папку текущего авторского решения задачи
+            Directory.CreateDirectory(tmpAuthorDir);
 
-                //Получаем структуру результата компиляции
-                SimplePM_Compiler.CompilerResult cResult = SimplePM_Compiler.ChooseCompilerAndRun(authorProblemCodeLanguage, compiler);
+            //Определяем путь хранения файла исходного кода вторского решения
+            string tmpAuthorSrcLocation = tmpAuthorDir + "sa" + submissionId + authorFileExt;
 
-                //В случае возникновения ошибки при компиляции
-                //авторского решения аварийно завершаем работу
-                if (cResult.HasErrors)
-                    throw new FileLoadException(cResult.ExeFullname);
+            //Записываем исходный код авторского решения в заданный временный файл
+            File.WriteAllText(tmpAuthorSrcLocation, authorProblemCode, Encoding.UTF8);
 
-                string authorCodePath = cResult.ExeFullname;
+            //Устанавливаем его аттрибуты
+            File.SetAttributes(tmpAuthorSrcLocation, FileAttributes.Temporary | FileAttributes.NotContentIndexed);
 
-                ///////////////////////////////////////////////////
-                // Время запросов к базе данных системы
-                ///////////////////////////////////////////////////
+            //Инициализируем экземпляр класса компилятора
+            SimplePM_Compiler compiler = new SimplePM_Compiler(ref sConfig, "a" + submissionId, tmpAuthorSrcLocation);
 
-                //Запрос на выборку Debug Time Limit из базы данных MySQL
-                querySelect = $@"
+            //Получаем структуру результата компиляции
+            SimplePM_Compiler.CompilerResult cResult = SimplePM_Compiler.ChooseCompilerAndRun(authorProblemCodeLanguage, compiler);
+
+            //В случае возникновения ошибки при компиляции
+            //авторского решения аварийно завершаем работу
+            if (cResult.HasErrors)
+                throw new FileLoadException(cResult.ExeFullname);
+
+            string authorCodePath = cResult.ExeFullname;
+
+            ///////////////////////////////////////////////////
+            // Время запросов к базе данных системы
+            ///////////////////////////////////////////////////
+
+            //Запрос на выборку Debug Time Limit из базы данных MySQL
+            querySelect = $@"
                     SELECT 
                         `debugTimeLimit` 
                     FROM 
@@ -420,10 +422,10 @@ namespace SimplePM_Server
                     ;
                 ";
 
-                ulong debugTimeLimit = Convert.ToUInt64(new MySqlCommand(querySelect, connection).ExecuteScalar());
+            ulong debugTimeLimit = Convert.ToUInt64(new MySqlCommand(querySelect, connection).ExecuteScalar());
 
-                //То же самое, только для MEMORY LIMIT
-                querySelect = $@"
+            //То же самое, только для MEMORY LIMIT
+            querySelect = $@"
                     SELECT 
                         `debugMemoryLimit` 
                     FROM 
@@ -437,278 +439,294 @@ namespace SimplePM_Server
                     ;
                 ";
 
-                ulong debugMemoryLimit = Convert.ToUInt64(new MySqlCommand(querySelect, connection).ExecuteScalar());
+            ulong debugMemoryLimit = Convert.ToUInt64(new MySqlCommand(querySelect, connection).ExecuteScalar());
 
-                #region PROCESS START INFO CONFIGURATION
-                //Создаём новую конфигурацию запуска процесса
-                ProcessStartInfo startInfo = new ProcessStartInfo()
-                {
-                    //Перенаправляем потоки
-                    RedirectStandardInput = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
+            #region PROCESS START INFO CONFIGURATION
+            //Создаём новую конфигурацию запуска процесса
+            ProcessStartInfo startInfo = new ProcessStartInfo()
+            {
+                //Перенаправляем потоки
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
 
-                    //Запрещаем показ приложения на экран компа
-                    ErrorDialog = false,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Minimized
-                };
+                //Запрещаем показ приложения на экран компа
+                ErrorDialog = false,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Minimized
+            };
 
-                #endregion
+            #endregion
 
-                ///////////////////////////////////////////////////
-                // Раздел объявления необходимых переменных
-                ///////////////////////////////////////////////////
+            ///////////////////////////////////////////////////
+            // Раздел объявления необходимых переменных
+            ///////////////////////////////////////////////////
 
-                string authorOutput = "", userOutput = "";
-                string userErrorOutput = null;
-                char debugTestingResult = '+';
-                int userProblemExitCode = 0;
+            string authorOutput = "", userOutput = "";
+            string userErrorOutput = null;
+            char debugTestingResult = '+';
+            int userProblemExitCode = 0;
 
-                #region Запуск авторского решения
+            #region Запуск авторского решения
 
-                ///////////////////////////////////////////////////
-                // ЗАПУСК ПРОЦЕССА АВТОРСКОГО РЕШЕНИЯ
-                ///////////////////////////////////////////////////
+            ///////////////////////////////////////////////////
+            // ЗАПУСК ПРОЦЕССА АВТОРСКОГО РЕШЕНИЯ
+            ///////////////////////////////////////////////////
 
-                //Объявляем дескриптор процесса
-                Process authorProblemProc = new Process();
+            //Объявляем дескриптор процесса
+            Process authorProblemProc = new Process();
 
-                //Указываем полный путь к исполняемому файлу
-                startInfo.FileName = authorCodePath;
+            //Указываем полный путь к исполняемому файлу
+            startInfo.FileName = authorCodePath;
 
-                //Устанавливаем информацию о запускаемом файле
-                SetExecInfoByFileExt(ref startInfo, authorCodePath, authorProblemCodeLanguage);
+            //Устанавливаем информацию о запускаемом файле
+            SetExecInfoByFileExt(ref startInfo, authorCodePath, authorProblemCodeLanguage);
 
-                //Указываем интересующую нас конфигурацию тестирования
-                authorProblemProc.StartInfo = startInfo;
+            //Указываем интересующую нас конфигурацию тестирования
+            authorProblemProc.StartInfo = startInfo;
 
-                //Вызываем функцию управления, которая указывает,
-                //от имени какого пользователя стоит запускать
-                //пользовательский процесс.
-                SetProcessRunAs(ref authorProblemProc);
+            //Вызываем функцию управления, которая указывает,
+            //от имени какого пользователя стоит запускать
+            //пользовательский процесс.
+            SetProcessRunAs(ref authorProblemProc);
 
-                try
-                {
+            try
+            {
 
-                    //Запускаем процесс
-                    authorProblemProc.Start();
+                //Запускаем процесс
+                authorProblemProc.Start();
 
-                    //Устанавливаем наивысший приоритет процесса
-                    authorProblemProc.PriorityClass = ProcessPriorityClass.Normal;
+                //Устанавливаем наивысший приоритет процесса
+                authorProblemProc.PriorityClass = ProcessPriorityClass.Normal;
 
-                    //Инъекция входного потока
-                    authorProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
-                    authorProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
-                    authorProblemProc.StandardInput.Close(); //закрываем поток
+                //Инъекция входного потока
+                authorProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
+                authorProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
+                authorProblemProc.StandardInput.Close(); //закрываем поток
 
-                }
+            }
+            catch (Exception)
+            {
+
+                //Пытаемся удалить папку, содержащую авторское решение задачи
+                try { Directory.Delete(tmpAuthorDir, true); }
                 catch (Exception) {  }
 
-                ///////////////////////////////////////////////////
-                // КОНТРОЛЬ ИСПОЛЬЗУЕМОЙ ПРОЦЕССОМ ПАМЯТИ
-                ///////////////////////////////////////////////////
+                //Выбрасываем исключение
+                throw new SimplePM_Exceptions.AuthorSolutionRunningException();
 
-                new Task(() =>
-                {
+            }
 
-                    try
-                    {
-                        while (!authorProblemProc.HasExited)
-                        {
-                            //Очищаем кеш и получаем обновлённые значения
-                            authorProblemProc.Refresh();
+            ///////////////////////////////////////////////////
+            // КОНТРОЛЬ ИСПОЛЬЗУЕМОЙ ПРОЦЕССОМ ПАМЯТИ
+            ///////////////////////////////////////////////////
 
-                            //Проверка на превышение лимита памяти
-                            if ((ulong)authorProblemProc.PeakWorkingSet64 > debugMemoryLimit) //Лимит памяти превышен
-                                authorProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
-                        }
-                    }
-                    catch (Exception) {  }
+            new Task(() =>
+            {
 
-                }).Start();
-
-                ///////////////////////////////////////////////////
-                // ОГРАНИЧЕНИЕ ИСПОЛЬЗУЕМОГО ПРОЦЕССОРНОГО ВРЕМЕНИ
-                ///////////////////////////////////////////////////
-
-                void OnProcessorTimeLimit_APP()
-                {
-                    authorProblemProc.Kill();
-                }
-
-                ProcessorTimeLimitCheck(authorProblemProc, OnProcessorTimeLimit_APP, (int)debugTimeLimit);
-
-                //Ждём завершения, максимум X миллимекунд
-                //Если процесс не завершил свою работу - убиваем его
-                if (!authorProblemProc.WaitForExit(int.Parse(sConfig["UserProc"]["maxProcessTime"])))
-                    authorProblemProc.Kill();
-
-                //Получаем обработанный выходной поток авторского решения
-                authorOutput = GetNormalizedOutputText(authorProblemProc.StandardOutput);
-                
                 try
                 {
+                    while (!authorProblemProc.HasExited)
+                    {
+                        //Очищаем кеш и получаем обновлённые значения
+                        authorProblemProc.Refresh();
 
-                    //Пытаемся удалить временные файлы
-                    //авторского решения поставленной задачи
-                    Directory.Delete(tmpAuthorDir, true);
-
+                        //Проверка на превышение лимита памяти
+                        if ((ulong)authorProblemProc.PeakWorkingSet64 > debugMemoryLimit) //Лимит памяти превышен
+                            authorProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
+                    }
                 }
                 catch (Exception) { }
 
-                #endregion
+            }).Start();
 
-                #region Запуск пользовательского решения
+            ///////////////////////////////////////////////////
+            // ОГРАНИЧЕНИЕ ИСПОЛЬЗУЕМОГО ПРОЦЕССОРНОГО ВРЕМЕНИ
+            ///////////////////////////////////////////////////
 
-                ///////////////////////////////////////////////////
-                // ЗАПУСК ПРОЦЕССА ПОЛЬЗОВАТЕЛЬСКОГО РЕШЕНИЯ
-                ///////////////////////////////////////////////////
+            void OnProcessorTimeLimit_APP()
+            {
+                authorProblemProc.Kill();
+            }
 
-                //Объявляем дескриптор процесса
-                Process userProblemProc = new Process();
+            ProcessorTimeLimitCheck(authorProblemProc, OnProcessorTimeLimit_APP, (int)debugTimeLimit);
 
-                //Устанавливаем информацию о запускаемом файле
-                SetExecInfoByFileExt(ref startInfo);
+            //Ждём завершения, максимум X миллимекунд
+            //Если процесс не завершил свою работу - убиваем его
+            if (!authorProblemProc.WaitForExit(int.Parse(sConfig["UserProc"]["maxProcessTime"])))
+                authorProblemProc.Kill();
 
-                //Указываем интересующую нас конфигурацию тестирования
-                userProblemProc.StartInfo = startInfo;
+            //Получаем обработанный выходной поток авторского решения
+            authorOutput = GetNormalizedOutputText(authorProblemProc.StandardOutput);
 
-                //Вызываем функцию управления, которая указывает,
-                //от имени какого пользователя стоит запускать
-                //пользовательский процесс.
-                SetProcessRunAs(ref userProblemProc);
+            try
+            {
+
+                //Пытаемся удалить временные файлы
+                //авторского решения поставленной задачи
+                Directory.Delete(tmpAuthorDir, true);
+
+            }
+            catch (Exception) { }
+
+            //Выбрасываем исключение в случае, когда авторское решение задачи
+            //некорректно завершило свою работу и/или стандартный поток ошибок
+            //авторского решения не пустой.
+            if (authorProblemProc.ExitCode != 0 || authorProblemProc.StandardError.ReadToEnd().Length > 0)
+                throw new SimplePM_Exceptions.AuthorSolutionRunningException();
+
+            #endregion
+
+            #region Запуск пользовательского решения
+
+            ///////////////////////////////////////////////////
+            // ЗАПУСК ПРОЦЕССА ПОЛЬЗОВАТЕЛЬСКОГО РЕШЕНИЯ
+            ///////////////////////////////////////////////////
+
+            //Объявляем дескриптор процесса
+            Process userProblemProc = new Process();
+
+            //Устанавливаем информацию о запускаемом файле
+            SetExecInfoByFileExt(ref startInfo);
+
+            //Указываем интересующую нас конфигурацию тестирования
+            userProblemProc.StartInfo = startInfo;
+
+            //Вызываем функцию управления, которая указывает,
+            //от имени какого пользователя стоит запускать
+            //пользовательский процесс.
+            SetProcessRunAs(ref userProblemProc);
+
+            try
+            {
+
+                //Запускаем процесс
+                userProblemProc.Start();
+
+                //Устанавливаем наивысший приоритет процесса
+                userProblemProc.PriorityClass = ProcessPriorityClass.Normal;
+
+                //Инъекция входного потока
+                userProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
+                userProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
+                userProblemProc.StandardInput.Close(); //закрываем поток
+
+            }
+            catch (Exception ex)
+            {
+
+                //Произошла ошибка при выполнении программы
+                //В этом, скорее всего, виноват компилятор.
+                debugTestingResult = 'C';
+                logger.Error(ex);
+
+            }
+
+            ///////////////////////////////////////////////////
+            // КОНТРОЛЬ ИСПОЛЬЗУЕМОЙ ПРОЦЕССОМ ПАМЯТИ
+            ///////////////////////////////////////////////////
+            new Task(() =>
+            {
 
                 try
                 {
-
-                    //Запускаем процесс
-                    userProblemProc.Start();
-
-                    //Устанавливаем наивысший приоритет процесса
-                    userProblemProc.PriorityClass = ProcessPriorityClass.Normal;
-
-                    //Инъекция входного потока
-                    userProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
-                    userProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
-                    userProblemProc.StandardInput.Close(); //закрываем поток
-
-                }
-                catch (Exception ex)
-                {
-
-                    //Произошла ошибка при выполнении программы
-                    //В этом, скорее всего, виноват компилятор.
-                    debugTestingResult = 'C';
-                    logger.Error(ex);
-
-                }
-
-                ///////////////////////////////////////////////////
-                // КОНТРОЛЬ ИСПОЛЬЗУЕМОЙ ПРОЦЕССОМ ПАМЯТИ
-                ///////////////////////////////////////////////////
-                new Task(() =>
-                {
-
-                    try
+                    while (!userProblemProc.HasExited)
                     {
-                        while (!userProblemProc.HasExited)
-                        {
-                            //Очищаем кеш и получаем обновлённые значения
-                            userProblemProc.Refresh();
+                        //Очищаем кеш и получаем обновлённые значения
+                        userProblemProc.Refresh();
 
-                            //Проверка на превышение лимита памяти
-                            if ((ulong)userProblemProc.PeakWorkingSet64 > debugMemoryLimit)
-                            {
-                                //Лимит памяти превышен
-                                userProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
-                                debugTestingResult = 'M'; //устанавливаем преждевременный результат тестирования
-                            }
+                        //Проверка на превышение лимита памяти
+                        if ((ulong)userProblemProc.PeakWorkingSet64 > debugMemoryLimit)
+                        {
+                            //Лимит памяти превышен
+                            userProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
+                            debugTestingResult = 'M'; //устанавливаем преждевременный результат тестирования
                         }
                     }
-                    catch (Exception) {  }
+                }
+                catch (Exception) { }
 
-                }).Start();
+            }).Start();
 
-                ///////////////////////////////////////////////////
-                // ОГРАНИЧЕНИЕ ИСПОЛЬЗУЕМОГО ПРОЦЕССОРНОГО ВРЕМЕНИ
-                ///////////////////////////////////////////////////
+            ///////////////////////////////////////////////////
+            // ОГРАНИЧЕНИЕ ИСПОЛЬЗУЕМОГО ПРОЦЕССОРНОГО ВРЕМЕНИ
+            ///////////////////////////////////////////////////
 
-                void OnProcessorTimeLimit()
+            void OnProcessorTimeLimit()
+            {
+                userProblemProc.Kill();
+                debugTestingResult = 'T';
+                userOutput = "--- PROCESSOR TIME LIMIT ---";
+            }
+
+            ProcessorTimeLimitCheck(userProblemProc, OnProcessorTimeLimit, (int)debugTimeLimit);
+
+            ///////////////////////////////////////////////////
+            // ПОЛУЧЕНИЕ РЕЗУЛЬТАТОВ ТЕСТИРОВАНИЯ
+            ///////////////////////////////////////////////////
+
+            try
+            {
+
+                //Ждём завершения, максимум X миллимекунд
+                //Если процесс не завершил свою работу - убиваем его
+                if (!userProblemProc.WaitForExit(int.Parse(sConfig["UserProc"]["maxProcessTime"])))
                 {
                     userProblemProc.Kill();
                     debugTestingResult = 'T';
-                    userOutput = "--- PROCESSOR TIME LIMIT ---";
+                    userOutput = "--- PROGRAM TIME LIMIT ---";
                 }
 
-                ProcessorTimeLimitCheck(userProblemProc, OnProcessorTimeLimit, (int)debugTimeLimit);
-                
-                ///////////////////////////////////////////////////
-                // ПОЛУЧЕНИЕ РЕЗУЛЬТАТОВ ТЕСТИРОВАНИЯ
-                ///////////////////////////////////////////////////
-                
+                //Если всё хорошо, получаем обработанный выходной поток пользовательского решения
+                //но только в случае, когда приложение завершило свою работу самопроизвольно.
+                //Если всё плохо - делаем userOutput пустым
                 try
                 {
-
-                    //Ждём завершения, максимум X миллимекунд
-                    //Если процесс не завершил свою работу - убиваем его
-                    if (!userProblemProc.WaitForExit(int.Parse(sConfig["UserProc"]["maxProcessTime"])))
-                    {
-                        userProblemProc.Kill();
-                        debugTestingResult = 'T';
-                        userOutput = "--- PROGRAM TIME LIMIT ---";
-                    }
-                    
-                    //Если всё хорошо, получаем обработанный выходной поток пользовательского решения
-                    //но только в случае, когда приложение завершило свою работу самопроизвольно.
-                    //Если всё плохо - делаем userOutput пустым
-                    try
-                    {
-                        if (userOutput.Length == 0)
-                            userOutput = GetNormalizedOutputText(userProblemProc.StandardOutput);
-                    }
-                    catch (Exception)
-                    {
-                        userOutput = null;
-                    }
-
-                    //Получаем exitcode пользовательского приложения
-                    userProblemExitCode = userProblemProc.ExitCode;
-
-                    //Получаем выходной поток ошибок пользовательского решения
-                    userErrorOutput = userProblemProc.StandardError.ReadToEnd();
-
-                    //Устанавливаем результат отладочного тестирования.
-                    //В случае преждевременного результата ничего не делаем
-                    if (debugTestingResult == '+')
-                    {
-                        debugTestingResult =
-                        (
-                            userProblemExitCode == 0 &&
-                            authorOutput == userOutput &&
-                            String.IsNullOrWhiteSpace(userErrorOutput)
-                            ? '+' : '-'
-                        );
-                    }
-
+                    if (userOutput.Length == 0)
+                        userOutput = GetNormalizedOutputText(userProblemProc.StandardOutput);
                 }
-                catch (Exception) {  }
+                catch (Exception)
+                {
+                    userOutput = null;
+                }
 
-                #endregion
+                //Получаем exitcode пользовательского приложения
+                userProblemExitCode = userProblemProc.ExitCode;
 
-                ///////////////////////////////////////////////////
-                // ПОЛУЧЕНИЕ ВЫХОДНОГО ПОТОКА
-                // ПОЛЬЗОВАТЕЛЬСКОЙ ПРОГРАММЫ
-                ///////////////////////////////////////////////////
+                //Получаем выходной поток ошибок пользовательского решения
+                userErrorOutput = userProblemProc.StandardError.ReadToEnd();
 
-                userOutput = HttpUtility.HtmlEncode(userOutput);
+                //Устанавливаем результат отладочного тестирования.
+                //В случае преждевременного результата ничего не делаем
+                if (debugTestingResult == '+')
+                {
+                    debugTestingResult =
+                    (
+                        userProblemExitCode == 0 &&
+                        authorOutput == userOutput &&
+                        String.IsNullOrWhiteSpace(userErrorOutput)
+                            ? '+' : '-'
+                    );
+                }
 
-                ///////////////////////////////////////////////////
-                // Отправка результатов тестирования в базу данных
-                ///////////////////////////////////////////////////
+            }
+            catch (Exception) { }
 
-                string queryUpdate = $@"
+            #endregion
+
+            ///////////////////////////////////////////////////
+            // ПОЛУЧЕНИЕ ВЫХОДНОГО ПОТОКА
+            // ПОЛЬЗОВАТЕЛЬСКОЙ ПРОГРАММЫ
+            ///////////////////////////////////////////////////
+
+            userOutput = HttpUtility.HtmlEncode(userOutput);
+
+            ///////////////////////////////////////////////////
+            // Отправка результатов тестирования в базу данных
+            ///////////////////////////////////////////////////
+
+            string queryUpdate = $@"
                     UPDATE 
                         `spm_submissions` 
                     SET 
@@ -725,58 +743,29 @@ namespace SimplePM_Server
                     ;
                 ";
 
-                //Создаём и инициализируем команду для сервера баз данных MySQL
-                MySqlCommand sendResultCmd = new MySqlCommand(queryUpdate, connection);
+            //Создаём и инициализируем команду для сервера баз данных MySQL
+            MySqlCommand sendResultCmd = new MySqlCommand(queryUpdate, connection);
 
-                //Устанавливаем значения параметров
-                sendResultCmd.Parameters.AddWithValue("@output", userOutput);
-                sendResultCmd.Parameters.AddWithValue("@errorOutput", userErrorOutput);
-                sendResultCmd.Parameters.AddWithValue("@result", debugTestingResult);
-                sendResultCmd.Parameters.AddWithValue("@exitcodes", userProblemExitCode);
+            //Устанавливаем значения параметров
+            sendResultCmd.Parameters.AddWithValue("@output", userOutput);
+            sendResultCmd.Parameters.AddWithValue("@errorOutput", userErrorOutput);
+            sendResultCmd.Parameters.AddWithValue("@result", debugTestingResult);
+            sendResultCmd.Parameters.AddWithValue("@exitcodes", userProblemExitCode);
 
-                //Выполняем запрос не требуя ответа
-                sendResultCmd.ExecuteNonQuery();
+            //Выполняем запрос не требуя ответа
+            sendResultCmd.ExecuteNonQuery();
 
-                ///////////////////////////////////////////////////
+            ///////////////////////////////////////////////////
 
-            }
-            else
-            {
-
-                ///////////////////////////////////////////////////
-                // В случае отсутствия авторского решения
-                // возвращаем информацию об ошибке в базу данных
-                ///////////////////////////////////////////////////
-
-                //Запрос на обновление данных в базе данных
-                string queryUpdate = $@"
-                    UPDATE 
-                        `spm_submissions` 
-                    SET 
-                        `status` = 'ready', 
-                        `errorOutput` = 'ERR_NO_AUTHOR_SOLUTION', 
-                        `hasError` = true 
-                    WHERE 
-                        `submissionId` = '{submissionId}' 
-                    LIMIT 
-                        1
-                    ;
-                ";
-
-                //Выполняем запрос, адресованный к серверу баз данных MySQL
-                new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
-
-                ///////////////////////////////////////////////////
-
-            }
+            #endregion
 
         }
-        
+
         ///////////////////////////////////////////////////
         /// Функция, отвечающая за релизное тестирование
         /// пользовательских решений задач
         ///////////////////////////////////////////////////
-        
+
         public void ReleaseTest()
         {
 
