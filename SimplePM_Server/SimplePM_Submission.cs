@@ -53,6 +53,7 @@ namespace SimplePM_Server
 
             switch (codeLang)
             {
+
                 case "freepascal":
                     return SubmissionLanguage.Freepascal;
                 case "csharp":
@@ -71,6 +72,7 @@ namespace SimplePM_Server
                     return SubmissionLanguage.PHP;
                 default:
                     return SubmissionLanguage.Unset;
+
             }
 
         }
@@ -86,6 +88,7 @@ namespace SimplePM_Server
 
             switch (lang)
             {
+
                 case SubmissionLanguage.Freepascal:
                     return "pas";
                 case SubmissionLanguage.CSharp:
@@ -104,6 +107,7 @@ namespace SimplePM_Server
                     return "java";
                 default:
                     return "txt";
+
             }
 
         }

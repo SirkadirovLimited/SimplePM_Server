@@ -110,7 +110,7 @@ namespace SimplePM_Server
         /// Функция "нормализует" выходные данные потока
         /// для дальнейшего анализа.
         ///////////////////////////////////////////////////
-        public string GetNormalizedOutputText(StreamReader outputReader)
+        public string GetNormalizedOutputText(StreamReader outputReader, bool normalize = true)
         {
             
             //Создаём переменную, которая будет содержать весь выходной поток
@@ -126,8 +126,10 @@ namespace SimplePM_Server
                 //получаем содержимое текущей строки
                 string curLine = outputReader.ReadLine();
 
-                //Убираем все начальные и конечные пробелы
-                curLine = curLine.TrimEnd(' ');
+                //Убираем все конечные пробелы (если, конечно,
+                //результат должен быть нормализирован)
+                if (normalize)
+                    curLine = curLine.TrimEnd(' ');
                 
                 //Дозаписываем данные в переменную выходного потока приложения
                 _output += curLine + "\n";
@@ -142,6 +144,7 @@ namespace SimplePM_Server
 
             //Возвращаем результат нормализации
             return _output;
+
         }
 
         ///////////////////////////////////////////////////
@@ -166,18 +169,23 @@ namespace SimplePM_Server
 
                 //Lua
                 case SubmissionLanguage.Lua:
+
                     startInfo.FileName = sConfig["Compilers"]["lua_location"];
                     startInfo.Arguments = '"' + filePath + '"';
+
                     break;
 
                 //Python
                 case SubmissionLanguage.Python:
+
                     startInfo.FileName = sConfig["Compilers"]["python_location"];
                     startInfo.Arguments = '"' + filePath + '"';
+
                     break;
 
                 //Java
                 case SubmissionLanguage.Java:
+
                     //Получаем информацию о файле
                     FileInfo fileInfo = new FileInfo(filePath);
 
@@ -193,13 +201,17 @@ namespace SimplePM_Server
 
                 //PHP
                 case SubmissionLanguage.PHP:
+
                     startInfo.FileName = sConfig["Compilers"]["php_location"];
                     startInfo.Arguments = '"' + filePath + '"';
+
                     break;
 
                 //MONO-C#
                 case SubmissionLanguage.CSharp:
+
                     int platform = (int)Environment.OSVersion.Platform;
+
                     if (platform == 4 || platform == 6 || platform == 128)
                     {
                         startInfo.FileName = sConfig["Compilers"]["mono_location"];
@@ -210,12 +222,15 @@ namespace SimplePM_Server
                         startInfo.FileName = filePath;
                         startInfo.Arguments = "";
                     }
+
                     break;
 
                 //Executable files
                 default:
+
                     startInfo.FileName = filePath;
                     startInfo.Arguments = "";
+
                     break;
                 
             }
@@ -231,7 +246,7 @@ namespace SimplePM_Server
         /// передаётся в аргументах данной функции.
         ///////////////////////////////////////////////////
 
-        void ProcessorTimeLimitCheck(Process proc, Action doProcessorTimeLimit, int timeLimit)
+        private void ProcessorTimeLimitCheck(Process proc, Action doProcessorTimeLimit, int timeLimit)
         {
 
             //Создаём и сразу же запускаем новую задачу
@@ -276,36 +291,34 @@ namespace SimplePM_Server
         /// запущен сервер проверки решений задач.
         ///////////////////////////////////////////////////
 
-        void SetProcessRunAs(ref Process proc)
+        private void SetProcessRunAs(ref Process proc)
         {
 
             //Проверяем, включена ли функция запуска
-            //пользовательских программ от имени инного пользователя
-            if (sConfig["RunAs"]["enabled"] == "true")
-            {
+            //пользовательских программ от имени инного пользователя.
+            //Если отключена - выходим.
+            if (sConfig["RunAs"]["enabled"] != "true") return;
 
-                /* Указываем, что будем запускать процесс от имени другого пользователя */
-                proc.StartInfo.Verb = "runas";
+            /* Указываем, что будем запускать процесс от имени другого пользователя */
+            proc.StartInfo.Verb = "runas";
 
-                /* Передаём имя пользователя */
-                proc.StartInfo.UserName = sConfig["RunAs"]["accountLogin"];
+            /* Передаём имя пользователя */
+            proc.StartInfo.UserName = sConfig["RunAs"]["accountLogin"];
 
-                /* Передаём, что необходимо вытянуть профайл из реестра */
-                proc.StartInfo.LoadUserProfile = false;
+            /* Передаём, что необходимо вытянуть профайл из реестра */
+            proc.StartInfo.LoadUserProfile = false;
 
-                /* Передаём пароль пользователя */
+            /* Передаём пароль пользователя */
 
-                //Создаём защищённую строку
-                SecureString encPassword = new SecureString();
+            //Создаём защищённую строку
+            SecureString encPassword = new SecureString();
 
-                //Добавляем данные в защищённую строку
-                foreach (char c in sConfig["RunAs"]["accountPassword"])
-                    encPassword.AppendChar(c);
+            //Добавляем данные в защищённую строку
+            foreach (char c in sConfig["RunAs"]["accountPassword"])
+                encPassword.AppendChar(c);
 
-                //Устанавливаем пароль пользователя
-                proc.StartInfo.Password = encPassword;
-
-            }
+            //Устанавливаем пароль пользователя
+            proc.StartInfo.Password = encPassword;
 
         }
         

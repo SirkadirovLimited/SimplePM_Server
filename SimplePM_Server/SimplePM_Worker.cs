@@ -312,6 +312,7 @@ namespace SimplePM_Server
                             1
                         ;
                     ";
+
                     MySqlCommand cmdGetProblemDifficulty = new MySqlCommand(queryGetDifficulty, connection);
                     submissionInfo["difficulty"] = cmdGetProblemDifficulty.ExecuteScalar().ToString();
 
@@ -327,13 +328,13 @@ namespace SimplePM_Server
                             1
                         ;
                     ";
+
                     new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
                     _customersCount++;
 
                     //Зовём официанта-шляпочника
                     //уж он знает, что делать в таких вот ситуациях
-                    SimplePM_Officiant officiant = new SimplePM_Officiant(connection, sConfig, submissionInfo);
-                    officiant.ServeSubmission();
+                    new SimplePM_Officiant(connection, sConfig, submissionInfo).ServeSubmission();
 
                     //Уменьшаем количество текущих соединений
                     //чтобы другие соединения были возможны.
@@ -369,6 +370,7 @@ namespace SimplePM_Server
                     Charset={sConfig["Database"]["db_chst"]}
                 "
             );
+
             db.Open();
 
             //Возвращаем дескриптор подключения к базе данных
