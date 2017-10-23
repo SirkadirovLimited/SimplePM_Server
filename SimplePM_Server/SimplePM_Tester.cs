@@ -936,7 +936,7 @@ namespace SimplePM_Server
                 ///////////////////////////////////////////////////
                 // КОНТРОЛЬ ИСПОЛЬЗУЕМОЙ ПРОЦЕССОМ ПАМЯТИ
                 ///////////////////////////////////////////////////
-                /// 
+                
                 new Task(() =>
                 {
 
@@ -1090,7 +1090,7 @@ namespace SimplePM_Server
                 //Тестов нет, но вы держитесь!
                 if (testsInfo.Count <= 0)
                 {
-                    testingResults = new string[] {"C"};
+                    testingResults = new[] {"C"};
                     _problemPassedTests = 0;
                 }
 
@@ -1120,7 +1120,7 @@ namespace SimplePM_Server
                 //Устанавливаем полученные пользователем баллы
                 _bResult = 0;
                 //Устанавливаем результаты тестирования
-                testingResults = new string[] { "-" };
+                testingResults = new[] { "-" };
 
             }
 

@@ -53,21 +53,21 @@ namespace SimplePM_Server
             Объявляем переменную указателя на менеджер журнала собылий
             и присваиваем ей указатель на журнал событий текущего класса
         */
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         //Текущее количество подсоединённых пользователей
-        private static ulong _customersCount = 0;
-        private static ulong _maxCustomersCount = 80;
+        private ulong _customersCount = 0;
+        private ulong _maxCustomersCount = 80;
 
         //Объявляем дескриптор конфигурационного файла
-        public static IniData sConfig;
+        public IniData sConfig;
 
         //Устанавливаем время ожидания
-        private static int SleepTime = 500;
+        private int SleepTime = 500;
 
         //Список поддерживаемых языков программирования
         //для использования в выборочных SQL запросах
-        private static string EnabledLangs;
+        private string EnabledLangs;
 
         ///////////////////////////////////////////////////
         /// Функция генерирует строку из допустимых для
@@ -75,7 +75,7 @@ namespace SimplePM_Server
         /// написаны пользовательские программы
         ///////////////////////////////////////////////////
 
-        public static void GenerateEnabledLangsList()
+        public void GenerateEnabledLangsList()
         {
 
             /* Инициализируем список строк */
@@ -125,7 +125,7 @@ namespace SimplePM_Server
         /// непредвиденных исключений
         ///////////////////////////////////////////////////
 
-        private static void SetExceptionHandler()
+        private void SetExceptionHandler()
         {
 
             //Устанавливаем обработчик необработанных исключений
@@ -138,7 +138,7 @@ namespace SimplePM_Server
         /// о необработанном фатальном исключении
         ///////////////////////////////////////////////////
 
-        private static void ExceptionEventLogger(object sender, UnhandledExceptionEventArgs e)
+        private void ExceptionEventLogger(object sender, UnhandledExceptionEventArgs e)
         {
 
             //Записываем сообщение об ошибке в журнал событий
@@ -151,7 +151,7 @@ namespace SimplePM_Server
         /// сервера функция. Является точкой входа.
         ///////////////////////////////////////////////////
 
-        public static void Main(string[] args)
+        public void Run(string[] args)
         {
 
             ///////////////////////////////////////////////////
@@ -228,11 +228,14 @@ namespace SimplePM_Server
         /// ПЕРВОНАЧАЛЬНАЯ НАСТРОЙКА ОКНА КОНСОЛИ
         ///////////////////////////////////////////////////
 
-        public static void GenerateProgramHeader()
+        public void GenerateProgramHeader()
         {
 
             //Установка заголовка приложения
             Console.Title = "SimplePM_Server";
+
+            //Очищаем экран
+            Console.Clear();
 
             //Выводим на экран информацию о приложении
             Console.WriteLine(Properties.Resources.consoleHeader);
@@ -246,7 +249,7 @@ namespace SimplePM_Server
         /// ОБРАБОТКА ЗАПРОСОВ НА ПРОВЕРКУ РЕШЕНИЙ
         ///////////////////////////////////////////////////
 
-        public static void GetSubIdAndRunCompile(MySqlConnection connection)
+        public void GetSubIdAndRunCompile(MySqlConnection connection)
         {
             
             //Создаём новую задачу, без неё - никак!
@@ -356,7 +359,7 @@ namespace SimplePM_Server
         /// /return Указатель на соединение с БД
         ///////////////////////////////////////////////////
 
-        public static MySqlConnection StartMysqlConnection(IniData sConfig)
+        public MySqlConnection StartMysqlConnection(IniData sConfig)
         {
 
             //Подключаемся к базе данных на удалённом
