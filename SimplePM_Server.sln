@@ -22,6 +22,7 @@ Global
 		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Debug|x64.ActiveCfg = Debug|x64
 		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Release|Any CPU.ActiveCfg = Release|x64
 		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Release|x64.ActiveCfg = Release|x64
+		{94AF3181-17F8-4CC3-945C-CF911824B91C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

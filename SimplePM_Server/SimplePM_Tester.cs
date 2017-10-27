@@ -911,6 +911,7 @@ namespace SimplePM_Server
 
                 try
                 {
+
                     //Запускаем процесс
                     problemProc.Start();
 
@@ -921,6 +922,7 @@ namespace SimplePM_Server
                     problemProc.StandardInput.WriteLine(input); //добавляем текст во входной поток
                     problemProc.StandardInput.Flush(); //производим запись во входной поток и последующую очистку буфера
                     problemProc.StandardInput.Close(); //закрываем запись входного потока
+
                 }
                 catch (Exception ex)
                 {
