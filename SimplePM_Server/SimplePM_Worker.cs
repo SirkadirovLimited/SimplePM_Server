@@ -1,7 +1,7 @@
 ﻿/*
  * Copyright (C) 2017, Kadirov Yurij.
  * All rights are reserved.
- * Licensed under Apache License 2.0 license.
+ * Licensed under Apache License 2.0 with additional restrictions.
  * 
  * @Author: Kadirov Yurij
  * @Website: https://sirkadirov.com/
@@ -197,26 +197,44 @@ namespace SimplePM_Server
             // ОСНОВНОЙ ЦИКЛ СЕРВЕРА
             ///////////////////////////////////////////////////
 
+            uint rechecksCount = 0;
+
             while (true)
             {
 
-                //Отлавливаем все ошибки
-                try
+                if (_customersCount < _maxCustomersCount)
                 {
-                
-                    //Получаем дескриптор соединения с базой данных
-                    MySqlConnection conn = StartMysqlConnection(sConfig);
 
-                    //Защита от перегрузки сервера
-                    if (_customersCount < _maxCustomersCount)
+                    //Отлавливаем все ошибки
+                    try
+                    {
+
+                        //Получаем дескриптор соединения с базой данных
+                        MySqlConnection conn = StartMysqlConnection(sConfig);
+
+                        //Вызов чекера
                         GetSubIdAndRunCompile(conn);
 
+                    }
+                    //В случае ошибки передаём информацию о ней логгеру событий
+                    catch (Exception ex) { logger.Error(ex); }
+                    
                 }
-                //В случае ошибки передаём информацию о ней логгеру событий
-                catch (Exception ex) { logger.Error(ex); }
 
-                //Ожидание для уменьшения нагрузки на сервер
-                Thread.Sleep(SleepTime);
+                bool tmpCheck = rechecksCount >= uint.Parse(sConfig["Connection"]["rechecks_without_timeout"]);
+
+                if (_customersCount < _maxCustomersCount && tmpCheck)
+                {
+
+                    //Ожидание для уменьшения нагрузки на сервер
+                    Thread.Sleep(SleepTime);
+
+                    //Обнуляем итератор
+                    rechecksCount = 0;
+
+                }
+                else
+                    rechecksCount++;
 
             }
 
@@ -246,7 +264,7 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        /// ОБРАБОТКА ЗАПРОСОВ НА ПРОВЕРКУ РЕШЕНИЙ
+        /// Функция обработки запросов на проверки решений
         ///////////////////////////////////////////////////
 
         public void GetSubIdAndRunCompile(MySqlConnection connection)

@@ -1,7 +1,7 @@
 ﻿/*
  * Copyright (C) 2017, Kadirov Yurij.
  * All rights are reserved.
- * Licensed under Apache License 2.0 license.
+ * Licensed under Apache License 2.0 with additional restrictions.
  * 
  * @Author: Kadirov Yurij
  * @Website: https://sirkadirov.com/
