@@ -26,9 +26,13 @@ using IniParser;
 using IniParser.Model;
 //Для безопасности
 using System.Web;
+//ICompilerPlugin
+using CompilerBase;
 //Журнал событий
 using NLog;
 using NLog.Config;
+using System.IO;
+using System.Reflection;
 
 namespace SimplePM_Server
 {
@@ -56,8 +60,8 @@ namespace SimplePM_Server
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         //Текущее количество подсоединённых пользователей
-        private ulong _customersCount = 0;
-        private ulong _maxCustomersCount = 80;
+        private ulong _customersCount;
+        private ulong _maxCustomersCount;
 
         //Объявляем дескриптор конфигурационного файла
         public IniData sConfig;
@@ -68,6 +72,44 @@ namespace SimplePM_Server
         //Список поддерживаемых языков программирования
         //для использования в выборочных SQL запросах
         private string EnabledLangs;
+
+        private List<ICompilerPlugin> _compilerPlugins = new List<ICompilerPlugin>();
+
+        private void LoadCompilerPlugins()
+        {
+
+            string[] pluginFiles = Directory.GetFiles(sConfig["Program"]["ICompilerPlugin_directory"], "*.dll");
+
+            foreach (string pluginPath in pluginFiles)
+            {
+                
+                logger.Debug("Start loading plugin..." + pluginPath);
+
+                try
+                {
+                    
+                    // Загружаем сборку
+                    Assembly assembly = Assembly.LoadFrom(pluginPath);
+
+                    // Получаем тип сборки
+                    Type objectType = assembly.GetType(Path.GetFileNameWithoutExtension(pluginPath) + ".ICompilerPlugin");
+                    
+                    // Проверка на ненулевое значение типа сборки:
+                    // если всё хорошо - добавляем плагин в список
+                    if (objectType != null)
+                        _compilerPlugins.Add((ICompilerPlugin)Activator.CreateInstance(objectType));
+
+                    logger.Debug("Plugin loaded!");
+
+                }
+                catch (Exception ex)
+                {
+                    logger.Debug(ex);
+                }
+
+            }
+
+        }
 
         ///////////////////////////////////////////////////
         /// Функция генерирует строку из допустимых для
@@ -158,37 +200,48 @@ namespace SimplePM_Server
             // ИНИЦИАЛИЗАЦИЯ СЕРВЕРНЫХ ПОДСИСТЕМ И ПРОЧИЙ ХЛАМ
             ///////////////////////////////////////////////////
 
-            //Устанавливаем "улавливатель исключений"
+            // Устанавливаем "улавливатель исключений"
             SetExceptionHandler();
             
-            //Открываем конфигурационный файл для чтения
+            // Открываем конфигурационный файл для чтения
             FileIniDataParser iniParser = new FileIniDataParser();
 
-            //Присваиваем глобальной переменной sConfig дескриптор файла конфигурации
+            // Присваиваем глобальной переменной sConfig дескриптор файла конфигурации
             sConfig = iniParser.ReadFile("server_config.ini", Encoding.UTF8);
 
-            //Конфигурируем журнал событий (библиотека NLog)
+            // Конфигурируем журнал событий (библиотека NLog)
             try
             {
                 LogManager.Configuration = new XmlLoggingConfiguration(sConfig["Program"]["NLogConfig_path"]);
             }
-            catch (Exception) { /* Deal with it */ }
+            catch
+            {
+                /* Deal with it */
+            }
 
-            //Получаем информацию с конфигурационного файла
-            //для некоторых переменных
+            // Получаем информацию с конфигурационного файла
+            // для некоторых переменных
             _maxCustomersCount = ulong.Parse(sConfig["Connection"]["maxConnectedClients"]);
             SleepTime = int.Parse(sConfig["Connection"]["check_timeout"]);
 
+            ///////////////////////////////////////////////////
+            // Загрузка в память информации о плагинах сервера
+            // проверки пользовательских решений задач
+            ///////////////////////////////////////////////////
+
+            // Модули компиляторов
+            LoadCompilerPlugins();
+
+            // Модули сервера
+            //TODO:LoadServerPlugins();
+
             // Вызываем функцию получения строчного списка
-            // поддерживаемых языков программирования данным
-            // экземплятор сервера SimplePM_Server
+            // поддерживаемых языков программирования
             GenerateEnabledLangsList();
 
-            //Генерирую "шапку" консоли сервера
-            GenerateProgramHeader();
-
             ///////////////////////////////////////////////////
-            // ОБРАБОТКА АРГУМЕНТОВ
+            // Вызов метода обработки аргументов запуска
+            // консольного приложения
             ///////////////////////////////////////////////////
 
             new SimplePM_Commander().SplitArguments(args);
@@ -199,7 +252,7 @@ namespace SimplePM_Server
 
             uint rechecksCount = 0;
 
-            while (true)
+            while (42 == 42)
             {
 
                 if (_customersCount < _maxCustomersCount)
@@ -243,28 +296,7 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        /// ПЕРВОНАЧАЛЬНАЯ НАСТРОЙКА ОКНА КОНСОЛИ
-        ///////////////////////////////////////////////////
-
-        public void GenerateProgramHeader()
-        {
-
-            //Установка заголовка приложения
-            Console.Title = "SimplePM_Server";
-
-            //Очищаем экран
-            Console.Clear();
-
-            //Выводим на экран информацию о приложении
-            Console.WriteLine(Properties.Resources.consoleHeader);
-
-            //Отключаем показ курсора и возможность ввода
-            Console.CursorVisible = false;
-
-        }
-
-        ///////////////////////////////////////////////////
-        /// Функция обработки запросов на проверки решений
+        /// Функция обработки запросов на проверку решений
         ///////////////////////////////////////////////////
 
         public void GetSubIdAndRunCompile(MySqlConnection connection)
@@ -391,7 +423,8 @@ namespace SimplePM_Server
                     Charset={sConfig["Database"]["db_chst"]}
                 "
             );
-
+            
+            //Открываем соединение с БД
             db.Open();
 
             //Возвращаем дескриптор подключения к базе данных
