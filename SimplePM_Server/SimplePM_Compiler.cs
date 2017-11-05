@@ -10,17 +10,17 @@
  */
 /*! \file */
 
-//Основа
+// Основа
 using System;
-//Работа с процессами
+// Работа с процессами
 using System.Diagnostics;
-//Конфигурационный файл
+// Конфигурационный файл
 using IniParser.Model;
-//Работа с файлами
+// Работа с файлами
 using System.IO;
-//Безопасность
+// Безопасность
 using System.Web;
-//Журнал событий
+// Журнал событий
 using NLog;
 
 namespace SimplePM_Server
@@ -181,7 +181,7 @@ namespace SimplePM_Server
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = RunCompiler(
                 sConfig["Compilers"]["freepascal_location"],
-                "-ve -vw -vi -vb \"" + fileLocation + "\""
+                "-ve -vw -vi -vx -Sc -C3 \"" + fileLocation + "\""
             );
 
             //Передаём полный путь к исполняемому файлу
@@ -358,6 +358,7 @@ namespace SimplePM_Server
 
         public CompilerResult RunCompiler(string compilerFullName, string compilerArgs)
         {
+
             //Создаём новый экземпляр процесса компилятора
             Process cplProc = new Process();
 
@@ -403,6 +404,7 @@ namespace SimplePM_Server
 
             //Возвращаем результат компиляции
             return result;
+
         }
 
         ///////////////////////////////////////////////////
@@ -412,6 +414,7 @@ namespace SimplePM_Server
 
         public CompilerResult ReturnCompilerResult(CompilerResult temporaryResult)
         {
+
             //Проверяем результат компиляции
             //на предопределённость наличия ошибки
             if (!temporaryResult.HasErrors)

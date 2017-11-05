@@ -78,7 +78,7 @@ namespace SimplePM_Server
         private void LoadCompilerPlugins()
         {
 
-            string[] pluginFiles = Directory.GetFiles(sConfig["Program"]["ICompilerPlugin_directory"], "*.dll");
+            string[] pluginFiles = Directory.GetFiles(sConfig["Program"]["ICompilerPlugin_directory"], "*Compiler.dll");
 
             foreach (string pluginPath in pluginFiles)
             {

@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IServerPlugin", "IServerPlu
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Main projects", "Main projects", "{2045A3E1-12ED-4919-9BB1-6626477112D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.Lua", "ICompilerPlugin.Lua\ICompilerPlugin.Lua.csproj", "{86091FB0-BDB6-496D-820C-C5D21CBC6C8A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.NoCompiler", "ICompilerPlugin.NoCompiler\ICompilerPlugin.NoCompiler.csproj", "{86091FB0-BDB6-496D-820C-C5D21CBC6C8A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
