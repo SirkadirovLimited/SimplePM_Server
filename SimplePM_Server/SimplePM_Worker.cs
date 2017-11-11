@@ -75,9 +75,16 @@ namespace SimplePM_Server
 
         private List<ICompilerPlugin> _compilerPlugins = new List<ICompilerPlugin>();
 
+        ///////////////////////////////////////////////////
+        /// Функция загружает в память компиляционные
+        /// модули, которые собирает из специально
+        /// заготовленной директории
+        ///////////////////////////////////////////////////
+        
         private void LoadCompilerPlugins()
         {
 
+            // Инициализируем массив путей к сборкам
             string[] pluginFiles = Directory.GetFiles(sConfig["Program"]["ICompilerPlugin_directory"], "*Compiler.dll");
 
             foreach (string pluginPath in pluginFiles)
