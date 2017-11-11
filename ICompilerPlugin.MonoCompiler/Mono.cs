@@ -10,8 +10,8 @@
  */
 /*! \file */
 
-// Для работы с файловой системой
-using System.IO;
+// Для работы с системой
+using System;
 // Для работы с процессами
 using System.Diagnostics;
 // Для использования базовых
@@ -20,16 +20,16 @@ using CompilerBase;
 // Парсер INI файлов конфигурации
 using IniParser.Model;
 
-namespace NoCompiler
+namespace MonoCompiler
 {
     
-    public class NoCompilerPlugin : ICompilerPlugin
+    public class MonoCompilerPlugin : ICompilerPlugin
     {
 
         // Поддерживаемые языки программирования
-        private const string _progLang = "lua,php,python,ruby";
+        private const string _progLang = "csharp";
         // Отображаемое имя
-        private const string _displayName = "SimplePM NoCompiler";
+        private const string _displayName = "SimplePM Mono/C# Compiler module";
         // Автор модуля
         private const string _author = "Kadirov Yurij";
         // Адрес технической поддержки
@@ -52,26 +52,23 @@ namespace NoCompiler
         public CompilerResult StartCompiler(ref IniData sConfig, string submissionId, string fileLocation)
         {
 
-            //Делаем преждевременные выводы
-            //прям как некоторые девушки
-            //(по крайней мере на данный момент)
+            // Инициализируем объект CompilerRefs
+            CompilerRefs cRefs = new CompilerRefs();
 
-            CompilerResult result = new CompilerResult()
-            {
+            //Будущее местонахождение исполняемого файла
+            string exeLocation = cRefs.GenerateExeFileLocation(fileLocation, submissionId, sConfig["UserProc"]["exeFileExt"]);
 
-                //ошибок нет - но вы держитесь
-                HasErrors = false,
+            //Запуск компилятора с заранее определёнными аргументами
+            CompilerResult result = cRefs.RunCompiler(
+                sConfig["Compilers"]["mcs_location"],
+                fileLocation
+            );
 
-                //что дали - то и скинул
-                ExeFullname = fileLocation,
+            //Передаём полный путь к исполняемому файлу
+            result.ExeFullname = exeLocation;
 
-                //хз зачем, но надо
-                CompilerMessage = Properties.Resources.noCompilerRequired
-
-            };
-
-            //Возвращаем результат фальш-компиляции
-            return result;
+            //Возвращаем результат компиляции
+            return cRefs.ReturnCompilerResult(result);
 
         }
 
@@ -86,12 +83,29 @@ namespace NoCompiler
         {
             try
             {
+                
+                int platform = (int)Environment.OSVersion.Platform;
 
-                // Устанавливаем имя запускаемой программы
-                startInfo.FileName = sConfig["Compiler"][new FileInfo(filePath).Extension.ToLower().Replace(".", "") + "_location"];
+                if (platform == 4 || platform == 6 || platform == 128)
+                {
 
-                // Аргументы запуска данной программы
-                startInfo.Arguments = '"' + filePath + '"';
+                    // Указываем имя запускаемой программы (полный путь к ней)
+                    startInfo.FileName = sConfig["Compilers"]["mono_location"];
+
+                    // Указываем аргументы запуска
+                    startInfo.Arguments = '"' + filePath + '"';
+
+                }
+                else
+                {
+
+                    // Указываем имя запускаемой программы (полный путь к ней)
+                    startInfo.FileName = filePath;
+
+                    // Указываем аргументы запуска
+                    startInfo.Arguments = "";
+
+                }
 
             }
             catch
