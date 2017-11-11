@@ -17,6 +17,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Main projects", "Main proje
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.NoCompiler", "ICompilerPlugin.NoCompiler\ICompilerPlugin.NoCompiler.csproj", "{86091FB0-BDB6-496D-820C-C5D21CBC6C8A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.FreePascal", "ICompilerPlugin.FreePascal\ICompilerPlugin.FreePascal.csproj", "{4972495C-3341-484D-AAF3-01DB824C8031}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.MonoCompiler", "ICompilerPlugin.MonoCompiler\ICompilerPlugin.MonoCompiler.csproj", "{5AE99DC1-D02D-4EBF-8045-1DDE8AAA21FF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -35,6 +39,14 @@ Global
 		{86091FB0-BDB6-496D-820C-C5D21CBC6C8A}.Debug|x64.Build.0 = Release|x64
 		{86091FB0-BDB6-496D-820C-C5D21CBC6C8A}.Release|x64.ActiveCfg = Release|x64
 		{86091FB0-BDB6-496D-820C-C5D21CBC6C8A}.Release|x64.Build.0 = Release|x64
+		{4972495C-3341-484D-AAF3-01DB824C8031}.Debug|x64.ActiveCfg = Debug|x64
+		{4972495C-3341-484D-AAF3-01DB824C8031}.Debug|x64.Build.0 = Debug|x64
+		{4972495C-3341-484D-AAF3-01DB824C8031}.Release|x64.ActiveCfg = Release|x64
+		{4972495C-3341-484D-AAF3-01DB824C8031}.Release|x64.Build.0 = Release|x64
+		{5AE99DC1-D02D-4EBF-8045-1DDE8AAA21FF}.Debug|x64.ActiveCfg = Debug|x64
+		{5AE99DC1-D02D-4EBF-8045-1DDE8AAA21FF}.Debug|x64.Build.0 = Debug|x64
+		{5AE99DC1-D02D-4EBF-8045-1DDE8AAA21FF}.Release|x64.ActiveCfg = Release|x64
+		{5AE99DC1-D02D-4EBF-8045-1DDE8AAA21FF}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -43,6 +55,8 @@ Global
 		{94AF3181-17F8-4CC3-945C-CF911824B91C} = {2045A3E1-12ED-4919-9BB1-6626477112D7}
 		{BAEC96C2-D35E-40DE-99A8-8162174082AC} = {5B3793B0-D301-43CB-91B9-BF6D5E8CA34F}
 		{86091FB0-BDB6-496D-820C-C5D21CBC6C8A} = {AB1BFCB2-43F0-42D9-A7A7-23938E8C20D4}
+		{4972495C-3341-484D-AAF3-01DB824C8031} = {AB1BFCB2-43F0-42D9-A7A7-23938E8C20D4}
+		{5AE99DC1-D02D-4EBF-8045-1DDE8AAA21FF} = {AB1BFCB2-43F0-42D9-A7A7-23938E8C20D4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56F31401-B3C0-4807-AE6F-109275F9E051}
