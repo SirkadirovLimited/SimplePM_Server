@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Sirkadirov Team")]
-[assembly: AssemblyProduct("ICompilerPlugin.NoCompiler")]
+[assembly: AssemblyProduct("ICompilerPlugin.MonoCompiler")]
 [assembly: AssemblyCopyright("Copyright © 2017, Kadirov Yurij. All rights reserved.")]
 [assembly: AssemblyTrademark("SimplePM")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Следующий GUID служит для идентификации библиотеки типов, если этот проект будет видимым для COM
-[assembly: Guid("86091fb0-bdb6-496d-820c-c5d21cbc6c8a")]
+[assembly: Guid("3CE98E78-514B-4B21-AC13-9B145E0E98DF")]
 
 // Сведения о версии сборки состоят из следующих четырех значений:
 //
