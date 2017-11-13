@@ -13,7 +13,7 @@
 // Для работы с процессами
 using System.Diagnostics;
 // Для использования базовых
-// методов и полейсистемы плагинов
+// методов и полей системы плагинов
 using CompilerBase;
 // Парсер INI файлов конфигурации
 using IniParser.Model;
@@ -25,11 +25,11 @@ namespace CompilerPlugin
     {
 
         // Поддерживаемый язык программирования
-        private const string _progLang = "cpp";
+        private const string _progLang = "php";
         // Расширение файла поддерживаемого языка программирования
-        private const string _progLangExt = "cpp";
+        private const string _progLangExt = "php";
         // Отображаемое имя
-        private const string _displayName = "SimplePM C++ Compiler module";
+        private const string _displayName = "SimplePM PHP compiler module";
         // Автор модуля
         private const string _author = "Kadirov Yurij";
         // Адрес технической поддержки
@@ -53,23 +53,26 @@ namespace CompilerPlugin
         public CompilerResult StartCompiler(ref IniData sConfig, string submissionId, string fileLocation)
         {
 
-            // Инициализируем объект CompilerRefs
-            CompilerRefs cRefs = new CompilerRefs();
+            //Делаем преждевременные выводы
+            //прям как некоторые девушки
+            //(по крайней мере на данный момент)
 
-            //Будущее местонахождение исполняемого файла
-            string exeLocation = cRefs.GenerateExeFileLocation(fileLocation, submissionId, sConfig["UserProc"]["exeFileExt"]);
+            CompilerResult result = new CompilerResult()
+            {
 
-            //Запуск компилятора с заранее определёнными аргументами
-            CompilerResult result = cRefs.RunCompiler(
-                sConfig["Compilers"]["gpp_location"],
-                fileLocation + " " + sConfig["Compilers"]["gpp_arguments"] + " -o " + exeLocation
-            );
+                //ошибок нет - но вы держитесь
+                HasErrors = false,
 
-            //Передаём полный путь к исполняемому файлу
-            result.ExeFullname = exeLocation;
+                //что дали - то и скинул
+                ExeFullname = fileLocation,
 
-            //Возвращаем результат компиляции
-            return cRefs.ReturnCompilerResult(result);
+                //хз зачем, но надо
+                CompilerMessage = Properties.Resources.noCompilerRequired
+
+            };
+
+            //Возвращаем результат фальш-компиляции
+            return result;
 
         }
 
@@ -86,10 +89,10 @@ namespace CompilerPlugin
             {
 
                 // Устанавливаем имя запускаемой программы
-                startInfo.FileName = filePath;
+                startInfo.FileName = sConfig["Compiler"]["php_location"];
 
                 // Аргументы запуска данной программы
-                startInfo.Arguments = "";
+                startInfo.Arguments = '"' + filePath + '"';
 
             }
             catch

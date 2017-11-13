@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Общие сведения об этой сборке предоставляются следующим набором
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("ICompilerPlugin.MonoCompiler")]
+[assembly: AssemblyTitle("ICompilerPlugin.Lua")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Sirkadirov Team")]
-[assembly: AssemblyProduct("ICompilerPlugin.MonoCompiler")]
+[assembly: AssemblyProduct("ICompilerPlugin.Lua")]
 [assembly: AssemblyCopyright("Copyright © 2017, Kadirov Yurij. All rights reserved.")]
 [assembly: AssemblyTrademark("SimplePM")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Следующий GUID служит для идентификации библиотеки типов, если этот проект будет видимым для COM
-[assembly: Guid("64BCA705-A341-40C8-A983-D6B878F9FB31")]
+[assembly: Guid("CE29FCE9-3B7C-4474-98C8-192124315F9F")]
 
 // Сведения о версии сборки состоят из следующих четырех значений:
 //

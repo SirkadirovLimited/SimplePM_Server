@@ -10,17 +10,19 @@
  */
 /*! \file */
 
-//Основа
+// Основа всего
 using System;
-//Подключаем коллекции
+// Подключаем коллекции
 using System.Collections.Generic;
-//Подключение к БД
+// Подключение к БД
 using MySql.Data.MySqlClient;
-//Конфигурационный файл
+// Конфигурационный файл
 using IniParser.Model;
-//Работа с файлами
+// Работа с файлами
 using System.IO;
-//Журнал событий
+// Работа с компиляторами
+using CompilerBase;
+// Журнал событий
 using NLog;
 
 namespace SimplePM_Server
@@ -49,6 +51,7 @@ namespace SimplePM_Server
         private MySqlConnection connection; //!< Дескриптор соединения с БД
         private Dictionary<string, string> submissionInfo; //!< Словарь информации о запросе
         private IniData sConfig; //!< Дескриптор конфигурационного файла
+        private List<ICompilerPlugin> _compilerPlugins; //!< Список загруженных модулей компиляторв
 
         ///////////////////////////////////////////////////
         /// Функция-конструктор официанта, обрабатывающего
@@ -56,11 +59,12 @@ namespace SimplePM_Server
         /// решения поставленной задачи.
         ///////////////////////////////////////////////////
 
-        public SimplePM_Officiant(MySqlConnection connection, IniData sConfig, Dictionary<string, string> submissionInfo)
+        public SimplePM_Officiant(MySqlConnection connection, ref IniData sConfig, ref List<ICompilerPlugin> _compilerPlugins, Dictionary<string, string> submissionInfo)
         {
 
             this.connection = connection;
             this.sConfig = sConfig;
+            this._compilerPlugins = _compilerPlugins;
             this.submissionInfo = submissionInfo;
 
         }
@@ -76,7 +80,7 @@ namespace SimplePM_Server
         {
 
             //Генерируем имя директории
-            string directoryName = sConfig["Program"]["tempPath"] + @"\" + Path.GetRandomFileName() + submissionId + @"\";
+            string directoryName = sConfig["Program"]["tempPath"] + @"\" + Guid.NewGuid() + submissionId + @"\";
 
             //Создаём все необходимые каталоги
             Directory.CreateDirectory(directoryName);
@@ -96,16 +100,13 @@ namespace SimplePM_Server
 
         public void ServeSubmission()
         {
-
-            //Определяем язык написания пользовательской программы
-            SimplePM_Submission.SubmissionLanguage codeLang = SimplePM_Submission.GetCodeLanguageByName(submissionInfo["codeLang"]);
-
+            
             ///////////////////////////////////////////////////
             // РАБОТА С ФАЙЛОМ ИСХОДНОГО КОДА
             ///////////////////////////////////////////////////
 
             //Определяем расширение файла
-            string fileExt = "." + SimplePM_Submission.GetExtByLang(codeLang);
+            string fileExt = "." + SimplePM_Submission.GetExtByLang(submissionInfo["codeLang"], ref _compilerPlugins);
             //Определяем полный путь к файлу
             string fileLocation = RandomGenSourceFileLocation(submissionInfo["submissionId"], fileExt);
 
@@ -121,7 +122,13 @@ namespace SimplePM_Server
             File.SetAttributes(fileLocation, FileAttributes.Temporary | FileAttributes.NotContentIndexed);
 
             //Объявляем экземпляр класса компиляции
-            SimplePM_Compiler compiler = new SimplePM_Compiler(ref sConfig, submissionInfo["submissionId"], fileLocation);
+            SimplePM_Compiler compiler = new SimplePM_Compiler(
+                ref sConfig,
+                ref _compilerPlugins,
+                submissionInfo["submissionId"],
+                fileLocation,
+                submissionInfo["codeLang"]
+            );
 
             ///////////////////////////////////////////////////
             // Вызываем функцию запуска компилятора для
@@ -130,7 +137,7 @@ namespace SimplePM_Server
             // компиляции пользовательской программы.
             ///////////////////////////////////////////////////
 
-            SimplePM_Compiler.CompilerResult cResult = SimplePM_Compiler.ChooseCompilerAndRun(codeLang, compiler);
+            CompilerResult cResult = compiler.ChooseCompilerAndRun();
 
             ///////////////////////////////////////////////////
             // Записываем в базу данных сообщение компилятора
@@ -213,10 +220,11 @@ namespace SimplePM_Server
 
                                 //Запускаем тестирование программы
                                 new SimplePM_Tester(
-                                    ref connection, //дескриптор соединения с БД
-                                    ref cResult.ExeFullname, //полный путь к исполняемому файлу
-                                    ref submissionInfo, //информация о запросе на тестирование
-                                    ref sConfig //дескриптор конфигурационного файла сервера
+                                    ref connection, // дескриптор соединения с БД
+                                    ref _compilerPlugins, // список модулей поддержки компиляторов
+                                    ref cResult.ExeFullname, // полный путь к исполняемому файлу
+                                    ref submissionInfo, // информация о запросе на тестирование
+                                    ref sConfig // дескриптор конфигурационного файла сервера
                                 ).DebugTest();
 
                             }
@@ -275,9 +283,10 @@ namespace SimplePM_Server
 
                             //Запускаем тестирование программы
                             new SimplePM_Tester(
-                                ref connection, //дескриптор соединения с БД
-                                ref cResult.ExeFullname, //полный путь к исполняемому файлу
-                                ref submissionInfo, //информация о запросе на тестирование
+                                ref connection, // дескриптор соединения с БД
+                                ref _compilerPlugins, // список модулей поддержки компиляторов
+                                ref cResult.ExeFullname, // полный путь к исполняемому файлу
+                                ref submissionInfo, // информация о запросе на тестирование
                                 ref sConfig
                             ).ReleaseTest();
 

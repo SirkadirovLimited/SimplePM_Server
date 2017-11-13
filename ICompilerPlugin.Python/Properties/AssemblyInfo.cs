@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Общие сведения об этой сборке предоставляются следующим набором
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("ICompilerPlugin.Lua")]
+[assembly: AssemblyTitle("ICompilerPlugin.Python")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Sirkadirov Team")]
-[assembly: AssemblyProduct("ICompilerPlugin.NoCompiler")]
+[assembly: AssemblyProduct("ICompilerPlugin.Python")]
 [assembly: AssemblyCopyright("Copyright © 2017, Kadirov Yurij. All rights reserved.")]
 [assembly: AssemblyTrademark("SimplePM")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Следующий GUID служит для идентификации библиотеки типов, если этот проект будет видимым для COM
-[assembly: Guid("86091fb0-bdb6-496d-820c-c5d21cbc6c8a")]
+[assembly: Guid("DE428CAF-FE84-4DE0-B5B2-2B303E9E0898")]
 
 // Сведения о версии сборки состоят из следующих четырех значений:
 //

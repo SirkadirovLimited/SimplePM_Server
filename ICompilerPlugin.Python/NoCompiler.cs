@@ -10,8 +10,6 @@
  */
 /*! \file */
 
-// Для работы с файловой системой
-using System.IO;
 // Для работы с процессами
 using System.Diagnostics;
 // Для использования базовых
@@ -20,16 +18,18 @@ using CompilerBase;
 // Парсер INI файлов конфигурации
 using IniParser.Model;
 
-namespace NoCompiler
+namespace CompilerPlugin
 {
     
-    public class NoCompilerPlugin : ICompilerPlugin
+    public class Compiler : ICompilerPlugin
     {
 
-        // Поддерживаемые языки программирования
-        private const string _progLang = "lua,php,python,ruby";
+        // Поддерживаемый язык программирования
+        private const string _progLang = "python";
+        // Расширение файла поддерживаемого языка программирования
+        private const string _progLangExt = "py";
         // Отображаемое имя
-        private const string _displayName = "SimplePM NoCompiler";
+        private const string _displayName = "SimplePM Python compiler module";
         // Автор модуля
         private const string _author = "Kadirov Yurij";
         // Адрес технической поддержки
@@ -37,6 +37,7 @@ namespace NoCompiler
 
         /* Начало раздела безопасной передачи */
         public string CompilerPluginLanguageName => _progLang;
+        public string CompilerPluginLanguageExt => _progLangExt;
         public string CompilerPluginDisplayName => _displayName;
         public string CompilerPluginAuthor => _author;
         public string CompilerPluginSupportUrl => _supportUrl;
@@ -88,7 +89,7 @@ namespace NoCompiler
             {
 
                 // Устанавливаем имя запускаемой программы
-                startInfo.FileName = sConfig["Compiler"][new FileInfo(filePath).Extension.ToLower().Replace(".", "") + "_location"];
+                startInfo.FileName = sConfig["Compiler"]["python_location"];
 
                 // Аргументы запуска данной программы
                 startInfo.Arguments = '"' + filePath + '"';

@@ -27,6 +27,7 @@ using System.Threading;
 using System.Threading.Tasks;
 //Безопасность
 using System.Web;
+using CompilerBase;
 //Подключение к MySQL серверу
 using MySql.Data.MySqlClient;
 //Парсер конфигурационного файла
@@ -66,40 +67,44 @@ namespace SimplePM_Server
         private readonly ulong userId; //!< Идентификатор пользователя
         private readonly float problemDifficulty; //!<  Сложность задачи
         private IniData sConfig; //!<  Дескриптор конфигурационного файла сервера
+        private List<ICompilerPlugin> _compilerPlugins; //!< Список загруженных модулей компиляторв
 
         ///////////////////////////////////////////////////
         /// Функция-конструктор класса тестирования
         /// пользовательских решений задач
         ///////////////////////////////////////////////////
 
-        public SimplePM_Tester(ref MySqlConnection connection, ref string exeFileUrl, ref Dictionary<string, string> submissionInfo, ref IniData sConfig)
+        public SimplePM_Tester(ref MySqlConnection connection, ref List<ICompilerPlugin> _compilerPlugins, ref string exeFileUrl, ref Dictionary<string, string> submissionInfo, ref IniData sConfig)
         {
 
-            //Database connection
+            // Database connection
             this.connection = connection;
 
-            //Excutable file url
+            // Compiler plugins list
+            this._compilerPlugins = _compilerPlugins;
+
+            // Excutable file url
             this.exeFileUrl = exeFileUrl;
 
-            //Submission information
+            // Submission information
             this.submissionInfo = submissionInfo;
 
-            //Problem ID
+            // Problem ID
             problemId = ulong.Parse(submissionInfo["problemId"]);
 
-            //Submission ID
+            // Submission ID
             submissionId = ulong.Parse(submissionInfo["submissionId"]);
 
-            //Problem difficulty
+            // Problem difficulty
             problemDifficulty = float.Parse(submissionInfo["difficulty"]);
 
-            //User ID
+            // User ID
             userId = ulong.Parse(submissionInfo["userId"]);
 
-            //Configuration file reader pointer
+            // Configuration file reader pointer
             this.sConfig = sConfig;
 
-            //Custom test checker
+            // Custom test checker
             customTestInput = submissionInfo.ContainsKey("customTest") ? submissionInfo["customTest"] : null;
 
         }
@@ -110,7 +115,7 @@ namespace SimplePM_Server
         /// Функция "нормализует" выходные данные потока
         /// для дальнейшего анализа.
         ///////////////////////////////////////////////////
-        public string GetNormalizedOutputText(StreamReader outputReader, bool normalize = true)
+        public static string GetNormalizedOutputText(StreamReader outputReader, bool normalize = true)
         {
             
             //Создаём переменную, которая будет содержать весь выходной поток
@@ -152,88 +157,30 @@ namespace SimplePM_Server
         /// запуске процесса пользовательского или
         /// авторского решения задачи.
         ///////////////////////////////////////////////////
-        public void SetExecInfoByFileExt(ref ProcessStartInfo startInfo, string filePath = null, SubmissionLanguage codeLanguage = SubmissionLanguage.Unset)
+        
+        private void SetExecInfoByFileExt(ref ProcessStartInfo startInfo, string filePath = null, string codeLanguage = "unset")
         {
 
-            //Путь к исполняемому файлу
-            if (filePath == null)
+            // Проверяем путь к исполняемому файлу
+            if (string.IsNullOrWhiteSpace(filePath))
                 filePath = exeFileUrl;
 
-            //Язык решения задачи
-            if (codeLanguage == SubmissionLanguage.Unset)
-                codeLanguage = GetCodeLanguageByName(submissionInfo["codeLang"]);
+            // Проверяем язык решения задачи
+            if (codeLanguage == "unset")
+                codeLanguage = submissionInfo["codeLang"];
 
-            //Выбор способа запуска от языка программирования попытки
-            switch (codeLanguage)
-            {
+            // Вызываем ассоциированный метод, который знает лучше, как это делать
+            bool f = SimplePM_Compiler.GetCompPluginByProgLangName(
+                ref _compilerPlugins,
+                codeLanguage
+            ).SetRunningMethod(
+                ref sConfig,
+                ref startInfo,
+                filePath
+            );
 
-                //Lua
-                case SubmissionLanguage.Lua:
-
-                    startInfo.FileName = sConfig["Compilers"]["lua_location"];
-                    startInfo.Arguments = '"' + filePath + '"';
-
-                    break;
-
-                //Python
-                case SubmissionLanguage.Python:
-
-                    startInfo.FileName = sConfig["Compilers"]["python_location"];
-                    startInfo.Arguments = '"' + filePath + '"';
-
-                    break;
-
-                //Java
-                case SubmissionLanguage.Java:
-
-                    //Получаем информацию о файле
-                    FileInfo fileInfo = new FileInfo(filePath);
-
-                    //Устанавливаем рабочую папку процесса
-                    startInfo.WorkingDirectory = fileInfo.DirectoryName;
-
-                    //Устанавливаем имя файла пройесса
-                    startInfo.FileName = sConfig["Compilers"]["java_location"];
-                    //Устанавливаем аргументы процесса
-                    startInfo.Arguments = "-d64 -cp . " + '"' + Path.GetFileNameWithoutExtension(fileInfo.Name) + '"';
-
-                    break;
-
-                //PHP
-                case SubmissionLanguage.PHP:
-
-                    startInfo.FileName = sConfig["Compilers"]["php_location"];
-                    startInfo.Arguments = '"' + filePath + '"';
-
-                    break;
-
-                //MONO-C#
-                case SubmissionLanguage.CSharp:
-
-                    int platform = (int)Environment.OSVersion.Platform;
-
-                    if (platform == 4 || platform == 6 || platform == 128)
-                    {
-                        startInfo.FileName = sConfig["Compilers"]["mono_location"];
-                        startInfo.Arguments = '"' + filePath + '"';
-                    }
-                    else
-                    {
-                        startInfo.FileName = filePath;
-                        startInfo.Arguments = "";
-                    }
-
-                    break;
-
-                //Executable files
-                default:
-
-                    startInfo.FileName = filePath;
-                    startInfo.Arguments = "";
-
-                    break;
-                
-            }
+            if (!f)
+                throw new SimplePM_Exceptions.UnknownException();
 
         }
 
@@ -246,7 +193,7 @@ namespace SimplePM_Server
         /// передаётся в аргументах данной функции.
         ///////////////////////////////////////////////////
 
-        private void ProcessorTimeLimitCheck(Process proc, Action doProcessorTimeLimit, int timeLimit)
+        public static void ProcessorTimeLimitCheck(Process proc, Action doProcessorTimeLimit, int timeLimit)
         {
 
             //Создаём и сразу же запускаем новую задачу
@@ -358,7 +305,7 @@ namespace SimplePM_Server
             
             //Объявляем необходимые переменные
             string authorProblemCode = null;
-            SubmissionLanguage authorProblemCodeLanguage = SubmissionLanguage.Unset;
+            string authorProblemCodeLanguage = "unset";
 
             //Читаем полученные данные
             while (dataReader.Read())
@@ -368,7 +315,7 @@ namespace SimplePM_Server
                 authorProblemCode = dataReader["code"].ToString();
 
                 //Язык авторского решения
-                authorProblemCodeLanguage = GetCodeLanguageByName(dataReader["codeLang"].ToString());
+                authorProblemCodeLanguage = dataReader["codeLang"].ToString();
 
             }
 
@@ -376,7 +323,7 @@ namespace SimplePM_Server
             dataReader.Close();
 
             /* ===== Проверка на наличие авторского решения задачи ==== */
-            if (authorProblemCode == null || authorProblemCodeLanguage == SubmissionLanguage.Unset)
+            if (authorProblemCode == null || authorProblemCodeLanguage == "unset")
                 throw new SimplePM_Exceptions.AuthorSolutionNotFoundException();
 
             #region ПРОВЕРКА РЕШЕНИЯ
@@ -386,7 +333,7 @@ namespace SimplePM_Server
             ///////////////////////////////////////////////////
 
             //Определяем расширение файла
-            string authorFileExt = "." + GetExtByLang(authorProblemCodeLanguage);
+            string authorFileExt = "." + GetExtByLang(authorProblemCodeLanguage, ref _compilerPlugins);
 
             //Получаем случайный путь к директории авторского решения
             string tmpAuthorDir = sConfig["Program"]["tempPath"] + @"\author\" + Path.GetRandomFileName() + @"\";
@@ -404,10 +351,16 @@ namespace SimplePM_Server
             File.SetAttributes(tmpAuthorSrcLocation, FileAttributes.Temporary | FileAttributes.NotContentIndexed);
 
             //Инициализируем экземпляр класса компилятора
-            SimplePM_Compiler compiler = new SimplePM_Compiler(ref sConfig, "a" + submissionId, tmpAuthorSrcLocation);
+            SimplePM_Compiler compiler = new SimplePM_Compiler(
+                ref sConfig,
+                ref _compilerPlugins,
+                "a" + submissionId,
+                tmpAuthorSrcLocation,
+                authorProblemCodeLanguage
+            );
 
             //Получаем структуру результата компиляции
-            SimplePM_Compiler.CompilerResult cResult = SimplePM_Compiler.ChooseCompilerAndRun(authorProblemCodeLanguage, compiler);
+            CompilerResult cResult = compiler.ChooseCompilerAndRun();
 
             //В случае возникновения ошибки при компиляции
             //авторского решения аварийно завершаем работу
@@ -951,17 +904,17 @@ namespace SimplePM_Server
                             problemProc.Refresh();
 
                             //Проверка на превышение лимита памяти
-                            if (problemProc.PeakWorkingSet64 > memoryLimit)
-                            {
-                                //Очищаем кеш и получаем обновлённые значения
-                                problemProc.Refresh();
+                            if (problemProc.PeakWorkingSet64 <= memoryLimit) continue;
 
-                                //Лимит памяти превышен
-                                problemProc.Kill(); //завершаем работу процесса в принудительном порядке
+                            //Очищаем кеш и получаем обновлённые значения
+                            problemProc.Refresh();
 
-                                testingResults[i - 1] = "M"; //устанавливаем преждевременный результат тестирования
-                                preResultGiven = true; //указываем, что выдали преждевременный результат тестирования
-                            }
+                            //Лимит памяти превышен
+                            problemProc.Kill(); //завершаем работу процесса в принудительном порядке
+
+                            testingResults[i - 1] = "M"; //устанавливаем преждевременный результат тестирования
+                            preResultGiven = true; //указываем, что выдали преждевременный результат тестирования
+
                         }
                     }
                     catch (Exception) { }

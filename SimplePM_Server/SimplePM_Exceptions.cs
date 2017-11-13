@@ -5,6 +5,7 @@ namespace SimplePM_Server
     class SimplePM_Exceptions
     {
 
+        [Serializable]
         public class AuthorSolutionRunningException : Exception
         {
 
@@ -16,6 +17,7 @@ namespace SimplePM_Server
 
         }
 
+        [Serializable]
         public class AuthorSolutionNotFoundException : Exception
         {
 
@@ -27,6 +29,19 @@ namespace SimplePM_Server
 
         }
 
+        [Serializable]
+        public class PluginLoadingException : Exception
+        {
+
+            public PluginLoadingException() { }
+
+            public PluginLoadingException(string message) : base(message) { }
+
+            public PluginLoadingException(string message, Exception inner) : base(message, inner) { }
+
+        }
+
+        [Serializable]
         public class UnknownException : Exception
         {
 

@@ -10,6 +10,10 @@
  */
 /*! \file */
 
+using System.Collections.Generic;
+using System.Linq;
+using CompilerBase;
+
 namespace SimplePM_Server
 {
 
@@ -83,32 +87,15 @@ namespace SimplePM_Server
         /// языка программирования
         ///////////////////////////////////////////////////
 
-        public static string GetExtByLang(SubmissionLanguage lang)
+        public static string GetExtByLang(string lang, ref List<ICompilerPlugin> _compilerPlugins)
         {
 
-            switch (lang)
-            {
-
-                case SubmissionLanguage.Freepascal:
-                    return "pas";
-                case SubmissionLanguage.CSharp:
-                    return "cs";
-                case SubmissionLanguage.Cpp:
-                    return "cpp";
-                case SubmissionLanguage.C:
-                    return "c";
-                case SubmissionLanguage.Python:
-                    return "py";
-                case SubmissionLanguage.Lua:
-                    return "lua";
-                case SubmissionLanguage.PHP:
-                    return "php";
-                case SubmissionLanguage.Java:
-                    return "java";
-                default:
-                    return "txt";
-
-            }
+            return (
+                from compilerPlugin
+                in _compilerPlugins
+                where compilerPlugin.CompilerPluginLanguageName == lang
+                select compilerPlugin.CompilerPluginLanguageExt
+            ).FirstOrDefault();
 
         }
 

@@ -21,14 +21,16 @@ using CompilerBase;
 // Парсер INI файлов конфигурации
 using IniParser.Model;
 
-namespace JavaCompiler
+namespace CompilerPlugin
 {
     
-    public class JavaCompilerPlugin : ICompilerPlugin
+    public class Compiler : ICompilerPlugin
     {
 
-        // Поддерживаемые языки программирования
+        // Поддерживаемый язык программирования
         private const string _progLang = "java";
+        // Расширение файла поддерживаемого языка программирования
+        private const string _progLangExt = "java";
         // Отображаемое имя
         private const string _displayName = "SimplePM Java Compiler module";
         // Автор модуля
@@ -38,6 +40,7 @@ namespace JavaCompiler
 
         /* Начало раздела безопасной передачи */
         public string CompilerPluginLanguageName => _progLang;
+        public string CompilerPluginLanguageExt => _progLangExt;
         public string CompilerPluginDisplayName => _displayName;
         public string CompilerPluginAuthor => _author;
         public string CompilerPluginSupportUrl => _supportUrl;
