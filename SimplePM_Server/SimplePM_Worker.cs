@@ -31,7 +31,10 @@ using CompilerBase;
 //Журнал событий
 using NLog;
 using NLog.Config;
+// Работа с файловой системой
 using System.IO;
+// Использование запросов
+using System.Linq;
 using System.Reflection;
 
 namespace SimplePM_Server
@@ -85,28 +88,32 @@ namespace SimplePM_Server
         {
 
             // Инициализируем массив путей к сборкам
-            string[] pluginFiles = Directory.GetFiles(sConfig["Program"]["ICompilerPlugin_directory"], "*Compiler.dll");
+            string[] pluginFiles = Directory.GetFiles(sConfig["Program"]["ICompilerPlugin_directory"], "ICompilerPlugin.*.dll");
 
+            /*
+             * В цикле осуществляем поиск модулей, которые добавляют
+             * поддержку языков программирования.
+             */
             foreach (string pluginPath in pluginFiles)
             {
                 
-                logger.Debug("Start loading plugin..." + pluginPath);
+                logger.Debug("Start loading plugin [" + pluginPath + "]...");
 
                 try
                 {
-                    
+
                     // Загружаем сборку
                     Assembly assembly = Assembly.LoadFrom(pluginPath);
 
-                    // Получаем тип сборки
-                    Type objectType = assembly.GetType(Path.GetFileNameWithoutExtension(pluginPath) + ".ICompilerPlugin");
-                    
-                    // Проверка на ненулевое значение типа сборки:
-                    // если всё хорошо - добавляем плагин в список
-                    if (objectType != null)
-                        _compilerPlugins.Add((ICompilerPlugin)Activator.CreateInstance(objectType));
+                    // Ищем необходимую для нас реализацию интерфейса
+                    foreach (Type type in assembly.GetTypes())
+                    {
+                        
+                        // Если мы нашли то, что искали - добавляем плагин в список
+                        if (type.FullName == "CompilerPlugin.Compiler")
+                            _compilerPlugins.Add((ICompilerPlugin) Activator.CreateInstance(type));
 
-                    logger.Debug("Plugin loaded!");
+                    }
 
                 }
                 catch (Exception ex)
@@ -127,44 +134,29 @@ namespace SimplePM_Server
         public void GenerateEnabledLangsList()
         {
 
-            /* Инициализируем список строк */
+            /*
+             * Инициализируем список строк и собираем
+             * поддерживаемые языки программирования в массив
+             */
             List<string> EnabledLangsList = new List<string>();
 
-            /* Добавляем элементы в массив */
+            /*
+             * В цикле перебираем все поддерживаемые языки
+             * программирования подключаемыми модулями и
+             * приводим список поддерживаемых системой
+             * языков к требуемому виду.
+             */
+            foreach (ICompilerPlugin compilerPlugin in _compilerPlugins)
+            {
+                
+                //Добавляем язык программирования в список
+                EnabledLangsList.Add("'" + compilerPlugin.CompilerPluginLanguageName + "'");
 
-            //Pascal (Free Pascal, Object Pascal, etc.)
-            if (sConfig["Compilers"].ContainsKey("freepascal"))
-                EnabledLangsList.Add("'" + sConfig["Compilers"]["freepascal"] + "'");
-            
-            // C#
-            if (sConfig["Compilers"].ContainsKey("csharp"))
-                EnabledLangsList.Add("'" + sConfig["Compilers"]["csharp"] + "'");
-            
-            // C++
-            if (sConfig["Compilers"].ContainsKey("cpp"))
-                EnabledLangsList.Add("'" + sConfig["Compilers"]["cpp"] + "'");
-            
-            // C
-            if (sConfig["Compilers"].ContainsKey("c"))
-                EnabledLangsList.Add("'" + sConfig["Compilers"]["c"] + "'");
-            
-            // Lua
-            if (sConfig["Compilers"].ContainsKey("lua"))
-                EnabledLangsList.Add("'" + sConfig["Compilers"]["lua"] + "'");
-            
-            // Python
-            if (sConfig["Compilers"].ContainsKey("python"))
-                EnabledLangsList.Add("'" + sConfig["Compilers"]["python"] + "'");
-            
-            // PHP
-            if (sConfig["Compilers"].ContainsKey("php"))
-                EnabledLangsList.Add("'" + sConfig["Compilers"]["php"] + "'");
-            
-            // Java
-            if (sConfig["Compilers"].ContainsKey("java"))
-                EnabledLangsList.Add("'" + sConfig["Compilers"]["java"] + "'");
+            }
 
-            //Формируем список доступных языков
+            /*
+             * Формируем список доступных языков
+             */
             EnabledLangs = string.Join(", ", EnabledLangsList);
             
         }
@@ -177,7 +169,7 @@ namespace SimplePM_Server
         private void SetExceptionHandler()
         {
 
-            //Устанавливаем обработчик необработанных исключений
+            /* Устанавливаем обработчик необработанных исключений */
             AppDomain.CurrentDomain.UnhandledException += ExceptionEventLogger;
 
         }
@@ -190,7 +182,7 @@ namespace SimplePM_Server
         private void ExceptionEventLogger(object sender, UnhandledExceptionEventArgs e)
         {
 
-            //Записываем сообщение об ошибке в журнал событий
+            /* Записываем сообщение об ошибке в журнал событий */
             logger.Fatal(e.ExceptionObject);
 
         }
@@ -226,8 +218,10 @@ namespace SimplePM_Server
                 /* Deal with it */
             }
 
-            // Получаем информацию с конфигурационного файла
-            // для некоторых переменных
+            /*
+             * Получаем информацию с конфигурационного файла
+             * для некоторых переменных
+             */
             _maxCustomersCount = ulong.Parse(sConfig["Connection"]["maxConnectedClients"]);
             SleepTime = int.Parse(sConfig["Connection"]["check_timeout"]);
 
@@ -242,8 +236,10 @@ namespace SimplePM_Server
             // Модули сервера
             //TODO:LoadServerPlugins();
 
-            // Вызываем функцию получения строчного списка
-            // поддерживаемых языков программирования
+            /*
+             * Вызываем функцию получения строчного списка
+             * поддерживаемых языков программирования
+             */
             GenerateEnabledLangsList();
 
             ///////////////////////////////////////////////////
@@ -254,21 +250,20 @@ namespace SimplePM_Server
             new SimplePM_Commander().SplitArguments(args);
 
             ///////////////////////////////////////////////////
-            // ОСНОВНОЙ ЦИКЛ СЕРВЕРА
+            // Основной вечный цикл сервера
             ///////////////////////////////////////////////////
 
             uint rechecksCount = 0;
 
             while (42 == 42)
             {
-
+                
                 if (_customersCount < _maxCustomersCount)
                 {
 
                     //Отлавливаем все ошибки
                     try
                     {
-
                         //Получаем дескриптор соединения с базой данных
                         MySqlConnection conn = StartMysqlConnection(sConfig);
 
@@ -277,7 +272,10 @@ namespace SimplePM_Server
 
                     }
                     //В случае ошибки передаём информацию о ней логгеру событий
-                    catch (Exception ex) { logger.Error(ex); }
+                    catch (Exception ex)
+                    {
+                        logger.Error(ex);
+                    }
                     
                 }
 
@@ -342,15 +340,17 @@ namespace SimplePM_Server
                 //Получаем все поля запроса на тестирование
                 while (dataReader.Read())
                 {
-                    submissionInfo["submissionId"] = dataReader["submissionId"].ToString(); //идентификатор
-                    submissionInfo["classworkId"] = dataReader["classworkId"].ToString(); //идентификатор урока
-                    submissionInfo["olympId"] = dataReader["olympId"].ToString(); //идентификатор олимпиады
-                    submissionInfo["codeLang"] = dataReader["codeLang"].ToString(); //язык исходного кода
-                    submissionInfo["userId"] = dataReader["userId"].ToString(); //идентификатор пользователя
-                    submissionInfo["problemId"] = dataReader["problemId"].ToString(); //идентификатор задачи
-                    submissionInfo["testType"] = dataReader["testType"].ToString(); //тип теста
-                    submissionInfo["problemCode"] = HttpUtility.HtmlDecode(dataReader["problemCode"].ToString()); //код программы
-                    submissionInfo["customTest"] = HttpUtility.HtmlDecode(dataReader["customTest"].ToString()); //собственный тест пользователя
+
+                    submissionInfo["submissionId"] = dataReader["submissionId"].ToString(); // идентификатор
+                    submissionInfo["classworkId"] = dataReader["classworkId"].ToString(); // идентификатор урока
+                    submissionInfo["olympId"] = dataReader["olympId"].ToString(); // идентификатор олимпиады
+                    submissionInfo["codeLang"] = dataReader["codeLang"].ToString(); // язык исходного кода
+                    submissionInfo["userId"] = dataReader["userId"].ToString(); // идентификатор пользователя
+                    submissionInfo["problemId"] = dataReader["problemId"].ToString(); // идентификатор задачи
+                    submissionInfo["testType"] = dataReader["testType"].ToString(); // тип теста
+                    submissionInfo["problemCode"] = HttpUtility.HtmlDecode(dataReader["problemCode"].ToString()); // код программы
+                    submissionInfo["customTest"] = HttpUtility.HtmlDecode(dataReader["customTest"].ToString()); // собственный тест пользователя
+
                 }
 
                 //Закрываем чтение временной таблицы
@@ -394,7 +394,7 @@ namespace SimplePM_Server
 
                     //Зовём официанта-шляпочника
                     //уж он знает, что делать в таких вот ситуациях
-                    new SimplePM_Officiant(connection, sConfig, submissionInfo).ServeSubmission();
+                    new SimplePM_Officiant(connection, ref sConfig, ref _compilerPlugins, submissionInfo).ServeSubmission();
 
                     //Уменьшаем количество текущих соединений
                     //чтобы другие соединения были возможны.

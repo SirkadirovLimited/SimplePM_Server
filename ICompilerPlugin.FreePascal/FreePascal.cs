@@ -18,14 +18,16 @@ using CompilerBase;
 // Парсер INI файлов конфигурации
 using IniParser.Model;
 
-namespace FreePascalCompiler
+namespace CompilerPlugin
 {
     
-    public class FreePascalCompilerPlugin : ICompilerPlugin
+    public class Compiler : ICompilerPlugin
     {
 
-        // Поддерживаемые языки программирования
+        // Поддерживаемый язык программирования
         private const string _progLang = "freepascal";
+        // Расширение файла поддерживаемого языка программирования
+        private const string _progLangExt = "pas";
         // Отображаемое имя
         private const string _displayName = "SimplePM Free Pascal & other dialects Compiler module";
         // Автор модуля
@@ -35,6 +37,7 @@ namespace FreePascalCompiler
 
         /* Начало раздела безопасной передачи */
         public string CompilerPluginLanguageName => _progLang;
+        public string CompilerPluginLanguageExt => _progLangExt;
         public string CompilerPluginDisplayName => _displayName;
         public string CompilerPluginAuthor => _author;
         public string CompilerPluginSupportUrl => _supportUrl;

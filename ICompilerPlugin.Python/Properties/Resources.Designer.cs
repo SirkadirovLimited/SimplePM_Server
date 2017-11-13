@@ -59,5 +59,21 @@ namespace CompilerPlugin.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на =====================================
+        ///SimplePM
+        ///=====================================
+        ///For programming language you selected
+        ///there is no need to use compiler!
+        ///=====================================
+        ///You can check syntax in debug mode!
+        ///=====================================.
+        /// </summary>
+        internal static string noCompilerRequired {
+            get {
+                return ResourceManager.GetString("noCompilerRequired", resourceCulture);
+            }
+        }
     }
 }
