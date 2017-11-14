@@ -276,6 +276,10 @@ namespace SimplePM_Server
                                 new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
 
                             }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex);
+                            }
 
                             break;
                         //Отправка решения задачи
