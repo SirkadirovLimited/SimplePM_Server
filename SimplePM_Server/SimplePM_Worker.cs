@@ -36,6 +36,7 @@ using System.IO;
 // Использование запросов
 using System.Linq;
 using System.Reflection;
+using System.Security.AccessControl;
 
 namespace SimplePM_Server
 {
@@ -168,6 +169,22 @@ namespace SimplePM_Server
 
         private void SetExceptionHandler()
         {
+
+            /*
+             * На всякий случай создаём директорию
+             * для хранения лог-файлов, так как
+             * некоторые версии NLog не создают
+             * её автоматически.
+             */
+            
+            try
+            {
+                Directory.CreateDirectory("./log/");
+            }
+            catch
+            {
+                /* Deal with it */
+            }
 
             /* Устанавливаем обработчик необработанных исключений */
             AppDomain.CurrentDomain.UnhandledException += ExceptionEventLogger;

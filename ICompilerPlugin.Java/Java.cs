@@ -64,7 +64,7 @@ namespace CompilerPlugin
                 sConfig["Compilers"]["javac_location"],
                 sConfig["Compilers"]["javac_arguments"] + " " + '"' + fileLocation + '"'
             );
-
+            
             // Для отлавливания всевозможных ошибок
             // создаём их улавливатель.
             // Он также поможет отловить пользовательские
