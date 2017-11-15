@@ -89,7 +89,7 @@ namespace CompilerPlugin
             {
 
                 // Устанавливаем имя запускаемой программы
-                startInfo.FileName = sConfig["Compiler"]["php_location"];
+                startInfo.FileName = sConfig["Compilers"]["php_location"];
 
                 // Аргументы запуска данной программы
                 startInfo.Arguments = '"' + filePath + '"';

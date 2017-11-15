@@ -89,7 +89,7 @@ namespace CompilerPlugin
             {
 
                 // Устанавливаем имя запускаемой программы
-                startInfo.FileName = sConfig["Compiler"]["python_location"];
+                startInfo.FileName = sConfig["Compilers"]["python_location"];
 
                 // Аргументы запуска данной программы
                 startInfo.Arguments = '"' + filePath + '"';

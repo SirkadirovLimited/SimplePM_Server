@@ -11,6 +11,8 @@
 /*! \file */
 
 // Для работы с процессами
+
+using System;
 using System.Diagnostics;
 // Для использования базовых
 // методов и полей системы плагинов
@@ -89,8 +91,8 @@ namespace CompilerPlugin
             {
 
                 // Устанавливаем имя запускаемой программы
-                startInfo.FileName = sConfig["Compiler"]["lua_location"];
-
+                startInfo.FileName = sConfig["Compilers"]["lua_location"];
+                
                 // Аргументы запуска данной программы
                 startInfo.Arguments = '"' + filePath + '"';
 
