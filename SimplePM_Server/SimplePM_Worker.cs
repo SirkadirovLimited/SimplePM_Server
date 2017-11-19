@@ -33,10 +33,9 @@ using NLog;
 using NLog.Config;
 // Работа с файловой системой
 using System.IO;
-// Использование запросов
 using System.Linq;
+// Использование запросов
 using System.Reflection;
-using System.Security.AccessControl;
 
 namespace SimplePM_Server
 {
@@ -205,20 +204,21 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
-        /// Автоматически запускаемая при запуске
-        /// сервера функция. Является точкой входа.
+        /// Функция, инициализирующая все необходимые
+        /// переменные и прочий хлам для возможности
+        /// работы сервера проверки решений
         ///////////////////////////////////////////////////
 
-        public void Run(string[] args)
+        private void LoadResources(string[] args)
         {
-            
+
             ///////////////////////////////////////////////////
             // ИНИЦИАЛИЗАЦИЯ СЕРВЕРНЫХ ПОДСИСТЕМ И ПРОЧИЙ ХЛАМ
             ///////////////////////////////////////////////////
 
             // Устанавливаем "улавливатель исключений"
             SetExceptionHandler();
-            
+
             // Открываем конфигурационный файл для чтения
             FileIniDataParser iniParser = new FileIniDataParser();
 
@@ -266,34 +266,46 @@ namespace SimplePM_Server
 
             new SimplePM_Commander().SplitArguments(args);
 
+        }
+
+        ///////////////////////////////////////////////////
+        /// Функция, которая запускает соновной цикл
+        /// сервера проверки решений. Работает постоянно
+        /// в высшем родительском потоке.
+        ///////////////////////////////////////////////////
+
+        private void ServerLoop()
+        {
+
             ///////////////////////////////////////////////////
             // Основной вечный цикл сервера
             ///////////////////////////////////////////////////
 
-            uint rechecksCount = 0;
+            uint rechecksCount = 0; // количество перепроверок без
 
             while (42 == 42)
             {
-                
+
                 if (_customersCount < _maxCustomersCount)
                 {
 
-                    //Отлавливаем все ошибки
+                    // Отлавливаем все ошибки
                     try
                     {
                         //Получаем дескриптор соединения с базой данных
                         MySqlConnection conn = StartMysqlConnection(sConfig);
 
-                        //Вызов чекера
-                        GetSubIdAndRunCompile(conn);
+                        //Вызов чекера (если всё "хорошо")
+                        if (conn != null)
+                            GetSubIdAndRunCompile(conn);
 
                     }
-                    //В случае ошибки передаём информацию о ней логгеру событий
+                    // В случае ошибки передаём информацию о ней логгеру событий
                     catch (Exception ex)
                     {
                         logger.Error(ex);
                     }
-                    
+
                 }
 
                 bool tmpCheck = rechecksCount >= uint.Parse(sConfig["Connection"]["rechecks_without_timeout"]);
@@ -301,10 +313,10 @@ namespace SimplePM_Server
                 if (_customersCount < _maxCustomersCount && tmpCheck)
                 {
 
-                    //Ожидание для уменьшения нагрузки на сервер
+                    // Ожидание для уменьшения нагрузки на сервер
                     Thread.Sleep(SleepTime);
 
-                    //Обнуляем итератор
+                    // Обнуляем итератор
                     rechecksCount = 0;
 
                 }
@@ -318,17 +330,32 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
+        /// Базовая точка входа из-под всего сущего
+        ///////////////////////////////////////////////////
+
+        public void Run(string[] args)
+        {
+            
+            // Загружаем все необходимые ресурсы
+            LoadResources(args);
+
+            // Запускаем основной цикл
+            ServerLoop();
+            
+        }
+
+        ///////////////////////////////////////////////////
         /// Функция обработки запросов на проверку решений
         ///////////////////////////////////////////////////
 
         public void GetSubIdAndRunCompile(MySqlConnection connection)
         {
             
-            //Создаём новую задачу, без неё - никак!
+            // Создаём новую задачу, без неё - никак!
             new Task(() =>
             {
 
-                //Формируем запрос на выборку
+                // Формируем запрос на выборку
                 string querySelect = $@"
                     SELECT 
                         * 
@@ -345,17 +372,17 @@ namespace SimplePM_Server
                     ;
                 ";
 
-                //Объявляем словарь, который будет содержать информацию о запросе
+                // Объявляем словарь, который будет содержать информацию о запросе
                 Dictionary<string, string> submissionInfo = new Dictionary<string, string>();
 
-                //Создаём запрос на выборку из базы данных
+                // Создаём запрос на выборку из базы данных
                 MySqlCommand cmdSelect = new MySqlCommand(querySelect, connection);
 
-                //Производим выборку полученных результатов из временной таблицы
+                // Производим выборку полученных результатов из временной таблицы
                 MySqlDataReader dataReader = cmdSelect.ExecuteReader();
 
-                //Получаем все поля запроса на тестирование
-                while (dataReader.Read())
+                // Получаем все поля запроса на тестирование
+                if (dataReader.Read())
                 {
 
                     submissionInfo["submissionId"] = dataReader["submissionId"].ToString(); // идентификатор
@@ -367,17 +394,17 @@ namespace SimplePM_Server
                     submissionInfo["testType"] = dataReader["testType"].ToString(); // тип теста
                     submissionInfo["problemCode"] = HttpUtility.HtmlDecode(dataReader["problemCode"].ToString()); // код программы
                     submissionInfo["customTest"] = HttpUtility.HtmlDecode(dataReader["customTest"].ToString()); // собственный тест пользователя
-
+                    
                 }
 
-                //Закрываем чтение временной таблицы
+                // Закрываем чтение временной таблицы
                 dataReader.Close();
 
-                //Производим проверку на успешное получение данных о запросе
+                // Производим проверку на успешное получение данных о запросе
                 if (submissionInfo.Count > 0)
                 {
 
-                    //Получаем сложность поставленной задачи
+                    // Получаем сложность поставленной задачи
                     string queryGetDifficulty = $@"
                         SELECT 
                             `difficulty` 
@@ -393,7 +420,7 @@ namespace SimplePM_Server
                     MySqlCommand cmdGetProblemDifficulty = new MySqlCommand(queryGetDifficulty, connection);
                     submissionInfo["difficulty"] = cmdGetProblemDifficulty.ExecuteScalar().ToString();
 
-                    //Устанавливаем статус запроса на "в обработке"
+                    // Устанавливаем статус запроса на "в обработке"
                     string queryUpdate = $@"
                         UPDATE 
                             `spm_submissions` 
@@ -409,17 +436,22 @@ namespace SimplePM_Server
                     new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
                     _customersCount++;
 
-                    //Зовём официанта-шляпочника
-                    //уж он знает, что делать в таких вот ситуациях
-                    new SimplePM_Officiant(connection, ref sConfig, ref _compilerPlugins, submissionInfo).ServeSubmission();
+                    // Зовём официанта-шляпочника
+                    // уж он знает, что делать в таких вот ситуациях
+                    new SimplePM_Officiant(
+                        connection,
+                        ref sConfig,
+                        ref _compilerPlugins,
+                        submissionInfo
+                    ).ServeSubmission();
 
-                    //Уменьшаем количество текущих соединений
-                    //чтобы другие соединения были возможны.
+                    // Уменьшаем количество текущих соединений
+                    // чтобы другие соединения были возможны.
                     _customersCount--;
 
                 }
 
-                //Закрываем соединение с БД
+                // Закрываем соединение с БД
                 connection.Close();
 
             }).Start();
@@ -436,20 +468,33 @@ namespace SimplePM_Server
         public MySqlConnection StartMysqlConnection(IniData sConfig)
         {
 
-            //Подключаемся к базе данных на удалённом
-            //MySQL сервере и получаем дескриптор подключения к ней
-            MySqlConnection db = new MySqlConnection(
-                $@"
+            // Объявляем переменную, которая будет хранить
+            // дескриптор соединения с базой данных системы.
+            MySqlConnection db = null;
+
+            try
+            {
+
+                // Подключаемся к базе данных на удалённом
+                // MySQL сервере и получаем дескриптор подключения к ней
+                db = new MySqlConnection(
+                    $@"
                     server={sConfig["Database"]["db_host"]};
                     uid={sConfig["Database"]["db_user"]};
                     pwd={sConfig["Database"]["db_pass"]};
                     database={sConfig["Database"]["db_name"]};
                     Charset={sConfig["Database"]["db_chst"]}
                 "
-            );
-            
-            //Открываем соединение с БД
-            db.Open();
+                );
+
+                // Открываем соединение с БД
+                db.Open();
+
+            }
+            catch (MySqlException)
+            {
+                /* Deal with it */
+            }
 
             //Возвращаем дескриптор подключения к базе данных
             return db;
