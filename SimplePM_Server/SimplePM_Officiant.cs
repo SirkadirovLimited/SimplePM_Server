@@ -62,9 +62,16 @@ namespace SimplePM_Server
         public SimplePM_Officiant(MySqlConnection connection, ref IniData sConfig, ref List<ICompilerPlugin> _compilerPlugins, Dictionary<string, string> submissionInfo)
         {
 
+            // Connection
             this.connection = connection;
+
+            // Configuration file
             this.sConfig = sConfig;
+
+            // Compiler plugins
             this._compilerPlugins = _compilerPlugins;
+
+            // Submission information
             this.submissionInfo = submissionInfo;
 
         }
