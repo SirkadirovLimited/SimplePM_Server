@@ -394,7 +394,8 @@ namespace SimplePM_Server
                     submissionInfo["testType"] = dataReader["testType"].ToString(); // тип теста
                     submissionInfo["problemCode"] = HttpUtility.HtmlDecode(dataReader["problemCode"].ToString()); // код программы
                     submissionInfo["customTest"] = HttpUtility.HtmlDecode(dataReader["customTest"].ToString()); // собственный тест пользователя
-                    
+                    submissionInfo["setAsAuthorSolution"] = HttpUtility.HtmlDecode(dataReader["setAsAuthorSolution"].ToString()); // собственный тест пользователя
+
                 }
 
                 // Закрываем чтение временной таблицы
@@ -479,12 +480,12 @@ namespace SimplePM_Server
                 // MySQL сервере и получаем дескриптор подключения к ней
                 db = new MySqlConnection(
                     $@"
-                    server={sConfig["Database"]["db_host"]};
-                    uid={sConfig["Database"]["db_user"]};
-                    pwd={sConfig["Database"]["db_pass"]};
-                    database={sConfig["Database"]["db_name"]};
-                    Charset={sConfig["Database"]["db_chst"]}
-                "
+                        server={sConfig["Database"]["db_host"]};
+                        uid={sConfig["Database"]["db_user"]};
+                        pwd={sConfig["Database"]["db_pass"]};
+                        database={sConfig["Database"]["db_name"]};
+                        Charset={sConfig["Database"]["db_chst"]}
+                    "
                 );
 
                 // Открываем соединение с БД

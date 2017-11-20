@@ -42,6 +42,18 @@ namespace SimplePM_Server
         }
 
         [Serializable]
+        public class OutputLengthLimitException : Exception
+        {
+
+            public OutputLengthLimitException() { }
+
+            public OutputLengthLimitException(string message) : base(message) { }
+
+            public OutputLengthLimitException(string message, Exception inner) : base(message, inner) { }
+
+        }
+
+        [Serializable]
         public class UnknownException : Exception
         {
 

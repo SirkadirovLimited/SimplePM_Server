@@ -115,39 +115,57 @@ namespace SimplePM_Server
         /// Функция "нормализует" выходные данные потока
         /// для дальнейшего анализа.
         ///////////////////////////////////////////////////
-        public static string GetNormalizedOutputText(StreamReader outputReader, bool normalize = true)
+        public static string GetNormalizedOutputText(StreamReader outputReader, bool normalize = true, int lengthLimit = 0)
         {
             
-            //Создаём переменную, которая будет содержать весь выходной поток
-            //авторского решения поставленной задачи
+            // Создаём переменную, которая будет содержать весь выходной поток
+            // авторского решения поставленной задачи
             string _output = "";
+
+            // Объявляем переменную, которая будет так называемым
+            // счётчиком количества символов в выходном потоке
+            // пользовательского решения поставленной задачи
+            int currentLength = 0;
             
-            //Производим необходимые действия пока мы
-            //не достигли конца выходного потока
+            // Производим необходимые действия пока мы
+            // не достигли конца выходного потока
             while (!outputReader.EndOfStream)
             {
                 
-                //Создаём временную переменную текущей строки вывода,
-                //получаем содержимое текущей строки
+                // Создаём временную переменную текущей строки вывода,
+                // получаем содержимое текущей строки
                 string curLine = outputReader.ReadLine();
 
-                //Убираем все конечные пробелы (если, конечно,
-                //результат должен быть нормализирован)
+                if (lengthLimit > 0)
+                {
+
+                    // Прибавляем к длине уже просмотренного
+                    // входного потока длину текущей строки
+                    currentLength += curLine.Length;
+
+                    // Проверка на превышение лимита по длине выходного потока
+                    if (currentLength > lengthLimit)
+                        throw new SimplePM_Exceptions.OutputLengthLimitException();
+
+                }
+
+                // Убираем все конечные пробелы (если, конечно,
+                // результат должен быть нормализирован)
                 if (normalize)
                     curLine = curLine.TrimEnd(' ');
                 
-                //Дозаписываем данные в переменную выходного потока приложения
+                // Дозаписываем данные в переменную выходного потока приложения
                 _output += curLine + "\n";
                 
             }
 
-            //Удаляем последний искуственно
-            //созданный перевод на новую строку
-            //но только в случае, если размер строки больше 0.
+            // Удаляем последний искуственно
+            // созданный перевод на новую строку
+            // но только в случае, если размер строки больше 0.
             if (_output.Length > 0)
                 _output = _output.Substring(0, _output.LastIndexOf('\n'));
 
-            //Возвращаем результат нормализации
+            // Возвращаем результат нормализации
             return _output;
 
         }
@@ -215,16 +233,19 @@ namespace SimplePM_Server
                         TimeSpan pts = proc.TotalProcessorTime;
 
                         //Проверяем процесс на превышение лимита процессорного времени
-                        bool checker = (int)Math.Round(pts.TotalMilliseconds) > timeLimit;
+                        bool checker = (int) Math.Round(pts.TotalMilliseconds) > timeLimit;
 
                         //В случае превышения лимита запускаем пользовательский метод
                         if (checker)
                             doProcessorTimeLimit();
-                        
+
                     }
 
                 }
-                catch (Exception) { /* Deal with it */ }
+                catch (Exception)
+                {
+                    /* Deal with it */
+                }
 
             }).Start();
 
@@ -283,7 +304,7 @@ namespace SimplePM_Server
             // Выборка информации об авторском решении задачи
             ///////////////////////////////////////////////////
 
-            //Запрос на выборку авторского решения из БД
+            // Запрос на выборку авторского решения из БД
             string querySelect = $@"
                 SELECT 
                     `codeLang`, 
@@ -291,7 +312,7 @@ namespace SimplePM_Server
                 FROM 
                     `spm_problems_ready` 
                 WHERE 
-                    `problemId` = '{problemId}' 
+                    `problemId` = @problemId 
                 ORDER BY 
                     `problemId` ASC 
                 LIMIT 
@@ -299,27 +320,32 @@ namespace SimplePM_Server
                 ;
             ";
 
-            //Дескрипторы временных таблиц выборки из БД
+            // Дескрипторы временных таблиц выборки из БД
             MySqlCommand cmdSelect = new MySqlCommand(querySelect, connection);
+
+            // Параметры запроса
+            cmdSelect.Parameters.AddWithValue("@problemId", problemId);
+
+            // Чтение результатов запроса
             MySqlDataReader dataReader = cmdSelect.ExecuteReader();
             
-            //Объявляем необходимые переменные
+            // Объявляем необходимые переменные
             string authorProblemCode = null;
             string authorProblemCodeLanguage = "unset";
 
-            //Читаем полученные данные
+            // Читаем полученные данные
             while (dataReader.Read())
             {
 
-                //Исходный код авторского решения
+                // Исходный код авторского решения
                 authorProblemCode = dataReader["code"].ToString();
 
-                //Язык авторского решения
+                // Язык авторского решения
                 authorProblemCodeLanguage = dataReader["codeLang"].ToString();
 
             }
 
-            //Закрываем data reader
+            // Закрываем data reader
             dataReader.Close();
 
             /* ===== Проверка на наличие авторского решения задачи ==== */
@@ -332,25 +358,25 @@ namespace SimplePM_Server
             // Скачивание и компиляция авторского решения
             ///////////////////////////////////////////////////
 
-            //Определяем расширение файла
+            // Определяем расширение файла
             string authorFileExt = "." + GetExtByLang(authorProblemCodeLanguage, ref _compilerPlugins);
 
-            //Получаем случайный путь к директории авторского решения
+            // Получаем случайный путь к директории авторского решения
             string tmpAuthorDir = sConfig["Program"]["tempPath"] + @"\author\" + Path.GetRandomFileName() + @"\";
 
-            //Создаём папку текущего авторского решения задачи
+            // Создаём папку текущего авторского решения задачи
             Directory.CreateDirectory(tmpAuthorDir);
 
-            //Определяем путь хранения файла исходного кода вторского решения
+            // Определяем путь хранения файла исходного кода вторского решения
             string tmpAuthorSrcLocation = tmpAuthorDir + "sa" + submissionId + authorFileExt;
 
-            //Записываем исходный код авторского решения в заданный временный файл
+            // Записываем исходный код авторского решения в заданный временный файл
             File.WriteAllText(tmpAuthorSrcLocation, authorProblemCode, Encoding.UTF8);
 
-            //Устанавливаем его аттрибуты
+            // Устанавливаем его аттрибуты
             File.SetAttributes(tmpAuthorSrcLocation, FileAttributes.Temporary | FileAttributes.NotContentIndexed);
 
-            //Инициализируем экземпляр класса компилятора
+            // Инициализируем экземпляр класса компилятора
             SimplePM_Compiler compiler = new SimplePM_Compiler(
                 ref sConfig,
                 ref _compilerPlugins,
@@ -359,11 +385,11 @@ namespace SimplePM_Server
                 authorProblemCodeLanguage
             );
 
-            //Получаем структуру результата компиляции
+            // Получаем структуру результата компиляции
             CompilerResult cResult = compiler.ChooseCompilerAndRun();
 
-            //В случае возникновения ошибки при компиляции
-            //авторского решения аварийно завершаем работу
+            // В случае возникновения ошибки при компиляции
+            // авторского решения аварийно завершаем работу
             if (cResult.HasErrors)
                 throw new FileLoadException(cResult.ExeFullname);
 
@@ -373,7 +399,7 @@ namespace SimplePM_Server
             // Время запросов к базе данных системы
             ///////////////////////////////////////////////////
 
-            //Запрос на выборку Debug Time Limit из базы данных MySQL
+            // Запрос на выборку Debug Time Limit из базы данных MySQL
             querySelect = $@"
                     SELECT 
                         `debugTimeLimit` 
@@ -390,7 +416,7 @@ namespace SimplePM_Server
 
             ulong debugTimeLimit = Convert.ToUInt64(new MySqlCommand(querySelect, connection).ExecuteScalar());
 
-            //То же самое, только для MEMORY LIMIT
+            // То же самое, только для MEMORY LIMIT
             querySelect = $@"
                     SELECT 
                         `debugMemoryLimit` 
@@ -411,12 +437,12 @@ namespace SimplePM_Server
             //Создаём новую конфигурацию запуска процесса
             ProcessStartInfo startInfo = new ProcessStartInfo()
             {
-                //Перенаправляем потоки
+                // Перенаправляем потоки
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
 
-                //Запрещаем показ приложения на экран компа
+                // Запрещаем показ приложения на экран компа
                 ErrorDialog = false,
                 UseShellExecute = false,
                 CreateNoWindow = true,
@@ -440,105 +466,81 @@ namespace SimplePM_Server
             // ЗАПУСК ПРОЦЕССА АВТОРСКОГО РЕШЕНИЯ
             ///////////////////////////////////////////////////
 
-            //Объявляем дескриптор процесса
+            // Объявляем дескриптор процесса
             Process authorProblemProc = new Process();
 
-            //Указываем полный путь к исполняемому файлу
+            // Указываем полный путь к исполняемому файлу
             startInfo.FileName = authorCodePath;
 
-            //Устанавливаем информацию о запускаемом файле
+            // Устанавливаем информацию о запускаемом файле
             SetExecInfoByFileExt(ref startInfo, authorCodePath, authorProblemCodeLanguage);
 
-            //Указываем интересующую нас конфигурацию тестирования
+            // Указываем интересующую нас конфигурацию тестирования
             authorProblemProc.StartInfo = startInfo;
 
-            //Вызываем функцию управления, которая указывает,
-            //от имени какого пользователя стоит запускать
-            //пользовательский процесс.
+            // Вызываем функцию управления, которая указывает,
+            // от имени какого пользователя стоит запускать
+            // пользовательский процесс.
             SetProcessRunAs(ref authorProblemProc);
 
             try
             {
 
-                //Запускаем процесс
+                // Запускаем процесс
                 authorProblemProc.Start();
 
-                //Устанавливаем наивысший приоритет процесса
+                // Устанавливаем наивысший приоритет процесса
                 authorProblemProc.PriorityClass = ProcessPriorityClass.Normal;
 
-                //Инъекция входного потока
-                authorProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
-                authorProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
-                authorProblemProc.StandardInput.Close(); //закрываем поток
+                // Инъекция входного потока
+                authorProblemProc.StandardInput.WriteLine(customTestInput); // вставка текста
+                authorProblemProc.StandardInput.Flush(); // запись в поток, очистка буфера
+                authorProblemProc.StandardInput.Close(); // закрываем поток
 
             }
             catch (Exception)
             {
 
-                //Пытаемся удалить папку, содержащую авторское решение задачи
+                // Пытаемся удалить папку, содержащую авторское решение задачи
                 try { Directory.Delete(tmpAuthorDir, true); }
                 catch (Exception) {  }
 
-                //Выбрасываем исключение
+                // Выбрасываем исключение
                 throw new SimplePM_Exceptions.AuthorSolutionRunningException();
 
             }
-
-            ///////////////////////////////////////////////////
-            // КОНТРОЛЬ ИСПОЛЬЗУЕМОЙ ПРОЦЕССОМ ПАМЯТИ
-            ///////////////////////////////////////////////////
-
-            new Task(() =>
-            {
-
-                try
-                {
-                    while (!authorProblemProc.HasExited)
-                    {
-                        //Очищаем кеш и получаем обновлённые значения
-                        authorProblemProc.Refresh();
-
-                        //Проверка на превышение лимита памяти
-                        if ((ulong)authorProblemProc.PeakWorkingSet64 > debugMemoryLimit) //Лимит памяти превышен
-                            authorProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
-                    }
-                }
-                catch (Exception) { }
-
-            }).Start();
-
-            ///////////////////////////////////////////////////
-            // ОГРАНИЧЕНИЕ ИСПОЛЬЗУЕМОГО ПРОЦЕССОРНОГО ВРЕМЕНИ
-            ///////////////////////////////////////////////////
-
-            void OnProcessorTimeLimit_APP()
-            {
-                authorProblemProc.Kill();
-            }
-
-            ProcessorTimeLimitCheck(authorProblemProc, OnProcessorTimeLimit_APP, (int)debugTimeLimit);
-
-            //Ждём завершения, максимум X миллимекунд
-            //Если процесс не завершил свою работу - убиваем его
+            
+            // Ждём завершения, максимум X миллимекунд
+            // Если процесс не завершил свою работу - убиваем его
             if (!authorProblemProc.WaitForExit(int.Parse(sConfig["UserProc"]["maxProcessTime"])))
                 authorProblemProc.Kill();
 
-            //Получаем обработанный выходной поток авторского решения
-            authorOutput = GetNormalizedOutputText(authorProblemProc.StandardOutput);
+            try
+            {
+                // Получаем обработанный выходной поток авторского решения
+                authorOutput = GetNormalizedOutputText(authorProblemProc.StandardOutput);
+            }
+            catch (Exception)
+            {
+                throw new SimplePM_Exceptions.AuthorSolutionRunningException();
+            }
 
             try
             {
 
-                //Пытаемся удалить временные файлы
-                //авторского решения поставленной задачи
+                // Пытаемся удалить временные файлы
+                // авторского решения поставленной задачи
                 Directory.Delete(tmpAuthorDir, true);
 
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                /* Deal with it */
+            }
 
-            //Выбрасываем исключение в случае, когда авторское решение задачи
-            //некорректно завершило свою работу и/или стандартный поток ошибок
-            //авторского решения не пустой.
+            // Выбрасываем исключение в случае, когда авторское решение задачи
+            // некорректно завершило свою работу и/или стандартный поток ошибок
+            // авторского решения не пустой.
             if (authorProblemProc.ExitCode != 0 || authorProblemProc.StandardError.ReadToEnd().Length > 0)
                 throw new SimplePM_Exceptions.AuthorSolutionRunningException();
 
@@ -550,40 +552,40 @@ namespace SimplePM_Server
             // ЗАПУСК ПРОЦЕССА ПОЛЬЗОВАТЕЛЬСКОГО РЕШЕНИЯ
             ///////////////////////////////////////////////////
             
-            //Объявляем дескриптор процесса
+            // Объявляем дескриптор процесса
             Process userProblemProc = new Process();
 
-            //Устанавливаем информацию о запускаемом файле
+            // Устанавливаем информацию о запускаемом файле
             SetExecInfoByFileExt(ref startInfo);
 
-            //Указываем интересующую нас конфигурацию тестирования
+            // Указываем интересующую нас конфигурацию тестирования
             userProblemProc.StartInfo = startInfo;
 
-            //Вызываем функцию управления, которая указывает,
-            //от имени какого пользователя стоит запускать
-            //пользовательский процесс.
+            // Вызываем функцию управления, которая указывает,
+            // от имени какого пользователя стоит запускать
+            // пользовательский процесс.
             SetProcessRunAs(ref userProblemProc);
 
             try
             {
 
-                //Запускаем процесс
+                // Запускаем процесс
                 userProblemProc.Start();
 
-                //Устанавливаем наивысший приоритет процесса
+                // Устанавливаем наивысший приоритет процесса
                 userProblemProc.PriorityClass = ProcessPriorityClass.Normal;
 
-                //Инъекция входного потока
-                userProblemProc.StandardInput.WriteLine(customTestInput); //вставка текста
-                userProblemProc.StandardInput.Flush(); //запись в поток, очистка буфера
-                userProblemProc.StandardInput.Close(); //закрываем поток
+                // Инъекция входного потока
+                userProblemProc.StandardInput.WriteLine(customTestInput); // вставка текста
+                userProblemProc.StandardInput.Flush(); // запись в поток, очистка буфера
+                userProblemProc.StandardInput.Close(); // закрываем поток
 
             }
             catch (Exception ex)
             {
 
-                //Произошла ошибка при выполнении программы
-                //В этом, скорее всего, виноват компилятор.
+                // Произошла ошибка при выполнении программы
+                // В этом, скорее всего, виноват компилятор.
                 debugTestingResult = 'C';
                 logger.Error(ex);
 
@@ -599,15 +601,15 @@ namespace SimplePM_Server
                 {
                     while (!userProblemProc.HasExited)
                     {
-                        //Очищаем кеш и получаем обновлённые значения
+                        // Очищаем кеш и получаем обновлённые значения
                         userProblemProc.Refresh();
 
-                        //Проверка на превышение лимита памяти
+                        // Проверка на превышение лимита памяти
                         if ((ulong)userProblemProc.PeakWorkingSet64 > debugMemoryLimit)
                         {
-                            //Лимит памяти превышен
-                            userProblemProc.Kill(); //завершаем работу процесса в принудительном порядке
-                            debugTestingResult = 'M'; //устанавливаем преждевременный результат тестирования
+                            // Лимит памяти превышен
+                            userProblemProc.Kill(); // завершаем работу процесса в принудительном порядке
+                            debugTestingResult = 'M'; // устанавливаем преждевременный результат тестирования
                         }
                     }
                 }
@@ -635,8 +637,8 @@ namespace SimplePM_Server
             try
             {
 
-                //Ждём завершения, максимум X миллимекунд
-                //Если процесс не завершил свою работу - убиваем его
+                // Ждём завершения, максимум X миллимекунд
+                // Если процесс не завершил свою работу - убиваем его
                 if (!userProblemProc.WaitForExit(int.Parse(sConfig["UserProc"]["maxProcessTime"])))
                 {
                     userProblemProc.Kill();
@@ -644,9 +646,9 @@ namespace SimplePM_Server
                     userOutput = "--- PROGRAM TIME LIMIT ---";
                 }
 
-                //Если всё хорошо, получаем обработанный выходной поток пользовательского решения
-                //но только в случае, когда приложение завершило свою работу самопроизвольно.
-                //Если всё плохо - делаем userOutput пустым
+                // Если всё хорошо, получаем обработанный выходной поток пользовательского решения
+                // но только в случае, когда приложение завершило свою работу самопроизвольно.
+                // Если всё плохо - делаем userOutput пустым
                 try
                 {
                     if (userOutput.Length == 0)
@@ -657,23 +659,25 @@ namespace SimplePM_Server
                     userOutput = null;
                 }
 
-                //Получаем exitcode пользовательского приложения
+                // Получаем exitcode пользовательского приложения
                 userProblemExitCode = userProblemProc.ExitCode;
 
-                //Получаем выходной поток ошибок пользовательского решения
+                // Получаем выходной поток ошибок пользовательского решения
                 userErrorOutput = userProblemProc.StandardError.ReadToEnd();
 
-                //Устанавливаем результат отладочного тестирования.
-                //В случае преждевременного результата ничего не делаем
+                // Устанавливаем результат отладочного тестирования.
+                // В случае преждевременного результата ничего не делаем
                 if (debugTestingResult == '+')
                 {
+
                     debugTestingResult =
                     (
                         userProblemExitCode == 0 &&
                         authorOutput == userOutput &&
-                        String.IsNullOrWhiteSpace(userErrorOutput)
+                        string.IsNullOrWhiteSpace(userErrorOutput)
                             ? '+' : '-'
                     );
+
                 }
 
             }
@@ -693,32 +697,32 @@ namespace SimplePM_Server
             ///////////////////////////////////////////////////
 
             string queryUpdate = $@"
-                    UPDATE 
-                        `spm_submissions` 
-                    SET 
-                        `status` = 'ready', 
-                        `errorOutput` = @errorOutput, 
-                        `result` = @result, 
-                        `b` = '0', 
-                        `output` = @output, 
-                        `exitcodes` = @exitcodes 
-                    WHERE 
-                        `submissionId` = '{submissionId}' 
-                    LIMIT 
-                        1
-                    ;
-                ";
+                UPDATE 
+                    `spm_submissions` 
+                SET 
+                    `status` = 'ready', 
+                    `errorOutput` = @errorOutput, 
+                    `result` = @result, 
+                    `b` = '0', 
+                    `output` = @output, 
+                    `exitcodes` = @exitcodes 
+                WHERE 
+                    `submissionId` = '{submissionId}' 
+                LIMIT 
+                    1
+                ;
+            ";
 
-            //Создаём и инициализируем команду для сервера баз данных MySQL
+            // Создаём и инициализируем команду для сервера баз данных MySQL
             MySqlCommand sendResultCmd = new MySqlCommand(queryUpdate, connection);
 
-            //Устанавливаем значения параметров
+            // Устанавливаем значения параметров
             sendResultCmd.Parameters.AddWithValue("@output", userOutput);
             sendResultCmd.Parameters.AddWithValue("@errorOutput", userErrorOutput);
             sendResultCmd.Parameters.AddWithValue("@result", debugTestingResult);
             sendResultCmd.Parameters.AddWithValue("@exitcodes", userProblemExitCode);
 
-            //Выполняем запрос не требуя ответа
+            // Выполняем запрос не требуя ответа
             sendResultCmd.ExecuteNonQuery();
 
             ///////////////////////////////////////////////////
@@ -740,30 +744,34 @@ namespace SimplePM_Server
             // А ИМЕННО ВЫБОРКА ИЗ БД ТЕСТОВ ЗАДАЧИ
             ///////////////////////////////////////////////////
 
-            //Запрос на выборку всех тестов данной программы из БД
+            // Запрос на выборку всех тестов данной программы из БД
             string querySelect = $@"
                 SELECT 
                     * 
                 FROM 
                     `spm_problems_tests`
                 WHERE 
-                    `problemId` = '{problemId}' 
+                    `problemId` = @problemId 
                 ORDER BY 
                     `id` ASC
                 ;
             ";
 
-            //Дескрипторы временных таблиц выборки из БД
+            // Дескрипторы временных таблиц выборки из БД
             MySqlCommand cmdSelect = new MySqlCommand(querySelect, connection);
+
+            cmdSelect.Parameters.AddWithValue("@problemId", problemId);
+
             MySqlDataReader dataReader = cmdSelect.ExecuteReader();
 
-            //Переменная результата выполнения всех тестов
+            // Переменная результата выполнения всех тестов
             int _problemPassedTests = 0;
 
-            //Объявляем словарь информации о тестах
+            // Объявляем словарь информации о тестах
             Dictionary<int, Dictionary<string, string>> testsInfo = new Dictionary<int, Dictionary<string, string>>();
 
-            //Производим выборку полученных результатов из временной таблицы на сервере MySQL
+            // Производим выборку полученных результатов
+            // из временной таблицы на сервере MySQL
             int i = 1;
 
             while (dataReader.Read())
@@ -771,24 +779,42 @@ namespace SimplePM_Server
 
                 Dictionary<string, string> tmpDict = new Dictionary<string, string>
                 {
+                    {
+                        "testId",
+                        HttpUtility.HtmlDecode(dataReader["id"].ToString())
+                    }, // Идентификатор теста
 
-                    { "testId", HttpUtility.HtmlDecode(dataReader["id"].ToString()) }, //Идентификатор теста
-                    { "input", HttpUtility.HtmlDecode(dataReader["input"].ToString()) }, //Входной поток
-                    { "output", HttpUtility.HtmlDecode(dataReader["output"].ToString()) }, //Выходной поток
-                    { "timeLimit", HttpUtility.HtmlDecode(dataReader["timeLimit"].ToString()) }, //Лимит по времени
-                    { "memoryLimit", HttpUtility.HtmlDecode(dataReader["memoryLimit"].ToString()) } //Лимит по памяти
+                    {
+                        "input",
+                        HttpUtility.HtmlDecode(dataReader["input"].ToString())
+                    }, // Входной поток
+
+                    {
+                        "output",
+                        HttpUtility.HtmlDecode(dataReader["output"].ToString())
+                    }, // Выходной поток
+
+                    {
+                        "timeLimit",
+                        HttpUtility.HtmlDecode(dataReader["timeLimit"].ToString())
+                    }, // Лимит по времени
+
+                    {
+                        "memoryLimit",
+                        HttpUtility.HtmlDecode(dataReader["memoryLimit"].ToString())
+                    } // Лимит по памяти
 
                 };
 
-                //Добавляем в словарь
+                // Добавляем в словарь
                 testsInfo.Add(i, tmpDict);
 
-                //Увеличиваем индекс текущего теста на единицу
+                // Увеличиваем индекс текущего теста на единицу
                 i++;
 
             }
 
-            //Завершаем чтение потока
+            // Завершаем чтение потока
             dataReader.Close();
 
             ///////////////////////////////////////////////////
@@ -796,16 +822,17 @@ namespace SimplePM_Server
             ///////////////////////////////////////////////////
 
             #region PROCESS START INFO CONFIGURATION
-            //Создаём новую конфигурацию запуска процесса
+
+            // Создаём новую конфигурацию запуска процесса
             ProcessStartInfo startInfo = new ProcessStartInfo()
             {
 
-                //Перенаправляем потоки
+                // Перенаправляем потоки
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
 
-                //Запрещаем исполнение приложения в графическом режиме
+                // Запрещаем исполнение приложения в графическом режиме
                 ErrorDialog = false,
                 UseShellExecute = false,
                 CreateNoWindow = true,
@@ -813,7 +840,7 @@ namespace SimplePM_Server
 
             };
 
-            //Устанавливаем информацию о запускаемом файле
+            // Устанавливаем информацию о запускаемом файле
             SetExecInfoByFileExt(ref startInfo);
 
             #endregion
@@ -822,23 +849,23 @@ namespace SimplePM_Server
             // РЕГИОН ТЕСТИРОВАНИЯ ПОЛЬЗОВАТЕЛЬСКОЙ ПРОГРАММЫ
             ///////////////////////////////////////////////////
 
-            //Объявление необходимых переменных для тестирования
-            //пользовательской программы
-            //ulong testId; //идентификатор теста
-            string input, output; //входной и выходной потоки теста
-            int timeLimit; //лимит времени теста
-            long memoryLimit; //лимит памяти теста
-            string standartErrorOutputText = null; //переменная стандартного потока ошибок
-            string _exitcodes = "|"; //переменная кодов выхода
+            // Объявление необходимых переменных для тестирования
+            // пользовательской программы
+            // ulong testId; // идентификатор теста
+            string input, output; // входной и выходной потоки теста
+            int timeLimit; // лимит времени теста
+            long memoryLimit; // лимит памяти теста
+            string standartErrorOutputText = null; // переменная стандартного потока ошибок
+            string _exitcodes = "|"; // переменная кодов выхода
             long exitcodesSum = 0;
-            bool preResultGiven = false; //служебная переменная для определения предопределённого результата
-            string[] testingResults = new string[testsInfo.Count]; //переменная, хранящая информацию о пройденных тестах
+            bool preResultGiven = false; // служебная переменная для определения предопределённого результата
+            string[] testingResults = new string[testsInfo.Count]; // переменная, хранящая информацию о пройденных тестах
 
             for (i = 1; i <= testsInfo.Count; i++)
             {
 
-                //Присвоение переменных данных теста для быстрого доступа
-                //testId = ulong.Parse(testsInfo[i]["testId"]);
+                // Присвоение переменных данных теста для быстрого доступа
+                // testId = ulong.Parse(testsInfo[i]["testId"]);
                 input = testsInfo[i]["input"];
                 output = testsInfo[i]["output"].Replace("\r\n", "\n");
                 timeLimit = int.Parse(testsInfo[i]["timeLimit"]);
@@ -846,16 +873,16 @@ namespace SimplePM_Server
                 preResultGiven = false;
                 testingResults[i - 1] = null;
 
-                //Объявляем дескриптор процесса
+                // Объявляем дескриптор процесса
                 Process problemProc = new Process()
                 {
-                    //Указываем интересующую нас конфигурацию тестирования
+                    // Указываем интересующую нас конфигурацию тестирования
                     StartInfo = startInfo
                 };
 
-                //Вызываем функцию управления, которая указывает,
-                //от имени какого пользователя стоит запускать
-                //пользовательский процесс.
+                // Вызываем функцию управления, которая указывает,
+                // от имени какого пользователя стоит запускать
+                // пользовательский процесс.
                 SetProcessRunAs(ref problemProc);
 
                 ///////////////////////////////////////////////////
@@ -865,25 +892,27 @@ namespace SimplePM_Server
                 try
                 {
 
-                    //Запускаем процесс
+                    // Запускаем процесс
                     problemProc.Start();
 
-                    //Устанавливаем наивысший приоритет процесса
+                    // Устанавливаем наивысший приоритет процесса
                     problemProc.PriorityClass = ProcessPriorityClass.Normal;
 
-                    //Инъекция входного потока
-                    problemProc.StandardInput.WriteLine(input); //добавляем текст во входной поток
-                    problemProc.StandardInput.Flush(); //производим запись во входной поток и последующую очистку буфера
-                    problemProc.StandardInput.Close(); //закрываем запись входного потока
+                    // Инъекция входного потока
+                    problemProc.StandardInput.WriteLine(input); // добавляем текст во входной поток
+                    problemProc.StandardInput.Flush(); // производим запись во входной поток и последующую очистку буфера
+                    problemProc.StandardInput.Close(); // закрываем запись входного потока
 
                 }
                 catch (Exception ex)
                 {
                     
-                    //Произошла ошибка при выполнении программы.
-                    //Виноват, как всегда, компилятор!
+                    // Произошла ошибка при выполнении программы.
+                    // Виноват, как всегда, компилятор!
+
                     testingResults[i-1] = "C";
                     preResultGiven = true;
+
                     logger.Error(ex);
 
                 }
@@ -895,29 +924,32 @@ namespace SimplePM_Server
                 new Task(() =>
                 {
 
-                    //Для обеспечения безопасности
+                    // Для обеспечения безопасности
                     try
                     {
                         while (!problemProc.HasExited)
                         {
-                            //Очищаем кеш и получаем обновлённые значения
+                            // Очищаем кеш и получаем обновлённые значения
                             problemProc.Refresh();
 
-                            //Проверка на превышение лимита памяти
+                            // Проверка на превышение лимита памяти
                             if (problemProc.PeakWorkingSet64 <= memoryLimit) continue;
 
-                            //Очищаем кеш и получаем обновлённые значения
+                            // Очищаем кеш и получаем обновлённые значения
                             problemProc.Refresh();
 
-                            //Лимит памяти превышен
-                            problemProc.Kill(); //завершаем работу процесса в принудительном порядке
+                            // Лимит памяти превышен
+                            problemProc.Kill(); // завершаем работу процесса в принудительном порядке
 
-                            testingResults[i - 1] = "M"; //устанавливаем преждевременный результат тестирования
-                            preResultGiven = true; //указываем, что выдали преждевременный результат тестирования
+                            testingResults[i - 1] = "M"; // устанавливаем преждевременный результат тестирования
+                            preResultGiven = true; // указываем, что выдали преждевременный результат тестирования
 
                         }
                     }
-                    catch (Exception) { }
+                    catch (Exception)
+                    {
+                        /* Deal with it */
+                    }
 
                 }).Start();
 
@@ -928,79 +960,94 @@ namespace SimplePM_Server
                 void OnProcessorTimeLimit()
                 {
 
-                    //Убиваем процесс
+                    // Убиваем процесс
                     problemProc.Kill();
 
-                    //Предварительный результат появился
+                    // Предварительный результат появился
                     preResultGiven = true;
 
-                    //Временной лимит превышен
+                    // Временной лимит превышен
                     testingResults[i - 1] = "T";
 
                 }
 
                 ProcessorTimeLimitCheck(problemProc, OnProcessorTimeLimit, timeLimit);
+
                 ///////////////////////////////////////////////////
                 // ОЖИДАНИЕ ЗАВЕРШЕНИЯ ПОЛЬЗОВАТЕЛЬСКОЙ ПРОГРАММЫ
                 ///////////////////////////////////////////////////
 
-                //Проверка на досрочный результат проверки
+                // Проверка на досрочный результат проверки
                 if (!preResultGiven)
                 {
 
-                    //Ждём завершения, максимум X миллимекунд
+                    // Ждём завершения, максимум X миллимекунд
                     if (!problemProc.WaitForExit(int.Parse(sConfig["UserProc"]["maxProcessTime"])))
                     {
 
-                        //Процесс не завершил свою работу
-                        //Исключение: времени не хватило!
+                        // Процесс не завершил свою работу
+                        // Исключение: времени не хватило!
                         problemProc.Kill();
 
-                        //Методом научного тыка было выявлено, что необходимо 10 мс чтобы программа
-                        //корректно завершила свою работу
+                        // Методом научного тыка было выявлено, что необходимо 10 мс чтобы программа
+                        // корректно завершила свою работу
                         Thread.Sleep(10);
 
-                        //Устанавливаем результат теста
+                        // Устанавливаем результат теста
                         testingResults[i - 1] = "T";
 
                     }
                     else
                     {
 
-                        //Проверка на "вшивость"
+                        // Проверка на "вшивость"
                         string currentErrors = problemProc.StandardError.ReadToEnd();
                         problemProc.StandardError.Close();
 
-                        //Добавляем ошибки текущего теста в список всех ошибок
+                        // Добавляем ошибки текущего теста в список всех ошибок
                         if (currentErrors.Length > 0)
                             standartErrorOutputText += currentErrors + '\n';
 
                         if (currentErrors.Length > 0)
                         {
-                            //Ошибка при тесте!
+
+                            // Ошибка при тесте!
                             testingResults[i - 1] = "E";
+
                         }
                         else
                         {
 
                             /* Ошибок при тесте не выявлено, но вы держитесь! */
 
-                            //Читаем выходной поток приложения
-                            string pOut = GetNormalizedOutputText(problemProc.StandardOutput);
+                            // Объявляем переменную, которая будет хранить
+                            // полученные выходные данные пользовательского
+                            // решения поставленной задачи
+                            string pOut = "";
 
-                            //Устанавливаем результат прохождения теста
-                            //(если, конечно, уже не вынесен предварительный результат)
+                            // Читаем выходной поток приложения
+                            try
+                            {
+                                pOut = GetNormalizedOutputText(problemProc.StandardOutput);
+                            }
+                            catch (Exception)
+                            {
+                                testingResults[i - 1] = "O";
+                            }
+
+                            // Устанавливаем результат прохождения теста
+                            // (если, конечно, уже не вынесен предварительный результат)
                             if (testingResults[i - 1] == null)
                             {
 
-                                if (problemProc.ExitCode != 0) //код выхода не нуль
+                                if (problemProc.ExitCode != 0) // код выхода не нуль
                                     testingResults[i - 1] = "R";
-                                else if (output == pOut) //выходные потоки равны
+                                else if (output == pOut) // выходные потоки равны
                                 {
                                     testingResults[i - 1] = "+";
                                     _problemPassedTests++;
                                 }
-                                else //тест не пройден
+                                else // тест не пройден
                                     testingResults[i - 1] = "-";
 
                             }
@@ -1009,12 +1056,12 @@ namespace SimplePM_Server
 
                     }
 
-                    //Добавляем конечную палку для правильности
-                    //последующих парсингов
+                    // Добавляем конечную палку для правильности
+                    // последующих парсингов
                     _exitcodes += problemProc.ExitCode + "|";
 
-                    //Вычисляем сумму абсолютных значений кодов выхода
-                    //для последующей проверки на ошибочность решения
+                    // Вычисляем сумму абсолютных значений кодов выхода
+                    // для последующей проверки на ошибочность решения
 
                     exitcodesSum += Math.Abs(problemProc.ExitCode);
 
@@ -1028,7 +1075,10 @@ namespace SimplePM_Server
                 {
                     problemProc.Kill();
                 }
-                catch (Exception) {  }
+                catch (Exception)
+                {
+                    /* Deal with it */
+                }
 
             }
 
@@ -1036,27 +1086,27 @@ namespace SimplePM_Server
             // ГЕНЕРИРУЕМ РЕЗУЛЬТАТЫ ТЕСТИРОВАНИЯ
             ///////////////////////////////////////////////////
 
-            //Объявляем переменную численного результата тестирования
+            // Объявляем переменную численного результата тестирования
             float _bResult;
 
             try
             {
 
-                //Тестов нет, но вы держитесь!
+                // Тестов нет, но вы держитесь!
                 if (testsInfo.Count <= 0)
                 {
                     testingResults = new[] {"C"};
                     _problemPassedTests = 0;
                 }
 
-                //Вычисляем полученный балл за решение задачи
-                //на основе количества пройденных тестов
+                // Вычисляем полученный балл за решение задачи
+                // на основе количества пройденных тестов
 
                 int testsCount = (testsInfo.Count == 0 ? 1 : testsInfo.Count);
 
-                //Вычисляем зачисляемые за решение задачи
-                //баллы, метод вычисления выбираем в
-                //зависимости от типа запроса
+                // Вычисляем зачисляемые за решение задачи
+                // баллы, метод вычисления выбираем в
+                // зависимости от типа запроса
 
                 if (exitcodesSum == 0)
                 {
@@ -1072,9 +1122,9 @@ namespace SimplePM_Server
             catch (Exception)
             {
 
-                //Устанавливаем полученные пользователем баллы
+                // Устанавливаем полученные пользователем баллы
                 _bResult = 0;
-                //Устанавливаем результаты тестирования
+                // Устанавливаем результаты тестирования
                 testingResults = new[] { "-" };
 
             }
@@ -1098,15 +1148,18 @@ namespace SimplePM_Server
                     1
                 ;
             ";
-            //Создаём запрос к базе данных MySql
+
+            // Создаём запрос к базе данных MySql
             MySqlCommand cmdUpd = new MySqlCommand(queryUpdate, connection);
-            //Безопасно добавляем отправляемые данные
+
+            // Безопасно добавляем отправляемые данные
             cmdUpd.Parameters.AddWithValue("@errorOutput", standartErrorOutputText);
             cmdUpd.Parameters.AddWithValue("@result", string.Join("", testingResults));
             cmdUpd.Parameters.AddWithValue("@exitcodes", _exitcodes);
             cmdUpd.Parameters.AddWithValue("@b", _bResult);
             cmdUpd.Parameters.AddWithValue("@submId", submissionId.ToString());
-            //Выполняем запрос
+
+            // Выполняем запрос
             cmdUpd.ExecuteNonQuery();
 
             ///////////////////////////////////////////////////
@@ -1114,91 +1167,57 @@ namespace SimplePM_Server
             ///////////////////////////////////////////////////
 
             #region Установка авторского решения
-
-            //Составляем SQL запрос на выборку из записи запроса на проверку 
-            querySelect = $@"
-                SELECT 
-                    `setAsAuthorSolution` 
-                FROM 
-                    `spm_submissions` 
-                WHERE 
-                    `submissionId` = '{submissionId}' 
-                LIMIT 
-                    1
-                ;
-            ";
-
-            //Получаем результат выполнения запроса
-            bool setAsAuthorSolution = Convert.ToBoolean(new MySqlCommand(querySelect, connection).ExecuteScalar());
-
-            //Проверка на запрос установить ткущее решение как авторское
-            if (setAsAuthorSolution)
+            
+            // Проверка на запрос установить ткущее решение как авторское
+            if (submissionInfo["setAsAuthorSolution"] == "1")
             {
 
-                //Составляем запрос на выборку из БД решения задачи и язык её решения по текущей попытке
-                querySelect = $@"
-                    SELECT 
-                        `problemCode`, 
-                        `codeLang` 
-                    FROM 
-                        `spm_submissions` 
-                    WHERE 
-                        `submissionId` = '{submissionId}' 
-                    LIMIT 
-                        1
-                    ;
-                ";
-
-                //Получаем результат выполнения запроса
-                dataReader = new MySqlCommand(querySelect, connection).ExecuteReader();
-
-                if (dataReader.Read())
+                try
                 {
 
-                    try
-                    {
+                    // Исходный код авторского решения
+                    string problemCode = submissionInfo["problemCode"];
 
-                        //Исходный код авторского решения
-                        string problemCode = dataReader["problemCode"].ToString();
-                        //Язык написания авторского решения
-                        string problemLang = dataReader["codeLang"].ToString();
-                        
-                        //Закрываем соединение с базой данных (временное).
-                        //Временные таблицы, расположенные на MySQL сервере, при этом удаляются.
-                        dataReader.Close();
+                    // Язык написания авторского решения
+                    string problemLang = submissionInfo["codeLang"];
 
-                        //Формируем запрос на добавление/обновление авторского
-                        //решения для данной задачи.
+                    // Закрываем соединение с базой данных (временное).
+                    // Временные таблицы, расположенные на MySQL сервере, при этом удаляются.
+                    dataReader.Close();
 
-                        queryUpdate = $@"
+                    // Формируем запрос на добавление/обновление авторского
+                    // решения для данной задачи.
+                    queryUpdate = $@"
                             INSERT INTO 
                                 `spm_problems_ready` 
                             SET 
-                                `problemId` = '{problemId}', 
-                                `codeLang` = '{problemLang}', 
+                                `problemId` = @problemId, 
+                                `codeLang` = @problemLang, 
                                 `code` = @problemCode 
                             ON DUPLICATE KEY UPDATE 
-                                `codeLang` = '{problemLang}', 
+                                `codeLang` = @problemLang, 
                                 `code` = @problemCode
                             ;
                         ";
 
-                        //Создаём запрос
-                        MySqlCommand insertCmd = new MySqlCommand(queryUpdate, connection);
+                    // Создаём запрос
+                    MySqlCommand insertCmd = new MySqlCommand(queryUpdate, connection);
 
-                        //Добавляем параметры, которые требуется эскейпить
-                        insertCmd.Parameters.AddWithValue("@problemCode", problemCode);
+                    // Добавляем параметры, которые требуется эскейпить
+                    insertCmd.Parameters.AddWithValue("@problemId", problemId);
+                    insertCmd.Parameters.AddWithValue("@problemLang", problemLang);
+                    insertCmd.Parameters.AddWithValue("@problemCode", problemCode);
 
-                        //Выполняем запрос к базе данных на добавление/обновление
-                        //авторского решения для данной задачи.
-                        insertCmd.ExecuteNonQuery();
-
-                    }
-                    catch (Exception) { }
+                    // Выполняем запрос к базе данных на добавление/обновление
+                    // авторского решения для данной задачи.
+                    insertCmd.ExecuteNonQuery();
 
                 }
-                else
-                    dataReader.Close(); // для безопасности разрываем соединение читателя с БД
+                catch (Exception)
+                {
+                    /* Deal with it */
+                }
+
             }
 
             #endregion
@@ -1210,16 +1229,20 @@ namespace SimplePM_Server
             try
             {
 
-                //Обновляем количество баллов и рейтинг пользователя
-                //для этого вызываем пользовательские процедуры mysql,
-                //созданные как раз для этих нужд
-                //P.S. но делаем это в том случае, если попытка была
-                //произведена не во время олимпиады и не во время урока
+                // Обновляем количество баллов и рейтинг пользователя
+                // для этого вызываем пользовательские процедуры mysql,
+                // созданные как раз для этих нужд
+                // P.S. но делаем это в том случае, если попытка была
+                // произведена не во время олимпиады и не во время урока
                 if (ulong.Parse(submissionInfo["classworkId"]) == 0 && ulong.Parse(submissionInfo["olympId"]) == 0)
-                    new MySqlCommand($"CALL updateBCount({userId}); CALL updateRating({userId})", connection).ExecuteNonQuery();
+                    new MySqlCommand($"CALL updateBCount({userId}); CALL updateRating({userId})", connection)
+                        .ExecuteNonQuery();
 
             }
-            catch (Exception) {  }
+            catch (Exception)
+            {
+                /* Deal with it */
+            }
 
             ///////////////////////////////////////////////////
             
