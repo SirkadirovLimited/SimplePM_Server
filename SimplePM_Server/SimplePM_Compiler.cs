@@ -111,7 +111,7 @@ namespace SimplePM_Server
             {
                 return new CompilerResult
                 {
-                    HasErrors = true, //Хьюстон, у нас проблема!
+                    HasErrors = true, // Хьюстон, у нас проблема!
                     CompilerMessage = "Language not supported by SimplePM!"
                 };
             }
