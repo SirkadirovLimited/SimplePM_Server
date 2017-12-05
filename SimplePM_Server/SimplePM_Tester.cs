@@ -514,7 +514,7 @@ namespace SimplePM_Server
             // Если процесс не завершил свою работу - убиваем его
             if (!authorProblemProc.WaitForExit(int.Parse(sConfig["UserProc"]["maxProcessTime"])))
                 authorProblemProc.Kill();
-
+            
             try
             {
                 // Получаем обработанный выходной поток авторского решения
@@ -645,6 +645,8 @@ namespace SimplePM_Server
                     debugTestingResult = 'T';
                     userOutput = "--- PROGRAM TIME LIMIT ---";
                 }
+
+                //Console.WriteLine(userProblemProc.TotalProcessorTime);
 
                 // Если всё хорошо, получаем обработанный выходной поток пользовательского решения
                 // но только в случае, когда приложение завершило свою работу самопроизвольно.
