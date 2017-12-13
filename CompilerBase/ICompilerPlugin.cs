@@ -28,6 +28,10 @@ namespace CompilerBase
     public interface ICompilerPlugin
     {
 
+        ///////////////////////////////////////////////////
+        /// Раздел описания важных констант
+        ///////////////////////////////////////////////////
+
         string CompilerPluginLanguageName { get; } //!< Имя языка программирования, поддержка которого осуществляется модулем
         string CompilerPluginLanguageExt { get; } //!< Расширение файла исходного кода языка программирования, поддержка которого осуществляется модулем
         string CompilerPluginDisplayName { get; } //!< Отображаемое имя модуля
