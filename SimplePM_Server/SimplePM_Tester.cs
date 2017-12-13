@@ -1112,10 +1112,12 @@ namespace SimplePM_Server
 
                 if (exitcodesSum == 0)
                 {
+
                     if (ulong.Parse(submissionInfo["olympId"]) > 0)
                         _bResult = (float) _problemPassedTests / testsCount * problemDifficulty;
                     else
                         _bResult = _problemPassedTests == testsCount ? problemDifficulty : 0;
+
                 }
                 else
                     _bResult = 0;
@@ -1126,6 +1128,7 @@ namespace SimplePM_Server
 
                 // Устанавливаем полученные пользователем баллы
                 _bResult = 0;
+
                 // Устанавливаем результаты тестирования
                 testingResults = new[] { "-" };
 
@@ -1163,67 +1166,7 @@ namespace SimplePM_Server
 
             // Выполняем запрос
             cmdUpd.ExecuteNonQuery();
-
-            ///////////////////////////////////////////////////
-            // УСТАНОВКА АВТОРСКОГО РЕШЕНИЯ (ПО ТРЕБОВАНИЮ)
-            ///////////////////////////////////////////////////
-
-            #region Установка авторского решения
             
-            // Проверка на запрос установить ткущее решение как авторское
-            if (submissionInfo["setAsAuthorSolution"] == "1")
-            {
-
-                try
-                {
-
-                    // Исходный код авторского решения
-                    string problemCode = submissionInfo["problemCode"];
-
-                    // Язык написания авторского решения
-                    string problemLang = submissionInfo["codeLang"];
-
-                    // Закрываем соединение с базой данных (временное).
-                    // Временные таблицы, расположенные на MySQL сервере, при этом удаляются.
-                    dataReader.Close();
-
-                    // Формируем запрос на добавление/обновление авторского
-                    // решения для данной задачи.
-                    queryUpdate = $@"
-                            INSERT INTO 
-                                `spm_problems_ready` 
-                            SET 
-                                `problemId` = @problemId, 
-                                `codeLang` = @problemLang, 
-                                `code` = @problemCode 
-                            ON DUPLICATE KEY UPDATE 
-                                `codeLang` = @problemLang, 
-                                `code` = @problemCode
-                            ;
-                        ";
-
-                    // Создаём запрос
-                    MySqlCommand insertCmd = new MySqlCommand(queryUpdate, connection);
-
-                    // Добавляем параметры, которые требуется эскейпить
-                    insertCmd.Parameters.AddWithValue("@problemId", problemId);
-                    insertCmd.Parameters.AddWithValue("@problemLang", problemLang);
-                    insertCmd.Parameters.AddWithValue("@problemCode", problemCode);
-
-                    // Выполняем запрос к базе данных на добавление/обновление
-                    // авторского решения для данной задачи.
-                    insertCmd.ExecuteNonQuery();
-
-                }
-                catch (Exception)
-                {
-                    /* Deal with it */
-                }
-
-            }
-
-            #endregion
-
             ///////////////////////////////////////////////////
             // РЕГИОН ГЕНЕРАЦИИ РЕЙТИНГА ПОЛЬЗОВАТЕЛЯ
             ///////////////////////////////////////////////////
