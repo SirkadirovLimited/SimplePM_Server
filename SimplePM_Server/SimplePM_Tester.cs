@@ -59,12 +59,12 @@ namespace SimplePM_Server
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private readonly MySqlConnection connection; //!< Дескриптор соединения с БД
-        private readonly Dictionary<string, string> submissionInfo; //!< Информация о запросе на проверку
+        private readonly SubmissionInfo submissionInfo; //!< Информация о запросе на проверку
         private readonly string exeFileUrl; //!< Полный путь к исполняемому файлу
         private readonly string customTestInput; //!< Кастомный тест, введённый пользователем
-        private readonly ulong problemId; //!< Идентификатор задачи
-        private readonly ulong submissionId; //!< Идентификатор запроса на компиляцию
-        private readonly ulong userId; //!< Идентификатор пользователя
+        private readonly int problemId; //!< Идентификатор задачи
+        private readonly int submissionId; //!< Идентификатор запроса на компиляцию
+        private readonly int userId; //!< Идентификатор пользователя
         private readonly float problemDifficulty; //!<  Сложность задачи
         private IniData sConfig; //!<  Дескриптор конфигурационного файла сервера
         private List<ICompilerPlugin> _compilerPlugins; //!< Список загруженных модулей компиляторв
@@ -74,7 +74,7 @@ namespace SimplePM_Server
         /// пользовательских решений задач
         ///////////////////////////////////////////////////
 
-        public SimplePM_Tester(ref MySqlConnection connection, ref List<ICompilerPlugin> _compilerPlugins, ref string exeFileUrl, ref Dictionary<string, string> submissionInfo, ref IniData sConfig)
+        public SimplePM_Tester(ref MySqlConnection connection, ref List<ICompilerPlugin> _compilerPlugins, ref string exeFileUrl, ref SubmissionInfo submissionInfo, ref IniData sConfig)
         {
 
             // Database connection
@@ -90,22 +90,22 @@ namespace SimplePM_Server
             this.submissionInfo = submissionInfo;
 
             // Problem ID
-            problemId = ulong.Parse(submissionInfo["problemId"]);
+            problemId = submissionInfo.ProblemId;
 
             // Submission ID
-            submissionId = ulong.Parse(submissionInfo["submissionId"]);
+            submissionId = submissionInfo.SubmissionId;
 
             // Problem difficulty
-            problemDifficulty = float.Parse(submissionInfo["difficulty"]);
+            problemDifficulty = submissionInfo.ProblemDifficulty;
 
             // User ID
-            userId = ulong.Parse(submissionInfo["userId"]);
+            userId = submissionInfo.UserId;
 
             // Configuration file reader pointer
             this.sConfig = sConfig;
 
             // Custom test checker
-            customTestInput = submissionInfo.ContainsKey("customTest") ? submissionInfo["customTest"] : null;
+            customTestInput = submissionInfo.CustomTest;
 
         }
 
@@ -185,7 +185,7 @@ namespace SimplePM_Server
 
             // Проверяем язык решения задачи
             if (codeLanguage == "unset")
-                codeLanguage = submissionInfo["codeLang"];
+                codeLanguage = submissionInfo.CodeLang;
 
             // Вызываем ассоциированный метод, который знает лучше, как это делать
             bool f = SimplePM_Compiler.GetCompPluginByProgLangName(
@@ -330,7 +330,7 @@ namespace SimplePM_Server
             MySqlDataReader dataReader = cmdSelect.ExecuteReader();
             
             // Объявляем необходимые переменные
-            string authorProblemCode = null;
+            byte[] authorProblemCode = null;
             string authorProblemCodeLanguage = "unset";
 
             // Читаем полученные данные
@@ -338,7 +338,7 @@ namespace SimplePM_Server
             {
 
                 // Исходный код авторского решения
-                authorProblemCode = dataReader["code"].ToString();
+                authorProblemCode = (byte[])dataReader["code"];
 
                 // Язык авторского решения
                 authorProblemCodeLanguage = dataReader["codeLang"].ToString();
@@ -349,7 +349,7 @@ namespace SimplePM_Server
             dataReader.Close();
 
             /* ===== Проверка на наличие авторского решения задачи ==== */
-            if (authorProblemCode == null || authorProblemCodeLanguage == "unset")
+            if (authorProblemCode.Length == 0 || authorProblemCode == null || authorProblemCodeLanguage == "unset")
                 throw new SimplePM_Exceptions.AuthorSolutionNotFoundException();
 
             #region ПРОВЕРКА РЕШЕНИЯ
@@ -371,7 +371,7 @@ namespace SimplePM_Server
             string tmpAuthorSrcLocation = tmpAuthorDir + "sa" + submissionId + authorFileExt;
 
             // Записываем исходный код авторского решения в заданный временный файл
-            File.WriteAllText(tmpAuthorSrcLocation, authorProblemCode, Encoding.UTF8);
+            File.WriteAllBytes(tmpAuthorSrcLocation, authorProblemCode);
 
             // Устанавливаем его аттрибуты
             File.SetAttributes(tmpAuthorSrcLocation, FileAttributes.Temporary | FileAttributes.NotContentIndexed);
@@ -1113,7 +1113,7 @@ namespace SimplePM_Server
                 if (exitcodesSum == 0)
                 {
 
-                    if (ulong.Parse(submissionInfo["olympId"]) > 0)
+                    if (submissionInfo.OlympId > 0)
                         _bResult = (float) _problemPassedTests / testsCount * problemDifficulty;
                     else
                         _bResult = _problemPassedTests == testsCount ? problemDifficulty : 0;
@@ -1179,7 +1179,7 @@ namespace SimplePM_Server
                 // созданные как раз для этих нужд
                 // P.S. но делаем это в том случае, если попытка была
                 // произведена не во время олимпиады и не во время урока
-                if (ulong.Parse(submissionInfo["classworkId"]) == 0 && ulong.Parse(submissionInfo["olympId"]) == 0)
+                if (submissionInfo.ClassworkId == 0 && submissionInfo.OlympId == 0)
                     new MySqlCommand($"CALL updateBCount({userId}); CALL updateRating({userId})", connection)
                         .ExecuteNonQuery();
 

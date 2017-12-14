@@ -49,7 +49,7 @@ namespace SimplePM_Server
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private MySqlConnection connection; //!< Дескриптор соединения с БД
-        private Dictionary<string, string> submissionInfo; //!< Словарь информации о запросе
+        private SimplePM_Submission.SubmissionInfo submissionInfo; //!< Словарь информации о запросе
         private IniData sConfig; //!< Дескриптор конфигурационного файла
         private List<ICompilerPlugin> _compilerPlugins; //!< Список загруженных модулей компиляторв
 
@@ -59,7 +59,7 @@ namespace SimplePM_Server
         /// решения поставленной задачи.
         ///////////////////////////////////////////////////
 
-        public SimplePM_Officiant(MySqlConnection connection, ref IniData sConfig, ref List<ICompilerPlugin> _compilerPlugins, Dictionary<string, string> submissionInfo)
+        public SimplePM_Officiant(MySqlConnection connection, ref IniData sConfig, ref List<ICompilerPlugin> _compilerPlugins, SimplePM_Submission.SubmissionInfo submissionInfo)
         {
 
             // Connection
@@ -113,28 +113,23 @@ namespace SimplePM_Server
             ///////////////////////////////////////////////////
 
             //Определяем расширение файла
-            string fileExt = "." + SimplePM_Submission.GetExtByLang(submissionInfo["codeLang"], ref _compilerPlugins);
+            string fileExt = "." + SimplePM_Submission.GetExtByLang(submissionInfo.CodeLang, ref _compilerPlugins);
             //Определяем полный путь к файлу
-            string fileLocation = RandomGenSourceFileLocation(submissionInfo["submissionId"], fileExt);
-
-            //Создаём файл исходного кода
-            StreamWriter codeWriter = File.CreateText(fileLocation);
+            string fileLocation = RandomGenSourceFileLocation(submissionInfo.SubmissionId.ToString(), fileExt);
             
             //Записываем в него исходный код, очищаем буфер и закрываем поток записи
-            codeWriter.WriteLine(submissionInfo["problemCode"]);
-            codeWriter.Flush();
-            codeWriter.Close();
+            File.WriteAllBytes(fileLocation, submissionInfo.ProblemCode);
 
             //Устанавливаем его аттрибуты
-            File.SetAttributes(fileLocation, FileAttributes.Temporary | FileAttributes.NotContentIndexed);
+            File.SetAttributes(fileLocation, FileAttributes.NotContentIndexed);
 
             //Объявляем экземпляр класса компиляции
             SimplePM_Compiler compiler = new SimplePM_Compiler(
                 ref sConfig,
                 ref _compilerPlugins,
-                submissionInfo["submissionId"],
+                submissionInfo.SubmissionId.ToString(),
                 fileLocation,
-                submissionInfo["codeLang"]
+                submissionInfo.CodeLang
             );
 
             ///////////////////////////////////////////////////
@@ -156,7 +151,7 @@ namespace SimplePM_Server
                 SET 
                     `compiler_text` = '{cResult.CompilerMessage}' 
                 WHERE 
-                    `submissionId` = '{submissionInfo["submissionId"]}' 
+                    `submissionId` = '{submissionInfo.SubmissionId}' 
                 LIMIT 
                     1
                 ;
@@ -179,7 +174,7 @@ namespace SimplePM_Server
                         `status` = 'ready', 
                         `hasError` = true 
                     WHERE 
-                        `submissionId` = '{submissionInfo["submissionId"]}' 
+                        `submissionId` = '{submissionInfo.SubmissionId}' 
                     LIMIT 
                         1
                     ;
@@ -199,7 +194,7 @@ namespace SimplePM_Server
                     // ТИПА ПРОВЕРКИ РЕШЕНИЯ ПОСТАВЛЕННОЙ ЗАДАЧИ
                     ///////////////////////////////////////////////////
 
-                    switch (submissionInfo["testType"])
+                    switch (submissionInfo.TestType)
                     {
                         //Проверка синтаксиса
                         case "syntax":
@@ -210,7 +205,7 @@ namespace SimplePM_Server
                                 SET 
                                     `status` = 'ready' 
                                 WHERE 
-                                    `submissionId` = '{submissionInfo["submissionId"]}' 
+                                    `submissionId` = '{submissionInfo.SubmissionId}' 
                                 LIMIT 
                                     1
                                 ;
@@ -249,7 +244,7 @@ namespace SimplePM_Server
                                         `errorOutput` = 'ERR_AUTHOR_SOLUTION_CRASHED', 
                                         `hasError` = true 
                                     WHERE 
-                                        `submissionId` = '{submissionInfo["submissionId"]}' 
+                                        `submissionId` = '{submissionInfo.SubmissionId}' 
                                     LIMIT 
                                         1
                                     ;
@@ -273,7 +268,7 @@ namespace SimplePM_Server
                                         `errorOutput` = 'ERR_NO_AUTHOR_SOLUTION', 
                                         `hasError` = true 
                                     WHERE 
-                                        `submissionId` = '{submissionInfo["submissionId"]}' 
+                                        `submissionId` = '{submissionInfo.SubmissionId}' 
                                     LIMIT 
                                         1
                                     ;
@@ -285,7 +280,10 @@ namespace SimplePM_Server
                             }
                             catch (Exception ex)
                             {
-                                Console.WriteLine(ex);
+                                
+                                // Логгируем событие
+                                logger.Fatal(ex);
+
                             }
 
                             break;
@@ -328,7 +326,7 @@ namespace SimplePM_Server
                             `errorOutput` = @errorOutput, 
                             `b` = '0'
                         WHERE 
-                            `submissionId` = '{submissionInfo["submissionId"]}' 
+                            `submissionId` = '{submissionInfo.SubmissionId}' 
                         LIMIT 
                             1
                         ;
