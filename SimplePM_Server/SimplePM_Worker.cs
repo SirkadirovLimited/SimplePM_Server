@@ -149,7 +149,7 @@ namespace SimplePM_Server
              */
             foreach (ICompilerPlugin compilerPlugin in _compilerPlugins)
             {
-                
+
                 //Добавляем язык программирования в список
                 EnabledLangsList.Add("'" + compilerPlugin.CompilerPluginLanguageName + "'");
 
@@ -179,7 +179,9 @@ namespace SimplePM_Server
             
             try
             {
+
                 Directory.CreateDirectory("./log/");
+
             }
             catch
             {
@@ -199,7 +201,9 @@ namespace SimplePM_Server
         private void ExceptionEventLogger(object sender, UnhandledExceptionEventArgs e)
         {
 
-            /* Записываем сообщение об ошибке в журнал событий */
+            /*
+             * Записываем сообщение об ошибке в журнал событий
+             **/
             logger.Fatal(e.ExceptionObject);
 
         }
@@ -229,7 +233,9 @@ namespace SimplePM_Server
             // Конфигурируем журнал событий (библиотека NLog)
             try
             {
+
                 LogManager.Configuration = new XmlLoggingConfiguration(sConfig["Program"]["NLogConfig_path"]);
+
             }
             catch
             {
@@ -282,10 +288,7 @@ namespace SimplePM_Server
             // Основной вечный цикл сервера
             ///////////////////////////////////////////////////
 
-            uint rechecksCount = 0; // количество перепроверок без
-
-            //Получаем дескриптор соединения с базой данных
-            MySqlConnection conn = StartMysqlConnection(sConfig);
+            uint rechecksCount = 0; // количество перепроверок без ожидания
 
             while (42 == 42)
             {
@@ -298,7 +301,13 @@ namespace SimplePM_Server
                     // Отлавливаем все ошибки
                     try
                     {
-                        
+
+                        /* Инициализируем новое уникальное
+                         * соединение с базой данных для того,
+                         * чтобы не мешать остальным потокам
+                         */
+                        MySqlConnection conn = StartMysqlConnection(sConfig);
+
                         //Вызов чекера (если всё "хорошо")
                         if (conn != null)
                             GetSubIdAndRunCompile(conn);
@@ -307,11 +316,14 @@ namespace SimplePM_Server
                     // В случае ошибки передаём информацию о ней логгеру событий
                     catch (Exception ex)
                     {
+
                         logger.Error(ex);
+
                     }
 
                 }
 
+                // Проверка
                 bool tmpCheck = rechecksCount >= uint.Parse(sConfig["Connection"]["rechecks_without_timeout"]);
 
                 if (_customersCount < _maxCustomersCount && tmpCheck)
@@ -379,99 +391,105 @@ namespace SimplePM_Server
                     ;
                 ";
 
-                // Объявляем словарь, который будет содержать информацию о запросе
-                Dictionary<string, string> submissionInfo = new Dictionary<string, string>();
+                /*
+                 * Объявляем объект, который будет хранить
+                 * всю информацию об отправке.
+                 **/
+                SimplePM_Submission.SubmissionInfo submissionInfo;
 
-                // Синхронизируем Task-и
+                // Создаём запрос на выборку из базы данных
+                MySqlCommand cmdSelect = new MySqlCommand(querySelect, conn);
+
+                // Производим выборку полученных результатов из временной таблицы
+                MySqlDataReader dataReader = cmdSelect.ExecuteReader();
+
+                bool f = false;
+
                 lock (new object())
                 {
 
-                    // Создаём запрос на выборку из базы данных
-                    MySqlCommand cmdSelect = new MySqlCommand(querySelect, conn);
-
-                    // Производим выборку полученных результатов из временной таблицы
-                    MySqlDataReader dataReader = cmdSelect.ExecuteReader();
-
-                    // Проверка на пустоту полученного результата
-                    if (_customersCount >= _maxCustomersCount | !dataReader.Read())
-                    {
-
-                        // Закрываем чтение пустой временной таблицы
-                        dataReader.Close();
-
-                        // Завершем работу таски
-                        return;
-
-                    }
-
-                    /* 
-                     * Запускаем секундомер для того,
-                     * чтобы определить время, за которое
-                     * запрос на проверку обрабатывается
-                     * сервером проверки решений задач
-                     */
-                    sw = Stopwatch.StartNew();
-
-                    // Увеличиваем количество текущих соединений
-                    lock (new object())
-                    {
-                        _customersCount++;
-                    }
-
-                    // Производим чтение полученных данных
-                    submissionInfo["submissionId"] = dataReader["submissionId"].ToString(); // идентификатор
-                    submissionInfo["classworkId"] = dataReader["classworkId"].ToString(); // идентификатор урока
-                    submissionInfo["olympId"] = dataReader["olympId"].ToString(); // идентификатор олимпиады
-                    submissionInfo["codeLang"] = dataReader["codeLang"].ToString(); // язык исходного кода
-                    submissionInfo["userId"] = dataReader["userId"].ToString(); // идентификатор пользователя
-                    submissionInfo["problemId"] = dataReader["problemId"].ToString(); // идентификатор задачи
-                    submissionInfo["testType"] = dataReader["testType"].ToString(); // тип теста
-                    submissionInfo["problemCode"] = HttpUtility.HtmlDecode(dataReader["problemCode"].ToString()); // код программы
-                    submissionInfo["customTest"] = HttpUtility.HtmlDecode(dataReader["customTest"].ToString()); // собственный тест пользователя
-                    submissionInfo["setAsAuthorSolution"] = HttpUtility.HtmlDecode(dataReader["setAsAuthorSolution"].ToString()); // собственный тест пользователя
-
-                    // Закрываем чтение временной таблицы
-                    dataReader.Close();
-
-                    // Устанавливаем статус запроса на "в обработке"
-                    string queryUpdate = $@"
-                        UPDATE 
-                            `spm_submissions` 
-                        SET 
-                            `status` = 'processing' 
-                        WHERE 
-                            `submissionId` = '{submissionInfo["submissionId"]}'
-                        LIMIT 
-                            1
-                        ;
-                    ";
-
-                    // Выполняем запрос к базе данных
-                    new MySqlCommand(queryUpdate, conn).ExecuteNonQuery();
+                    f = _customersCount >= _maxCustomersCount | !dataReader.Read();
 
                 }
-                
-                /* Инициализируем новое уникальное
-                 * соединение с базой данных для того,
-                 * чтобы не мешать остальным потокам
+
+                // Проверка на пустоту полученного результата
+                if (f)
+                {
+
+                    // Закрываем чтение пустой временной таблицы
+                    dataReader.Close();
+
+                    // Завершем работу таски
+                    return;
+
+                }
+
+                /* 
+                 * Запускаем секундомер для того,
+                 * чтобы определить время, за которое
+                 * запрос на проверку обрабатывается
+                 * сервером проверки решений задач
                  */
-                MySqlConnection connection = StartMysqlConnection(sConfig);
+                sw = Stopwatch.StartNew();
+
+                // Увеличиваем количество текущих соединений
+                lock (new object())
+                {
+
+                    _customersCount++;
+                    
+                }
+
+                /*
+                 * Производим чтение полученных данных
+                 **/
+                submissionInfo = new SimplePM_Submission.SubmissionInfo
+                (
+                    int.Parse(dataReader["submissionId"].ToString()),
+                    int.Parse(dataReader["userId"].ToString()),
+                    int.Parse(dataReader["problemId"].ToString()),
+                    int.Parse(dataReader["classworkId"].ToString()),
+                    int.Parse(dataReader["olympId"].ToString()),
+                    dataReader["codeLang"].ToString(),
+                    dataReader["testType"].ToString(),
+                    HttpUtility.HtmlDecode(dataReader["customTest"].ToString()),
+                    (byte[])dataReader["problemCode"]
+                );
+                
+                // Закрываем чтение временной таблицы
+                dataReader.Close();
+
+                // Устанавливаем статус запроса на "в обработке"
+                string queryUpdate = $@"
+                    UPDATE 
+                        `spm_submissions` 
+                    SET 
+                        `status` = 'processing' 
+                    WHERE 
+                        `submissionId` = '{submissionInfo.SubmissionId}'
+                    LIMIT 
+                        1
+                    ;
+                ";
+
+                // Выполняем запрос к базе данных
+                new MySqlCommand(queryUpdate, conn).ExecuteNonQuery();
 
                 // Получаем сложность поставленной задачи
                 string queryGetDifficulty = $@"
-                        SELECT 
-                            `difficulty` 
-                        FROM 
-                            `spm_problems` 
-                        WHERE 
-                            `id` = '{submissionInfo["problemId"]}' 
-                        LIMIT 
-                            1
-                        ;
-                    ";
+                    SELECT 
+                        `difficulty` 
+                    FROM 
+                        `spm_problems` 
+                    WHERE 
+                        `id` = '{submissionInfo.ProblemId}' 
+                    LIMIT 
+                        1
+                    ;
+                ";
 
-                MySqlCommand cmdGetProblemDifficulty = new MySqlCommand(queryGetDifficulty, connection);
-                submissionInfo["difficulty"] = cmdGetProblemDifficulty.ExecuteScalar().ToString();
+                MySqlCommand cmdGetProblemDifficulty = new MySqlCommand(queryGetDifficulty, conn);
+                submissionInfo.ProblemDifficulty = int.Parse(cmdGetProblemDifficulty.ExecuteScalar().ToString());
                 
                 /*
                  * Зовём официанта-шляпочника
@@ -479,12 +497,11 @@ namespace SimplePM_Server
                  * вот неожиданных ситуациях
                  */
                 new SimplePM_Officiant(
-                    connection,
+                    conn,
                     ref sConfig,
                     ref _compilerPlugins,
                     submissionInfo
                 ).ServeSubmission();
-
                 /*
                  * Уменьшаем количество текущих соединений
                  * чтобы другие соединения были возможны.
@@ -495,14 +512,14 @@ namespace SimplePM_Server
                 }
 
                 // Закрываем соединение с БД
-                connection.Close();
+                conn.Close();
 
                 /*
                  * Останавливаем секундомер и записываем
                  * полученное значение в Debug log поток
                  */
                 sw.Stop();
-
+                
                 //Console.WriteLine(sw.ElapsedMilliseconds);
 
             }).Start();
@@ -542,9 +559,13 @@ namespace SimplePM_Server
                 db.Open();
 
             }
-            catch (MySqlException)
+            catch (MySqlException ex)
             {
+                
+
+                Console.WriteLine(ex);
                 /* Deal with it */
+
             }
 
             //Возвращаем дескриптор подключения к базе данных
