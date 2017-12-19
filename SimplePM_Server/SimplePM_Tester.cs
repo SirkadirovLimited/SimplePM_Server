@@ -46,7 +46,7 @@ namespace SimplePM_Server
      * задач по программированию
      */
 
-    internal class SimplePM_Tester
+    internal class SimplePM_Tester2
     {
         ///////////////////////////////////////////////////
         // РАЗДЕЛ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ
@@ -74,7 +74,7 @@ namespace SimplePM_Server
         /// пользовательских решений задач
         ///////////////////////////////////////////////////
 
-        public SimplePM_Tester(ref MySqlConnection connection, ref List<ICompilerPlugin> _compilerPlugins, ref string exeFileUrl, ref SubmissionInfo submissionInfo, ref IniData sConfig)
+        public SimplePM_Tester2(ref MySqlConnection connection, ref List<ICompilerPlugin> _compilerPlugins, ref string exeFileUrl, ref SubmissionInfo submissionInfo, ref IniData sConfig)
         {
 
             // Database connection
