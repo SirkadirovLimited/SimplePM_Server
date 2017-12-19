@@ -221,7 +221,7 @@ namespace SimplePM_Server
                             {
 
                                 //Запускаем тестирование программы
-                                new SimplePM_Tester(
+                                new SimplePM_Tester2(
                                     ref connection, // дескриптор соединения с БД
                                     ref _compilerPlugins, // список модулей поддержки компиляторов
                                     ref cResult.ExeFullname, // полный путь к исполняемому файлу
@@ -291,7 +291,7 @@ namespace SimplePM_Server
                         case "release":
 
                             //Запускаем тестирование программы
-                            new SimplePM_Tester(
+                            new SimplePM_Tester2(
                                 ref connection, // дескриптор соединения с БД
                                 ref _compilerPlugins, // список модулей поддержки компиляторов
                                 ref cResult.ExeFullname, // полный путь к исполняемому файлу

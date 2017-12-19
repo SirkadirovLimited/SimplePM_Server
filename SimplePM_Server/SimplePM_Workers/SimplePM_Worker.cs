@@ -57,34 +57,29 @@ namespace SimplePM_Server
         // РАЗДЕЛ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ
         ///////////////////////////////////////////////////
 
-        /*!
-            Объявляем переменную указателя на менеджер журнала собылий
-            и присваиваем ей указатель на журнал событий текущего класса
-        */
+        /*
+         * Объявляем переменную указателя на менеджер журнала собылий
+         * и присваиваем ей указатель на журнал событий текущего класса
+         **/
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
+        
+        private ulong _customersCount; //!< Количество текущих обрабатываемых запросов
+        private ulong _maxCustomersCount; //!< Максимальное количество обрабатываемых запросов
+        
+        public IniData sConfig; //!< Дескриптор конфигурационного файла
+        
+        private int SleepTime = 500; //!< Период ожидания
+        
+        private string EnabledLangs; //!< Список поддерживаемых ЯП для SQL запросов
 
-        //Текущее количество подсоединённых пользователей
-        private ulong _customersCount;
-        private ulong _maxCustomersCount;
-
-        //Объявляем дескриптор конфигурационного файла
-        public IniData sConfig;
-
-        //Устанавливаем время ожидания
-        private int SleepTime = 500;
-
-        //Список поддерживаемых языков программирования
-        //для использования в выборочных SQL запросах
-        private string EnabledLangs;
-
-        private List<ICompilerPlugin> _compilerPlugins = new List<ICompilerPlugin>();
+        private List<ICompilerPlugin> _compilerPlugins = new List<ICompilerPlugin>(); //!< Список, содержащий ссылки на модули компиляторов
 
         ///////////////////////////////////////////////////
         /// Функция загружает в память компиляционные
         /// модули, которые собирает из специально
         /// заготовленной директории
         ///////////////////////////////////////////////////
-        
+
         private void LoadCompilerPlugins()
         {
 
@@ -209,6 +204,48 @@ namespace SimplePM_Server
         }
 
         ///////////////////////////////////////////////////
+        /// Функция, очищающая директорию хранения
+        /// временных файлов сервера проверки решений.
+        /// В оснвном используется лишь при запуске нового
+        /// экземпляра сервера для избежания конфликтов.
+        ///////////////////////////////////////////////////
+
+        public bool CleanTempDirectory()
+        {
+
+            /*
+             * Объявляем переменную, которая будет
+             * хранить информацию о том, успешна
+             * ли очистка временных файлов или нет.
+             **/
+            bool f = true;
+
+            try
+            {
+
+                /* Удаляем все файлы в папке */
+                foreach (string file in Directory.GetFiles(sConfig["Program"]["tempPath"]))
+                    File.Delete(file);
+
+                /* Удаляем все директории в папке */
+                foreach (string dir in Directory.GetDirectories(sConfig["Program"]["tempPath"]))
+                    Directory.Delete(dir, true);
+
+            }
+            catch (Exception)
+            {
+
+                /* Указываем, что очистка произведена с ошибкой */
+                f = false;
+
+            }
+
+            // Возвращаем результат выполнения операции
+            return f;
+
+        }
+        
+        ///////////////////////////////////////////////////
         /// Функция, инициализирующая все необходимые
         /// переменные и прочий хлам для возможности
         /// работы сервера проверки решений
@@ -223,6 +260,9 @@ namespace SimplePM_Server
 
             // Устанавливаем "улавливатель исключений"
             SetExceptionHandler();
+
+            // Очищаем директорию временных файлов
+            CleanTempDirectory();
 
             // Открываем конфигурационный файл для чтения
             FileIniDataParser iniParser = new FileIniDataParser();
@@ -551,7 +591,9 @@ namespace SimplePM_Server
                         uid={sConfig["Database"]["db_user"]};
                         pwd={sConfig["Database"]["db_pass"]};
                         database={sConfig["Database"]["db_name"]};
-                        Charset={sConfig["Database"]["db_chst"]}
+                        Charset={sConfig["Database"]["db_chst"]};
+                        SslMode=Preferred;
+                        Pooling=False;
                     "
                 );
 
@@ -562,7 +604,6 @@ namespace SimplePM_Server
             catch (MySqlException ex)
             {
                 
-
                 Console.WriteLine(ex);
                 /* Deal with it */
 
