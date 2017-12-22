@@ -20,8 +20,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 //Безопасная передача паролей
 using System.Security;
-//Работа с текстовыми данными
-using System.Text;
 //Работа с потоками и задачами
 using System.Threading;
 using System.Threading.Tasks;
