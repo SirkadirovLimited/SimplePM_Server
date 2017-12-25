@@ -13,20 +13,28 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using CompilerBase;
+using IniParser.Model;
 
 namespace SimplePM_Server.SimplePM_Tester
 {
 
+    /*!
+     * \brief
+     * Класс, содержащий методы для выполнения единичного
+     * тестирования пользовательского и авторского решений
+     * поставленных задач по программированию.
+     */
+
     internal class ProgramTester
     {
 
-        /* Начало секции объявления глобальных переменных */
+        #region Секция объявления глобальных переменных
 
-        private readonly List<ICompilerPlugin> _compilerPlugins;               // список плагинов компиляторов
+        private          IniData               sConfig;                        // дескриптор конфигурационного файла
+        private          List<ICompilerPlugin> _compilerPlugins;               // список плагинов компиляторов
         private readonly string                _codeLanguage;                  // наименование языка программирования
         private readonly string                _programPath;                   // путь к исполняемому файлу
         private readonly string                _programArguments;              // аргументы запуска
@@ -34,7 +42,7 @@ namespace SimplePM_Server.SimplePM_Tester
         private readonly long                  _programMemoryLimit;            // лимит по памяти в байтах
         private readonly int                   _programProcessorTimeLimit;     // лимит по процессорному времени в миллисекундах
         private readonly int                   _outputCharsLimit;              // лимит по количеству символов в выходном потоке
-        private          string                _programOutput;                 // данные из выходного потока программы
+        private          string                _programOutput = "";            // данные из выходного потока программы
         private          string                _programErrorOutput;            // данные из выходного потока ошибок программы
         private          Process               _programProcess;                // ссылка на дескриптор процесса
 
@@ -62,9 +70,10 @@ namespace SimplePM_Server.SimplePM_Tester
             
         };
 
-        /* Конец секции объявления глобальных переменных */
+        #endregion
 
         public ProgramTester(
+            ref IniData sConfig,
             ref List<ICompilerPlugin> _compilerPlugins,
             string codeLanguage,
             string path,
@@ -75,7 +84,9 @@ namespace SimplePM_Server.SimplePM_Tester
             int outputCharsLimit = 0
         )
         {
-            
+
+            this.sConfig = sConfig;
+
             this._compilerPlugins = _compilerPlugins;
 
             _codeLanguage = codeLanguage;
@@ -90,6 +101,8 @@ namespace SimplePM_Server.SimplePM_Tester
             _outputCharsLimit = outputCharsLimit;
 
         }
+
+        #region Чекеры на достижение лимитов
 
         private void StartMemoryLimitChecker()
         {
@@ -161,15 +174,54 @@ namespace SimplePM_Server.SimplePM_Tester
 
         }
 
+        #endregion
+
         public Test RunTesting()
         {
+
+            // Инициализация всего необходимого
+            Init();
+
+            // Запускаем пользовательский процесс
+            _programProcess.Start();
             
-            throw new NotImplementedException();
+            // Записываем входные данные во входной поток
+            WriteInputString();
+
+            // Вызываем метод, запускающий слежение за памятью
+            StartProcessorTimeLimitChecker();
+
+            // Вызываем метод, запускающий слежение за процессорным временем
+            StartMemoryLimitChecker();
+
+            // Ожидаем завершения пользовательского процесса
+            _programProcess.WaitForExit();
+
+            // Возвращаем промежуточный результат тестирования
+            return GenerateTestResult();
 
         }
 
         private void Init()
         {
+
+            /* Управление методом запуска пользовательского процесса */
+
+            // Устанавливаем вид запуска
+            ProgramTestingFunctions.SetExecInfoByFileExt(
+                ref sConfig,
+                ref _compilerPlugins,
+                ref programStartInfo,
+                _programPath,
+                _programArguments,
+                _codeLanguage
+            );
+
+            // Устанавливаем RunAs информацию
+            ProgramTestingFunctions.SetProcessRunAs(
+                ref sConfig,
+                ref _programProcess
+            );
 
             /* Инициализация необходимых для тестирования переменных */
 
@@ -190,7 +242,55 @@ namespace SimplePM_Server.SimplePM_Tester
 
         }
 
-        private Test GenerateTest()
+        private void WriteInputString()
+        {
+            
+            // Для обеспечения безопасности отлавливаем все исключения
+            try
+            {
+
+                // Записываем входные данные во входной поток
+                _programProcess.StandardInput.Write(_programInputString);
+
+                // Очищаем буферы
+                _programProcess.StandardInput.Flush();
+
+                // Закрываем входной поток
+                _programProcess.StandardInput.Close();
+
+            }
+            catch (Exception)
+            {
+
+                try
+                {
+
+                    // Убиваем процесс
+                    _programProcess.Kill();
+
+                }
+                catch (Exception)
+                {
+
+                    /* Deal with it */
+
+                }
+                finally
+                {
+
+                    // Указываем, что результат тестирования получен
+                    _TestingResultReceived = true;
+
+                    // Указываем результат тестирования
+                    _testingResult = 'I';
+
+                }
+
+            }
+
+        }
+
+        private Test GenerateTestResult()
         {
 
             return new Test
@@ -216,6 +316,8 @@ namespace SimplePM_Server.SimplePM_Tester
 
         }
 
+        #region Обработчики событий
+
         private void ProgramProcess_Exited(object sender, EventArgs e)
         {
 
@@ -225,7 +327,8 @@ namespace SimplePM_Server.SimplePM_Tester
 
             /* Проверка на использованную память */
 
-            checker = !_TestingResultReceived && _programProcess.PeakWorkingSet64 > _programMemoryLimit;
+            checker = !_TestingResultReceived &&
+                _programProcess.PeakWorkingSet64 > _programMemoryLimit;
 
             if (checker)
             {
@@ -251,7 +354,9 @@ namespace SimplePM_Server.SimplePM_Tester
 
             /* Проверка на обнаружение Runtime-ошибок */
 
-            checker = !_TestingResultReceived && _programProcess.ExitCode != 0;
+            checker = !_TestingResultReceived &&
+                _programProcess.ExitCode != 0 &&
+                _programProcess.ExitCode != -1;
 
             if (checker)
             {
@@ -265,10 +370,10 @@ namespace SimplePM_Server.SimplePM_Tester
             {
 
                 // Читаем выходной поток ошибок
-                string errorOutput = _programProcess.StandardError.ReadToEnd();
+                _programErrorOutput = _programProcess.StandardError.ReadToEnd();
 
                 // Проверка на наличие ошибок
-                if (errorOutput.Length > 0)
+                if (_programErrorOutput.Length > 0)
                 {
 
                     _TestingResultReceived = true;
@@ -320,6 +425,8 @@ namespace SimplePM_Server.SimplePM_Tester
             _programOutput += e.Data;
 
         }
+
+        #endregion
 
     }
 

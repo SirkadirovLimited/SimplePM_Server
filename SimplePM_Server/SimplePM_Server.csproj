@@ -124,6 +124,7 @@
     <Compile Include="SimplePM_Base\SimplePM_Commander.cs" />
     <Compile Include="SimplePM_Base\SimplePM_Main.cs" />
     <Compile Include="SimplePM_Tester\ProgramTester.cs" />
+    <Compile Include="SimplePM_Tester\ProgramTestingFunctions.cs" />
     <Compile Include="SimplePM_Tester\ProgramTestingResult.cs" />
     <Compile Include="SimplePM_Tester\SimplePM_Tester.cs" />
     <Compile Include="SimplePM_Tester\Test.cs" />
