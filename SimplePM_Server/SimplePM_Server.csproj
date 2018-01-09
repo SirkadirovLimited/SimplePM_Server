@@ -144,6 +144,7 @@
     <None Include="App.config" />
     <EmbeddedResource Include="Program_Data\consoleHeader.pdat" />
     <None Include="app.manifest" />
+    <None Include="ICompilerPlugin.ini" />
     <None Include="NLog.config">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -155,6 +156,8 @@
     <None Include="server_config.ini">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Compile Include="SimplePM_Tester\SimplePM_Tester.Debug.cs" />
+    <Compile Include="SimplePM_Tester\SimplePM_Tester.Release.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.2">
