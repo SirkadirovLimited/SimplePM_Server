@@ -37,10 +37,20 @@ namespace SimplePM_Server.SimplePM_Tester
         /// авторского решения задачи.
         ///////////////////////////////////////////////////
 
-        public static void SetExecInfoByFileExt(ref IniData sConfig, ref List<ICompilerPlugin> _compilerPlugins, ref ProcessStartInfo startInfo, string filePath, string arguments, string codeLanguage)
+        public static void SetExecInfoByFileExt(
+            ref IniData sConfig,
+            ref List<ICompilerPlugin> _compilerPlugins,
+            ref ProcessStartInfo startInfo,
+            string filePath,
+            string arguments,
+            string codeLanguage
+        )
         {
             
-            // Вызываем ассоциированный метод, который знает лучше, как это делать
+            /*
+             * Вызываем ассоциированный метод, который
+             * знает лучше, как это делать
+             */
             bool f = SimplePM_Compiler.GetCompPluginByProgLangName(
                 ref _compilerPlugins,
                 codeLanguage
@@ -50,13 +60,18 @@ namespace SimplePM_Server.SimplePM_Tester
                 filePath
             );
 
-            // Добавляем к этому всему аргументы коммандной строки
+            /*
+             * Добавляем к этому всему аргументы коммандной строки
+             */
             if (startInfo.Arguments.Length > 0)
                 startInfo.Arguments += " " + arguments;
             else
                 startInfo.Arguments = arguments;
 
-            // В случае возникновения непредвиденных ошибок выбрасываем исключение
+            /*
+             * В случае возникновения непредвиденных
+             * ошибок выбрасываем исключение
+             */
             if (!f)
                 throw new SimplePM_Exceptions.UnknownException();
 
@@ -73,22 +88,33 @@ namespace SimplePM_Server.SimplePM_Tester
         public static void SetProcessRunAs(ref IniData sConfig, ref Process proc)
         {
 
-            // Проверяем, включена ли функция запуска
-            // пользовательских программ от имени инного пользователя.
-            // Если отключена - выходим.
+            /*
+             * Проверяем, включена ли функция запуска
+             * пользовательских программ от имени
+             * инного пользователя. Если отключена - выходим.
+             */
             if (sConfig["RunAs"]["enabled"] != "true" && sConfig["RunAs"]["enabled"] != "1")
                 return;
 
-            /* Указываем, что будем запускать процесс от имени другого пользователя */
+            /*
+             * Указываем, что будем запускать процесс
+             * от имени другого пользователя
+             */
             proc.StartInfo.Verb = "runas";
 
-            /* Передаём имя пользователя */
+            /*
+             * Передаём имя пользователя
+             */
             proc.StartInfo.UserName = sConfig["RunAs"]["accountLogin"];
 
-            /* Передаём, что необходимо вытянуть профайл из реестра */
+            /*
+             * Передаём, что необходимо вытянуть профайл из реестра
+             */
             proc.StartInfo.LoadUserProfile = false;
 
-            /* Передаём пароль пользователя */
+            /*
+             * Передаём пароль пользователя
+             */
 
             // Создаём защищённую строку
             SecureString encPassword = new SecureString();

@@ -52,12 +52,12 @@ namespace SimplePM_Server.SimplePM_Tester
         private ProcessStartInfo programStartInfo = new ProcessStartInfo
         {
 
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            RedirectStandardInput = true,
+
             StandardOutputEncoding = Encoding.UTF8,
             StandardErrorEncoding  = Encoding.UTF8,
-
-            RedirectStandardOutput = true,
-            RedirectStandardError  = true,
-            RedirectStandardInput  = true,
             
             UseShellExecute        = false,
             LoadUserProfile        = false,
@@ -78,8 +78,8 @@ namespace SimplePM_Server.SimplePM_Tester
             string codeLanguage,
             string path,
             string args,
-            long memoryLimit,
-            int processorTimeLimit,
+            long memoryLimit = 0,
+            int processorTimeLimit = 0,
             string input = null,
             int outputCharsLimit = 0
         )
@@ -107,70 +107,91 @@ namespace SimplePM_Server.SimplePM_Tester
         private void StartMemoryLimitChecker()
         {
 
-            // Создаём новую задачу и ставим её на выполнение
-            new Task(() => {
+            /*
+             * Выполняем необходимые действия
+             * лишь в том случае, когда лимит
+             * по памяти активирован
+             */
+            if (_programMemoryLimit > 0)
+            {
 
-                // Защита от всевозможных исключений
-                try
-                {
+                // Создаём новую задачу и ставим её на выполнение
+                new Task(() => {
 
-                    // Крутим цикл пока пользовательский процесс не завершится
-                    while (!_programProcess.HasExited)
+                    // Защита от всевозможных исключений
+                    try
                     {
-                        
-                        // Удаляем весь кэш, связанный с компонентом
-                        _programProcess.Refresh();
 
-                        // Проверяем на превышение лимита и в случае обнаружения, "убиваем" процесс
-                        if (_programProcess.PeakWorkingSet64 > _programMemoryLimit)
-                            _programProcess.Kill();
+                        // Крутим цикл пока пользовательский процесс не завершится
+                        while (!_programProcess.HasExited)
+                        {
+
+                            // Удаляем весь кэш, связанный с компонентом
+                            _programProcess.Refresh();
+
+                            // Проверяем на превышение лимита и в случае обнаружения, "убиваем" процесс
+                            if (_programProcess.PeakWorkingSet64 > _programMemoryLimit)
+                                _programProcess.Kill();
+
+                        }
+
+                    }
+                    catch (Exception)
+                    {
+
+                        /* Deal with it */
 
                     }
 
-                }
-                catch (Exception)
-                {
-                    
-                    /* Deal with it */
+                }).Start();
 
-                }
-
-            }).Start();
+            }
 
         }
 
         private void StartProcessorTimeLimitChecker()
         {
 
-            // Создаём новую задачу и ставим её на выполнение
-            new Task(() => {
+            /*
+             * Выполняем необходимые действия
+             * лишь  в  том   случае,   когда
+             * лимит по процессорному времени
+             * активирован
+             */
+            if (_programProcessorTimeLimit > 0)
+            {
 
-                // Защита от всевозможных исключений
-                try
-                {
+                // Создаём новую задачу и ставим её на выполнение
+                new Task(() => {
 
-                    // Крутим цикл пока пользовательский процесс не завершится
-                    while (!_programProcess.HasExited)
+                    // Защита от всевозможных исключений
+                    try
                     {
 
-                        // Удаляем весь кэш, связанный с компонентом
-                        _programProcess.Refresh();
+                        // Крутим цикл пока пользовательский процесс не завершится
+                        while (!_programProcess.HasExited)
+                        {
 
-                        // Проверяем на превышение лимита и в случае обнаружения, "убиваем" процесс
-                        if (Convert.ToInt32(Math.Round(_programProcess.TotalProcessorTime.TotalMilliseconds)) > _programProcessorTimeLimit)
-                            _programProcess.Kill();
+                            // Удаляем весь кэш, связанный с компонентом
+                            _programProcess.Refresh();
+
+                            // Проверяем на превышение лимита и в случае обнаружения, "убиваем" процесс
+                            if (Convert.ToInt32(Math.Round(_programProcess.TotalProcessorTime.TotalMilliseconds)) > _programProcessorTimeLimit)
+                                _programProcess.Kill();
+
+                        }
+
+                    }
+                    catch (Exception)
+                    {
+
+                        /* Deal with it */
 
                     }
 
-                }
-                catch (Exception)
-                {
+                }).Start();
 
-                    /* Deal with it */
-
-                }
-
-            }).Start();
+            }
 
         }
 
@@ -197,6 +218,9 @@ namespace SimplePM_Server.SimplePM_Tester
             // Ожидаем завершения пользовательского процесса
             _programProcess.WaitForExit();
 
+            // Освобождаем все связанные с процессом ресурсы
+            _programProcess.Close();
+
             // Возвращаем промежуточный результат тестирования
             return GenerateTestResult();
 
@@ -205,7 +229,10 @@ namespace SimplePM_Server.SimplePM_Tester
         private void Init()
         {
 
-            /* Управление методом запуска пользовательского процесса */
+            /*
+             * Управление методом запуска
+             * пользовательского процесса
+             */
 
             // Устанавливаем вид запуска
             ProgramTestingFunctions.SetExecInfoByFileExt(
@@ -223,7 +250,10 @@ namespace SimplePM_Server.SimplePM_Tester
                 ref _programProcess
             );
 
-            /* Инициализация необходимых для тестирования переменных */
+            /*
+             * Инициализация необходимых для
+             * тестирования переменных
+             */
 
             _programProcess = new Process
             {
@@ -236,10 +266,12 @@ namespace SimplePM_Server.SimplePM_Tester
 
             };
 
-            /* Добавляем обработчики для некоторых событий */
+            /*
+             * Добавляем обработчики для некоторых событий
+             */
             _programProcess.OutputDataReceived += ProgramProcess_OutputDataReceived;
             _programProcess.Exited += ProgramProcess_Exited;
-
+            
         }
 
         private void WriteInputString()
@@ -321,13 +353,17 @@ namespace SimplePM_Server.SimplePM_Tester
         private void ProgramProcess_Exited(object sender, EventArgs e)
         {
 
-            /* Раздел объявления необходимых переменных */
+            /*
+             * Раздел объявления необходимых переменных
+             */
 
             bool checker;
 
-            /* Проверка на использованную память */
+            /*
+             * Проверка на использованную память
+             */
 
-            checker = !_TestingResultReceived &&
+            checker = !_TestingResultReceived && _programMemoryLimit > 0 &&
                 _programProcess.PeakWorkingSet64 > _programMemoryLimit;
 
             if (checker)
@@ -336,9 +372,11 @@ namespace SimplePM_Server.SimplePM_Tester
                 _testingResult = 'M';
             }
 
-            /* Проверка достижения лимита по процессорному времени */
+            /*
+             * Проверка достижения лимита по процессорному времени
+             */
 
-            checker = !_TestingResultReceived &&
+            checker = !_TestingResultReceived && _programProcessorTimeLimit > 0 &&
                       Convert.ToInt32(
                           Math.Round(
                               _programProcess.TotalProcessorTime.TotalMilliseconds
@@ -352,7 +390,9 @@ namespace SimplePM_Server.SimplePM_Tester
                 _testingResult = 'T';
             }
 
-            /* Проверка на обнаружение Runtime-ошибок */
+            /*
+             * Проверка на обнаружение Runtime-ошибок
+             */
 
             checker = !_TestingResultReceived &&
                 _programProcess.ExitCode != 0 &&
@@ -364,7 +404,9 @@ namespace SimplePM_Server.SimplePM_Tester
                 _testingResult = 'R';
             }
 
-            /* Проверка на наличие текста в выходном потоке ошибок */
+            /*
+             * Проверка на наличие текста в выходном потоке ошибок
+             */
 
             if (!_TestingResultReceived)
             {
@@ -383,7 +425,9 @@ namespace SimplePM_Server.SimplePM_Tester
 
             }
 
-            /* Если всё хорошо, возвращаем временный результат */
+            /*
+             * Если всё хорошо, возвращаем временный результат
+             */
             if (!_TestingResultReceived)
             {
 
@@ -397,11 +441,16 @@ namespace SimplePM_Server.SimplePM_Tester
         private void ProgramProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
 
-            /* Если результат тестирования уже имеется, не стоит ничего делать */
+            /*
+             * Если результат тестирования уже
+             * имеется, не стоит ничего делать
+             */
             if (_TestingResultReceived)
                 return;
-
-            /* Проверка на превышение лимита вывода */
+            
+            /*
+             * Проверка на превышение лимита вывода
+             */
 
             if (_outputCharsLimit > 0 && _programOutput.Length + e.Data.Length > _outputCharsLimit)
             {
@@ -419,10 +468,13 @@ namespace SimplePM_Server.SimplePM_Tester
                 return;
 
             }
-
-            /* В инном случае дозаписываем данные в соответственную переменную */
-
-            _programOutput += e.Data;
+            
+            /*
+             * В ином случае дозаписываем данные
+             * в соответственную переменную
+             */
+            
+            _programOutput += (_programOutput.Length > 0) ? e.Data : e.Data + '\n';
 
         }
 
