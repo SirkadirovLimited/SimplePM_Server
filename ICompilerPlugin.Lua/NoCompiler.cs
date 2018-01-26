@@ -91,7 +91,7 @@ namespace CompilerPlugin
             {
 
                 // Устанавливаем имя запускаемой программы
-                startInfo.FileName = sConfig["Compilers"]["lua_location"];
+                startInfo.FileName = sCompilersConfig["Lua"]["Path"];
                 
                 // Аргументы запуска данной программы
                 startInfo.Arguments = '"' + filePath + '"';

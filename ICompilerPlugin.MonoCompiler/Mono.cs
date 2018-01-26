@@ -63,7 +63,7 @@ namespace CompilerPlugin
 
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = cRefs.RunCompiler(
-                sConfig["Compilers"]["mcs_location"],
+                sCompilersConfig["MonoCompiler"]["Path"],
                 fileLocation
             );
 
@@ -93,7 +93,7 @@ namespace CompilerPlugin
                 {
 
                     // Указываем имя запускаемой программы (полный путь к ней)
-                    startInfo.FileName = sConfig["Compilers"]["mono_location"];
+                    startInfo.FileName = sCompilersConfig["MonoCompiler"]["RuntimePath"];
 
                     // Указываем аргументы запуска
                     startInfo.Arguments = '"' + filePath + '"';

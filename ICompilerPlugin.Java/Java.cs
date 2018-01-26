@@ -61,8 +61,8 @@ namespace CompilerPlugin
 
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = cRefs.RunCompiler(
-                sConfig["Compilers"]["javac_location"],
-                sConfig["Compilers"]["javac_arguments"] + " " + '"' + fileLocation + '"'
+                sCompilersConfig["GCC"]["Path"],
+                sCompilersConfig["FreePascal"]["Arguments"] + " " + '"' + fileLocation + '"'
             );
             
             // Для отлавливания всевозможных ошибок
@@ -77,7 +77,7 @@ namespace CompilerPlugin
                 FileInfo fileInfo = new FileInfo(fileLocation);
 
                 //Указываем полный путь к главному исполняемому файлу
-                result.ExeFullname = fileInfo.DirectoryName + "\\" + sConfig["Compilers"]["java_default_class_name"] + ".class";
+                result.ExeFullname = fileInfo.DirectoryName + "\\" + sCompilersConfig["Java"]["DefaultClassName"] + ".class";
 
                 //Проверяем на существование главного класса
                 if (!File.Exists(result.ExeFullname))
@@ -120,7 +120,7 @@ namespace CompilerPlugin
                 startInfo.WorkingDirectory = fileInfo.DirectoryName;
 
                 // Устанавливаем имя запускаемой программы
-                startInfo.FileName = sConfig["Compilers"]["java_location"];
+                startInfo.FileName = sCompilersConfig["Java"]["RuntimePath"];
                 
                 // Аргументы запуска данной программы
                 startInfo.Arguments = "-d64 -cp . " + '"' + Path.GetFileNameWithoutExtension(fileInfo.Name) + '"';
