@@ -53,7 +53,7 @@ namespace CompilerPlugin
         /// результата компиляции данной программы.
         ///////////////////////////////////////////////////
 
-        public CompilerResult StartCompiler(ref IniData sConfig, string submissionId, string fileLocation)
+        public CompilerResult StartCompiler(ref IniData sConfig, ref IniData sCompilersConfig, string submissionId, string fileLocation)
         {
 
             // Инициализируем объект CompilerRefs
@@ -108,7 +108,7 @@ namespace CompilerPlugin
         /// пользовательской программы.
         ///////////////////////////////////////////////////
 
-        public bool SetRunningMethod(ref IniData sConfig, ref ProcessStartInfo startInfo, string filePath)
+        public bool SetRunningMethod(ref IniData sConfig, ref IniData sCompilersConfig, ref ProcessStartInfo startInfo, string filePath)
         {
             try
             {
