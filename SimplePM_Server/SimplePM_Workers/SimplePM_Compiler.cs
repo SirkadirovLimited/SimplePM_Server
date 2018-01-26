@@ -51,6 +51,7 @@ namespace SimplePM_Server
         private readonly string submissionId; //!< Идентификатор запроса
         private readonly string fileLocation; //!< Полный путь к файлу и его расширение
         private IniData sConfig; //!< Дескриптор конфигурационного файла
+        private IniData sCompilersConfig; //!< Дескриптор конфигурационного файла модулей компиляции
         private List<ICompilerPlugin> _compilerPlugins; //!< Список загруженных модулей компиляторв
         private readonly string codeLang; //!< Название языка программирования, на котором написан код
 
@@ -60,7 +61,7 @@ namespace SimplePM_Server
         /// программированию.
         ///////////////////////////////////////////////////
 
-        public SimplePM_Compiler(ref IniData sConfig, ref List<ICompilerPlugin> _compilerPlugins, string submissionId, string fileLocation, string codeLang)
+        public SimplePM_Compiler(ref IniData sConfig, ref IniData sCompilersConfig, ref List<ICompilerPlugin> _compilerPlugins, string submissionId, string fileLocation, string codeLang)
         {
             
             //Проверяем путь к исходному коду на ошибки
@@ -70,6 +71,7 @@ namespace SimplePM_Server
             //Присваиваем глобальным для класса переменным
             //значения локальных переменных конструктора класса
             this.sConfig = sConfig;
+            this.sCompilersConfig = sCompilersConfig;
             this._compilerPlugins = _compilerPlugins;
             this.submissionId = submissionId;
             this.fileLocation = fileLocation;
@@ -87,6 +89,10 @@ namespace SimplePM_Server
         public static ICompilerPlugin GetCompPluginByProgLangName(ref List<ICompilerPlugin> _compilerPlugins, string programmingLanguage)
         {
 
+            /*
+             * Производим быстрый поиск по модулям компиляции,
+             * и, когда находим - возврщаем ссылку на объект
+             **/
             return (
                 from compilerPlugin
                 in _compilerPlugins
@@ -105,18 +111,34 @@ namespace SimplePM_Server
         public CompilerResult ChooseCompilerAndRun()
         {
 
+            // Получаем экземпляр реализации интерфейса модуля компиляции
             ICompilerPlugin requestedCompiler = GetCompPluginByProgLangName(ref _compilerPlugins, codeLang);
 
+            /*
+             * Выполняем необходимые действия в
+             * случае обнаружения нулевого возврата
+             **/
             if (requestedCompiler == null)
             {
+
                 return new CompilerResult
                 {
                     HasErrors = true, // Хьюстон, у нас проблема!
                     CompilerMessage = "Language not supported by SimplePM!"
                 };
+
             }
 
-            return requestedCompiler.StartCompiler(ref sConfig, submissionId, fileLocation);
+            /*
+             * Возвращаем ссылку на объект,
+             * содержащий результаты компиляции
+             **/
+            return requestedCompiler.StartCompiler(
+                ref sConfig,
+                ref sCompilersConfig,
+                submissionId,
+                fileLocation
+            );
 
         }
 

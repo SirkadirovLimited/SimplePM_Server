@@ -51,6 +51,7 @@ namespace SimplePM_Server
         private MySqlConnection connection; //!< Дескриптор соединения с БД
         private SimplePM_Submission.SubmissionInfo submissionInfo; //!< Словарь информации о запросе
         private IniData sConfig; //!< Дескриптор конфигурационного файла
+        private IniData sCompilersConfig; //!< Дескриптор конфигурационного файла модулей компиляции
         private List<ICompilerPlugin> _compilerPlugins; //!< Список загруженных модулей компиляторв
 
         ///////////////////////////////////////////////////
@@ -59,14 +60,15 @@ namespace SimplePM_Server
         /// решения поставленной задачи.
         ///////////////////////////////////////////////////
 
-        public SimplePM_Officiant(MySqlConnection connection, ref IniData sConfig, ref List<ICompilerPlugin> _compilerPlugins, SimplePM_Submission.SubmissionInfo submissionInfo)
+        public SimplePM_Officiant(MySqlConnection connection, ref IniData sConfig, ref IniData sCompilersConfig, ref List<ICompilerPlugin> _compilerPlugins, SimplePM_Submission.SubmissionInfo submissionInfo)
         {
 
             // Connection
             this.connection = connection;
 
-            // Configuration file
+            // Configuration files
             this.sConfig = sConfig;
+            this.sCompilersConfig = sCompilersConfig;
 
             // Compiler plugins
             this._compilerPlugins = _compilerPlugins;
@@ -126,6 +128,7 @@ namespace SimplePM_Server
             //Объявляем экземпляр класса компиляции
             SimplePM_Compiler compiler = new SimplePM_Compiler(
                 ref sConfig,
+                ref sCompilersConfig,
                 ref _compilerPlugins,
                 submissionInfo.SubmissionId.ToString(),
                 fileLocation,
@@ -226,7 +229,8 @@ namespace SimplePM_Server
                                     ref _compilerPlugins, // список модулей поддержки компиляторов
                                     ref cResult.ExeFullname, // полный путь к исполняемому файлу
                                     ref submissionInfo, // информация о запросе на тестирование
-                                    ref sConfig // дескриптор конфигурационного файла сервера
+                                    ref sConfig, // дескриптор конфигурационного файла сервера
+                                    ref sCompilersConfig // дескриптор конфигурационного файла модулей компиляции
                                 ).DebugTest();
 
                             }
@@ -296,7 +300,8 @@ namespace SimplePM_Server
                                 ref _compilerPlugins, // список модулей поддержки компиляторов
                                 ref cResult.ExeFullname, // полный путь к исполняемому файлу
                                 ref submissionInfo, // информация о запросе на тестирование
-                                ref sConfig
+                                ref sConfig, // дескриптор конфигурационного файла сервера
+                                ref sCompilersConfig // дескриптор конфигурационного файла модулей компиляции
                             ).ReleaseTest();
 
                             break;
