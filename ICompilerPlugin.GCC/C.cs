@@ -61,8 +61,8 @@ namespace CompilerPlugin
 
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = cRefs.RunCompiler(
-                sConfig["Compilers"]["gcc_location"],
-                fileLocation + " " + sConfig["Compilers"]["gpp_arguments"] + " -o " + exeLocation
+                sCompilersConfig["GCC"]["Path"],
+                sCompilersConfig["GCC"]["Arguments"] + " -o " + exeLocation
             );
 
             //Передаём полный путь к исполняемому файлу
