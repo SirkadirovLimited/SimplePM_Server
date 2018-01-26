@@ -45,7 +45,7 @@ namespace CompilerBase
         /// результата компиляции данной программы.
         ///////////////////////////////////////////////////
 
-        CompilerResult StartCompiler(ref IniData sConfig, string submissionId, string fileLocation);
+        CompilerResult StartCompiler(ref IniData sConfig, ref IniData sCompilerConfig, string submissionId, string fileLocation);
 
         ///////////////////////////////////////////////////
         /// Метод, который вызывается перед запуском
@@ -54,7 +54,7 @@ namespace CompilerBase
         /// пользовательской программы.
         ///////////////////////////////////////////////////
 
-        bool SetRunningMethod(ref IniData sConfig, ref ProcessStartInfo startInfo, string filePath);
+        bool SetRunningMethod(ref IniData sConfig, ref IniData sCompilerConfig, ref ProcessStartInfo startInfo, string filePath);
 
     }
     
