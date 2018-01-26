@@ -67,12 +67,13 @@ namespace SimplePM_Server
         private ulong _maxCustomersCount; //!< Максимальное количество обрабатываемых запросов
         
         public IniData sConfig; //!< Дескриптор конфигурационного файла
+        public IniData sCompilersConfig; //!< Дескриптор конфигурационного файла модулей компиляции
         
         private int SleepTime = 500; //!< Период ожидания
         
         private string EnabledLangs; //!< Список поддерживаемых ЯП для SQL запросов
 
-        private List<ICompilerPlugin> _compilerPlugins = new List<ICompilerPlugin>(); //!< Список, содержащий ссылки на модули компиляторов
+        public List<ICompilerPlugin> _compilerPlugins = new List<ICompilerPlugin>(); //!< Список, содержащий ссылки на модули компиляторов
 
         ///////////////////////////////////////////////////
         /// Функция загружает в память компиляционные
@@ -83,41 +84,72 @@ namespace SimplePM_Server
         private void LoadCompilerPlugins()
         {
 
-            // Инициализируем массив путей к сборкам
-            string[] pluginFiles = Directory.GetFiles(sConfig["Program"]["ICompilerPlugin_directory"], "ICompilerPlugin.*.dll");
+            /*
+             * Записываем в лог-файл информацию о том,
+             * что собираемся подгружать сторонние
+             * модули компиляции
+             **/
+            logger.Debug("ICompilerPlugin modules are being loaded...");
 
             /*
-             * В цикле осуществляем поиск модулей, которые добавляют
-             * поддержку языков программирования.
-             */
-            foreach (string pluginPath in pluginFiles)
+             * Учитывая тот факт, что каждый раздел в конфигурационном
+             * файле сторонних модулей компиляции определяет собственных
+             * модуль компиляции, осуществляем перебор всех секций этого
+             * конфигурационного файла и загружаем найденные модули,
+             * которые подпадают под все требования и условия поиска.
+             **/
+            foreach (SectionData section in sCompilersConfig.Sections)
             {
-                
-                logger.Debug("Start loading plugin [" + pluginPath + "]...");
+
+                // Формируем полный путь к предполягаемому модулю компиляции
+                string compilerPluginPath = Path.Combine(
+                    sConfig["Program"]["ICompilerPlugin_directory"],
+                    "ICompilerPlugin." + section.SectionName + ".dll"
+                );
+
+                // Проверка на существование и включённость модуля
+                if (section.Keys["Enabled"] != "true" || !File.Exists(compilerPluginPath))
+                    continue;
+
+                // Указываем в логе, что начинаем загружать определённый модуль компиляции
+                logger.Debug("Start loading plugin [" + compilerPluginPath + "]...");
 
                 try
                 {
 
-                    // Загружаем сборку
-                    Assembly assembly = Assembly.LoadFrom(pluginPath);
+                    // Загружаем сборку из файла по указанному пути
+                    Assembly assembly = Assembly.LoadFrom(compilerPluginPath);
 
                     // Ищем необходимую для нас реализацию интерфейса
                     foreach (Type type in assembly.GetTypes())
                     {
-                        
+
                         // Если мы нашли то, что искали - добавляем плагин в список
                         if (type.FullName == "CompilerPlugin.Compiler")
-                            _compilerPlugins.Add((ICompilerPlugin) Activator.CreateInstance(type));
+                            _compilerPlugins.Add((ICompilerPlugin)Activator.CreateInstance(type));
 
                     }
 
                 }
                 catch (Exception ex)
                 {
+
+                    /*
+                     * В случае возникновения ошибок записываем
+                     * информацию о них в лог-файле
+                     **/
                     logger.Debug(ex);
+
                 }
 
             }
+
+            /*
+             * Записываем в лог-файл информацию о том,
+             * что мы завершили процесс загрузки всех
+             * модулей компиляции (ну или не всех)
+             **/
+            logger.Debug("ICompilerPlugin modules were loaded...");
 
         }
 
@@ -269,6 +301,9 @@ namespace SimplePM_Server
 
             // Присваиваем глобальной переменной sConfig дескриптор файла конфигурации
             sConfig = iniParser.ReadFile("server_config.ini", Encoding.UTF8);
+
+            // Присваиваем глобальной переменной sCompilersConfig дескриптор файла конфигурации модулей компиляции
+            sCompilersConfig = iniParser.ReadFile("ICompilerPlugin.ini", Encoding.UTF8);
 
             // Конфигурируем журнал событий (библиотека NLog)
             try
@@ -443,8 +478,10 @@ namespace SimplePM_Server
                 // Производим выборку полученных результатов из временной таблицы
                 MySqlDataReader dataReader = cmdSelect.ExecuteReader();
 
+                // Объявляем временную переменную, так называемый "флаг"
                 bool f = false;
 
+                // Делаем различные проверки в безопасном контексте
                 lock (new object())
                 {
 
