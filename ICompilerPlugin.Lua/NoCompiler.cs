@@ -25,24 +25,13 @@ namespace CompilerPlugin
     
     public class Compiler : ICompilerPlugin
     {
-
-        // Поддерживаемый язык программирования
-        private const string _progLang = "lua";
-        // Расширение файла поддерживаемого языка программирования
-        private const string _progLangExt = "lua";
-        // Отображаемое имя
-        private const string _displayName = "SimplePM Lua compiler module";
-        // Автор модуля
-        private const string _author = "Kadirov Yurij";
-        // Адрес технической поддержки
-        private const string _supportUrl = "https://spm.sirkadirov.com/";
-
+        
         /* Начало раздела безопасной передачи */
-        public string CompilerPluginLanguageName => _progLang;
-        public string CompilerPluginLanguageExt => _progLangExt;
-        public string CompilerPluginDisplayName => _displayName;
-        public string CompilerPluginAuthor => _author;
-        public string CompilerPluginSupportUrl => _supportUrl;
+        public string CompilerPluginLanguageName => "lua";
+        public string CompilerPluginLanguageExt => "lua";
+        public string CompilerPluginDisplayName => "SimplePM Lua compiler module";
+        public string CompilerPluginAuthor => "Kadirov Yurij";
+        public string CompilerPluginSupportUrl => "https://spm.sirkadirov.com/";
         /* Конец раздела безопасной передачи */
 
         ///////////////////////////////////////////////////
