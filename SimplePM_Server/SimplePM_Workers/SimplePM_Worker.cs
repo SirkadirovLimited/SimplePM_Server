@@ -576,6 +576,7 @@ namespace SimplePM_Server
                 new SimplePM_Officiant(
                     conn,
                     ref sConfig,
+                    ref sCompilersConfig,
                     ref _compilerPlugins,
                     submissionInfo
                 ).ServeSubmission();

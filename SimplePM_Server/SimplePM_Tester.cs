@@ -65,6 +65,7 @@ namespace SimplePM_Server
         private readonly int userId; //!< Идентификатор пользователя
         private readonly float problemDifficulty; //!<  Сложность задачи
         private IniData sConfig; //!<  Дескриптор конфигурационного файла сервера
+        private IniData sCompilersConfig; //!<  Дескриптор конфигурационного файла модулей компиляции
         private List<ICompilerPlugin> _compilerPlugins; //!< Список загруженных модулей компиляторв
 
         ///////////////////////////////////////////////////
@@ -72,7 +73,7 @@ namespace SimplePM_Server
         /// пользовательских решений задач
         ///////////////////////////////////////////////////
 
-        public SimplePM_Tester2(ref MySqlConnection connection, ref List<ICompilerPlugin> _compilerPlugins, ref string exeFileUrl, ref SubmissionInfo submissionInfo, ref IniData sConfig)
+        public SimplePM_Tester2(ref MySqlConnection connection, ref List<ICompilerPlugin> _compilerPlugins, ref string exeFileUrl, ref SubmissionInfo submissionInfo, ref IniData sConfig, ref IniData sCompilersConfig)
         {
 
             // Database connection
@@ -191,6 +192,7 @@ namespace SimplePM_Server
                 codeLanguage
             ).SetRunningMethod(
                 ref sConfig,
+                ref sCompilersConfig,
                 ref startInfo,
                 filePath
             );
@@ -377,6 +379,7 @@ namespace SimplePM_Server
             // Инициализируем экземпляр класса компилятора
             SimplePM_Compiler compiler = new SimplePM_Compiler(
                 ref sConfig,
+                ref sCompilersConfig,
                 ref _compilerPlugins,
                 "a" + submissionId,
                 tmpAuthorSrcLocation,

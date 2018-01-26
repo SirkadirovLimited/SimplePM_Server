@@ -34,6 +34,7 @@ namespace SimplePM_Server.SimplePM_Tester
         #region Секция объявления глобальных переменных
 
         private          IniData               sConfig;                        // дескриптор конфигурационного файла
+        private          IniData               sCompilersConfig;               // дескриптор конфигурационного файла модулей компиляции
         private          List<ICompilerPlugin> _compilerPlugins;               // список плагинов компиляторов
         private readonly string                _codeLanguage;                  // наименование языка программирования
         private readonly string                _programPath;                   // путь к исполняемому файлу
@@ -74,6 +75,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
         public ProgramTester(
             ref IniData sConfig,
+            ref IniData sCompilersConfig,
             ref List<ICompilerPlugin> _compilerPlugins,
             string codeLanguage,
             string path,
@@ -86,6 +88,7 @@ namespace SimplePM_Server.SimplePM_Tester
         {
 
             this.sConfig = sConfig;
+            this.sCompilersConfig = sCompilersConfig;
 
             this._compilerPlugins = _compilerPlugins;
 
@@ -237,6 +240,7 @@ namespace SimplePM_Server.SimplePM_Tester
             // Устанавливаем вид запуска
             ProgramTestingFunctions.SetExecInfoByFileExt(
                 ref sConfig,
+                ref sCompilersConfig,
                 ref _compilerPlugins,
                 ref programStartInfo,
                 _programPath,

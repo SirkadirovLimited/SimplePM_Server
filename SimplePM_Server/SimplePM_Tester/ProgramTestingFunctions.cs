@@ -39,6 +39,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
         public static void SetExecInfoByFileExt(
             ref IniData sConfig,
+            ref IniData sCompilersConfig,
             ref List<ICompilerPlugin> _compilerPlugins,
             ref ProcessStartInfo startInfo,
             string filePath,
@@ -56,6 +57,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 codeLanguage
             ).SetRunningMethod(
                 ref sConfig,
+                ref sCompilersConfig,
                 ref startInfo,
                 filePath
             );
