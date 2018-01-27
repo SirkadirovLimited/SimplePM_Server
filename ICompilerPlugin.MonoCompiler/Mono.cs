@@ -52,7 +52,7 @@ namespace CompilerPlugin
 
             //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = cRefs.RunCompiler(
-                sCompilersConfig["MonoCompiler"]["Path"],
+                sCompilersConfig["Mono"]["Path"],
                 fileLocation
             );
 
