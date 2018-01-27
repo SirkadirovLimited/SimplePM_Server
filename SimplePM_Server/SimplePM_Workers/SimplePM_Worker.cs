@@ -251,7 +251,7 @@ namespace SimplePM_Server
              * ли очистка временных файлов или нет.
              **/
             bool f = true;
-
+            
             try
             {
 
@@ -264,7 +264,7 @@ namespace SimplePM_Server
                     Directory.Delete(dir, true);
 
             }
-            catch (Exception)
+            catch
             {
 
                 /* Указываем, что очистка произведена с ошибкой */
@@ -365,10 +365,16 @@ namespace SimplePM_Server
 
             uint rechecksCount = 0; // количество перепроверок без ожидания
 
+#if DEBUG
+            Console.WriteLine(EnabledLangs);
+#endif
+
             while (42 == 42)
             {
 
-                //Console.WriteLine(_customersCount + "/" + _maxCustomersCount);
+#if DEBUG
+                Console.WriteLine(_customersCount + "/" + _maxCustomersCount);
+#endif
 
                 if (_customersCount < _maxCustomersCount)
                 {
@@ -386,7 +392,7 @@ namespace SimplePM_Server
                         //Вызов чекера (если всё "хорошо")
                         if (conn != null)
                             GetSubIdAndRunCompile(conn);
-
+                        
                     }
                     // В случае ошибки передаём информацию о ней логгеру событий
                     catch (Exception ex)
@@ -441,10 +447,7 @@ namespace SimplePM_Server
 
         public void GetSubIdAndRunCompile(MySqlConnection conn)
         {
-
-            // Создаём пустой объект типа Stopwatch
-            Stopwatch sw;
-
+            
             // Создаём новую задачу, без неё - никак!
             new Task(() =>
             {
@@ -496,109 +499,116 @@ namespace SimplePM_Server
                     // Закрываем чтение пустой временной таблицы
                     dataReader.Close();
 
-                    // Завершем работу таски
-                    return;
+                    // Закрываем соединение с БД
+                    conn.Close();
 
                 }
-
-                /* 
-                 * Запускаем секундомер для того,
-                 * чтобы определить время, за которое
-                 * запрос на проверку обрабатывается
-                 * сервером проверки решений задач
-                 */
-                sw = Stopwatch.StartNew();
-
-                // Увеличиваем количество текущих соединений
-                lock (new object())
+                else
                 {
 
-                    _customersCount++;
-                    
+                    /* 
+                     * Запускаем секундомер для того,
+                     * чтобы определить время, за которое
+                     * запрос на проверку обрабатывается
+                     * сервером проверки решений задач
+                     */
+                    Stopwatch sw = Stopwatch.StartNew();
+
+                    // Увеличиваем количество текущих соединений
+                    lock (new object())
+                    {
+
+                        _customersCount++;
+
+                    }
+
+                    /*
+                     * Производим чтение полученных данных
+                     **/
+                    submissionInfo = new SimplePM_Submission.SubmissionInfo
+                    (
+                        int.Parse(dataReader["submissionId"].ToString()),
+                        int.Parse(dataReader["userId"].ToString()),
+                        int.Parse(dataReader["problemId"].ToString()),
+                        int.Parse(dataReader["classworkId"].ToString()),
+                        int.Parse(dataReader["olympId"].ToString()),
+                        dataReader["codeLang"].ToString(),
+                        dataReader["testType"].ToString(),
+                        HttpUtility.HtmlDecode(dataReader["customTest"].ToString()),
+                        (byte[])dataReader["problemCode"]
+                    );
+
+                    // Закрываем чтение временной таблицы
+                    dataReader.Close();
+
+                    // Устанавливаем статус запроса на "в обработке"
+                    string queryUpdate = $@"
+                        UPDATE 
+                            `spm_submissions` 
+                        SET 
+                            `status` = 'processing' 
+                        WHERE 
+                            `submissionId` = '{submissionInfo.SubmissionId}'
+                        LIMIT 
+                            1
+                        ;
+                    ";
+
+                    // Выполняем запрос к базе данных
+                    new MySqlCommand(queryUpdate, conn).ExecuteNonQuery();
+
+                    // Получаем сложность поставленной задачи
+                    string queryGetDifficulty = $@"
+                        SELECT 
+                            `difficulty` 
+                        FROM 
+                            `spm_problems` 
+                        WHERE 
+                            `id` = '{submissionInfo.ProblemId}' 
+                        LIMIT 
+                            1
+                        ;
+                    ";
+
+                    MySqlCommand cmdGetProblemDifficulty = new MySqlCommand(queryGetDifficulty, conn);
+                    submissionInfo.ProblemDifficulty = int.Parse(cmdGetProblemDifficulty.ExecuteScalar().ToString());
+
+                    /*
+                     * Зовём официанта-шляпочника
+                     * уж он знает, что делать в таких
+                     * вот неожиданных ситуациях
+                     */
+                    new SimplePM_Officiant(
+                        conn,
+                        ref sConfig,
+                        ref sCompilersConfig,
+                        ref _compilerPlugins,
+                        submissionInfo
+                    ).ServeSubmission();
+                    /*
+                     * Уменьшаем количество текущих соединений
+                     * чтобы другие соединения были возможны.
+                     */
+                    lock (new object())
+                    {
+                        _customersCount--;
+                    }
+
+                    /*
+                     * Останавливаем секундомер и записываем
+                     * полученное значение в Debug log поток
+                     */
+                    sw.Stop();
+
+#if DEBUG
+                    // Выводим затраченное время на экран
+                    Console.WriteLine(sw.ElapsedMilliseconds);
+#endif
+
+                    // Закрываем соединение с БД
+                    conn.Close();
+
                 }
-
-                /*
-                 * Производим чтение полученных данных
-                 **/
-                submissionInfo = new SimplePM_Submission.SubmissionInfo
-                (
-                    int.Parse(dataReader["submissionId"].ToString()),
-                    int.Parse(dataReader["userId"].ToString()),
-                    int.Parse(dataReader["problemId"].ToString()),
-                    int.Parse(dataReader["classworkId"].ToString()),
-                    int.Parse(dataReader["olympId"].ToString()),
-                    dataReader["codeLang"].ToString(),
-                    dataReader["testType"].ToString(),
-                    HttpUtility.HtmlDecode(dataReader["customTest"].ToString()),
-                    (byte[])dataReader["problemCode"]
-                );
-                
-                // Закрываем чтение временной таблицы
-                dataReader.Close();
-
-                // Устанавливаем статус запроса на "в обработке"
-                string queryUpdate = $@"
-                    UPDATE 
-                        `spm_submissions` 
-                    SET 
-                        `status` = 'processing' 
-                    WHERE 
-                        `submissionId` = '{submissionInfo.SubmissionId}'
-                    LIMIT 
-                        1
-                    ;
-                ";
-
-                // Выполняем запрос к базе данных
-                new MySqlCommand(queryUpdate, conn).ExecuteNonQuery();
-
-                // Получаем сложность поставленной задачи
-                string queryGetDifficulty = $@"
-                    SELECT 
-                        `difficulty` 
-                    FROM 
-                        `spm_problems` 
-                    WHERE 
-                        `id` = '{submissionInfo.ProblemId}' 
-                    LIMIT 
-                        1
-                    ;
-                ";
-
-                MySqlCommand cmdGetProblemDifficulty = new MySqlCommand(queryGetDifficulty, conn);
-                submissionInfo.ProblemDifficulty = int.Parse(cmdGetProblemDifficulty.ExecuteScalar().ToString());
-                
-                /*
-                 * Зовём официанта-шляпочника
-                 * уж он знает, что делать в таких
-                 * вот неожиданных ситуациях
-                 */
-                new SimplePM_Officiant(
-                    conn,
-                    ref sConfig,
-                    ref sCompilersConfig,
-                    ref _compilerPlugins,
-                    submissionInfo
-                ).ServeSubmission();
-                /*
-                 * Уменьшаем количество текущих соединений
-                 * чтобы другие соединения были возможны.
-                 */
-                lock (new object())
-                {
-                    _customersCount--;
-                }
-
-                // Закрываем соединение с БД
-                conn.Close();
-
-                /*
-                 * Останавливаем секундомер и записываем
-                 * полученное значение в Debug log поток
-                 */
-                sw.Stop();
-                
-                //Console.WriteLine(sw.ElapsedMilliseconds);
 
             }).Start();
 
