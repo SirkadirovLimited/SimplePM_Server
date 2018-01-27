@@ -25,8 +25,8 @@ namespace CompilerPlugin
     {
         
         /* Начало раздела безопасной передачи */
-        public string CompilerPluginLanguageName => "с";
-        public string CompilerPluginLanguageExt => "с";
+        public string CompilerPluginLanguageName => "c";
+        public string CompilerPluginLanguageExt => "c";
         public string CompilerPluginDisplayName => "SimplePM C Compiler module";
         public string CompilerPluginAuthor => "Kadirov Yurij";
         public string CompilerPluginSupportUrl => "https://spm.sirkadirov.com/";
