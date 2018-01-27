@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Main projects", "Main proje
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.FreePascal", "ICompilerPlugin.FreePascal\ICompilerPlugin.FreePascal.csproj", "{4972495C-3341-484D-AAF3-01DB824C8031}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.MonoCompiler", "ICompilerPlugin.MonoCompiler\ICompilerPlugin.MonoCompiler.csproj", "{5AE99DC1-D02D-4EBF-8045-1DDE8AAA21FF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.Mono", "ICompilerPlugin.MonoCompiler\ICompilerPlugin.Mono.csproj", "{5AE99DC1-D02D-4EBF-8045-1DDE8AAA21FF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.GCC", "ICompilerPlugin.GCC\ICompilerPlugin.GCC.csproj", "{FE0E75AC-CEE1-41AD-8E96-12BABEF27AD5}"
 EndProject
