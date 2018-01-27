@@ -144,7 +144,9 @@
     <None Include="App.config" />
     <EmbeddedResource Include="Program_Data\consoleHeader.pdat" />
     <None Include="app.manifest" />
-    <None Include="ICompilerPlugin.ini" />
+    <None Include="ICompilerPlugin.ini">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="NLog.config">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
