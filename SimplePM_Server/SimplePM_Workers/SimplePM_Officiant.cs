@@ -49,7 +49,7 @@ namespace SimplePM_Server
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private MySqlConnection connection; //!< Дескриптор соединения с БД
-        private SimplePM_Submission.SubmissionInfo submissionInfo; //!< Словарь информации о запросе
+        private SubmissionInfo.SubmissionInfo submissionInfo; //!< ссылка на объект, содержащий информацию о запросе на тестирование
         private IniData sConfig; //!< Дескриптор конфигурационного файла
         private IniData sCompilersConfig; //!< Дескриптор конфигурационного файла модулей компиляции
         private List<ICompilerPlugin> _compilerPlugins; //!< Список загруженных модулей компиляторв
@@ -60,7 +60,7 @@ namespace SimplePM_Server
         /// решения поставленной задачи.
         ///////////////////////////////////////////////////
 
-        public SimplePM_Officiant(MySqlConnection connection, ref IniData sConfig, ref IniData sCompilersConfig, ref List<ICompilerPlugin> _compilerPlugins, SimplePM_Submission.SubmissionInfo submissionInfo)
+        public SimplePM_Officiant(MySqlConnection connection, ref IniData sConfig, ref IniData sCompilersConfig, ref List<ICompilerPlugin> _compilerPlugins, SubmissionInfo.SubmissionInfo submissionInfo)
         {
 
             // Connection

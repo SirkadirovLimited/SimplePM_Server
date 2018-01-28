@@ -473,7 +473,7 @@ namespace SimplePM_Server
                  * Объявляем объект, который будет хранить
                  * всю информацию об отправке.
                  **/
-                SimplePM_Submission.SubmissionInfo submissionInfo;
+                SubmissionInfo.SubmissionInfo submissionInfo;
 
                 // Создаём запрос на выборку из базы данных
                 MySqlCommand cmdSelect = new MySqlCommand(querySelect, conn);
@@ -525,7 +525,7 @@ namespace SimplePM_Server
                     /*
                      * Производим чтение полученных данных
                      **/
-                    submissionInfo = new SimplePM_Submission.SubmissionInfo
+                    submissionInfo = new SubmissionInfo.SubmissionInfo
                     (
                         int.Parse(dataReader["submissionId"].ToString()),
                         int.Parse(dataReader["userId"].ToString()),

@@ -57,7 +57,7 @@ namespace SimplePM_Server
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private readonly MySqlConnection connection; //!< Дескриптор соединения с БД
-        private readonly SubmissionInfo submissionInfo; //!< Информация о запросе на проверку
+        private readonly SubmissionInfo.SubmissionInfo submissionInfo; //!< Информация о запросе на проверку
         private readonly string exeFileUrl; //!< Полный путь к исполняемому файлу
         private readonly string customTestInput; //!< Кастомный тест, введённый пользователем
         private readonly int problemId; //!< Идентификатор задачи
@@ -73,7 +73,7 @@ namespace SimplePM_Server
         /// пользовательских решений задач
         ///////////////////////////////////////////////////
 
-        public SimplePM_Tester2(ref MySqlConnection connection, ref List<ICompilerPlugin> _compilerPlugins, ref string exeFileUrl, ref SubmissionInfo submissionInfo, ref IniData sConfig, ref IniData sCompilersConfig)
+        public SimplePM_Tester2(ref MySqlConnection connection, ref List<ICompilerPlugin> _compilerPlugins, ref string exeFileUrl, ref SubmissionInfo.SubmissionInfo submissionInfo, ref IniData sConfig, ref IniData sCompilersConfig)
         {
 
             // Database connection
