@@ -28,6 +28,7 @@ namespace SimplePM_Server.SimplePM_Tester
         private List<ICompilerPlugin>         _compilerPlugins ; //!< ссылка на список модулей компиляции
         private MySqlConnection               connection       ; //!< ссылка на дескриптор соединения к базе данных
         private IniData                       sConfig          ; //!< ссылка на дескриптор файла конфигурации сервера проверки пользовательских решений
+        private IniData                       sCompilersConfig ; //!< ссылка на дескриптор файла конфигурации модулей компиляции
         private string                        exeFileUrl       ; //!< переменная, содержащая полный путь к exe-файлу пользовательского решения
         #endregion
 
@@ -36,6 +37,7 @@ namespace SimplePM_Server.SimplePM_Tester
             ref List<ICompilerPlugin> _compilerPlugins,
             ref string exeFileUrl,
             ref SubmissionInfo.SubmissionInfo submissionInfo,
+            ref IniData sCompilersConfig,
             ref IniData sConfig
         )
         {
@@ -44,6 +46,7 @@ namespace SimplePM_Server.SimplePM_Tester
             this._compilerPlugins = _compilerPlugins;
             this.exeFileUrl = exeFileUrl;
             this.submissionInfo = submissionInfo;
+            this.sConfig = sCompilersConfig;
             this.sConfig = sConfig;
 
         }
