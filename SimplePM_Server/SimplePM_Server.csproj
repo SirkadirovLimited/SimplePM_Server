@@ -183,6 +183,10 @@
       <Project>{baec96c2-d35e-40de-99a8-8162174082ac}</Project>
       <Name>CompilerBase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PluginBase\PluginBase.csproj">
+      <Project>{310e02f7-2d77-43fa-9ae1-9edf2af605ca}</Project>
+      <Name>PluginBase</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SimplePM_Exceptions\SimplePM_Exceptions.csproj">
       <Project>{bada387e-df27-4ab7-9b11-f3ea89630494}</Project>
       <Name>SimplePM_Exceptions</Name>
