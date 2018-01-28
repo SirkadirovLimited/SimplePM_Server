@@ -436,7 +436,7 @@ namespace SimplePM_Server.SimplePM_Tester
             {
 
                 _TestingResultReceived = true;
-                _testingResult = '*';
+                _testingResult = Test.MiddleSuccessResult;
 
             }
 
