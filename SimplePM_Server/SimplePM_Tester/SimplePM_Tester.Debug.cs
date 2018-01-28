@@ -31,13 +31,42 @@ namespace SimplePM_Server.SimplePM_Tester
              * к запускаемому файлу авторского
              * решения задачи
              **/
-            string authorSolutionExePath = GetAuthorSolutionExePath();
+            string authorSolutionCodeLanguage;
+            string authorSolutionExePath = GetAuthorSolutionExePath(out authorSolutionCodeLanguage);
+
+            /*
+             * Передаём новосозданным переменным
+             * информацию о лимитах для пользовательского
+             * процесса (пользовательского решения задачи)
+             **/
+            int memoryLimit, timeLimit;
+            GetDebugProgramLimits(out memoryLimit, out timeLimit);
+            
+            /*
+             * Проводим нетестовый запуск авторского решения
+             * и получаем всё необходимое для тестирования
+             * пользовательской программы
+             **/
+            Test authorTestingResult = new ProgramTester(
+                ref sConfig,
+                ref sCompilersConfig,
+                ref _compilerPlugins,
+                authorSolutionCodeLanguage,
+                authorSolutionExePath,
+                "-author-solution",
+                0,
+                0,
+                submissionInfo.CustomTest
+            ).RunTesting();
+
+            if (authorTestingResult.Result != Test.MiddleSuccessResult)
+                throw new SimplePM_Exceptions.AuthorSolutionRunningException();
 
 			throw new NotImplementedException();
 
         }
 
-        private string GetAuthorSolutionExePath()
+        private string GetAuthorSolutionExePath(out string authorSolutionCodeLanguage)
         {
             ///////////////////////////////////////////////////
             // Выборка информации об авторском решении задачи
@@ -70,7 +99,6 @@ namespace SimplePM_Server.SimplePM_Tester
 
             // Объявляем необходимые переменные
             byte[] authorProblemCode;
-            string authorProblemCodeLanguage;
 
             // Читаем полученные данные
             if (dataReader.Read())
@@ -80,7 +108,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 authorProblemCode = (byte[]) dataReader["code"];
 
                 // Язык авторского решения
-                authorProblemCodeLanguage = dataReader["codeLang"].ToString();
+                authorSolutionCodeLanguage = dataReader["codeLang"].ToString();
 
             }
             else
@@ -103,7 +131,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
             // Определяем расширение файла
             string authorFileExt = "." + SimplePM_Submission.GetExtByLang(
-                authorProblemCodeLanguage,
+                authorSolutionCodeLanguage,
                 ref _compilerPlugins
             );
 
@@ -136,7 +164,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 ref _compilerPlugins,
                 "a" + submissionInfo.SubmissionId,
                 tmpAuthorSrcLocation,
-                authorProblemCodeLanguage
+                authorSolutionCodeLanguage
             );
 
             // Получаем структуру результата компиляции
@@ -146,8 +174,63 @@ namespace SimplePM_Server.SimplePM_Tester
             // авторского решения аварийно завершаем работу
             if (cResult.HasErrors)
                 throw new FileLoadException(cResult.ExeFullname);
-
+            
             return cResult.ExeFullname;
+
+        }
+
+        private void GetDebugProgramLimits(out int memoryLimit, out int timeLimit)
+        {
+
+            // Запрос на выборку лимитов из БД
+            string querySelect = $@"
+                SELECT 
+                    `memoryLimit`, 
+                    `timeLimit` 
+                FROM 
+                    `spm_problems_tests` 
+                WHERE 
+                    `problemId` = @problemId 
+                ORDER BY 
+                    `id` ASC 
+                LIMIT 
+                    1
+                ;
+            ";
+
+            // Дескрипторы временных таблиц выборки из БД
+            MySqlCommand cmdSelect = new MySqlCommand(querySelect, connection);
+
+            // Параметры запроса
+            cmdSelect.Parameters.AddWithValue("@problemId", submissionInfo.ProblemId);
+
+            // Чтение результатов запроса
+            MySqlDataReader dataReader = cmdSelect.ExecuteReader();
+            
+            // Читаем полученные данные
+            if (dataReader.Read())
+            {
+
+                // Memory limit
+                memoryLimit = int.Parse(dataReader["memoryLimit"].ToString());
+
+                // Time limit
+                timeLimit = int.Parse(dataReader["timeLimit"].ToString());
+
+            }
+            else
+            {
+
+                // Закрываем data reader
+                dataReader.Close();
+
+                // Авторское решение не найдено
+                throw new SimplePM_Exceptions.UnknownException();
+
+            }
+
+            // Закрываем data reader
+            dataReader.Close();
 
         }
 
