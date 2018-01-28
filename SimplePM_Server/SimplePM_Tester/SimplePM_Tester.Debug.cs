@@ -22,9 +22,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
     internal partial class SimplePM_Tester
     {
-
-
-
+        
         public void Debug()
         {
 
