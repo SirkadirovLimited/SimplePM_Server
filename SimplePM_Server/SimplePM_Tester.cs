@@ -456,7 +456,7 @@ namespace SimplePM_Server
             // Раздел объявления необходимых переменных
             ///////////////////////////////////////////////////
 
-            string authorOutput = "", userOutput = "";
+            string authorOutput, userOutput = "";
             string userErrorOutput = null;
             char debugTestingResult = '+';
             int userProblemExitCode = 0;
@@ -504,7 +504,7 @@ namespace SimplePM_Server
 
                 // Пытаемся удалить папку, содержащую авторское решение задачи
                 try { Directory.Delete(tmpAuthorDir, true); }
-                catch (Exception) {  }
+                catch (Exception) { /* Deal with it */ }
 
                 // Выбрасываем исключение
                 throw new SimplePM_Exceptions.AuthorSolutionRunningException();
@@ -748,7 +748,7 @@ namespace SimplePM_Server
             ///////////////////////////////////////////////////
 
             // Запрос на выборку всех тестов данной программы из БД
-            string querySelect = $@"
+            string querySelect = @"
                 SELECT 
                     * 
                 FROM 
