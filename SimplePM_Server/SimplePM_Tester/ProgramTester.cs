@@ -262,7 +262,7 @@ namespace SimplePM_Server.SimplePM_Tester
             _programProcess = new Process
             {
 
-                PriorityClass = ProcessPriorityClass.Normal, // устанавливаем стандартный приоритет
+                PriorityClass = ProcessPriorityClass.BelowNormal, // устанавливаем низкий приоритет
                 PriorityBoostEnabled = false, // не даём возможности увеличивать приоритет
 
                 StartInfo = programStartInfo, // устанавливаем информацию о программе
