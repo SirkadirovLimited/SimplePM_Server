@@ -31,23 +31,26 @@ namespace SimplePM_Server.SimplePM_Tester
              * к запускаемому файлу авторского
              * решения задачи
              **/
-            string authorSolutionCodeLanguage;
-            string authorSolutionExePath = GetAuthorSolutionExePath(out authorSolutionCodeLanguage);
+            var authorSolutionExePath = GetAuthorSolutionExePath(
+                out var authorSolutionCodeLanguage
+            );
 
             /*
              * Передаём новосозданным переменным
              * информацию о лимитах для пользовательского
              * процесса (пользовательского решения задачи)
              **/
-            int memoryLimit, timeLimit;
-            GetDebugProgramLimits(out memoryLimit, out timeLimit);
+            GetDebugProgramLimits(
+                out var memoryLimit,
+                out var timeLimit
+            );
             
             /*
              * Проводим нетестовый запуск авторского решения
              * и получаем всё необходимое для тестирования
              * пользовательской программы
              **/
-            Test authorTestingResult = new ProgramTester(
+            var authorTestingResult = new ProgramTester(
                 ref sConfig,
                 ref sCompilersConfig,
                 ref _compilerPlugins,
@@ -73,7 +76,7 @@ namespace SimplePM_Server.SimplePM_Tester
             ///////////////////////////////////////////////////
 
             // Запрос на выборку авторского решения из БД
-            string querySelect = $@"
+            const string querySelect = @"
                 SELECT 
                     `codeLang`, 
                     `code` 
@@ -89,13 +92,13 @@ namespace SimplePM_Server.SimplePM_Tester
             ";
 
             // Дескрипторы временных таблиц выборки из БД
-            MySqlCommand cmdSelect = new MySqlCommand(querySelect, connection);
+            var cmdSelect = new MySqlCommand(querySelect, connection);
 
             // Параметры запроса
             cmdSelect.Parameters.AddWithValue("@problemId", submissionInfo.ProblemId);
 
             // Чтение результатов запроса
-            MySqlDataReader dataReader = cmdSelect.ExecuteReader();
+            var dataReader = cmdSelect.ExecuteReader();
 
             // Объявляем необходимые переменные
             byte[] authorProblemCode;
@@ -130,20 +133,20 @@ namespace SimplePM_Server.SimplePM_Tester
             ///////////////////////////////////////////////////
 
             // Определяем расширение файла
-            string authorFileExt = "." + SimplePM_Submission.GetExtByLang(
+            var authorFileExt = "." + SimplePM_Submission.GetExtByLang(
                 authorSolutionCodeLanguage,
                 ref _compilerPlugins
             );
 
             // Получаем случайный путь к директории авторского решения
-            string tmpAuthorDir = sConfig["Program"]["tempPath"] + 
+            var tmpAuthorDir = sConfig["Program"]["tempPath"] + 
                 @"\author\" + Guid.NewGuid() + @"\";
 
             // Создаём папку текущего авторского решения задачи
             Directory.CreateDirectory(tmpAuthorDir);
 
             // Определяем путь хранения файла исходного кода вторского решения
-            string tmpAuthorSrcLocation = 
+            var tmpAuthorSrcLocation = 
                 tmpAuthorDir + "sa" + 
                 submissionInfo.SubmissionId + 
                 authorFileExt;
@@ -158,7 +161,7 @@ namespace SimplePM_Server.SimplePM_Tester
             );
 
             // Инициализируем экземпляр класса компилятора
-            SimplePM_Compiler compiler = new SimplePM_Compiler(
+            var compiler = new SimplePM_Compiler(
                 ref sConfig,
                 ref sCompilersConfig,
                 ref _compilerPlugins,
@@ -168,7 +171,7 @@ namespace SimplePM_Server.SimplePM_Tester
             );
 
             // Получаем структуру результата компиляции
-            CompilerResult cResult = compiler.ChooseCompilerAndRun();
+            var cResult = compiler.ChooseCompilerAndRun();
 
             // В случае возникновения ошибки при компиляции
             // авторского решения аварийно завершаем работу
@@ -183,7 +186,7 @@ namespace SimplePM_Server.SimplePM_Tester
         {
 
             // Запрос на выборку лимитов из БД
-            string querySelect = $@"
+            const string querySelect = @"
                 SELECT 
                     `memoryLimit`, 
                     `timeLimit` 
@@ -199,13 +202,13 @@ namespace SimplePM_Server.SimplePM_Tester
             ";
 
             // Дескрипторы временных таблиц выборки из БД
-            MySqlCommand cmdSelect = new MySqlCommand(querySelect, connection);
+            var cmdSelect = new MySqlCommand(querySelect, connection);
 
             // Параметры запроса
             cmdSelect.Parameters.AddWithValue("@problemId", submissionInfo.ProblemId);
 
             // Чтение результатов запроса
-            MySqlDataReader dataReader = cmdSelect.ExecuteReader();
+            var dataReader = cmdSelect.ExecuteReader();
             
             // Читаем полученные данные
             if (dataReader.Read())
