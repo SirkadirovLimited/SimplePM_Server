@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using CompilerBase;
 using IniParser.Model;
 using MySql.Data.MySqlClient;
-
 using static SimplePM_Server.SimplePM_Submission;
 
 namespace SimplePM_Server.SimplePM_Tester
