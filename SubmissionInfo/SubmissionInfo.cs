@@ -18,6 +18,7 @@
         public byte[] ProblemCode { get; set; }
 
         public int ProblemDifficulty { get; set; }
+        public bool AdaptProgramOutput { get; set; }
 
         public SubmissionInfo
         (
@@ -34,7 +35,8 @@
 
             byte[] _problemCode,
 
-            int _problemDifficulty = 0
+            int _problemDifficulty = 0,
+            bool _adaptProgramOutput = true
         )
         {
 
@@ -52,6 +54,7 @@
             ProblemCode = _problemCode;
 
             ProblemDifficulty = _problemDifficulty;
+            AdaptProgramOutput = _adaptProgramOutput;
 
         }
 
