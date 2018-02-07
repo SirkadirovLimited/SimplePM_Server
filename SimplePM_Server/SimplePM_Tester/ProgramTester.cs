@@ -46,8 +46,9 @@ namespace SimplePM_Server.SimplePM_Tester
         private          string                _programOutput = "";            // данные из выходного потока программы
         private          string                _programErrorOutput;            // данные из выходного потока ошибок программы
         private          Process               _programProcess;                // ссылка на дескриптор процесса
+        private readonly bool                  _adaptOutput;                   // 
 
-        private          bool                  _TestingResultReceived = false; // указывает, есть ли результат тестирования
+        private          bool                  _testingResultReceived = false; // указывает, есть ли результат тестирования
         private          char                  _testingResult;                 // результат тестирования
         
         private ProcessStartInfo programStartInfo = new ProcessStartInfo
@@ -83,7 +84,8 @@ namespace SimplePM_Server.SimplePM_Tester
             long memoryLimit = 0,
             int processorTimeLimit = 0,
             string input = null,
-            int outputCharsLimit = 0
+            int outputCharsLimit = 0,
+            bool adaptOutput = true
         )
         {
 
@@ -102,6 +104,8 @@ namespace SimplePM_Server.SimplePM_Tester
 
             _programInputString = input;
             _outputCharsLimit = outputCharsLimit;
+
+            _adaptOutput = adaptOutput;
 
         }
 
@@ -315,7 +319,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 {
 
                     // Указываем, что результат тестирования получен
-                    _TestingResultReceived = true;
+                    _testingResultReceived = true;
 
                     // Указываем результат тестирования
                     _testingResult = 'I';
@@ -334,7 +338,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
                 // Выходные данные
                 ErrorOutput = _programErrorOutput,
-                Output = _programOutput,
+                Output = (_adaptOutput) ? _programOutput.TrimEnd('\r', '\n') : _programOutput,
 
                 // Результаты предварительного тестирования
                 ExitCode = _programProcess.ExitCode,
@@ -367,12 +371,12 @@ namespace SimplePM_Server.SimplePM_Tester
              * Проверка на использованную память
              */
 
-            checker = !_TestingResultReceived && _programMemoryLimit > 0 &&
+            checker = !_testingResultReceived && _programMemoryLimit > 0 &&
                 _programProcess.PeakWorkingSet64 > _programMemoryLimit;
 
             if (checker)
             {
-                _TestingResultReceived = true;
+                _testingResultReceived = true;
                 _testingResult = 'M';
             }
 
@@ -380,7 +384,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Проверка достижения лимита по процессорному времени
              */
 
-            checker = !_TestingResultReceived && _programProcessorTimeLimit > 0 &&
+            checker = !_testingResultReceived && _programProcessorTimeLimit > 0 &&
                       Convert.ToInt32(
                           Math.Round(
                               _programProcess.TotalProcessorTime.TotalMilliseconds
@@ -390,7 +394,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
             if (checker)
             {
-                _TestingResultReceived = true;
+                _testingResultReceived = true;
                 _testingResult = 'T';
             }
 
@@ -398,13 +402,13 @@ namespace SimplePM_Server.SimplePM_Tester
              * Проверка на обнаружение Runtime-ошибок
              */
 
-            checker = !_TestingResultReceived &&
+            checker = !_testingResultReceived &&
                 _programProcess.ExitCode != 0 &&
                 _programProcess.ExitCode != -1;
 
             if (checker)
             {
-                _TestingResultReceived = true;
+                _testingResultReceived = true;
                 _testingResult = 'R';
             }
 
@@ -412,7 +416,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Проверка на наличие текста в выходном потоке ошибок
              */
 
-            if (!_TestingResultReceived)
+            if (!_testingResultReceived)
             {
 
                 // Читаем выходной поток ошибок
@@ -422,7 +426,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 if (_programErrorOutput.Length > 0)
                 {
 
-                    _TestingResultReceived = true;
+                    _testingResultReceived = true;
                     _testingResult = 'E';
 
                 }
@@ -432,10 +436,10 @@ namespace SimplePM_Server.SimplePM_Tester
             /*
              * Если всё хорошо, возвращаем временный результат
              */
-            if (!_TestingResultReceived)
+            if (!_testingResultReceived)
             {
 
-                _TestingResultReceived = true;
+                _testingResultReceived = true;
                 _testingResult = Test.MiddleSuccessResult;
 
             }
@@ -449,7 +453,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Если результат тестирования уже
              * имеется, не стоит ничего делать
              */
-            if (_TestingResultReceived)
+            if (_testingResultReceived)
                 return;
             
             /*
@@ -460,7 +464,7 @@ namespace SimplePM_Server.SimplePM_Tester
             {
 
                 // Указываем, что результаты проверки уже есть
-                _TestingResultReceived = true;
+                _testingResultReceived = true;
 
                 // Указываем результат тестирования
                 _testingResult = 'O';
@@ -477,8 +481,10 @@ namespace SimplePM_Server.SimplePM_Tester
              * В ином случае дозаписываем данные
              * в соответственную переменную
              */
-            
-            _programOutput += (_programOutput.Length > 0) ? e.Data : e.Data + '\n';
+
+            var adaptedString = (_adaptOutput) ? e.Data.Trim() : e.Data;
+
+            _programOutput += (_programOutput.Length > 0) ? adaptedString : adaptedString + '\n';
 
         }
 
