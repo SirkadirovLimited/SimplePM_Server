@@ -30,7 +30,7 @@ namespace SimplePM_Server.SimplePM_Tester
         /// Раздел объявления необходимых переменных.
         ///////////////////////////////////////////////////
 
-        public Test[] testingResults; //!< Массив, содержащий информацию о тестировании пользовательского решения
+        public Test[] TestingResults; //!< Массив, содержащий информацию о тестировании пользовательского решения
 
         ///////////////////////////////////////////////////
         /// Метод является переопределением стандартного
@@ -41,7 +41,7 @@ namespace SimplePM_Server.SimplePM_Tester
         {
 
             // Инициализируем массив результатов тестирования
-            testingResults = new Test[testsCount];
+            TestingResults = new Test[testsCount];
 
         }
 
@@ -64,7 +64,7 @@ namespace SimplePM_Server.SimplePM_Tester
             {
 
                 // С помощью LINQ запроса формируем строку результата
-                resultLine = testingResults.Aggregate("", (current, test) => current + (test.Result + splitter));
+                resultLine = TestingResults.Aggregate("", (current, test) => current + (test.Result + splitter));
 
                 /*
                  * Удаляем все ненужные символы
@@ -104,7 +104,7 @@ namespace SimplePM_Server.SimplePM_Tester
             {
 
                 // С помощью LINQ запроса формируем строку результата
-                resultLine = testingResults.Aggregate("", (current, test) => current + (test.ExitCode + splitter));
+                resultLine = TestingResults.Aggregate("", (current, test) => current + (test.ExitCode + splitter));
 
                 /*
                  * Удаляем все ненужные символы
@@ -144,7 +144,7 @@ namespace SimplePM_Server.SimplePM_Tester
             {
 
                 // С помощью LINQ запроса формируем строку результата
-                resultLine = testingResults.Aggregate("", (current, test) => current + (test.UsedMemory + splitter));
+                resultLine = TestingResults.Aggregate("", (current, test) => current + (test.UsedMemory + splitter));
 
                 /*
                  * Удаляем все ненужные символы
@@ -184,7 +184,7 @@ namespace SimplePM_Server.SimplePM_Tester
             {
 
                 // С помощью LINQ запроса формируем строку результата
-                resultLine = testingResults.Aggregate("", (current, test) => current + (test.UsedProcessorTime + splitter));
+                resultLine = TestingResults.Aggregate("", (current, test) => current + (test.UsedProcessorTime + splitter));
 
                 /*
                  * Удаляем все ненужные символы
@@ -223,7 +223,7 @@ namespace SimplePM_Server.SimplePM_Tester
             {
 
                 // С помощью LINQ запроса формируем строку результата
-                resultLine = testingResults.Aggregate("", (current, test) => current + (test.ErrorOutput + "\r\n"));
+                resultLine = TestingResults.Aggregate("", (current, test) => current + (test.ErrorOutput + "\r\n"));
 
                 /*
                  * Удаляем все ненужные символы
@@ -257,7 +257,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Выполняем LINQ запрос на выборку и проверку, после
              * чего возвращаем результат выполнения метода.
              **/
-            return testingResults.Aggregate(true, (current, test) => current && test.IsSuccessful);
+            return TestingResults.Aggregate(true, (current, test) => current && test.IsSuccessful);
 
         }
 
