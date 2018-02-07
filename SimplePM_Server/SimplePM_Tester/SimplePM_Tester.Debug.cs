@@ -23,7 +23,7 @@ namespace SimplePM_Server.SimplePM_Tester
     internal partial class SimplePM_Tester
     {
         
-        public void Debug()
+        public ProgramTestingResult Debug()
         {
 
             /*
@@ -57,15 +57,46 @@ namespace SimplePM_Server.SimplePM_Tester
                 authorSolutionCodeLanguage,
                 authorSolutionExePath,
                 "-author-solution",
+                memoryLimit,
+                timeLimit,
+                submissionInfo.CustomTest,
                 0,
-                0,
-                submissionInfo.CustomTest
+                submissionInfo.AdaptProgramOutput
             ).RunTesting();
 
             if (authorTestingResult.Result != Test.MiddleSuccessResult)
                 throw new SimplePM_Exceptions.AuthorSolutionRunningException();
 
-			throw new NotImplementedException();
+            var userTestingResult = new ProgramTester(
+                ref sConfig,
+                ref sCompilersConfig,
+                ref _compilerPlugins,
+                submissionInfo.CodeLang,
+                exeFileUrl,
+                "-user-solution",
+                memoryLimit,
+                timeLimit,
+                submissionInfo.CustomTest,
+                authorTestingResult.Output.Length,
+                submissionInfo.AdaptProgramOutput
+            ).RunTesting();
+            
+            if (userTestingResult.Result == Test.MiddleSuccessResult)
+            {
+
+                userTestingResult.Result = (userTestingResult.Output == authorTestingResult.Output) ? '+' : '-';
+
+            }
+
+            var programTestingResult = new ProgramTestingResult(1)
+            {
+                TestingResults =
+                {
+                    [0] = userTestingResult
+                }
+            };
+
+            return programTestingResult;
 
         }
 
