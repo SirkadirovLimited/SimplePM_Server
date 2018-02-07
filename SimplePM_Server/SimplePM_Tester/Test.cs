@@ -28,6 +28,10 @@ namespace SimplePM_Server.SimplePM_Tester
         ///////////////////////////////////////////////////
 
         public const char MiddleSuccessResult = '*';
+        public const char TimeLimitResult = 'T';
+        public const char MemoryLimitResult = 'M';
+        public const char RuntimeErrorResult = 'R';
+        public const char OutputErrorResult = 'O';
         
         ///////////////////////////////////////////////////
         /// Раздел объявления используемых переменных
