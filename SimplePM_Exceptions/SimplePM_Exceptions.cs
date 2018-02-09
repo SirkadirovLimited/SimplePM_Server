@@ -56,6 +56,18 @@ namespace SimplePM_Exceptions
     }
 
     [Serializable]
+    public class DatabaseQueryException : Exception
+    {
+
+        public DatabaseQueryException() { }
+
+        public DatabaseQueryException(string message) : base(message) { }
+
+        public DatabaseQueryException(string message, Exception inner) : base(message, inner) { }
+
+    }
+
+    [Serializable]
     public class UnknownException : Exception
     {
 
