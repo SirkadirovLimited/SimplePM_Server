@@ -135,11 +135,14 @@ namespace SimplePM_Server.SimplePM_Tester
 
         private string GetAuthorSolutionExePath(out string authorSolutionCodeLanguage)
         {
-            ///////////////////////////////////////////////////
-            // Выборка информации об авторском решении задачи
-            ///////////////////////////////////////////////////
-
-            // Запрос на выборку авторского решения из БД
+            
+            /*
+             * Выборка информации об
+             * авторском решении из
+             * базы данных SimplePM.
+             */
+            
+            // Формируем SQL запрос
             const string querySelect = @"
                 SELECT 
                     `codeLang`, 
@@ -154,11 +157,8 @@ namespace SimplePM_Server.SimplePM_Tester
                     1
                 ;
             ";
-
-            // Дескрипторы временных таблиц выборки из БД
+            
             var cmdSelect = new MySqlCommand(querySelect, connection);
-
-            // Параметры запроса
             cmdSelect.Parameters.AddWithValue("@problemId", submissionInfo.ProblemId);
 
             // Чтение результатов запроса
@@ -177,6 +177,9 @@ namespace SimplePM_Server.SimplePM_Tester
                 // Язык авторского решения
                 authorSolutionCodeLanguage = dataReader["codeLang"].ToString();
 
+                // Закрываем data reader
+                dataReader.Close();
+
             }
             else
             {
@@ -188,13 +191,12 @@ namespace SimplePM_Server.SimplePM_Tester
                 throw new SimplePM_Exceptions.AuthorSolutionNotFoundException();
 
             }
-
-            // Закрываем data reader
-            dataReader.Close();
             
-            ///////////////////////////////////////////////////
-            // Скачивание и компиляция авторского решения
-            ///////////////////////////////////////////////////
+            /*
+             * Компиляция авторского решения
+             * поставленной задачи с последующим
+             * возвращением результатов компиляции.
+             */
 
             // Определяем расширение файла
             var authorFileExt = "." + SimplePM_Submission.GetExtByLang(
@@ -216,7 +218,10 @@ namespace SimplePM_Server.SimplePM_Tester
                 authorFileExt;
 
             // Записываем исходный код авторского решения в заданный временный файл
-            File.WriteAllBytes(tmpAuthorSrcLocation, authorProblemCode);
+            File.WriteAllBytes(
+                tmpAuthorSrcLocation,
+                authorProblemCode
+            );
 
             // Устанавливаем его аттрибуты
             File.SetAttributes(
@@ -237,8 +242,13 @@ namespace SimplePM_Server.SimplePM_Tester
             // Получаем структуру результата компиляции
             var cResult = compiler.ChooseCompilerAndRun();
 
-            // В случае возникновения ошибки при компиляции
-            // авторского решения аварийно завершаем работу
+            /*
+             * В случае возникновения ошибки при компиляции
+             * авторского решения аварийно завершаем работу
+             * функции и выбрасываем исключение, содержащее
+             * информацию о файле и причине ошибки при  его
+             * открытии.
+             */
             if (cResult.HasErrors)
                 throw new FileLoadException(cResult.ExeFullname);
             
@@ -249,7 +259,15 @@ namespace SimplePM_Server.SimplePM_Tester
         private void GetDebugProgramLimits(out int memoryLimit, out int timeLimit)
         {
 
-            // Запрос на выборку лимитов из БД
+            /*
+             * Формируем и выполняем запрос к
+             * базе  данных  системы, который
+             * позволит нам узнать информацию
+             * о лимитах для пользовательской
+             * программы.
+             */
+
+            // Формируем SQL запрос
             const string querySelect = @"
                 SELECT 
                     `memoryLimit`, 
@@ -265,10 +283,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 ;
             ";
 
-            // Дескрипторы временных таблиц выборки из БД
             var cmdSelect = new MySqlCommand(querySelect, connection);
-
-            // Параметры запроса
             cmdSelect.Parameters.AddWithValue("@problemId", submissionInfo.ProblemId);
 
             // Чтение результатов запроса
@@ -278,11 +293,14 @@ namespace SimplePM_Server.SimplePM_Tester
             if (dataReader.Read())
             {
 
-                // Memory limit
+                // Получаем лимит по используемой программой памяти
                 memoryLimit = int.Parse(dataReader["memoryLimit"].ToString());
 
-                // Time limit
+                // Получаем лимит по используемом программой процессорному времени
                 timeLimit = int.Parse(dataReader["timeLimit"].ToString());
+
+                // Закрываем data reader
+                dataReader.Close();
 
             }
             else
@@ -291,13 +309,14 @@ namespace SimplePM_Server.SimplePM_Tester
                 // Закрываем data reader
                 dataReader.Close();
 
-                // Авторское решение не найдено
-                throw new SimplePM_Exceptions.UnknownException();
+                /*
+                 * Выбрасываем исключение, которое означает
+                 * присутствие ошибки при попытке получения
+                 * информации с базы данных системы.
+                 */
+                throw new SimplePM_Exceptions.DatabaseQueryException();
 
             }
-
-            // Закрываем data reader
-            dataReader.Close();
 
         }
 
