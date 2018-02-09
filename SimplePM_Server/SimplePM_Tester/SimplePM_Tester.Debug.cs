@@ -41,8 +41,8 @@ namespace SimplePM_Server.SimplePM_Tester
              * процесса (пользовательского решения задачи)
              **/
             GetDebugProgramLimits(
-                out var memoryLimit,
-                out var timeLimit
+                out var memoryLimit, // переменная, хранящая значение лимита по памяти
+                out var timeLimit // переменная, хранящая значение лимита по процессорному времени
             );
             
             /*
@@ -64,9 +64,24 @@ namespace SimplePM_Server.SimplePM_Tester
                 submissionInfo.AdaptProgramOutput
             ).RunTesting();
 
+            /*
+             * Проверяем, успешно ли проведен запуск
+             * авторского решения задачи. В случае
+             * обнаружения каких-либо ошибок выбрасываем
+             * исключение AuthorSolutionRunningException,
+             * которое информирует улавливатель исключений
+             * о необходимости предоставления информации
+             * об ошибке в лог-файлах сервера и прочих
+             * местах, где это важно и необходимо.
+             */
             if (authorTestingResult.Result != Test.MiddleSuccessResult)
                 throw new SimplePM_Exceptions.AuthorSolutionRunningException();
-
+            
+            /*
+             * Проводим тестовый запуск пользовательского
+             * решения поставленной задачи и получаем всё
+             * необходимое для тестирования программы.
+             **/
             var userTestingResult = new ProgramTester(
                 ref sConfig,
                 ref sCompilersConfig,
@@ -81,13 +96,26 @@ namespace SimplePM_Server.SimplePM_Tester
                 submissionInfo.AdaptProgramOutput
             ).RunTesting();
             
+            /*
+             * Если результат тестирования не полностью
+             * известен, осуществляем проверку по дополнительным
+             * тестам и выдвигаем остаточный результат debug
+             * тестирования пользовательского решения задачи.
+             */
             if (userTestingResult.Result == Test.MiddleSuccessResult)
             {
-
-                userTestingResult.Result = (userTestingResult.Output == authorTestingResult.Output) ? '+' : '-';
-
+                userTestingResult.Result = (
+                    userTestingResult.Output == authorTestingResult.Output
+                ) ? '+' : '-';
             }
 
+            /*
+             * Формируем результат тестирования пользовательского
+             * решения поставленной задачи, добавляем информацию
+             * о единственном тесте, который был проведен
+             * непосредственно при тестировании данного
+             * пользовательского решения данной задачи.
+             */
             var programTestingResult = new ProgramTestingResult(1)
             {
                 TestingResults =
@@ -96,6 +124,11 @@ namespace SimplePM_Server.SimplePM_Tester
                 }
             };
 
+            /*
+             * Возвращаем сформированный результат
+             * тестирования пользовательского
+             * решения поставленной задачи.
+             */
             return programTestingResult;
 
         }
