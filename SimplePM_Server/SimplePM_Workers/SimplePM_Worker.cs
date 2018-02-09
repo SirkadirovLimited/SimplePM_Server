@@ -34,7 +34,6 @@ using NLog;
 using NLog.Config;
 // Работа с файловой системой
 using System.IO;
-using System.Linq;
 // Использование запросов
 using System.Reflection;
 
@@ -63,17 +62,16 @@ namespace SimplePM_Server
          **/
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
         
-        private ulong _customersCount; //!< Количество текущих обрабатываемых запросов
+        private ulong _customersCount;    //!< Количество текущих обрабатываемых запросов
         private ulong _maxCustomersCount; //!< Максимальное количество обрабатываемых запросов
         
-        public IniData sConfig; //!< Дескриптор конфигурационного файла
+        public IniData sConfig;          //!< Дескриптор конфигурационного файла
         public IniData sCompilersConfig; //!< Дескриптор конфигурационного файла модулей компиляции
         
         private int SleepTime = 500; //!< Период ожидания
-        
         private string EnabledLangs; //!< Список поддерживаемых ЯП для SQL запросов
 
-        public List<ICompilerPlugin> _compilerPlugins = new List<ICompilerPlugin>(); //!< Список, содержащий ссылки на модули компиляторов
+        public List<ICompilerPlugin> _compilerPlugins; //!< Список, содержащий ссылки на модули компиляторов
 
         ///////////////////////////////////////////////////
         /// Функция загружает в память компиляционные
@@ -92,17 +90,23 @@ namespace SimplePM_Server
             logger.Debug("ICompilerPlugin modules are being loaded...");
 
             /*
+             * Проводим инициализацию необходимых для продолжения
+             * работы переменных.
+             */
+            _compilerPlugins = new List<ICompilerPlugin>();
+
+            /*
              * Учитывая тот факт, что каждый раздел в конфигурационном
              * файле сторонних модулей компиляции определяет собственных
              * модуль компиляции, осуществляем перебор всех секций этого
              * конфигурационного файла и загружаем найденные модули,
              * которые подпадают под все требования и условия поиска.
              **/
-            foreach (SectionData section in sCompilersConfig.Sections)
+            foreach (var section in sCompilersConfig.Sections)
             {
 
                 // Формируем полный путь к предполягаемому модулю компиляции
-                string compilerPluginPath = Path.Combine(
+                var compilerPluginPath = Path.Combine(
                     sConfig["Program"]["ICompilerPlugin_directory"],
                     "ICompilerPlugin." + section.SectionName + ".dll"
                 );
@@ -369,7 +373,7 @@ namespace SimplePM_Server
             Console.WriteLine(EnabledLangs);
 #endif
 
-            while (42 == 42)
+            while (true)
             {
 
 #if DEBUG
@@ -405,7 +409,7 @@ namespace SimplePM_Server
                 }
 
                 // Проверка
-                bool tmpCheck = rechecksCount >= uint.Parse(sConfig["Connection"]["rechecks_without_timeout"]);
+                var tmpCheck = rechecksCount >= uint.Parse(sConfig["Connection"]["rechecks_without_timeout"]);
 
                 if (_customersCount < _maxCustomersCount && tmpCheck)
                 {
@@ -423,7 +427,7 @@ namespace SimplePM_Server
             }
 
             ///////////////////////////////////////////////////
-
+            
         }
 
         ///////////////////////////////////////////////////
@@ -453,7 +457,7 @@ namespace SimplePM_Server
             {
                 
                 // Формируем запрос на выборку
-                string querySelect = $@"
+                var querySelect = $@"
                     SELECT 
                         * 
                     FROM 
@@ -476,13 +480,13 @@ namespace SimplePM_Server
                 SubmissionInfo.SubmissionInfo submissionInfo;
 
                 // Создаём запрос на выборку из базы данных
-                MySqlCommand cmdSelect = new MySqlCommand(querySelect, conn);
+                var cmdSelect = new MySqlCommand(querySelect, conn);
 
                 // Производим выборку полученных результатов из временной таблицы
-                MySqlDataReader dataReader = cmdSelect.ExecuteReader();
+                var dataReader = cmdSelect.ExecuteReader();
 
                 // Объявляем временную переменную, так называемый "флаг"
-                bool f = false;
+                bool f;
 
                 // Делаем различные проверки в безопасном контексте
                 lock (new object())
@@ -542,7 +546,7 @@ namespace SimplePM_Server
                     dataReader.Close();
 
                     // Устанавливаем статус запроса на "в обработке"
-                    string queryUpdate = $@"
+                    var queryUpdate = $@"
                         UPDATE 
                             `spm_submissions` 
                         SET 
@@ -558,7 +562,7 @@ namespace SimplePM_Server
                     new MySqlCommand(queryUpdate, conn).ExecuteNonQuery();
 
                     // Получаем сложность поставленной задачи
-                    string queryGetDifficulty = $@"
+                    var queryGetDifficulty = $@"
                         SELECT 
                             `difficulty` 
                         FROM 
@@ -570,8 +574,10 @@ namespace SimplePM_Server
                         ;
                     ";
 
-                    MySqlCommand cmdGetProblemDifficulty = new MySqlCommand(queryGetDifficulty, conn);
-                    submissionInfo.ProblemDifficulty = int.Parse(cmdGetProblemDifficulty.ExecuteScalar().ToString());
+                    var cmdGetProblemDifficulty = new MySqlCommand(queryGetDifficulty, conn);
+                    submissionInfo.ProblemDifficulty = int.Parse(
+                        cmdGetProblemDifficulty.ExecuteScalar().ToString()
+                    );
 
                     /*
                      * Зовём официанта-шляпочника
