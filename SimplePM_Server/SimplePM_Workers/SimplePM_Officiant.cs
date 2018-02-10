@@ -8,7 +8,6 @@
  * @Email: admin@sirkadirov.com
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
-/*! \file */
 
 // Основа всего
 using System;
@@ -27,8 +26,8 @@ using NLog;
 
 namespace SimplePM_Server
 {
-    /*!
-     * \brief
+
+    /*
      * Класс официанта, который занимается
      * обработкой пользовательских запросов
      * на тестирование решений задач по
@@ -37,43 +36,32 @@ namespace SimplePM_Server
 
     internal class SimplePM_Officiant
     {
-
-        ///////////////////////////////////////////////////
-        // РАЗДЕЛ ОБЪЯВЛЕНИЯ ГЛОБАЛЬНЫХ ПЕРЕМЕННЫХ
-        ///////////////////////////////////////////////////
-
-        /*!
+        
+        /*
             Объявляем переменную указателя на менеджер журнала собылий
             и присваиваем ей указатель на журнал событий текущего класса
         */
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        private MySqlConnection connection; //!< Дескриптор соединения с БД
-        private SubmissionInfo.SubmissionInfo submissionInfo; //!< ссылка на объект, содержащий информацию о запросе на тестирование
-        private IniData sConfig; //!< Дескриптор конфигурационного файла
-        private IniData sCompilersConfig; //!< Дескриптор конфигурационного файла модулей компиляции
-        private List<ICompilerPlugin> _compilerPlugins; //!< Список загруженных модулей компиляторв
-
-        ///////////////////////////////////////////////////
-        /// Функция-конструктор официанта, обрабатывающего
-        /// пользовательский запрос на тестирование
-        /// решения поставленной задачи.
-        ///////////////////////////////////////////////////
-
-        public SimplePM_Officiant(MySqlConnection connection, ref IniData sConfig, ref IniData sCompilersConfig, ref List<ICompilerPlugin> _compilerPlugins, SubmissionInfo.SubmissionInfo submissionInfo)
+        private MySqlConnection connection; // Дескриптор соединения с БД
+        private SubmissionInfo.SubmissionInfo submissionInfo; // Ссылка на объект, содержащий информацию о запросе на тестирование
+        private IniData sConfig; // Дескриптор конфигурационного файла
+        private IniData sCompilersConfig; // Дескриптор конфигурационного файла модулей компиляции
+        private List<ICompilerPlugin> _compilerPlugins; // Список загруженных модулей компиляторв
+        
+        public SimplePM_Officiant(
+            MySqlConnection connection,
+            ref IniData sConfig,
+            ref IniData sCompilersConfig,
+            ref List<ICompilerPlugin> _compilerPlugins,
+            SubmissionInfo.SubmissionInfo submissionInfo
+        )
         {
-
-            // Connection
+            
             this.connection = connection;
-
-            // Configuration files
             this.sConfig = sConfig;
             this.sCompilersConfig = sCompilersConfig;
-
-            // Compiler plugins
             this._compilerPlugins = _compilerPlugins;
-
-            // Submission information
             this.submissionInfo = submissionInfo;
 
         }
@@ -89,7 +77,9 @@ namespace SimplePM_Server
         {
 
             //Генерируем имя директории
-            string directoryName = sConfig["Program"]["tempPath"] + @"\" + Guid.NewGuid() + submissionId + @"\";
+            var directoryName = sConfig["Program"]["tempPath"] + 
+                                @"\" + Guid.NewGuid() + 
+                                submissionId + @"\";
 
             //Создаём все необходимые каталоги
             Directory.CreateDirectory(directoryName);
@@ -110,23 +100,40 @@ namespace SimplePM_Server
         public void ServeSubmission()
         {
             
-            ///////////////////////////////////////////////////
-            // РАБОТА С ФАЙЛОМ ИСХОДНОГО КОДА
-            ///////////////////////////////////////////////////
+            /*
+             * Проводим работу с файлом исходного кода
+             */
 
-            //Определяем расширение файла
-            string fileExt = "." + SimplePM_Submission.GetExtByLang(submissionInfo.CodeLang, ref _compilerPlugins);
-            //Определяем полный путь к файлу
-            string fileLocation = RandomGenSourceFileLocation(submissionInfo.SubmissionId.ToString(), fileExt);
+            // Определяем расширение файла
+            var fileExt = "." + SimplePM_Submission.GetExtByLang(
+                submissionInfo.CodeLang,
+                ref _compilerPlugins
+            );
+
+            // Определяем полный путь к файлу
+            var fileLocation = RandomGenSourceFileLocation(
+                submissionInfo.SubmissionId.ToString(),
+                fileExt
+            );
             
-            //Записываем в него исходный код, очищаем буфер и закрываем поток записи
-            File.WriteAllBytes(fileLocation, submissionInfo.ProblemCode);
+            /*
+             * Записываем в него исходный код,
+             * очищаем буфер и закрываем поток
+             * записи.
+             */
+            File.WriteAllBytes(
+                fileLocation,
+                submissionInfo.ProblemCode
+            );
 
-            //Устанавливаем его аттрибуты
-            File.SetAttributes(fileLocation, FileAttributes.NotContentIndexed);
+            // Устанавливаем его аттрибуты
+            File.SetAttributes(
+                fileLocation,
+                FileAttributes.NotContentIndexed
+            );
 
-            //Объявляем экземпляр класса компиляции
-            SimplePM_Compiler compiler = new SimplePM_Compiler(
+            // Объявляем экземпляр класса компиляции
+            var compiler = new SimplePM_Compiler(
                 ref sConfig,
                 ref sCompilersConfig,
                 ref _compilerPlugins,
@@ -134,21 +141,20 @@ namespace SimplePM_Server
                 fileLocation,
                 submissionInfo.CodeLang
             );
-
-            ///////////////////////////////////////////////////
-            // Вызываем функцию запуска компилятора для
-            // данного языка программирования.
-            // Функция возвращает информацию о результате
-            // компиляции пользовательской программы.
-            ///////////////////////////////////////////////////
-
-            CompilerResult cResult = compiler.ChooseCompilerAndRun();
+            
+            /*
+             * Вызываем функцию  запуска  компилятора для
+             * данного языка программирования.
+             * Функция возвращает информацию о результате
+             * компиляции пользовательской программы.
+             */
+            var cResult = compiler.ChooseCompilerAndRun();
 
             ///////////////////////////////////////////////////
             // Записываем в базу данных сообщение компилятора
             ///////////////////////////////////////////////////
             
-            string queryUpdate = $@"
+            var queryUpdate = $@"
                 UPDATE 
                     `spm_submissions` 
                 SET 
@@ -161,15 +167,14 @@ namespace SimplePM_Server
             ";
 
             new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
-
-            ///////////////////////////////////////////////////
-            // ПРОВЕРКА НА НАЛИЧИЕ ОШИБОК ПРИ КОМПИЛЯЦИИ
-            ///////////////////////////////////////////////////
-
+            
+            /*
+             * Проверка на наличие ошибок при компиляции
+             */
             if (cResult.HasErrors)
             {
 
-                //Ошибка компиляции, записываем это в БД
+                // Ошибка компиляции, записываем это в БД
                 queryUpdate = $@"
                     UPDATE 
                         `spm_submissions` 
@@ -191,15 +196,15 @@ namespace SimplePM_Server
 
                 try
                 {
-
-                    ///////////////////////////////////////////////////
-                    // ВЫПОЛНЯЕМ РАЗЛИЧНЫЕ ДЕЙСТВИЯ В ЗАВИСИМОСТИ ОТ
-                    // ТИПА ПРОВЕРКИ РЕШЕНИЯ ПОСТАВЛЕННОЙ ЗАДАЧИ
-                    ///////////////////////////////////////////////////
-
+                    
+                    /*
+                     * Выполняем  различные  действия
+                     * в зависимости от типа проверки
+                     * решения поставленной задачи.
+                     */
                     switch (submissionInfo.TestType)
                     {
-                        //Проверка синтаксиса
+                        // Проверка синтаксиса
                         case "syntax":
 
                             queryUpdate = $@"
@@ -217,13 +222,13 @@ namespace SimplePM_Server
                             new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
 
                             break;
-                        //Отладка программы по пользовательскому тесту
+                        // Отладка программы по пользовательскому тесту
                         case "debug":
 
                             try
                             {
 
-                                //Запускаем тестирование программы
+                                // Запускаем тестирование программы
                                 new SimplePM_Tester2(
                                     ref connection, // дескриптор соединения с БД
                                     ref _compilerPlugins, // список модулей поддержки компиляторов
@@ -234,15 +239,18 @@ namespace SimplePM_Server
                                 ).DebugTest();
 
                             }
-                            //Выполняем необходимые действия в случае,
-                            //когда авторское решение "ломается" при запуске или работе
+                            /*
+                             * Выполняем необходимые действия в случае,
+                             * когда  авторское  решение "ломается" при
+                             * запуске или работе.
+                             */
                             catch (SimplePM_Exceptions.AuthorSolutionRunningException)
                             {
 
-                                //Запрос на обновление данных в базе данных
+                                // Запрос на обновление данных в базе данных
                                 queryUpdate = $@"
-                                UPDATE 
-                                    `spm_submissions` 
+                                    UPDATE 
+                                        `spm_submissions` 
                                     SET 
                                         `status` = 'ready', 
                                         `errorOutput` = 'ERR_AUTHOR_SOLUTION_CRASHED', 
@@ -254,16 +262,19 @@ namespace SimplePM_Server
                                     ;
                                 ";
 
-                                //Выполняем запрос, адресованный к серверу баз данных MySQL
+                                //сВыполняем запрос, адресованный к серверу баз данных MySQL
                                 new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
 
                             }
-                            //Выполняем необходимые действия в случае,
-                            //когда авторское решение для задачи не найдено
+                            /*
+                             * Выполняем необходимые действия в случае,
+                             * когда  авторское  решение  для задачи не
+                             * найдено.
+                             */
                             catch (SimplePM_Exceptions.AuthorSolutionNotFoundException)
                             {
 
-                                //Запрос на обновление данных в базе данных
+                                // Запрос на обновление данных в базе данных
                                 queryUpdate = $@"
                                     UPDATE 
                                         `spm_submissions` 
@@ -278,7 +289,10 @@ namespace SimplePM_Server
                                     ;
                                 ";
 
-                                //Выполняем запрос, адресованный к серверу баз данных MySQL
+                                /*
+                                 * Выполняем запрос, адресованный
+                                 * к серверу баз данных MySQL.
+                                 */
                                 new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
 
                             }
@@ -291,10 +305,10 @@ namespace SimplePM_Server
                             }
 
                             break;
-                        //Отправка решения задачи
+                        // Отправка решения задачи
                         case "release":
 
-                            //Запускаем тестирование программы
+                            // Запускаем тестирование программы
                             new SimplePM_Tester2(
                                 ref connection, // дескриптор соединения с БД
                                 ref _compilerPlugins, // список модулей поддержки компиляторов
@@ -321,8 +335,12 @@ namespace SimplePM_Server
                     //Записываем информацию об ошибке в лог сервера
                     logger.Error(ex);
 
-                    //Делаем так, чтобы несчастливую отправку обрабатывал
-                    //кто-то другой, но только не мы (а может и мы, но позже)
+                    /*
+                     * Делаем так, чтобы несчастливую
+                     * отправку  обрабатывал   кто-то
+                     * другой,    но    только  не мы
+                     * (а может и мы, но позже).
+                     */
                     queryUpdate = $@"
                         UPDATE 
                             `spm_submissions` 
@@ -337,19 +355,19 @@ namespace SimplePM_Server
                         ;
                     ";
 
-                    //Создаём команду
-                    MySqlCommand cmd = new MySqlCommand(queryUpdate, connection);
+                    // Создаём команду
+                    var cmd = new MySqlCommand(queryUpdate, connection);
 
-                    //Устанавливаем значения параметров
+                    // Устанавливаем значения параметров
                     cmd.Parameters.AddWithValue("@output", ex);
 
-                    //Выполняем команду
+                    // Выполняем команду
                     cmd.ExecuteNonQuery();
 
-                    //Вызываем сборщика мусора
+                    // Вызываем сборщика мусора
                     ClearCache(cResult.ExeFullname, fileLocation);
 
-                    //Выходим
+                    // Выходим
                     return;
 
                 }
@@ -371,19 +389,24 @@ namespace SimplePM_Server
         public void ClearCache(string exe_fullname, string fileLocation)
         {
 
-            //Очищаем папку экзешников от мусора.
-            //В случае ошибки ничего не делаем.
+            /*
+             * Очищаем папку экзешников от мусора.
+             * В случае ошибки ничего не делаем.
+             */
             try
             {
 
-                //Удаляем каталог временных файлов
-                Directory.Delete(new FileInfo(fileLocation).DirectoryName, true);
+                // Удаляем каталог временных файлов
+                Directory.Delete(
+                    new FileInfo(fileLocation).DirectoryName,
+                    true
+                );
 
-                //Вызываем сборщик мусора оптимизированным методом
+                // Вызываем сборщик мусора оптимизированным методом
                 GC.Collect(2, GCCollectionMode.Optimized);
 
             }
-            catch (Exception) {  }
+            catch (Exception) { /* Deal with it. */ }
 
         }
         

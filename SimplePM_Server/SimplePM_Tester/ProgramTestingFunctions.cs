@@ -8,12 +8,9 @@
  * @Email: admin@sirkadirov.com
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
-/*! \file */
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Security;
 using CompilerBase;
 using IniParser.Model;
@@ -21,11 +18,11 @@ using IniParser.Model;
 namespace SimplePM_Server.SimplePM_Tester
 {
 
-    /*!
-     * \brief
-     * Класс, содержащий методы, необходимые для
-     * проведения корректного тестирования пользовательских
-     * решений задач по программированию
+    /*
+     * Класс,  содержащий методы,  необходимые
+     * для проведения корректного тестирования
+     * пользовательских   решений   задач   по
+     * программированию.
      */
     
     internal class ProgramTestingFunctions

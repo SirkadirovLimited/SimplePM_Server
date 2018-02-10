@@ -8,9 +8,6 @@
  * @Email: admin@sirkadirov.com
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
-/*! \file */
-
-// Для работы с процессами
 
 using System;
 using System.Diagnostics;

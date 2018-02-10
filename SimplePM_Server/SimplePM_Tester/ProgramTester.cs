@@ -8,7 +8,6 @@
  * @Email: admin@sirkadirov.com
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
-/*! \file */
 
 using System;
 using System.Collections.Generic;
@@ -21,11 +20,11 @@ using IniParser.Model;
 namespace SimplePM_Server.SimplePM_Tester
 {
 
-    /*!
-     * \brief
-     * Класс, содержащий методы для выполнения единичного
-     * тестирования пользовательского и авторского решений
-     * поставленных задач по программированию.
+    /*
+     * Класс,  содержащий  методы для выполнения
+     * единичного тестирования пользовательского
+     * и авторского  решений  поставленных задач
+     * по программированию.
      */
 
     internal class ProgramTester
@@ -122,21 +121,31 @@ namespace SimplePM_Server.SimplePM_Tester
             if (_programMemoryLimit > 0)
             {
 
-                // Создаём новую задачу и ставим её на выполнение
+                /*
+                 * Создаём  новую  задачу и
+                 * ставим её на выполнение.
+                 */
                 new Task(() => {
 
                     // Защита от всевозможных исключений
                     try
                     {
 
-                        // Крутим цикл пока пользовательский процесс не завершится
+                        /*
+                         * Крутим цикл пока пользовательский
+                         * процесс не завершится.
+                         */
                         while (!_programProcess.HasExited)
                         {
 
                             // Удаляем весь кэш, связанный с компонентом
                             _programProcess.Refresh();
 
-                            // Проверяем на превышение лимита и в случае обнаружения, "убиваем" процесс
+                            /*
+                             * Проверяем  на  превышение  лимита
+                             * и в случае обнаружения, "убиваем"
+                             * процесс.
+                             */
                             if (_programProcess.PeakWorkingSet64 > _programMemoryLimit)
                                 _programProcess.Kill();
 
@@ -168,21 +177,31 @@ namespace SimplePM_Server.SimplePM_Tester
             if (_programProcessorTimeLimit > 0)
             {
 
-                // Создаём новую задачу и ставим её на выполнение
+                /*
+                 * Создаём  новую  задачу и
+                 * ставим её на выполнение.
+                 */
                 new Task(() => {
 
                     // Защита от всевозможных исключений
                     try
                     {
 
-                        // Крутим цикл пока пользовательский процесс не завершится
+                        /*
+                         * Крутим цикл пока пользовательский
+                         * процесс не завершится.
+                         */
                         while (!_programProcess.HasExited)
                         {
 
                             // Удаляем весь кэш, связанный с компонентом
                             _programProcess.Refresh();
 
-                            // Проверяем на превышение лимита и в случае обнаружения, "убиваем" процесс
+                            /*
+                             * Проверяем  на  превышение  лимита
+                             * и в случае обнаружения, "убиваем"
+                             * процесс.
+                             */
                             if (Convert.ToInt32(Math.Round(_programProcess.TotalProcessorTime.TotalMilliseconds)) > _programProcessorTimeLimit)
                                 _programProcess.Kill();
 
@@ -213,22 +232,43 @@ namespace SimplePM_Server.SimplePM_Tester
             // Запускаем пользовательский процесс
             _programProcess.Start();
             
-            // Записываем входные данные во входной поток
+            /*
+             * Записываем входные
+             * данные во  входной
+             * поток.
+             */
             WriteInputString();
 
-            // Вызываем метод, запускающий слежение за памятью
+            /*
+             * Вызываем метод, запускающий
+             * слежение за памятью.
+             */
             StartProcessorTimeLimitChecker();
 
-            // Вызываем метод, запускающий слежение за процессорным временем
+            /*
+             * Вызываем метод, запускающий
+             * слежение  за   процессорным
+             * временем.
+             */
             StartMemoryLimitChecker();
 
-            // Ожидаем завершения пользовательского процесса
+            /*
+             * Ожидаем завершения
+             * пользовательского
+             * процесса.
+             */
             _programProcess.WaitForExit();
 
-            // Освобождаем все связанные с процессом ресурсы
+            /*
+             * Освобождаем все связанные
+             * с процессом ресурсы.
+             */
             _programProcess.Close();
 
-            // Возвращаем промежуточный результат тестирования
+            /*
+             * Возвращаем промежуточный
+             * результат тестирования.
+             */
             return GenerateTestResult();
 
         }
@@ -285,13 +325,16 @@ namespace SimplePM_Server.SimplePM_Tester
         private void WriteInputString()
         {
             
-            // Для обеспечения безопасности отлавливаем все исключения
+            /*
+             * Для обеспечения безопасности
+             * отлавливаем все исключения.
+             */
             try
             {
 
                 // Записываем входные данные во входной поток
                 _programProcess.StandardInput.Write(_programInputString);
-
+                
                 // Очищаем буферы
                 _programProcess.StandardInput.Flush();
 
