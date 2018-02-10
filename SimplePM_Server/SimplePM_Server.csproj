@@ -195,6 +195,10 @@
       <Project>{310e02f7-2d77-43fa-9ae1-9edf2af605ca}</Project>
       <Name>PluginBase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ReleaseTestInfo\ReleaseTestInfo.csproj">
+      <Project>{e25f67e4-58d5-4a8e-885c-7098745bdea4}</Project>
+      <Name>ReleaseTestInfo</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SimplePM_Exceptions\SimplePM_Exceptions.csproj">
       <Project>{bada387e-df27-4ab7-9b11-f3ea89630494}</Project>
       <Name>SimplePM_Exceptions</Name>
