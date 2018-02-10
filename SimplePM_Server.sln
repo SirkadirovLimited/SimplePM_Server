@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubmissionInfo", "Submissio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Additional projects", "Additional projects", "{260918EF-3103-4A98-8DA5-BCB40DEA37A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReleaseTestInfo", "ReleaseTestInfo\ReleaseTestInfo.csproj", "{E25F67E4-58D5-4A8E-885C-7098745BDEA4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -97,6 +99,10 @@ Global
 		{88A8832A-CB6F-49B6-B9DA-2E882E6DF482}.Debug|x64.Build.0 = Debug|x64
 		{88A8832A-CB6F-49B6-B9DA-2E882E6DF482}.Release|x64.ActiveCfg = Release|x64
 		{88A8832A-CB6F-49B6-B9DA-2E882E6DF482}.Release|x64.Build.0 = Release|x64
+		{E25F67E4-58D5-4A8E-885C-7098745BDEA4}.Debug|x64.ActiveCfg = Debug|x64
+		{E25F67E4-58D5-4A8E-885C-7098745BDEA4}.Debug|x64.Build.0 = Debug|x64
+		{E25F67E4-58D5-4A8E-885C-7098745BDEA4}.Release|x64.ActiveCfg = Release|x64
+		{E25F67E4-58D5-4A8E-885C-7098745BDEA4}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -115,6 +121,7 @@ Global
 		{BADA387E-DF27-4AB7-9B11-F3EA89630494} = {2045A3E1-12ED-4919-9BB1-6626477112D7}
 		{310E02F7-2D77-43FA-9AE1-9EDF2AF605CA} = {5B3793B0-D301-43CB-91B9-BF6D5E8CA34F}
 		{88A8832A-CB6F-49B6-B9DA-2E882E6DF482} = {2045A3E1-12ED-4919-9BB1-6626477112D7}
+		{E25F67E4-58D5-4A8E-885C-7098745BDEA4} = {2045A3E1-12ED-4919-9BB1-6626477112D7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56F31401-B3C0-4807-AE6F-109275F9E051}
