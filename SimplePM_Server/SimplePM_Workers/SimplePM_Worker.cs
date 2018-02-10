@@ -8,7 +8,6 @@
  * @Email: admin@sirkadirov.com
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
-/*! \file */
 
 //Основа
 using System;
@@ -40,11 +39,10 @@ using System.Reflection;
 namespace SimplePM_Server
 {
 
-    /*!
-     * \brief
+    /*
      * Базовый класс сервера контролирует
-     * работу сервера проверки решений в
-     * целом, содержит множество
+     * работу сервера  проверки решений в
+     * целом,      содержит     множество
      * инициализирующих что-либо функций,
      * множество переменных и т.д.
      */
@@ -59,19 +57,19 @@ namespace SimplePM_Server
         /*
          * Объявляем переменную указателя на менеджер журнала собылий
          * и присваиваем ей указатель на журнал событий текущего класса
-         **/
+         */
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
         
-        private ulong _customersCount;    //!< Количество текущих обрабатываемых запросов
-        private ulong _maxCustomersCount; //!< Максимальное количество обрабатываемых запросов
+        private ulong _customersCount;    // Количество текущих обрабатываемых запросов
+        private ulong _maxCustomersCount; // Максимальное количество обрабатываемых запросов
         
-        public IniData sConfig;          //!< Дескриптор конфигурационного файла
-        public IniData sCompilersConfig; //!< Дескриптор конфигурационного файла модулей компиляции
+        public IniData sConfig;          // Дескриптор конфигурационного файла
+        public IniData sCompilersConfig; // Дескриптор конфигурационного файла модулей компиляции
         
-        private int SleepTime = 500; //!< Период ожидания
-        private string EnabledLangs; //!< Список поддерживаемых ЯП для SQL запросов
+        private int SleepTime = 500; // Период ожидания
+        private string EnabledLangs; // Список поддерживаемых ЯП для SQL запросов
 
-        public List<ICompilerPlugin> _compilerPlugins; //!< Список, содержащий ссылки на модули компиляторов
+        public List<ICompilerPlugin> _compilerPlugins; // Список, содержащий ссылки на модули компиляторов
 
         ///////////////////////////////////////////////////
         /// Функция загружает в память компиляционные
@@ -84,51 +82,63 @@ namespace SimplePM_Server
 
             /*
              * Записываем в лог-файл информацию о том,
-             * что собираемся подгружать сторонние
-             * модули компиляции
-             **/
+             * что  собираемся   подгружать  сторонние
+             * модули компиляции.
+             */
             logger.Debug("ICompilerPlugin modules are being loaded...");
 
             /*
-             * Проводим инициализацию необходимых для продолжения
-             * работы переменных.
+             * Проводим инициализацию необходимых
+             * для продолжения работы переменных.
              */
             _compilerPlugins = new List<ICompilerPlugin>();
 
             /*
-             * Учитывая тот факт, что каждый раздел в конфигурационном
+             * Учитывая тот факт, что каждый раздел  в  конфигурационном
              * файле сторонних модулей компиляции определяет собственных
              * модуль компиляции, осуществляем перебор всех секций этого
-             * конфигурационного файла и загружаем найденные модули,
+             * конфигурационного  файла  и  загружаем найденные  модули,
              * которые подпадают под все требования и условия поиска.
-             **/
+             */
             foreach (var section in sCompilersConfig.Sections)
             {
 
-                // Формируем полный путь к предполягаемому модулю компиляции
+                /*
+                 * Формируем полный путь к
+                 * предполагаемому  модулю
+                 * компиляции.
+                 */
                 var compilerPluginPath = Path.Combine(
                     sConfig["Program"]["ICompilerPlugin_directory"],
                     "ICompilerPlugin." + section.SectionName + ".dll"
                 );
 
-                // Проверка на существование и включённость модуля
+                // Проверка на существование и доступность модуля
                 if (section.Keys["Enabled"] != "true" || !File.Exists(compilerPluginPath))
                     continue;
 
-                // Указываем в логе, что начинаем загружать определённый модуль компиляции
+                /*
+                 * Указываем в логе, что начинаем
+                 * загружать  определённый модуль
+                 * компиляции.
+                 */
                 logger.Debug("Start loading plugin [" + compilerPluginPath + "]...");
 
                 try
                 {
 
                     // Загружаем сборку из файла по указанному пути
-                    Assembly assembly = Assembly.LoadFrom(compilerPluginPath);
+                    var assembly = Assembly.LoadFrom(compilerPluginPath);
 
                     // Ищем необходимую для нас реализацию интерфейса
-                    foreach (Type type in assembly.GetTypes())
+                    foreach (var type in assembly.GetTypes())
                     {
 
-                        // Если мы нашли то, что искали - добавляем плагин в список
+                        /*
+                         * Если мы нашли то, что
+                         * искали  -   добавляем
+                         * плагин в список.
+                         */
                         if (type.FullName == "CompilerPlugin.Compiler")
                             _compilerPlugins.Add((ICompilerPlugin)Activator.CreateInstance(type));
 
@@ -141,7 +151,7 @@ namespace SimplePM_Server
                     /*
                      * В случае возникновения ошибок записываем
                      * информацию о них в лог-файле
-                     **/
+                     */
                     logger.Debug(ex);
 
                 }
@@ -170,7 +180,7 @@ namespace SimplePM_Server
              * Инициализируем список строк и собираем
              * поддерживаемые языки программирования в массив
              */
-            List<string> EnabledLangsList = new List<string>();
+            var EnabledLangsList = new List<string>();
 
             /*
              * В цикле перебираем все поддерживаемые языки
@@ -178,10 +188,10 @@ namespace SimplePM_Server
              * приводим список поддерживаемых системой
              * языков к требуемому виду.
              */
-            foreach (ICompilerPlugin compilerPlugin in _compilerPlugins)
+            foreach (var compilerPlugin in _compilerPlugins)
             {
 
-                //Добавляем язык программирования в список
+                // Добавляем язык программирования в список
                 EnabledLangsList.Add("'" + compilerPlugin.CompilerPluginLanguageName + "'");
 
             }
@@ -234,7 +244,7 @@ namespace SimplePM_Server
 
             /*
              * Записываем сообщение об ошибке в журнал событий
-             **/
+             */
             logger.Fatal(e.ExceptionObject);
 
         }
@@ -253,8 +263,8 @@ namespace SimplePM_Server
              * Объявляем переменную, которая будет
              * хранить информацию о том, успешна
              * ли очистка временных файлов или нет.
-             **/
-            bool f = true;
+             */
+            var f = true;
             
             try
             {
@@ -301,19 +311,25 @@ namespace SimplePM_Server
             CleanTempDirectory();
 
             // Открываем конфигурационный файл для чтения
-            FileIniDataParser iniParser = new FileIniDataParser();
+            var iniParser = new FileIniDataParser();
 
             // Присваиваем глобальной переменной sConfig дескриптор файла конфигурации
             sConfig = iniParser.ReadFile("server_config.ini", Encoding.UTF8);
 
-            // Присваиваем глобальной переменной sCompilersConfig дескриптор файла конфигурации модулей компиляции
+            /*
+             * Присваиваем глобальной переменной
+             * sCompilersConfig дескриптор файла
+             * конфигурации модулей компиляции.
+             */
             sCompilersConfig = iniParser.ReadFile("ICompilerPlugin.ini", Encoding.UTF8);
 
             // Конфигурируем журнал событий (библиотека NLog)
             try
             {
 
-                LogManager.Configuration = new XmlLoggingConfiguration(sConfig["Program"]["NLogConfig_path"]);
+                LogManager.Configuration = new XmlLoggingConfiguration(
+                    sConfig["Program"]["NLogConfig_path"]
+                );
 
             }
             catch
@@ -322,8 +338,8 @@ namespace SimplePM_Server
             }
 
             /*
-             * Получаем информацию с конфигурационного файла
-             * для некоторых переменных
+             * Получаем информацию с конфигурационного
+             * файла для некоторых переменных.
              */
             _maxCustomersCount = ulong.Parse(sConfig["Connection"]["maxConnectedClients"]);
             SleepTime = int.Parse(sConfig["Connection"]["check_timeout"]);
@@ -341,7 +357,7 @@ namespace SimplePM_Server
 
             /*
              * Вызываем функцию получения строчного списка
-             * поддерживаемых языков программирования
+             * поддерживаемых языков программирования.
              */
             GenerateEnabledLangsList();
 
@@ -387,11 +403,12 @@ namespace SimplePM_Server
                     try
                     {
 
-                        /* Инициализируем новое уникальное
+                        /*
+                         * Инициализируем новое уникальное
                          * соединение с базой данных для того,
                          * чтобы не мешать остальным потокам
                          */
-                        MySqlConnection conn = StartMysqlConnection(sConfig);
+                        var conn = StartMysqlConnection(sConfig);
 
                         //Вызов чекера (если всё "хорошо")
                         if (conn != null)
@@ -476,7 +493,7 @@ namespace SimplePM_Server
                 /*
                  * Объявляем объект, который будет хранить
                  * всю информацию об отправке.
-                 **/
+                 */
                 SubmissionInfo.SubmissionInfo submissionInfo;
 
                 // Создаём запрос на выборку из базы данных
@@ -511,12 +528,12 @@ namespace SimplePM_Server
                 {
 
                     /* 
-                     * Запускаем секундомер для того,
+                     * Запускаем   секундомер  для  того,
                      * чтобы определить время, за которое
-                     * запрос на проверку обрабатывается
-                     * сервером проверки решений задач
+                     * запрос на проверку  обрабатывается
+                     * сервером проверки решений задач.
                      */
-                    Stopwatch sw = Stopwatch.StartNew();
+                    var sw = Stopwatch.StartNew();
 
                     // Увеличиваем количество текущих соединений
                     lock (new object())
@@ -528,7 +545,7 @@ namespace SimplePM_Server
 
                     /*
                      * Производим чтение полученных данных
-                     **/
+                     */
                     submissionInfo = new SubmissionInfo.SubmissionInfo
                     (
                         int.Parse(dataReader["submissionId"].ToString()),
@@ -575,6 +592,7 @@ namespace SimplePM_Server
                     ";
 
                     var cmdGetProblemDifficulty = new MySqlCommand(queryGetDifficulty, conn);
+
                     submissionInfo.ProblemDifficulty = int.Parse(
                         cmdGetProblemDifficulty.ExecuteScalar().ToString()
                     );
@@ -591,6 +609,7 @@ namespace SimplePM_Server
                         ref _compilerPlugins,
                         submissionInfo
                     ).ServeSubmission();
+
                     /*
                      * Уменьшаем количество текущих соединений
                      * чтобы другие соединения были возможны.
