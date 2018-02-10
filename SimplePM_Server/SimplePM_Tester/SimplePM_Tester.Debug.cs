@@ -8,21 +8,22 @@
  * @Email: admin@sirkadirov.com
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
-/*! \file */
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using CompilerBase;
-using IniParser.Model;
 using MySql.Data.MySqlClient;
 
 namespace SimplePM_Server.SimplePM_Tester
 {
-
+    
     internal partial class SimplePM_Tester
     {
         
+        /*
+         * Функция, ответственная за debug
+         * тестирование   пользовательских
+         * решений.
+         */
         public ProgramTestingResult Debug()
         {
 
@@ -30,7 +31,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Переменная хранит полный путь
              * к запускаемому файлу авторского
              * решения задачи
-             **/
+             */
             var authorSolutionExePath = GetAuthorSolutionExePath(
                 out var authorSolutionCodeLanguage
             );
@@ -39,7 +40,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Передаём новосозданным переменным
              * информацию о лимитах для пользовательского
              * процесса (пользовательского решения задачи)
-             **/
+             */
             GetDebugProgramLimits(
                 out var memoryLimit, // переменная, хранящая значение лимита по памяти
                 out var timeLimit // переменная, хранящая значение лимита по процессорному времени
@@ -49,7 +50,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Проводим нетестовый запуск авторского решения
              * и получаем всё необходимое для тестирования
              * пользовательской программы
-             **/
+             */
             var authorTestingResult = new ProgramTester(
                 ref sConfig,
                 ref sCompilersConfig,
@@ -81,7 +82,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Проводим тестовый запуск пользовательского
              * решения поставленной задачи и получаем всё
              * необходимое для тестирования программы.
-             **/
+             */
             var userTestingResult = new ProgramTester(
                 ref sConfig,
                 ref sCompilersConfig,
@@ -133,6 +134,12 @@ namespace SimplePM_Server.SimplePM_Tester
 
         }
 
+        /*
+         * Функция, ответственная за скачивание,
+         * компиляцию и получение  полного  пути
+         * к  авторскому   решению  поставленной
+         * задачи.
+         */
         private string GetAuthorSolutionExePath(out string authorSolutionCodeLanguage)
         {
             
@@ -256,6 +263,12 @@ namespace SimplePM_Server.SimplePM_Tester
 
         }
 
+        /*
+         * Функция, ответственная за получение
+         * информации  о  лимитах   для  debug
+         * тестирования       пользовательских
+         * решений  задач по программированию.
+         */
         private void GetDebugProgramLimits(out int memoryLimit, out int timeLimit)
         {
 
@@ -277,6 +290,8 @@ namespace SimplePM_Server.SimplePM_Tester
                 WHERE 
                     `problemId` = @problemId 
                 ORDER BY 
+                    `timeLimit` DESC,
+                    `memoryLimit` DESC,
                     `id` ASC 
                 LIMIT 
                     1
