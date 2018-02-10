@@ -11,9 +11,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Web;
-using CompilerBase;
-using IniParser.Model;
 using MySql.Data.MySqlClient;
 using ReleaseTestInfo;
 
@@ -22,8 +21,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
     internal partial class SimplePM_Tester
     {
-
-        private Queue<ReleaseTest> ReleaseTestsInfo;
+        
 
         public ProgramTestingResult Release()
         {
@@ -34,7 +32,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * пользовательского    решения
              * посталвенной задачи.
              */
-            ReleaseTestsInfo = GetTestsInfo();
+            var ReleaseTestsInfo = GetTestsInfo();
 
             /*
              * Сохраняем первоначальное количество
@@ -86,9 +84,9 @@ namespace SimplePM_Server.SimplePM_Tester
                     "",
                     currentTest.MemoryLimit,
                     currentTest.ProcessorTimeLimit,
-                    currentTest.InputData.ToString(),
+                    Encoding.UTF8.GetString(currentTest.InputData),
                     currentTest.OutputData.Length * 2,
-                    true
+                    submissionInfo.AdaptProgramOutput
                 ).RunTesting();
 
                 /*
