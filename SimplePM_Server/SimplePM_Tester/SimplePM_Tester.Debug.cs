@@ -212,7 +212,7 @@ namespace SimplePM_Server.SimplePM_Tester
             );
 
             // Получаем случайный путь к директории авторского решения
-            var tmpAuthorDir = sConfig["Program"]["tempPath"] + 
+            var tmpAuthorDir = sConfig["Program"]["temp_path"] + 
                 @"\author\" + Guid.NewGuid() + @"\";
 
             // Создаём папку текущего авторского решения задачи

@@ -362,7 +362,7 @@ namespace SimplePM_Server
             string authorFileExt = "." + GetExtByLang(authorProblemCodeLanguage, ref _compilerPlugins);
 
             // Получаем случайный путь к директории авторского решения
-            string tmpAuthorDir = sConfig["Program"]["tempPath"] + @"\author\" + Path.GetRandomFileName() + @"\";
+            string tmpAuthorDir = sConfig["Program"]["temp_path"] + @"\author\" + Path.GetRandomFileName() + @"\";
 
             // Создаём папку текущего авторского решения задачи
             Directory.CreateDirectory(tmpAuthorDir);

@@ -270,11 +270,11 @@ namespace SimplePM_Server
             {
 
                 /* Удаляем все файлы в папке */
-                foreach (string file in Directory.GetFiles(sConfig["Program"]["tempPath"]))
+                foreach (string file in Directory.GetFiles(sConfig["Program"]["temp_path"]))
                     File.Delete(file);
 
                 /* Удаляем все директории в папке */
-                foreach (string dir in Directory.GetDirectories(sConfig["Program"]["tempPath"]))
+                foreach (string dir in Directory.GetDirectories(sConfig["Program"]["temp_path"]))
                     Directory.Delete(dir, true);
 
             }
@@ -341,7 +341,7 @@ namespace SimplePM_Server
              * Получаем информацию с конфигурационного
              * файла для некоторых переменных.
              */
-            _maxCustomersCount = ulong.Parse(sConfig["Connection"]["maxConnectedClients"]);
+            _maxCustomersCount = ulong.Parse(sConfig["Connection"]["max_connected_clients"]);
             SleepTime = int.Parse(sConfig["Connection"]["check_timeout"]);
 
             ///////////////////////////////////////////////////
