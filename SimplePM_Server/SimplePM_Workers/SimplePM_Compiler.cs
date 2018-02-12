@@ -33,11 +33,13 @@ namespace SimplePM_Server
 
     internal class SimplePM_Compiler
     {
-        
+
         /*
-            Объявляем переменную указателя на менеджер журнала собылий
-            и присваиваем ей указатель на журнал событий текущего класса
-        */
+         * Объявляем переменную указателя
+         * на менеджер  журнала собылий и
+         * присваиваем  ей  указатель  на
+         * журнал событий текущего класса
+         */
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private readonly string submissionId; // Идентификатор запроса

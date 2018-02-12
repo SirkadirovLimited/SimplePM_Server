@@ -27,13 +27,12 @@ namespace SimplePM_Server.SimplePM_Tester
     
     internal class ProgramTestingFunctions
     {
-
-        ///////////////////////////////////////////////////
-        /// Функция определяет необходимые действия при
-        /// запуске процесса пользовательского или
-        /// авторского решения задачи.
-        ///////////////////////////////////////////////////
-
+        
+        /*
+         * Функция определяет необходимые действия
+         * при запуске  процесса пользовательского
+         * или авторского решения задачи.
+         */
         public static void SetExecInfoByFileExt(
             ref IniData sConfig,
             ref IniData sCompilersConfig,
@@ -46,10 +45,11 @@ namespace SimplePM_Server.SimplePM_Tester
         {
             
             /*
-             * Вызываем ассоциированный метод, который
-             * знает лучше, как это делать
+             * Вызываем ассоциированный метод,
+             * который  знает  лучше, как  это
+             * делать.
              */
-            bool f = SimplePM_Compiler.GetCompPluginByProgLangName(
+            var f = SimplePM_Compiler.GetCompPluginByProgLangName(
                 ref _compilerPlugins,
                 codeLanguage
             ).SetRunningMethod(
@@ -60,7 +60,8 @@ namespace SimplePM_Server.SimplePM_Tester
             );
 
             /*
-             * Добавляем к этому всему аргументы коммандной строки
+             * Добавляем   к   этому  всему
+             * аргументы коммандной строки.
              */
             if (startInfo.Arguments.Length > 0)
                 startInfo.Arguments += " " + arguments;
@@ -69,45 +70,45 @@ namespace SimplePM_Server.SimplePM_Tester
 
             /*
              * В случае возникновения непредвиденных
-             * ошибок выбрасываем исключение
+             * ошибок выбрасываем исключение.
              */
             if (!f)
-                throw new SimplePM_Exceptions.UnknownException();
+                throw new SimplePM_Exceptions.UnknownException("SetRunningMethod() failed!");
 
         }
-
-        ///////////////////////////////////////////////////
-        /// Функция в зависимости от конфигурации сервера
-        /// указывает объекту процесса, что инициатором
-        /// его запуска должен являться либо другой
-        /// пользователь, либо тот же, от имени которого
-        /// запущен сервер проверки решений задач.
-        ///////////////////////////////////////////////////
-
+        
+        /*
+         * Функция в зависимости от конфигурации сервера
+         * указывает объекту  процесса, что  инициатором
+         * его  запуска  должен   являться  либо  другой
+         * пользователь, либо тот же,  от имени которого
+         * запущен сервер проверки решений задач.
+         */
         public static void SetProcessRunAs(ref IniData sConfig, ref Process proc)
         {
 
             /*
-             * Проверяем, включена ли функция запуска
-             * пользовательских программ от имени
-             * инного пользователя. Если отключена - выходим.
+             * Проверяем, включена  ли  функция  запуска
+             * пользовательских программ от имени инного
+             * пользователя. Если отключена - выходим.
              */
             if (sConfig["RunAs"]["enabled"] != "true" && sConfig["RunAs"]["enabled"] != "1")
                 return;
 
             /*
              * Указываем, что будем запускать процесс
-             * от имени другого пользователя
+             * от имени другого пользователя.
              */
             proc.StartInfo.Verb = "runas";
 
             /*
              * Передаём имя пользователя
              */
-            proc.StartInfo.UserName = sConfig["RunAs"]["accountLogin"];
+            proc.StartInfo.UserName = sConfig["RunAs"]["login"];
 
             /*
-             * Передаём, что необходимо вытянуть профайл из реестра
+             * Передаём,  что   необходимо
+             * вытянуть профайл из реестра
              */
             proc.StartInfo.LoadUserProfile = false;
 
@@ -116,10 +117,10 @@ namespace SimplePM_Server.SimplePM_Tester
              */
 
             // Создаём защищённую строку
-            SecureString encPassword = new SecureString();
+            var encPassword = new SecureString();
 
             // Добавляем данные в защищённую строку
-            foreach (char c in sConfig["RunAs"]["accountPassword"])
+            foreach (var c in sConfig["RunAs"]["password"])
                 encPassword.AppendChar(c);
 
             // Устанавливаем пароль пользователя
