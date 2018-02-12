@@ -36,11 +36,13 @@ namespace SimplePM_Server
 
     internal class SimplePM_Officiant
     {
-        
+
         /*
-            Объявляем переменную указателя на менеджер журнала собылий
-            и присваиваем ей указатель на журнал событий текущего класса
-        */
+         * Объявляем переменную указателя
+         * на менеджер  журнала собылий и
+         * присваиваем  ей  указатель  на
+         * журнал событий текущего класса
+         */
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private MySqlConnection connection; // Дескриптор соединения с БД

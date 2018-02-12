@@ -186,8 +186,12 @@ namespace SimplePM_Server
             if (codeLanguage == "unset")
                 codeLanguage = submissionInfo.CodeLang;
 
-            // Вызываем ассоциированный метод, который знает лучше, как это делать
-            bool f = SimplePM_Compiler.GetCompPluginByProgLangName(
+            /*
+             * Вызываем ассоциированный метод,
+             * который  знает  лучше,  как это
+             * делать.
+             */
+            var f = SimplePM_Compiler.GetCompPluginByProgLangName(
                 ref _compilerPlugins,
                 codeLanguage
             ).SetRunningMethod(
@@ -197,8 +201,12 @@ namespace SimplePM_Server
                 filePath
             );
 
+            /*
+             * В случае возникновения ошибок
+             * выбрасываем исключение.
+             */
             if (!f)
-                throw new SimplePM_Exceptions.UnknownException();
+                throw new SimplePM_Exceptions.UnknownException("SetRunningMethod() failed!");
 
         }
 
@@ -214,11 +222,11 @@ namespace SimplePM_Server
         public static void ProcessorTimeLimitCheck(Process proc, Action doProcessorTimeLimit, int timeLimit)
         {
 
-            //Создаём и сразу же запускаем новую задачу
+            // Создаём и сразу же запускаем новую задачу
             new Task(() =>
             {
 
-                //Ловим непредвиденные исключения
+                //Л овим непредвиденные исключения
                 try
                 {
 
@@ -262,30 +270,40 @@ namespace SimplePM_Server
         private void SetProcessRunAs(ref Process proc)
         {
 
-            //Проверяем, включена ли функция запуска
-            //пользовательских программ от имени инного пользователя.
-            //Если отключена - выходим.
+            /*
+             * Проверяем,  включена  ли  функция запуска
+             * пользовательских программ от имени инного
+             * пользователя. Если отключена  -  выходим.
+             */
             if (sConfig["RunAs"]["enabled"] != "true") return;
 
-            /* Указываем, что будем запускать процесс от имени другого пользователя */
+            /*
+             * Указываем, что будем запускать процесс
+             * от имени другого пользователя.
+             */
             proc.StartInfo.Verb = "runas";
 
             /* Передаём имя пользователя */
-            proc.StartInfo.UserName = sConfig["RunAs"]["accountLogin"];
+            proc.StartInfo.UserName = sConfig["RunAs"]["login"];
 
-            /* Передаём, что необходимо вытянуть профайл из реестра */
+            /*
+             * Передаём, что необходимо
+             * вытянуть профайл из реестра.
+             */
             proc.StartInfo.LoadUserProfile = false;
 
-            /* Передаём пароль пользователя */
+            /*
+             * Передаём пароль пользователя
+             */
 
-            //Создаём защищённую строку
-            SecureString encPassword = new SecureString();
+            // Создаём защищённую строку
+            var encPassword = new SecureString();
 
-            //Добавляем данные в защищённую строку
-            foreach (char c in sConfig["RunAs"]["accountPassword"])
+            // Добавляем данные в защищённую строку
+            foreach (var c in sConfig["RunAs"]["password"])
                 encPassword.AppendChar(c);
 
-            //Устанавливаем пароль пользователя
+            // Устанавливаем пароль пользователя
             proc.StartInfo.Password = encPassword;
 
         }
