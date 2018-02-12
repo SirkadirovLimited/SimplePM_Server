@@ -96,6 +96,7 @@ namespace CompilerPlugin
 
         public bool SetRunningMethod(ref IniData sConfig, ref IniData sCompilersConfig, ref ProcessStartInfo startInfo, string filePath)
         {
+            
             try
             {
                 

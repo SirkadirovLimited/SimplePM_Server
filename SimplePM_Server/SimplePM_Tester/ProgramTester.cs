@@ -45,9 +45,9 @@ namespace SimplePM_Server.SimplePM_Tester
         private          string                _programOutput = "";            // данные из выходного потока программы
         private          string                _programErrorOutput;            // данные из выходного потока ошибок программы
         private          Process               _programProcess;                // ссылка на дескриптор процесса
-        private readonly bool                  _adaptOutput;                   // 
+        private readonly bool                  _adaptOutput;                   // указывает, мягкая или строгая проверка требуется
 
-        private          bool                  _testingResultReceived = false; // указывает, есть ли результат тестирования
+        private          bool                  _testingResultReceived;         // указывает, есть ли результат тестирования
         private          char                  _testingResult;                 // результат тестирования
         
         private ProcessStartInfo programStartInfo = new ProcessStartInfo
@@ -310,16 +310,16 @@ namespace SimplePM_Server.SimplePM_Tester
                 PriorityBoostEnabled = false, // не даём возможности увеличивать приоритет
 
                 StartInfo = programStartInfo, // устанавливаем информацию о программе
-                EnableRaisingEvents = true // указываем, что хотим обрабатывать события
+                EnableRaisingEvents = true, // указываем, что хотим обрабатывать события
 
             };
-
+            
             /*
              * Добавляем обработчики для некоторых событий
              */
             _programProcess.OutputDataReceived += ProgramProcess_OutputDataReceived;
             _programProcess.Exited += ProgramProcess_Exited;
-            
+
         }
 
         private void WriteInputString()
