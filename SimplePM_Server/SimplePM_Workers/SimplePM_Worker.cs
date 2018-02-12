@@ -225,21 +225,16 @@ namespace SimplePM_Server
             }
 
             /* Устанавливаем обработчик необработанных исключений */
-            AppDomain.CurrentDomain.UnhandledException += ExceptionEventLogger;
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
 
-        }
-        
-        /*
-         * Функция, вызывающаяся при получении информации
-         * о необработанном фатальном исключении.
-         */
-        private void ExceptionEventLogger(object sender, UnhandledExceptionEventArgs e)
-        {
+                /*
+                 * Записываем сообщение об
+                 * ошибке в журнал событий
+                 */
+                logger.Fatal(e.ExceptionObject);
 
-            /*
-             * Записываем сообщение об ошибке в журнал событий
-             */
-            logger.Fatal(e.ExceptionObject);
+            };
 
         }
         
@@ -651,7 +646,7 @@ namespace SimplePM_Server
          * данных  MySQL  используя  данные  аутенфикации,
          * расположенные в конфигурационном файле сервера.
          */
-        public MySqlConnection StartMysqlConnection(IniData sConfig)
+        private MySqlConnection StartMysqlConnection(IniData sConfig)
         {
 
             /*

@@ -17,8 +17,6 @@ using IniParser.Model;
 using System.IO;
 // Работа с запросами Linq
 using System.Linq;
-// Журнал событий
-using NLog;
 // Работа с компиляторами
 using CompilerBase;
 
@@ -33,14 +31,6 @@ namespace SimplePM_Server
 
     internal class SimplePM_Compiler
     {
-
-        /*
-         * Объявляем переменную указателя
-         * на менеджер  журнала собылий и
-         * присваиваем  ей  указатель  на
-         * журнал событий текущего класса
-         */
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private readonly string submissionId; // Идентификатор запроса
         private readonly string fileLocation; // Полный путь к файлу и его расширение
