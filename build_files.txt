@@ -1,0 +1,4 @@
+﻿Build\*.dll
+Build\*.exe
+Build\*.ini
+Build\*.config
