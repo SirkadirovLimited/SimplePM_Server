@@ -2,3 +2,4 @@
 Build\*.exe
 Build\*.ini
 Build\*.config
+CREDITS.txt
