@@ -4,7 +4,6 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/35hk5hpsn70j6vq0?svg=true)](https://ci.appveyor.com/project/sirkadirov/simplepm-server)
 [![GitHub (pre-)release version](https://img.shields.io/github/release/SirkadirovTeam/SimplePM_Server/all.svg)](https://github.com/SirkadirovTeam/SimplePM_Server/releases)
-[![Github All Releases downloads](https://img.shields.io/github/downloads/SirkadirovTeam/SimplePM_Server/total.svg)]()
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1230/badge)](https://bestpractices.coreinfrastructure.org/projects/1230)
 
 ## Документація
