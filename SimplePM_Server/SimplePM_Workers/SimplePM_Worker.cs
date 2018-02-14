@@ -9,31 +9,20 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
-//Основа
 using System;
-//Подключаем коллекции
 using System.Collections.Generic;
 using System.Diagnostics;
-//Работа с текстом
 using System.Text;
-//Многопоточность
 using System.Threading;
 using System.Threading.Tasks;
-//Подключение к MySQL серверу
 using MySql.Data.MySqlClient;
-//Парсер конфигурационного файла
 using IniParser;
 using IniParser.Model;
-//Для безопасности
 using System.Web;
-//ICompilerPlugin
 using CompilerBase;
-//Журнал событий
 using NLog;
 using NLog.Config;
-// Работа с файловой системой
 using System.IO;
-// Использование запросов
 using System.Reflection;
 using Newtonsoft.Json;
 
@@ -58,16 +47,12 @@ namespace SimplePM_Server
          * журнал событий текущего класса
          */
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
-        
-        private ulong _customersCount;    // Количество текущих обрабатываемых запросов
-        private ulong _maxCustomersCount; // Максимальное количество обрабатываемых запросов
-        
-        public IniData sConfig;          // Дескриптор конфигурационного файла
-        public IniData sCompilersConfig; // Дескриптор конфигурационного файла модулей компиляции
-        
-        private int SleepTime = 500; // Период ожидания
-        private string EnabledLangs; // Список поддерживаемых ЯП для SQL запросов
 
+        private dynamic _serverConfiguration; // переменная хранит основную конфигурацию сервера
+
+        private ulong _aliveTestersCount;    // Количество текущих обрабатываемых запросов
+        
+        private string EnabledLangs; // Список поддерживаемых ЯП для SQL запросов
         public List<ICompilerPlugin> _compilerPlugins; // Список, содержащий ссылки на модули компиляторов
         
         /*
@@ -106,10 +91,7 @@ namespace SimplePM_Server
                  * предполагаемому  модулю
                  * компиляции.
                  */
-                var compilerPluginPath = Path.Combine(
-                   "./",
-                    "ICompilerPlugin." + section.SectionName + ".dll"
-                );
+                var compilerPluginPath = "ICompilerPlugin." + section.SectionName + ".dll";
 
                 // Проверка на существование и доступность модуля
                 if (section.Keys["Enabled"] != "true" || !File.Exists(compilerPluginPath))
@@ -133,21 +115,18 @@ namespace SimplePM_Server
                     {
 
                         /*
-                         * Если мы нашли то, что
-                         * искали  -   добавляем
-                         * плагин  в  список.  И
-                         * выходим из цикла.
+                         * Если мы не нашли то, что искали - переходим
+                         * к следующей итерации цикла foreach,  в ином
+                         * случае  продолжаем  выполнение  необходимых
+                         * действий по добавлению плагина в список.
                          */
-                        if (type.FullName == "CompilerPlugin.Compiler")
-                        {
+                        if (type.FullName != "CompilerPlugin.Compiler") continue;
 
-                            // Добавляем плагин в список
-                            _compilerPlugins.Add((ICompilerPlugin)Activator.CreateInstance(type));
+                        // Добавляем плагин в список
+                        _compilerPlugins.Add((ICompilerPlugin)Activator.CreateInstance(type));
 
-                            // Выходим из цикла foreach
-                            break;
-
-                        }
+                        // Выходим из цикла foreach
+                        break;
 
                     }
 
@@ -312,22 +291,16 @@ namespace SimplePM_Server
             // Открываем конфигурационный файл для чтения
             var iniParser = new FileIniDataParser();
 
-            // Присваиваем глобальной переменной sConfig дескриптор файла конфигурации
-            sConfig = iniParser.ReadFile("server_config.ini", Encoding.UTF8);
+            _serverConfiguration = JsonConvert.DeserializeObject(
+                File.ReadAllText("./config/server.json")
+            );
             
-            /*
-             * Присваиваем глобальной переменной
-             * sCompilersConfig дескриптор файла
-             * конфигурации модулей компиляции.
-             */
-            sCompilersConfig = iniParser.ReadFile("ICompilerPlugin.ini", Encoding.UTF8);
-
             // Конфигурируем журнал событий (библиотека NLog)
             try
             {
 
                 LogManager.Configuration = new XmlLoggingConfiguration(
-                    sConfig["Program"]["NLogConfig_path"]
+                    "./NLog.config"
                 );
 
             }
@@ -336,17 +309,11 @@ namespace SimplePM_Server
                 /* Deal with it */
             }
 
-            /*
-             * Получаем информацию с конфигурационного
-             * файла для некоторых переменных.
-             */
-            _maxCustomersCount = ulong.Parse(sConfig["Connection"]["max_connected_clients"]);
-            SleepTime = int.Parse(sConfig["Connection"]["check_timeout"]);
+            if (_serverConfiguration.submission.rechecks_without_timeout == "auto")
+                _serverConfiguration.submission.rechecks_without_timeout = Environment.ProcessorCount.ToString();
 
-            ///////////////////////////////////////////////////
-            // Загрузка в память информации о плагинах сервера
-            // проверки пользовательских решений задач
-            ///////////////////////////////////////////////////
+            if (_serverConfiguration.submission.max_threads == "auto")
+                _serverConfiguration.submission.max_threads = Environment.ProcessorCount.ToString();
 
             // Модули компиляторов
             LoadCompilerPlugins();
@@ -396,7 +363,7 @@ namespace SimplePM_Server
                 Console.WriteLine(_customersCount + "/" + _maxCustomersCount);
 #endif
 
-                if (_customersCount < _maxCustomersCount)
+                if (_aliveTestersCount < _serverConfiguration.submission.max_threads)
                 {
 
                     /*
@@ -416,7 +383,7 @@ namespace SimplePM_Server
                          * соединение с базой данных для того,
                          * чтобы не мешать остальным потокам.
                          */
-                        var conn = StartMysqlConnection(sConfig);
+                        var conn = StartMysqlConnection();
 
                         //Вызов чекера (если всё "хорошо")
                         if (conn != null)
@@ -443,14 +410,14 @@ namespace SimplePM_Server
                  * процессор, или нет.
                  */
                 var tmpCheck = rechecksCount >= uint.Parse(
-                    sConfig["Connection"]["rechecks_without_timeout"]
+                    _serverConfiguration.submission.rechecks_without_timeout
                 );
 
-                if (_customersCount < _maxCustomersCount && tmpCheck)
+                if (_aliveTestersCount < _serverConfiguration.submission.max_threads && tmpCheck)
                 {
 
                     // Ожидание для уменьшения нагрузки на сервер
-                    Thread.Sleep(SleepTime);
+                    Thread.Sleep(_serverConfiguration.submission.check_timeout);
 
                     // Обнуляем итератор
                     rechecksCount = 0;
@@ -519,7 +486,7 @@ namespace SimplePM_Server
                 lock (new object())
                 {
 
-                    f = _customersCount >= _maxCustomersCount | !dataReader.Read();
+                    f = _aliveTestersCount >= _serverConfiguration.submission.max_threads | !dataReader.Read();
 
                 }
 
@@ -549,7 +516,7 @@ namespace SimplePM_Server
                     lock (new object())
                     {
 
-                        _customersCount++;
+                        _aliveTestersCount++;
 
                     }
 
@@ -628,7 +595,7 @@ namespace SimplePM_Server
                      */
                     lock (new object())
                     {
-                        _customersCount--;
+                        _aliveTestersCount--;
                     }
 
                     /*
@@ -656,7 +623,7 @@ namespace SimplePM_Server
          * данных  MySQL  используя  данные  аутенфикации,
          * расположенные в конфигурационном файле сервера.
          */
-        private MySqlConnection StartMysqlConnection(IniData sConfig)
+        private static MySqlConnection StartMysqlConnection()
         {
 
             /*
