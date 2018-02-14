@@ -157,6 +157,7 @@
     <None Include="App.config" />
     <EmbeddedResource Include="Program_Data\consoleHeader.pdat" />
     <None Include="app.manifest" />
+    <None Include="Dockerfile" />
     <None Include="ICompilerPlugin.ini">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
