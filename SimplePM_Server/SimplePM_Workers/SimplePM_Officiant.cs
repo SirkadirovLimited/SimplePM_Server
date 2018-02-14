@@ -78,15 +78,15 @@ namespace SimplePM_Server
         public string RandomGenSourceFileLocation(string submissionId, string fileExt)
         {
 
-            //Генерируем имя директории
+            // Генерируем имя директории
             var directoryName = sConfig["Program"]["temp_path"] + 
                                 @"\" + Guid.NewGuid() + 
                                 submissionId + @"\";
 
-            //Создаём все необходимые каталоги
+            // Создаём все необходимые каталоги
             Directory.CreateDirectory(directoryName);
 
-            //Возвращаем результат работы функции
+            // Возвращаем результат работы функции
             return directoryName + "s" + submissionId + fileExt;
 
         }
@@ -151,7 +151,7 @@ namespace SimplePM_Server
              * компиляции пользовательской программы.
              */
             var cResult = compiler.ChooseCompilerAndRun();
-
+            
             ///////////////////////////////////////////////////
             // Записываем в базу данных сообщение компилятора
             ///////////////////////////////////////////////////
@@ -206,131 +206,20 @@ namespace SimplePM_Server
                      */
                     switch (submissionInfo.TestType)
                     {
-                        // Проверка синтаксиса
                         case "syntax":
-
-                            queryUpdate = $@"
-                                UPDATE 
-                                    `spm_submissions` 
-                                SET 
-                                    `status` = 'ready' 
-                                WHERE 
-                                    `submissionId` = '{submissionInfo.SubmissionId}' 
-                                LIMIT 
-                                    1
-                                ;
-                            ";
-
-                            new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
-
+                            
                             break;
-                        // Отладка программы по пользовательскому тесту
                         case "debug":
-
-                            try
-                            {
-
-                                // Запускаем тестирование программы
-                                new SimplePM_Tester2(
-                                    ref connection, // дескриптор соединения с БД
-                                    ref _compilerPlugins, // список модулей поддержки компиляторов
-                                    ref cResult.ExeFullname, // полный путь к исполняемому файлу
-                                    ref submissionInfo, // информация о запросе на тестирование
-                                    ref sConfig, // дескриптор конфигурационного файла сервера
-                                    ref sCompilersConfig // дескриптор конфигурационного файла модулей компиляции
-                                ).DebugTest();
-
-                            }
-                            /*
-                             * Выполняем необходимые действия в случае,
-                             * когда  авторское  решение "ломается" при
-                             * запуске или работе.
-                             */
-                            catch (SimplePM_Exceptions.AuthorSolutionRunningException)
-                            {
-
-                                // Запрос на обновление данных в базе данных
-                                queryUpdate = $@"
-                                    UPDATE 
-                                        `spm_submissions` 
-                                    SET 
-                                        `status` = 'ready', 
-                                        `errorOutput` = 'ERR_AUTHOR_SOLUTION_CRASHED', 
-                                        `hasError` = true 
-                                    WHERE 
-                                        `submissionId` = '{submissionInfo.SubmissionId}' 
-                                    LIMIT 
-                                        1
-                                    ;
-                                ";
-
-                                //сВыполняем запрос, адресованный к серверу баз данных MySQL
-                                new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
-
-                            }
-                            /*
-                             * Выполняем необходимые действия в случае,
-                             * когда  авторское  решение  для задачи не
-                             * найдено.
-                             */
-                            catch (SimplePM_Exceptions.AuthorSolutionNotFoundException)
-                            {
-
-                                // Запрос на обновление данных в базе данных
-                                queryUpdate = $@"
-                                    UPDATE 
-                                        `spm_submissions` 
-                                    SET 
-                                        `status` = 'ready', 
-                                        `errorOutput` = 'ERR_NO_AUTHOR_SOLUTION', 
-                                        `hasError` = true 
-                                    WHERE 
-                                        `submissionId` = '{submissionInfo.SubmissionId}' 
-                                    LIMIT 
-                                        1
-                                    ;
-                                ";
-
-                                /*
-                                 * Выполняем запрос, адресованный
-                                 * к серверу баз данных MySQL.
-                                 */
-                                new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
-
-                            }
-                            catch (Exception ex)
-                            {
-                                
-                                // Логгируем событие
-                                logger.Fatal(ex);
-
-                            }
-
+                            
                             break;
-                        // Отправка решения задачи
                         case "release":
-
-                            // Запускаем тестирование программы
-                            new SimplePM_Tester2(
-                                ref connection, // дескриптор соединения с БД
-                                ref _compilerPlugins, // список модулей поддержки компиляторов
-                                ref cResult.ExeFullname, // полный путь к исполняемому файлу
-                                ref submissionInfo, // информация о запросе на тестирование
-                                ref sConfig, // дескриптор конфигурационного файла сервера
-                                ref sCompilersConfig // дескриптор конфигурационного файла модулей компиляции
-                            ).ReleaseTest();
-
+                            
                             break;
                     }
 
                     ///////////////////////////////////////////////////
                     
                 }
-
-                ///////////////////////////////////////////////////
-                // ДЕЙСТВИЯ В СЛУЧАЕ ОШИБКИ СЕРВЕРА ПРОВЕРКИ
-                ///////////////////////////////////////////////////
-                
                 catch (Exception ex)
                 {
 
