@@ -12,10 +12,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-// Для использования базовых
-// методов и полейсистемы плагинов
 using CompilerBase;
-// Парсер INI файлов конфигурации
 using IniParser.Model;
 
 namespace CompilerPlugin
@@ -24,21 +21,6 @@ namespace CompilerPlugin
     public class Compiler : ICompilerPlugin
     {
         
-        /* Начало раздела безопасной передачи */
-        public string CompilerPluginLanguageName => "java";
-        public string CompilerPluginLanguageExt => "java";
-        public string CompilerPluginDisplayName => "SimplePM Java Compiler module";
-        public string CompilerPluginAuthor => "Kadirov Yurij";
-        public string CompilerPluginSupportUrl => "https://spm.sirkadirov.com/";
-        /* Конец раздела безопасной передачи */
-
-        ///////////////////////////////////////////////////
-        /// Метод, который занимается запуском компилятора
-        /// для данного пользовательского решения
-        /// поставленной задачи, а также обработкой
-        /// результата компиляции данной программы.
-        ///////////////////////////////////////////////////
-
         public CompilerResult StartCompiler(ref IniData sConfig, ref IniData sCompilersConfig, string submissionId, string fileLocation)
         {
 
@@ -51,59 +33,47 @@ namespace CompilerPlugin
                 sCompilersConfig["FreePascal"]["Arguments"] + " " + '"' + fileLocation + '"'
             );
             
-            // Для отлавливания всевозможных ошибок
-            // создаём их улавливатель.
-            // Он также поможет отловить пользовательские
-            // ошибки в связи с незнанием правил использования
-            // автоматизированной системы проверки решений SimplePM.
             try
             {
 
-                //Получаем информацию о файле исходного кода
+                // Получаем информацию о файле исходного кода
                 FileInfo fileInfo = new FileInfo(fileLocation);
 
-                //Указываем полный путь к главному исполняемому файлу
+                // Указываем полный путь к главному исполняемому файлу
                 result.ExeFullname = fileInfo.DirectoryName + "\\" + sCompilersConfig["Java"]["DefaultClassName"] + ".class";
 
-                //Проверяем на существование главного класса
+                // Проверяем на существование главного класса
                 if (!File.Exists(result.ExeFullname))
                     throw new FileNotFoundException();
 
-                //Ошибок не найдено!
+                // Ошибок не найдено!
                 result.HasErrors = false;
 
             }
             catch (Exception)
             {
 
-                //В случае любой ошибки считаем что она
-                //произошла по прямой вине пользователя.
+                // В случае любой ошибки считаем что она
+                // произошла по прямой вине пользователя.
                 result.HasErrors = true;
 
             }
 
-            //Возвращаем результат компиляции
+            // Возвращаем результат компиляции
             return cRefs.ReturnCompilerResult(result);
 
         }
-
-        ///////////////////////////////////////////////////
-        /// Метод, который вызывается перед запуском
-        /// пользовательского решения поставленной задачи
-        /// и выполняет роль выборщика метода запуска
-        /// пользовательской программы.
-        ///////////////////////////////////////////////////
-
-        public bool SetRunningMethod(ref IniData sConfig, ref IniData sCompilersConfig, ref ProcessStartInfo startInfo, string filePath)
+        
+        public bool SetRunningMethod(ref IniData sCompilersConfig, ref ProcessStartInfo startInfo, string filePath)
         {
             
             try
             {
                 
-                //Получаем информацию о файле
+                // Получаем информацию о файле
                 FileInfo fileInfo = new FileInfo(filePath);
 
-                //Устанавливаем рабочую папку процесса
+                // Устанавливаем рабочую папку процесса
                 startInfo.WorkingDirectory = fileInfo.DirectoryName;
 
                 // Устанавливаем имя запускаемой программы
@@ -128,8 +98,7 @@ namespace CompilerPlugin
             return true;
 
         }
-
-        ///////////////////////////////////////////////////
-
+        
     }
+
 }

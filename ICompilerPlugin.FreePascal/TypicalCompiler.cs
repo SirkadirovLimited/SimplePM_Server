@@ -9,7 +9,6 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
-using System;
 using System.Diagnostics;
 using CompilerBase;
 using IniParser.Model;
@@ -26,19 +25,19 @@ namespace CompilerPlugin
             // Инициализируем объект CompilerRefs
             CompilerRefs cRefs = new CompilerRefs();
 
-            // Будущее местонахождение исполняемого файла
+            //Будущее местонахождение исполняемого файла
             string exeLocation = cRefs.GenerateExeFileLocation(fileLocation, submissionId, sConfig["UserProc"]["exeFileExt"]);
 
-            // Запуск компилятора с заранее определёнными аргументами
+            //Запуск компилятора с заранее определёнными аргументами
             CompilerResult result = cRefs.RunCompiler(
-                sCompilersConfig["Mono"]["Path"],
-                fileLocation
+                sCompilersConfig["FreePascal"]["Path"],
+                sCompilersConfig["FreePascal"]["Arguments"] + " \"" + fileLocation + "\""
             );
 
-            // Передаём полный путь к исполняемому файлу
+            //Передаём полный путь к исполняемому файлу
             result.ExeFullname = exeLocation;
 
-            // Возвращаем результат компиляции
+            //Возвращаем результат компиляции
             return cRefs.ReturnCompilerResult(result);
 
         }
@@ -47,29 +46,12 @@ namespace CompilerPlugin
         {
             try
             {
-                
-                int platform = (int)Environment.OSVersion.Platform;
 
-                if (platform == 4 || platform == 6 || platform == 128)
-                {
+                // Устанавливаем имя запускаемой программы
+                startInfo.FileName = filePath;
 
-                    // Указываем имя запускаемой программы (полный путь к ней)
-                    startInfo.FileName = sCompilersConfig["MonoCompiler"]["RuntimePath"];
-
-                    // Указываем аргументы запуска
-                    startInfo.Arguments = '"' + filePath + '"';
-
-                }
-                else
-                {
-
-                    // Указываем имя запускаемой программы (полный путь к ней)
-                    startInfo.FileName = filePath;
-
-                    // Указываем аргументы запуска
-                    startInfo.Arguments = "";
-
-                }
+                // Аргументы запуска данной программы
+                startInfo.Arguments = "";
 
             }
             catch

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Общие сведения об этой сборке предоставляются следующим набором
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("ICompilerPlugin.Lua")]
+[assembly: AssemblyTitle("ICompilerPlugin.TypicalCompiler")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Sirkadirov Team")]
-[assembly: AssemblyProduct("ICompilerPlugin.FreePascal")]
+[assembly: AssemblyProduct("SimplePM Server")]
 [assembly: AssemblyCopyright("Copyright © 2017, Kadirov Yurij. All rights reserved.")]
 [assembly: AssemblyTrademark("SimplePM")]
 [assembly: AssemblyCulture("")]

@@ -53,7 +53,6 @@ namespace SimplePM_Server.SimplePM_Tester
                 ref _compilerPlugins,
                 codeLanguage
             ).SetRunningMethod(
-                ref sConfig,
                 ref sCompilersConfig,
                 ref startInfo,
                 filePath

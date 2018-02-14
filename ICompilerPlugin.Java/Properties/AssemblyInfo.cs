@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Sirkadirov Team")]
-[assembly: AssemblyProduct("ICompilerPlugin.Java")]
+[assembly: AssemblyProduct("SimplePM Server")]
 [assembly: AssemblyCopyright("Copyright © 2017, Kadirov Yurij. All rights reserved.")]
 [assembly: AssemblyTrademark("SimplePM")]
 [assembly: AssemblyCulture("")]
