@@ -1,0 +1,66 @@
+﻿/*
+ * Copyright (C) 2018, Kadirov Yurij.
+ * All rights are reserved.
+ * Licensed under Apache License 2.0 with additional restrictions.
+ * 
+ * @Author: Kadirov Yurij
+ * @Website: https://sirkadirov.com/
+ * @Email: admin@sirkadirov.com
+ * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
+ */
+
+{
+  "mono": {
+    "enabled": true,
+    "module_name": "Mono",
+    "compiler_path": "C:\\Program Files\\Mono\\lib\\mono\\4.5\\mcs.exe",
+    "compiler_arguments": "{%fileLocation%}",
+    "runtime_path": "C:\\Program Files\\Mono\\bin\\mono.exe"
+  },
+  "java": {
+    "enabled": true,
+    "module_name": "Java",
+    "compiler_path": "C:\\Program Files\\Java\\jdk1.8.0_144\\bin\\javac.exe",
+    "compiler_arguments": "{%fileLocation%}",
+    "runtime_path": "C:\\Program Files\\Java\\jdk1.8.0_144\\bin\\java.exe"
+  },
+
+  "freepascal": {
+    "enabled": true,
+    "module_name": "TypicalCompiler",
+    "compiler_path": "C:\\Program Files (x86)\\FPC\\bin\\i386-win32\\ppcrossx64.exe",
+    "compiler_arguments": "-ve -vw -vi -vx -Sc -C3 \"{%fileLocation%}\""
+  },
+  "c": {
+    "enabled": true,
+    "module_name": "TypicalCompiler",
+    "compiler_path": "C:\\MinGW\\bin\\gcc.exe",
+    "compiler_arguments": "-v -o {%fileLocation%}"
+  },
+  "cpp": {
+    "enabled": true,
+    "module_name": "TypicalCompiler",
+    "compiler_path": "C:\\MinGW\\bin\\g++.exe",
+    "compiler_arguments": "-v -o {%fileLocation%}"
+  },
+
+  "lua": {
+    "enabled": true,
+    "module_name": "NoCompiler",
+    "compiler_path": "E:\\Lua\\lua.exe",
+    "compiler_arguments": "{%fileLocation%}"
+  },
+  "python": {
+    "enabled": true,
+    "module_name": "NoCompiler",
+    "compiler_path": "C:\\Program Files\\Python36\\python.exe",
+    "compiler_arguments": "{%fileLocation%}"
+  },
+  "php": {
+    "enabled": false,
+    "module_name": "NoCompiler",
+    "compiler_path": "",
+    "compiler_arguments": "{%fileLocation%}"
+  }
+
+}

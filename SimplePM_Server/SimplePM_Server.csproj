@@ -160,6 +160,18 @@
     <None Include="App.config" />
     <EmbeddedResource Include="Program_Data\consoleHeader.pdat" />
     <None Include="app.manifest" />
+    <None Include="config\compilers.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="config\database.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="config\security.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="config\server.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Dockerfile" />
     <None Include="ICompilerPlugin.ini">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
