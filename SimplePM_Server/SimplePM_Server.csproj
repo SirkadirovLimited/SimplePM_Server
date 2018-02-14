@@ -151,6 +151,9 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include=".dockerignore">
+      <DependentUpon>Dockerfile</DependentUpon>
+    </None>
     <None Include="App.config" />
     <EmbeddedResource Include="Program_Data\consoleHeader.pdat" />
     <None Include="app.manifest" />
