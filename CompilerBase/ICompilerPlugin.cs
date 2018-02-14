@@ -27,17 +27,7 @@ namespace CompilerBase
     
     public interface ICompilerPlugin
     {
-
-        ///////////////////////////////////////////////////
-        /// Раздел описания важных констант
-        ///////////////////////////////////////////////////
-
-        string CompilerPluginLanguageName { get; } //!< Имя языка программирования, поддержка которого осуществляется модулем
-        string CompilerPluginLanguageExt { get; } //!< Расширение файла исходного кода языка программирования, поддержка которого осуществляется модулем
-        string CompilerPluginDisplayName { get; } //!< Отображаемое имя модуля
-        string CompilerPluginAuthor { get; } //!< Имя автора или организации, которая создала модуль
-        string CompilerPluginSupportUrl { get; } //!< URL адрес сайта поддержки для пользователей модуля
-
+        
         ///////////////////////////////////////////////////
         /// Метод, который занимается запуском компилятора
         /// для данного пользовательского решения
@@ -54,7 +44,7 @@ namespace CompilerBase
         /// пользовательской программы.
         ///////////////////////////////////////////////////
 
-        bool SetRunningMethod(ref IniData sConfig, ref IniData sCompilerConfig, ref ProcessStartInfo startInfo, string filePath);
+        bool SetRunningMethod(ref IniData sCompilerConfig, ref ProcessStartInfo startInfo, string filePath);
 
     }
     
