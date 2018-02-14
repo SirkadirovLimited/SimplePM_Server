@@ -35,6 +35,7 @@ using NLog.Config;
 using System.IO;
 // Использование запросов
 using System.Reflection;
+using Newtonsoft.Json;
 
 namespace SimplePM_Server
 {
@@ -106,7 +107,7 @@ namespace SimplePM_Server
                  * компиляции.
                  */
                 var compilerPluginPath = Path.Combine(
-                    sConfig["Program"]["ICompilerPlugin_directory"],
+                   "./",
                     "ICompilerPlugin." + section.SectionName + ".dll"
                 );
 
@@ -134,10 +135,19 @@ namespace SimplePM_Server
                         /*
                          * Если мы нашли то, что
                          * искали  -   добавляем
-                         * плагин в список.
+                         * плагин  в  список.  И
+                         * выходим из цикла.
                          */
                         if (type.FullName == "CompilerPlugin.Compiler")
+                        {
+
+                            // Добавляем плагин в список
                             _compilerPlugins.Add((ICompilerPlugin)Activator.CreateInstance(type));
+
+                            // Выходим из цикла foreach
+                            break;
+
+                        }
 
                     }
 
@@ -304,7 +314,7 @@ namespace SimplePM_Server
 
             // Присваиваем глобальной переменной sConfig дескриптор файла конфигурации
             sConfig = iniParser.ReadFile("server_config.ini", Encoding.UTF8);
-
+            
             /*
              * Присваиваем глобальной переменной
              * sCompilersConfig дескриптор файла
@@ -655,6 +665,8 @@ namespace SimplePM_Server
              */
             MySqlConnection db = null;
 
+            dynamic databaseConfig = JsonConvert.DeserializeObject(File.ReadAllText("./config/database.json"));
+            
             try
             {
 
@@ -665,11 +677,11 @@ namespace SimplePM_Server
                  */
                 db = new MySqlConnection(
                     $@"
-                        server={sConfig["Database"]["db_host"]};
-                        uid={sConfig["Database"]["db_user"]};
-                        pwd={sConfig["Database"]["db_pass"]};
-                        database={sConfig["Database"]["db_name"]};
-                        Charset={sConfig["Database"]["db_chst"]};
+                        server={databaseConfig.hostname};
+                        uid={databaseConfig.username};
+                        pwd={databaseConfig.password};
+                        database={databaseConfig.basename};
+                        Charset={databaseConfig.mainchst};
                         SslMode=Preferred;
                         Pooling=False;
                     "
@@ -679,7 +691,7 @@ namespace SimplePM_Server
                 db.Open();
 
             }
-            catch (MySqlException)
+            catch (MySqlException ex)
             {
                 
                 /* Deal with it */
