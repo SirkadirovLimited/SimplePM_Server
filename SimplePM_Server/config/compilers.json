@@ -22,7 +22,8 @@
     "module_name": "Java",
     "compiler_path": "C:\\Program Files\\Java\\jdk1.8.0_144\\bin\\javac.exe",
     "compiler_arguments": "{%fileLocation%}",
-    "runtime_path": "C:\\Program Files\\Java\\jdk1.8.0_144\\bin\\java.exe"
+    "runtime_path": "C:\\Program Files\\Java\\jdk1.8.0_144\\bin\\java.exe",
+    "default_class_name": "Main"
   },
 
   "freepascal": {

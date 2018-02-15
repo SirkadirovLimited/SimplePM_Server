@@ -20,27 +20,31 @@ namespace CompilerPlugin
     
     public class Compiler : ICompilerPlugin
     {
-        
-        public CompilerResult StartCompiler(ref IniData sConfig, ref IniData sCompilersConfig, string submissionId, string fileLocation)
+
+        public string PluginName => "Java";
+        public string AuthorName => "Kadirov Yurij";
+        public string SupportUri => "https://spm.sirkadirov.com/";
+
+        public CompilerResult StartCompiler(ref dynamic languageConfiguration, string submissionId, string fileLocation)
         {
 
             // Инициализируем объект CompilerRefs
-            CompilerRefs cRefs = new CompilerRefs();
+            var cRefs = new CompilerRefs();
 
             //Запуск компилятора с заранее определёнными аргументами
-            CompilerResult result = cRefs.RunCompiler(
-                sCompilersConfig["GCC"]["Path"],
-                sCompilersConfig["FreePascal"]["Arguments"] + " " + '"' + fileLocation + '"'
+            var result = cRefs.RunCompiler(
+                languageConfiguration.compiler_path,
+                languageConfiguration.compiler_arguments
             );
             
             try
             {
 
                 // Получаем информацию о файле исходного кода
-                FileInfo fileInfo = new FileInfo(fileLocation);
+                var fileInfo = new FileInfo(fileLocation);
 
                 // Указываем полный путь к главному исполняемому файлу
-                result.ExeFullname = fileInfo.DirectoryName + "\\" + sCompilersConfig["Java"]["DefaultClassName"] + ".class";
+                result.ExeFullname = fileInfo.DirectoryName + "\\" + languageConfiguration.default_class_name + ".class";
 
                 // Проверяем на существование главного класса
                 if (!File.Exists(result.ExeFullname))
@@ -64,20 +68,20 @@ namespace CompilerPlugin
 
         }
         
-        public bool SetRunningMethod(ref IniData sCompilersConfig, ref ProcessStartInfo startInfo, string filePath)
+        public bool SetRunningMethod(ref dynamic languageConfiguration, ref ProcessStartInfo startInfo, string filePath)
         {
             
             try
             {
                 
                 // Получаем информацию о файле
-                FileInfo fileInfo = new FileInfo(filePath);
+                var fileInfo = new FileInfo(filePath);
 
                 // Устанавливаем рабочую папку процесса
                 startInfo.WorkingDirectory = fileInfo.DirectoryName;
 
                 // Устанавливаем имя запускаемой программы
-                startInfo.FileName = sCompilersConfig["Java"]["RuntimePath"];
+                startInfo.FileName = languageConfiguration.runtime_path;
                 
                 // Аргументы запуска данной программы
                 startInfo.Arguments = "-d64 -cp . " + '"' + Path.GetFileNameWithoutExtension(fileInfo.Name) + '"';
