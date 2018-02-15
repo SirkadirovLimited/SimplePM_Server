@@ -145,7 +145,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimplePM_Workers\SimplePM_Compiler.cs" />
     <Compile Include="SimplePM_Workers\SimplePM_Officiant.cs" />
-    <Compile Include="SimplePM_Tester.cs" />
     <Compile Include="SimplePM_Base\SimplePM_Submission.cs" />
   </ItemGroup>
   <ItemGroup>
