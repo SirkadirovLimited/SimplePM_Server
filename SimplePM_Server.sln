@@ -35,6 +35,10 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.NoCompiler", "ICompilerPlugin.NoCompiler\ICompilerPlugin.NoCompiler.csproj", "{86091FB0-BDB6-496D-820C-C5D21CBC6C8A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginsManager", "..\PluginsManager\PluginsManager.csproj", "{7DB15A91-C319-4C83-BE51-F1D093E2D2F3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{8B717D39-531F-4AEC-A339-32AEBD29EFF5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -84,6 +88,10 @@ Global
 		{86091FB0-BDB6-496D-820C-C5D21CBC6C8A}.Debug|x64.Build.0 = Debug|x64
 		{86091FB0-BDB6-496D-820C-C5D21CBC6C8A}.Release|x64.ActiveCfg = Release|x64
 		{86091FB0-BDB6-496D-820C-C5D21CBC6C8A}.Release|x64.Build.0 = Release|x64
+		{7DB15A91-C319-4C83-BE51-F1D093E2D2F3}.Debug|x64.ActiveCfg = Debug|x64
+		{7DB15A91-C319-4C83-BE51-F1D093E2D2F3}.Debug|x64.Build.0 = Debug|x64
+		{7DB15A91-C319-4C83-BE51-F1D093E2D2F3}.Release|x64.ActiveCfg = Release|x64
+		{7DB15A91-C319-4C83-BE51-F1D093E2D2F3}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -99,6 +107,7 @@ Global
 		{88A8832A-CB6F-49B6-B9DA-2E882E6DF482} = {2045A3E1-12ED-4919-9BB1-6626477112D7}
 		{E25F67E4-58D5-4A8E-885C-7098745BDEA4} = {2045A3E1-12ED-4919-9BB1-6626477112D7}
 		{86091FB0-BDB6-496D-820C-C5D21CBC6C8A} = {AB1BFCB2-43F0-42D9-A7A7-23938E8C20D4}
+		{7DB15A91-C319-4C83-BE51-F1D093E2D2F3} = {8B717D39-531F-4AEC-A339-32AEBD29EFF5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56F31401-B3C0-4807-AE6F-109275F9E051}
