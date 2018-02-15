@@ -40,16 +40,16 @@ namespace CompilerBase
         public string GenerateExeFileLocation(string srcFileLocation, string currentSubmissionId, string outFileExt = null)
         {
 
-            //Получаем путь родительской директории файла исходного кода
-            string parentDirectoryFullName = new FileInfo(srcFileLocation).DirectoryName + @"\";
+            // Получаем путь родительской директории файла исходного кода
+            var parentDirectoryFullName = new FileInfo(srcFileLocation).DirectoryName + @"\";
 
-            //Формируем начальный путь исполняемого файла
-            string exePath = parentDirectoryFullName + 's' + currentSubmissionId;
+            // Формируем начальный путь исполняемого файла
+            var exePath = parentDirectoryFullName + 's' + currentSubmissionId;
 
-            //В случае, если расширение исполняемого
-            //файла в данной ОС не нулевое,
-            //добавляем его к имени файла.
-            if (!String.IsNullOrWhiteSpace(outFileExt))
+            // В случае, если расширение исполняемого
+            // файла в данной ОС не нулевое,
+            // добавляем его к имени файла.
+            if (!string.IsNullOrWhiteSpace(outFileExt))
                 exePath += '.' + outFileExt;
 
             //Возвращаем результат
@@ -67,50 +67,55 @@ namespace CompilerBase
 
         public CompilerResult RunCompiler(string compilerFullName, string compilerArgs)
         {
-            //Создаём новый экземпляр процесса компилятора
-            Process cplProc = new Process();
+            // Создаём новый экземпляр процесса компилятора
+            var cplProc = new Process();
 
-            //Устанавливаем информацию о старте процесса
-            ProcessStartInfo pStartInfo = new ProcessStartInfo(compilerFullName, compilerArgs)
+            // Устанавливаем информацию о старте процесса
+            var pStartInfo = new ProcessStartInfo(compilerFullName, compilerArgs)
             {
-                //Никаких ошибок, я сказал!
+                // Никаких ошибок, я сказал!
                 ErrorDialog = false,
-                //Минимизируем его, ибо не достоен он почестей!
+
+                // Минимизируем его, ибо не достоен он почестей!
                 WindowStyle = ProcessWindowStyle.Minimized,
-                //Перехватываем выходной поток
+
+                // Перехватываем выходной поток
                 RedirectStandardOutput = true,
-                //Перехватываем поток ошибок
+
+                // Перехватываем поток ошибок
                 RedirectStandardError = true,
-                //Для перехвата делаем процесс демоном
+
+                // Для перехвата делаем процесс демоном
                 UseShellExecute = false
+
             };
 
-            //Устанавливаем информацию о старте процесса в дескриптор процесса компилятора
+            // Устанавливаем информацию о старте процесса в дескриптор процесса компилятора
             cplProc.StartInfo = pStartInfo;
 
-            //Запускаем процесс компилятора
+            // Запускаем процесс компилятора
             cplProc.Start();
 
-            //Ожидаем завершение процесса компилятора
+            // Ожидаем завершение процесса компилятора
             cplProc.WaitForExit();
 
-            //Получаем выходной поток компилятора
-            string standartOutput = cplProc.StandardOutput.ReadToEnd();
-            string standartError = cplProc.StandardError.ReadToEnd();
+            // Получаем выходной поток компилятора
+            var standartOutput = cplProc.StandardOutput.ReadToEnd();
+            var standartError = cplProc.StandardError.ReadToEnd();
 
-            //Если выходной поток компилятора пуст, заполняем его не нужным барахлом
+            // Если выходной поток компилятора пуст, заполняем его не нужным барахлом
             if (standartOutput.Length == 0)
                 standartOutput = "SimplePM_Server";
 
-            //Объявляем переменную результата компиляции
-            CompilerResult result = new CompilerResult()
+            // Объявляем переменную результата компиляции
+            var result = new CompilerResult()
             {
-                //Получаем результат выполнения компилятора и записываем
-                //его в переменную сообщения компилятора
+                // Получаем результат выполнения компилятора и записываем
+                // его в переменную сообщения компилятора
                 CompilerMessage = HttpUtility.HtmlEncode(standartOutput + "\n" + standartError)
             };
 
-            //Возвращаем результат компиляции
+            // Возвращаем результат компиляции
             return result;
         }
 
@@ -122,15 +127,15 @@ namespace CompilerBase
         public CompilerResult ReturnCompilerResult(CompilerResult temporaryResult)
         {
 
-            //Проверяем результат компиляции
-            //на предопределённость наличия ошибки
+            // Проверяем результат компиляции
+            // на предопределённость наличия ошибки
             if (!temporaryResult.HasErrors)
             {
-                //Проверяем на наличие исполняемого файла
+                // Проверяем на наличие исполняемого файла
                 temporaryResult.HasErrors = !File.Exists(temporaryResult.ExeFullname);
             }
 
-            //Возвращаем результат компиляции
+            // Возвращаем результат компиляции
             return temporaryResult;
 
         }

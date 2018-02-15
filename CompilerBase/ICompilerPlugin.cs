@@ -8,18 +8,13 @@
  * @Email: admin@sirkadirov.com
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
-/*! \file */
 
-// Для работы с процессами
 using System.Diagnostics;
-// Для парсинга конфигурационных файлов
-using IniParser.Model;
 
 namespace CompilerBase
 {
 
-    /*!
-     * \brief
+    /*
      * Интерфейс, который предоставляет возможность
      * создания собственных модулей компиляторов
      * для различных языков программирования.
@@ -28,23 +23,13 @@ namespace CompilerBase
     public interface ICompilerPlugin
     {
         
-        ///////////////////////////////////////////////////
-        /// Метод, который занимается запуском компилятора
-        /// для данного пользовательского решения
-        /// поставленной задачи, а также обработкой
-        /// результата компиляции данной программы.
-        ///////////////////////////////////////////////////
+        string PluginName { get; }
+        string AuthorName { get; }
+        string SupportUri { get; }
 
-        CompilerResult StartCompiler(ref IniData sConfig, ref IniData sCompilerConfig, string submissionId, string fileLocation);
-
-        ///////////////////////////////////////////////////
-        /// Метод, который вызывается перед запуском
-        /// пользовательского решения поставленной задачи
-        /// и выполняет роль выборщика метода запуска
-        /// пользовательской программы.
-        ///////////////////////////////////////////////////
-
-        bool SetRunningMethod(ref IniData sCompilerConfig, ref ProcessStartInfo startInfo, string filePath);
+        CompilerResult StartCompiler(ref dynamic languageConfiguration, string submissionId, string fileLocation);
+        
+        bool SetRunningMethod(ref dynamic languageConfiguration, ref ProcessStartInfo startInfo, string filePath);
 
     }
     

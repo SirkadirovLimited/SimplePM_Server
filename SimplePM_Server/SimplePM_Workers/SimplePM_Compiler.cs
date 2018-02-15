@@ -74,17 +74,17 @@ namespace SimplePM_Server
             string programmingLanguage
         )
         {
-            throw new Exception();
+
             /*
              * Производим быстрый поиск по модулям компиляции,
              * и, когда находим - возврщаем  ссылку на объект.
              */
-            /*return (
+            return (
                 from compilerPlugin
                 in _compilerPlugins
                 where compilerPlugin.CompilerPluginLanguageName == programmingLanguage
                 select compilerPlugin
-            ).FirstOrDefault();*/
+            ).FirstOrDefault();
 
         }
         

@@ -64,13 +64,13 @@ namespace SimplePM_Server.SimplePM_Tester
             ).RunTesting();
 
             /*
-             * Проверяем, успешно ли проведен запуск
-             * авторского решения задачи. В случае
-             * обнаружения каких-либо ошибок выбрасываем
-             * исключение AuthorSolutionRunningException,
+             * Проверяем,    успешно  ли  проведен  запуск
+             * авторского   решения     задачи.   В случае
+             * обнаружения  каких-либо  ошибок выбрасываем
+             * исключение  AuthorSolutionRunningException,
              * которое информирует улавливатель исключений
-             * о необходимости предоставления информации
-             * об ошибке в лог-файлах сервера и прочих
+             * о необходимости  предоставления  информации
+             * об  ошибке  в  лог-файлах  сервера и прочих
              * местах, где это важно и необходимо.
              */
             if (authorTestingResult.Result != Test.MiddleSuccessResult)
@@ -82,8 +82,6 @@ namespace SimplePM_Server.SimplePM_Tester
              * необходимое для тестирования программы.
              */
             var userTestingResult = new ProgramTester(
-                ref sConfig,
-                ref sCompilersConfig,
                 ref _compilerPlugins,
                 submissionInfo.CodeLang,
                 exeFileUrl,
@@ -236,8 +234,6 @@ namespace SimplePM_Server.SimplePM_Tester
 
             // Инициализируем экземпляр класса компилятора
             var compiler = new SimplePM_Compiler(
-                ref sConfig,
-                ref sCompilersConfig,
                 ref _compilerPlugins,
                 "a" + submissionInfo.SubmissionId,
                 tmpAuthorSrcLocation,
