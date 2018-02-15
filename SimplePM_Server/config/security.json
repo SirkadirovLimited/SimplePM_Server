@@ -13,8 +13,7 @@
   "runas": {
     "enabled": true,
     "username": "SimplePM_StartUser",
-    "password": "1234567890",
-    "domain": ""
+    "password": "1234567890"
   },
   "max_process_running_time": 5000
 }
