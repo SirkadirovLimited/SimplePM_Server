@@ -15,8 +15,6 @@ using System;
 using System.Collections.Generic;
 // Подключение к БД
 using MySql.Data.MySqlClient;
-// Конфигурационный файл
-using IniParser.Model;
 // Работа с файлами
 using System.IO;
 // Работа с компиляторами
@@ -45,26 +43,23 @@ namespace SimplePM_Server
          */
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        private MySqlConnection connection; // Дескриптор соединения с БД
-        private SubmissionInfo.SubmissionInfo submissionInfo; // Ссылка на объект, содержащий информацию о запросе на тестирование
-        private IniData sConfig; // Дескриптор конфигурационного файла
-        private IniData sCompilersConfig; // Дескриптор конфигурационного файла модулей компиляции
+        private MySqlConnection _connection; // Дескриптор соединения с БД
+        private SubmissionInfo.SubmissionInfo _submissionInfo; // Ссылка на объект, содержащий информацию о запросе на тестирование
+        private dynamic _serverConfiguration;
         private List<ICompilerPlugin> _compilerPlugins; // Список загруженных модулей компиляторв
         
         public SimplePM_Officiant(
             MySqlConnection connection,
             ref dynamic serverConfiguration,
-            ref IniData sCompilersConfig,
             ref List<ICompilerPlugin> _compilerPlugins,
             SubmissionInfo.SubmissionInfo submissionInfo
         )
         {
             
-            this.connection = connection;
-            this.sConfig = sConfig;
-            this.sCompilersConfig = sCompilersConfig;
+            _connection = connection;
+            _serverConfiguration = serverConfiguration;
             this._compilerPlugins = _compilerPlugins;
-            this.submissionInfo = submissionInfo;
+            _submissionInfo = submissionInfo;
 
         }
 
@@ -79,7 +74,7 @@ namespace SimplePM_Server
         {
 
             // Генерируем имя директории
-            var directoryName = sConfig["Program"]["temp_path"] + 
+            var directoryName = _serverConfiguration.temp_path + 
                                 @"\" + Guid.NewGuid() + 
                                 submissionId + @"\";
 
@@ -108,13 +103,13 @@ namespace SimplePM_Server
 
             // Определяем расширение файла
             var fileExt = "." + SimplePM_Submission.GetExtByLang(
-                submissionInfo.CodeLang,
+                _submissionInfo.CodeLang,
                 ref _compilerPlugins
             );
 
             // Определяем полный путь к файлу
             var fileLocation = RandomGenSourceFileLocation(
-                submissionInfo.SubmissionId.ToString(),
+                _submissionInfo.SubmissionId.ToString(),
                 fileExt
             );
             
@@ -125,7 +120,7 @@ namespace SimplePM_Server
              */
             File.WriteAllBytes(
                 fileLocation,
-                submissionInfo.ProblemCode
+                _submissionInfo.ProblemCode
             );
 
             // Устанавливаем его аттрибуты
@@ -136,12 +131,10 @@ namespace SimplePM_Server
 
             // Объявляем экземпляр класса компиляции
             var compiler = new SimplePM_Compiler(
-                ref sConfig,
-                ref sCompilersConfig,
                 ref _compilerPlugins,
-                submissionInfo.SubmissionId.ToString(),
+                _submissionInfo.SubmissionId.ToString(),
                 fileLocation,
-                submissionInfo.CodeLang
+                _submissionInfo.CodeLang
             );
             
             /*
@@ -162,13 +155,13 @@ namespace SimplePM_Server
                 SET 
                     `compiler_text` = '{cResult.CompilerMessage}' 
                 WHERE 
-                    `submissionId` = '{submissionInfo.SubmissionId}' 
+                    `submissionId` = '{_submissionInfo.SubmissionId}' 
                 LIMIT 
                     1
                 ;
             ";
 
-            new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+            new MySqlCommand(queryUpdate, _connection).ExecuteNonQuery();
             
             /*
              * Проверка на наличие ошибок при компиляции
@@ -184,13 +177,13 @@ namespace SimplePM_Server
                         `status` = 'ready', 
                         `hasError` = true 
                     WHERE 
-                        `submissionId` = '{submissionInfo.SubmissionId}' 
+                        `submissionId` = '{_submissionInfo.SubmissionId}' 
                     LIMIT 
                         1
                     ;
                 ";
 
-                new MySqlCommand(queryUpdate, connection).ExecuteNonQuery();
+                new MySqlCommand(queryUpdate, _connection).ExecuteNonQuery();
 
             }
             else
@@ -204,7 +197,7 @@ namespace SimplePM_Server
                      * в зависимости от типа проверки
                      * решения поставленной задачи.
                      */
-                    switch (submissionInfo.TestType)
+                    switch (_submissionInfo.TestType)
                     {
                         case "syntax":
                             
@@ -240,14 +233,14 @@ namespace SimplePM_Server
                             `errorOutput` = @errorOutput, 
                             `b` = '0'
                         WHERE 
-                            `submissionId` = '{submissionInfo.SubmissionId}' 
+                            `submissionId` = '{_submissionInfo.SubmissionId}' 
                         LIMIT 
                             1
                         ;
                     ";
 
                     // Создаём команду
-                    var cmd = new MySqlCommand(queryUpdate, connection);
+                    var cmd = new MySqlCommand(queryUpdate, _connection);
 
                     // Устанавливаем значения параметров
                     cmd.Parameters.AddWithValue("@output", ex);

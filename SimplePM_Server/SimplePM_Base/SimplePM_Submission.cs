@@ -9,6 +9,7 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using CompilerBase;
@@ -33,12 +34,7 @@ namespace SimplePM_Server
         public static string GetExtByLang(string lang, ref List<ICompilerPlugin> _compilerPlugins)
         {
 
-            return (
-                from compilerPlugin
-                in _compilerPlugins
-                where compilerPlugin.CompilerPluginLanguageName == lang
-                select compilerPlugin.CompilerPluginLanguageExt
-            ).FirstOrDefault();
+            throw new Exception();
 
         }
         

@@ -52,8 +52,6 @@ namespace SimplePM_Server.SimplePM_Tester
              * пользовательской программы
              */
             var authorTestingResult = new ProgramTester(
-                ref sConfig,
-                ref sCompilersConfig,
                 ref _compilerPlugins,
                 authorSolutionCodeLanguage,
                 authorSolutionExePath,

@@ -177,7 +177,7 @@ namespace SimplePM_Server
             {
 
                 // Добавляем язык программирования в список
-                EnabledLangsList.Add("'" + compilerPlugin.CompilerPluginLanguageName + "'");
+                //EnabledLangsList.Add("'" + compilerPlugin.CompilerPluginLanguageName + "'");
 
             }
 
@@ -247,11 +247,11 @@ namespace SimplePM_Server
             {
 
                 /* Удаляем все файлы в папке */
-                foreach (string file in Directory.GetFiles(sConfig["Program"]["temp_path"]))
+                foreach (var file in Directory.GetFiles(_serverConfiguration.temp_path))
                     File.Delete(file);
 
                 /* Удаляем все директории в папке */
-                foreach (string dir in Directory.GetDirectories(sConfig["Program"]["temp_path"]))
+                foreach (var dir in Directory.GetDirectories(_serverConfiguration.temp_path))
                     Directory.Delete(dir, true);
 
             }
@@ -583,7 +583,6 @@ namespace SimplePM_Server
                      */
                     new SimplePM_Officiant(
                         conn,
-                        ref sConfig,
                         ref sCompilersConfig,
                         ref _compilerPlugins,
                         submissionInfo
@@ -658,7 +657,7 @@ namespace SimplePM_Server
                 db.Open();
 
             }
-            catch (MySqlException ex)
+            catch (MySqlException)
             {
                 
                 /* Deal with it */

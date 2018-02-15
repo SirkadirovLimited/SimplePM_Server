@@ -10,6 +10,8 @@
  */
 
 // Для работы с коллекциями
+
+using System;
 using System.Collections.Generic;
 // Конфигурационный файл
 using IniParser.Model;
@@ -32,16 +34,12 @@ namespace SimplePM_Server
     internal class SimplePM_Compiler
     {
 
-        private readonly string submissionId; // Идентификатор запроса
-        private readonly string fileLocation; // Полный путь к файлу и его расширение
-        private IniData sConfig; // Дескриптор конфигурационного файла
-        private IniData sCompilersConfig; // Дескриптор конфигурационного файла модулей компиляции
+        private readonly string _submissionId; // Идентификатор запроса
+        private readonly string _fileLocation; // Полный путь к файлу и его расширение
         private List<ICompilerPlugin> _compilerPlugins; // Список загруженных модулей компиляторв
-        private readonly string codeLang; // Название языка программирования, на котором написан код
+        private readonly string _codeLang; // Название языка программирования, на котором написан код
         
         public SimplePM_Compiler(
-            ref IniData sConfig,
-            ref IniData sCompilersConfig,
             ref List<ICompilerPlugin> _compilerPlugins,
             string submissionId,
             string fileLocation,
@@ -58,12 +56,10 @@ namespace SimplePM_Server
              * значения локальных  переменных  конструктора
              * класса.
              */
-            this.sConfig = sConfig;
-            this.sCompilersConfig = sCompilersConfig;
             this._compilerPlugins = _compilerPlugins;
-            this.submissionId = submissionId;
-            this.fileLocation = fileLocation;
-            this.codeLang = codeLang;
+            _submissionId = submissionId;
+            _fileLocation = fileLocation;
+            _codeLang = codeLang;
 
         }
         
@@ -78,17 +74,17 @@ namespace SimplePM_Server
             string programmingLanguage
         )
         {
-
+            throw new Exception();
             /*
              * Производим быстрый поиск по модулям компиляции,
              * и, когда находим - возврщаем  ссылку на объект.
              */
-            return (
+            /*return (
                 from compilerPlugin
                 in _compilerPlugins
                 where compilerPlugin.CompilerPluginLanguageName == programmingLanguage
                 select compilerPlugin
-            ).FirstOrDefault();
+            ).FirstOrDefault();*/
 
         }
         
@@ -106,7 +102,7 @@ namespace SimplePM_Server
              */
             var requestedCompiler = GetCompPluginByProgLangName(
                 ref _compilerPlugins,
-                codeLang
+                _codeLang
             );
 
             /*
@@ -129,10 +125,8 @@ namespace SimplePM_Server
              * содержащий результаты компиляции
              */
             return requestedCompiler.StartCompiler(
-                ref sConfig,
-                ref sCompilersConfig,
-                submissionId,
-                fileLocation
+                _submissionId,
+                _fileLocation
             );
 
         }
