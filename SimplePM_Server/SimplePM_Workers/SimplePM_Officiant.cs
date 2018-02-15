@@ -53,7 +53,7 @@ namespace SimplePM_Server
         
         public SimplePM_Officiant(
             MySqlConnection connection,
-            ref IniData sConfig,
+            ref dynamic serverConfiguration,
             ref IniData sCompilersConfig,
             ref List<ICompilerPlugin> _compilerPlugins,
             SubmissionInfo.SubmissionInfo submissionInfo

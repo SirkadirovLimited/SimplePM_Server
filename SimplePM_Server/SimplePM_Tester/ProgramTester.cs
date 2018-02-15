@@ -31,8 +31,7 @@ namespace SimplePM_Server.SimplePM_Tester
     {
 
         #region Секция объявления глобальных переменных
-
-        private          IniData               sConfig;                        // дескриптор конфигурационного файла
+        
         private          IniData               sCompilersConfig;               // дескриптор конфигурационного файла модулей компиляции
         private          List<ICompilerPlugin> _compilerPlugins;               // список плагинов компиляторов
         private readonly string                _codeLanguage;                  // наименование языка программирования
@@ -74,7 +73,6 @@ namespace SimplePM_Server.SimplePM_Tester
         #endregion
 
         public ProgramTester(
-            ref IniData sConfig,
             ref IniData sCompilersConfig,
             ref List<ICompilerPlugin> _compilerPlugins,
             string codeLanguage,
@@ -87,8 +85,7 @@ namespace SimplePM_Server.SimplePM_Tester
             bool adaptOutput = true
         )
         {
-
-            this.sConfig = sConfig;
+            
             this.sCompilersConfig = sCompilersConfig;
 
             this._compilerPlugins = _compilerPlugins;
@@ -283,7 +280,6 @@ namespace SimplePM_Server.SimplePM_Tester
 
             // Устанавливаем вид запуска
             ProgramTestingFunctions.SetExecInfoByFileExt(
-                ref sConfig,
                 ref sCompilersConfig,
                 ref _compilerPlugins,
                 ref programStartInfo,
@@ -294,7 +290,6 @@ namespace SimplePM_Server.SimplePM_Tester
 
             // Устанавливаем RunAs информацию
             ProgramTestingFunctions.SetProcessRunAs(
-                ref sConfig,
                 ref _programProcess
             );
 
@@ -403,19 +398,13 @@ namespace SimplePM_Server.SimplePM_Tester
 
         private void ProgramProcess_Exited(object sender, EventArgs e)
         {
-
-            /*
-             * Раздел объявления необходимых переменных
-             */
-
-            bool checker;
-
+            
             /*
              * Проверка на использованную память
              */
 
-            checker = !_testingResultReceived && _programMemoryLimit > 0 &&
-                _programProcess.PeakWorkingSet64 > _programMemoryLimit;
+            var checker = !_testingResultReceived && _programMemoryLimit > 0 &&
+                           _programProcess.PeakWorkingSet64 > _programMemoryLimit;
 
             if (checker)
             {

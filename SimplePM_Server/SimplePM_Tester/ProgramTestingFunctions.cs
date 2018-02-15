@@ -11,9 +11,11 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Security;
 using CompilerBase;
 using IniParser.Model;
+using Newtonsoft.Json;
 
 namespace SimplePM_Server.SimplePM_Tester
 {
@@ -34,7 +36,6 @@ namespace SimplePM_Server.SimplePM_Tester
          * или авторского решения задачи.
          */
         public static void SetExecInfoByFileExt(
-            ref IniData sConfig,
             ref IniData sCompilersConfig,
             ref List<ICompilerPlugin> _compilerPlugins,
             ref ProcessStartInfo startInfo,
@@ -83,15 +84,23 @@ namespace SimplePM_Server.SimplePM_Tester
          * пользователь, либо тот же,  от имени которого
          * запущен сервер проверки решений задач.
          */
-        public static void SetProcessRunAs(ref IniData sConfig, ref Process proc)
+        public static void SetProcessRunAs(ref Process proc)
         {
+
+            /*
+             * Считываем параметры безопасности сервера
+             * из конфигурационного файла
+             */
+            dynamic securityConfiguration = JsonConvert.DeserializeObject(
+                File.ReadAllText("./config/security.config")
+            );
 
             /*
              * Проверяем, включена  ли  функция  запуска
              * пользовательских программ от имени инного
              * пользователя. Если отключена - выходим.
              */
-            if (sConfig["RunAs"]["enabled"] != "true" && sConfig["RunAs"]["enabled"] != "1")
+            if (securityConfiguration.runas.enabled != true)
                 return;
 
             /*
@@ -103,7 +112,7 @@ namespace SimplePM_Server.SimplePM_Tester
             /*
              * Передаём имя пользователя
              */
-            proc.StartInfo.UserName = sConfig["RunAs"]["login"];
+            proc.StartInfo.UserName = securityConfiguration.runas.username;
 
             /*
              * Передаём,  что   необходимо
@@ -119,12 +128,12 @@ namespace SimplePM_Server.SimplePM_Tester
             var encPassword = new SecureString();
 
             // Добавляем данные в защищённую строку
-            foreach (var c in sConfig["RunAs"]["password"])
+            foreach (var c in securityConfiguration.runas.password)
                 encPassword.AppendChar(c);
 
             // Устанавливаем пароль пользователя
             proc.StartInfo.Password = encPassword;
-
+            
         }
 
     }
