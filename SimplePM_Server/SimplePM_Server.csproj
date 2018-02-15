@@ -183,9 +183,6 @@
     <None Include="Program_Data\commanderHelp.pdat" />
     <None Include="Program_Data\noCompilerRequired.pdat" />
     <None Include="packages.config" />
-    <None Include="server_config.ini">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <Compile Include="SimplePM_Tester\SimplePM_Tester.Debug.cs" />
     <Compile Include="SimplePM_Tester\SimplePM_Tester.Release.cs" />
   </ItemGroup>
