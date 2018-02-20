@@ -11,27 +11,33 @@
 
 using System.Diagnostics;
 using CompilerBase;
-using IniParser.Model;
 
 namespace CompilerPlugin
 {
     
     public class Compiler : ICompilerPlugin
     {
-        
-        public CompilerResult StartCompiler(ref IniData sConfig, ref IniData sCompilersConfig, string submissionId, string fileLocation)
+
+        public string PluginName => "TypicalCompiler";
+        public string AuthorName => "Kadirov Yurij";
+        public string SupportUri => "https://spm.sirkadirov.com/";
+
+        public CompilerResult StartCompiler(ref dynamic languageConfiguration, string submissionId, string fileLocation)
         {
 
             // Инициализируем объект CompilerRefs
-            CompilerRefs cRefs = new CompilerRefs();
+            var cRefs = new CompilerRefs();
 
             //Будущее местонахождение исполняемого файла
-            string exeLocation = cRefs.GenerateExeFileLocation(fileLocation, submissionId, sConfig["UserProc"]["exeFileExt"]);
+            var exeLocation = cRefs.GenerateExeFileLocation(
+                fileLocation,
+                submissionId
+            );
 
             //Запуск компилятора с заранее определёнными аргументами
-            CompilerResult result = cRefs.RunCompiler(
-                sCompilersConfig["FreePascal"]["Path"],
-                sCompilersConfig["FreePascal"]["Arguments"] + " \"" + fileLocation + "\""
+            var result = cRefs.RunCompiler(
+                languageConfiguration.compiler_path,
+                languageConfiguration.compiler_arguments
             );
 
             //Передаём полный путь к исполняемому файлу

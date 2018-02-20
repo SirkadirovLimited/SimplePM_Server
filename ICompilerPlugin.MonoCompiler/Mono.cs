@@ -19,20 +19,27 @@ namespace CompilerPlugin
     
     public class Compiler : ICompilerPlugin
     {
-        
-        public CompilerResult StartCompiler(ref IniData sConfig, ref IniData sCompilersConfig, string submissionId, string fileLocation)
+
+        public string PluginName => "Mono";
+        public string AuthorName => "Yurij Kadirov";
+        public string SupportUri => "https://spm.sirkadirov.com/";
+
+        public CompilerResult StartCompiler(ref dynamic languageConfiguration, string submissionId, string fileLocation)
         {
 
             // Инициализируем объект CompilerRefs
-            CompilerRefs cRefs = new CompilerRefs();
+            var cRefs = new CompilerRefs();
 
             // Будущее местонахождение исполняемого файла
-            string exeLocation = cRefs.GenerateExeFileLocation(fileLocation, submissionId, sConfig["UserProc"]["exeFileExt"]);
+            var exeLocation = cRefs.GenerateExeFileLocation(
+                fileLocation,
+                submissionId
+            );
 
             // Запуск компилятора с заранее определёнными аргументами
-            CompilerResult result = cRefs.RunCompiler(
-                sCompilersConfig["Mono"]["Path"],
-                fileLocation
+            var result = cRefs.RunCompiler(
+                languageConfiguration.compiler_path,
+                languageConfiguration.compiler_arguments
             );
 
             // Передаём полный путь к исполняемому файлу
@@ -43,18 +50,26 @@ namespace CompilerPlugin
 
         }
         
-        public bool SetRunningMethod(ref IniData sCompilersConfig, ref ProcessStartInfo startInfo, string filePath)
+        public bool SetRunningMethod(ref dynamic languageConfiguration, ref ProcessStartInfo startInfo, string filePath)
         {
             try
             {
                 
-                int platform = (int)Environment.OSVersion.Platform;
-
+                // Получаем информацию о платформе запуска
+                var platform = (int)Environment.OSVersion.Platform;
+                
+                /*
+                 * В зависимости от установленной на машине
+                 * операционной системы, выполняем специфи-
+                 * ческие действия для указания верного ме-
+                 * тода  запуска  пользовательского решения
+                 * поставленной задачи.
+                 */
                 if (platform == 4 || platform == 6 || platform == 128)
                 {
 
                     // Указываем имя запускаемой программы (полный путь к ней)
-                    startInfo.FileName = sCompilersConfig["MonoCompiler"]["RuntimePath"];
+                    startInfo.FileName = languageConfiguration.runtime_path;
 
                     // Указываем аргументы запуска
                     startInfo.Arguments = '"' + filePath + '"';

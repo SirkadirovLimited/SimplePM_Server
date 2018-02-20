@@ -13,7 +13,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using CompilerBase;
-using IniParser.Model;
 
 namespace CompilerPlugin
 {
@@ -84,7 +83,8 @@ namespace CompilerPlugin
                 startInfo.FileName = languageConfiguration.runtime_path;
                 
                 // Аргументы запуска данной программы
-                startInfo.Arguments = "-d64 -cp . " + '"' + Path.GetFileNameWithoutExtension(fileInfo.Name) + '"';
+                startInfo.Arguments = "-d64 -cp . " + '"' +
+                                      Path.GetFileNameWithoutExtension(fileInfo.Name) + '"';
 
             }
             catch
