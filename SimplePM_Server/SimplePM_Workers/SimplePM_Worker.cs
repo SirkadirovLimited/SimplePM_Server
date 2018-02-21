@@ -95,10 +95,14 @@ namespace SimplePM_Server
                 try
                 {
 
-                    // Загружаем сборку из файла по указанному пути
-                    var assembly = Assembly.LoadFrom(compilerPluginPath);
+                    /*
+                     * Загружаем сборку из файла по указанному пути
+                     */
+                    var assembly = Assembly.LoadFrom(pluginFilePath);
 
-                    // Ищем необходимую для нас реализацию интерфейса
+                    /*
+                     * Ищем необходимую для нас реализацию интерфейса
+                     */
                     foreach (var type in assembly.GetTypes())
                     {
 
@@ -109,9 +113,13 @@ namespace SimplePM_Server
                          * действий по добавлению плагина в список.
                          */
                         if (type.FullName != "CompilerPlugin.Compiler") continue;
-
+                        
                         // Добавляем плагин в список
-                        _compilerPlugins.Add((ICompilerPlugin)Activator.CreateInstance(type));
+                        _compilerPlugins.Add(
+                            (ICompilerPlugin)Activator.CreateInstance(type)
+                        );
+
+                        logger.Debug("Plugin successfully loaded [" + pluginFilePath + "]");
 
                         // Выходим из цикла foreach
                         break;
@@ -123,9 +131,11 @@ namespace SimplePM_Server
                 {
 
                     /*
-                     * В случае возникновения ошибок записываем
-                     * информацию о них в лог-файле
+                     * В случае возникновения ошибок
+                     * записываем информацию о них в
+                     * лог-файле.
                      */
+                    logger.Debug("Plugin loading failed [" + pluginFilePath + "]:");
                     logger.Debug(ex);
 
                 }
