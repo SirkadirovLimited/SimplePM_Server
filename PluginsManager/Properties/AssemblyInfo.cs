@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("PluginsManager")]
+[assembly: AssemblyTitle("SimplePM Server Plugins Manager")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("PluginsManager")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCompany("Sirkadirov Team")]
+[assembly: AssemblyProduct("SimplePM Server")]
+[assembly: AssemblyCopyright("Copyright © 2018, Kadirov Yurij Victorovich. All rights reserved.")]
+[assembly: AssemblyTrademark("SimplePM")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
