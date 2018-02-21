@@ -15,5 +15,9 @@
     "rechecks_without_timeout": "auto",
     "max_threads": "auto"
   },
-  "temp_path": "E:\\SimplePM_Temp\\"
+  "temp_path": "E:\\SimplePM_Temp\\",
+  "path": {
+    "ICompilerPlugin": "./",
+    "IServerPlugin": "./" 
+  } 
 }
