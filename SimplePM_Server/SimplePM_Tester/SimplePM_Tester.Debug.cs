@@ -60,7 +60,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 timeLimit,
                 submissionInfo.CustomTest,
                 0,
-                submissionInfo.AdaptProgramOutput
+                submissionInfo.ProblemInformation.AdaptProgramOutput
             ).RunTesting();
 
             /*
@@ -90,7 +90,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 timeLimit,
                 submissionInfo.CustomTest,
                 authorTestingResult.Output.Length,
-                submissionInfo.AdaptProgramOutput
+                submissionInfo.ProblemInformation.AdaptProgramOutput
             ).RunTesting();
             
             /*
@@ -162,7 +162,7 @@ namespace SimplePM_Server.SimplePM_Tester
             ";
             
             var cmdSelect = new MySqlCommand(querySelect, connection);
-            cmdSelect.Parameters.AddWithValue("@problemId", submissionInfo.ProblemId);
+            cmdSelect.Parameters.AddWithValue("@problemId", submissionInfo.ProblemInformation.ProblemId);
 
             // Чтение результатов запроса
             var dataReader = cmdSelect.ExecuteReader();
@@ -293,7 +293,7 @@ namespace SimplePM_Server.SimplePM_Tester
             ";
 
             var cmdSelect = new MySqlCommand(querySelect, connection);
-            cmdSelect.Parameters.AddWithValue("@problemId", submissionInfo.ProblemId);
+            cmdSelect.Parameters.AddWithValue("@problemId", submissionInfo.ProblemInformation.ProblemId);
 
             // Чтение результатов запроса
             var dataReader = cmdSelect.ExecuteReader();
