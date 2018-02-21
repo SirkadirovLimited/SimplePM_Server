@@ -9,15 +9,19 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
-{
-  "mono": {
+[
+
+  {
+    "language_name": "csharp",
     "enabled": true,
     "module_name": "Mono",
     "compiler_path": "C:\\Program Files\\Mono\\lib\\mono\\4.5\\mcs.exe",
     "compiler_arguments": "{%fileLocation%}",
     "runtime_path": "C:\\Program Files\\Mono\\bin\\mono.exe"
   },
-  "java": {
+
+  {
+    "language_name": "java",
     "enabled": true,
     "module_name": "Java",
     "compiler_path": "C:\\Program Files\\Java\\jdk1.8.0_144\\bin\\javac.exe",
@@ -26,42 +30,52 @@
     "default_class_name": "Main"
   },
 
-  "freepascal": {
+  {
+    "language_name": "freepascal",
     "enabled": true,
     "module_name": "TypicalCompiler",
     "compiler_path": "C:\\Program Files (x86)\\FPC\\bin\\i386-win32\\ppcrossx64.exe",
     "compiler_arguments": "-ve -vw -vi -vx -Sc -C3 \"{%fileLocation%}\""
   },
-  "c": {
+
+  {
+    "language_name": "c",
     "enabled": true,
     "module_name": "TypicalCompiler",
     "compiler_path": "C:\\MinGW\\bin\\gcc.exe",
     "compiler_arguments": "-v -o {%fileLocation%}"
   },
-  "cpp": {
+
+  {
+    "language_name": "cpp",
     "enabled": true,
     "module_name": "TypicalCompiler",
     "compiler_path": "C:\\MinGW\\bin\\g++.exe",
     "compiler_arguments": "-v -o {%fileLocation%}"
   },
 
-  "lua": {
+  {
+    "language_name": "lua",
     "enabled": true,
     "module_name": "NoCompiler",
     "compiler_path": "E:\\Lua\\lua.exe",
     "compiler_arguments": "{%fileLocation%}"
   },
-  "python": {
+
+  {
+    "language_name": "python",
     "enabled": true,
     "module_name": "NoCompiler",
     "compiler_path": "C:\\Program Files\\Python36\\python.exe",
     "compiler_arguments": "{%fileLocation%}"
   },
-  "php": {
+
+  {
+    "language_name": "php",
     "enabled": false,
     "module_name": "NoCompiler",
     "compiler_path": "",
     "compiler_arguments": "{%fileLocation%}"
   }
 
-}
+]
