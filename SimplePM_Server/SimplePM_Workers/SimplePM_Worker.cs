@@ -12,12 +12,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
-using IniParser;
-using IniParser.Model;
 using System.Web;
 using CompilerBase;
 using NLog;
@@ -605,6 +602,7 @@ namespace SimplePM_Server
                     new SimplePM_Officiant(
                         conn,
                         ref _serverConfiguration,
+                        ref _compilerConfigs,
                         ref _compilerPlugins,
                         submissionInfo
                     ).ServeSubmission();

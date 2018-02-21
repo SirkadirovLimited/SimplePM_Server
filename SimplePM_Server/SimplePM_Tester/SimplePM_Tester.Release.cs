@@ -76,8 +76,6 @@ namespace SimplePM_Server.SimplePM_Tester
                  * нужд.
                  */
                 var currentTestResult = new ProgramTester(
-                    ref sConfig,
-                    ref sCompilersConfig,
                     ref _compilerPlugins,
                     submissionInfo.CodeLang,
                     exeFileUrl,
@@ -86,7 +84,7 @@ namespace SimplePM_Server.SimplePM_Tester
                     currentTest.ProcessorTimeLimit,
                     Encoding.UTF8.GetString(currentTest.InputData),
                     currentTest.OutputData.Length * 2,
-                    submissionInfo.AdaptProgramOutput
+                    submissionInfo.ProblemInformation.AdaptProgramOutput
                 ).RunTesting();
 
                 /*
@@ -127,7 +125,10 @@ namespace SimplePM_Server.SimplePM_Tester
 
             // Отправляем запрос на сервер БД
             var cmdSelect = new MySqlCommand(querySelect, connection);
-            cmdSelect.Parameters.AddWithValue("@problemId", submissionInfo.ProblemId);
+            cmdSelect.Parameters.AddWithValue(
+                "@problemId",
+                submissionInfo.ProblemInformation.ProblemId
+            );
 
             // Получаем результат выполнения запроса
             var dataReader = cmdSelect.ExecuteReader();

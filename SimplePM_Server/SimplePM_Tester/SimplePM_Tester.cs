@@ -11,7 +11,6 @@
 
 using System.Collections.Generic;
 using CompilerBase;
-using IniParser.Model;
 using MySql.Data.MySqlClient;
 
 namespace SimplePM_Server.SimplePM_Tester
@@ -29,8 +28,6 @@ namespace SimplePM_Server.SimplePM_Tester
         private SubmissionInfo.SubmissionInfo submissionInfo   ; // ссылка на объект, содержащий информацию о запросе на тестирование
         private List<ICompilerPlugin>         _compilerPlugins ; // ссылка на список модулей компиляции
         private MySqlConnection               connection       ; // ссылка на дескриптор соединения к базе данных
-        private IniData                       sConfig          ; // ссылка на дескриптор файла конфигурации сервера проверки пользовательских решений
-        private IniData                       sCompilersConfig ; // ссылка на дескриптор файла конфигурации модулей компиляции
         private string                        exeFileUrl       ; // переменная, содержащая полный путь к exe-файлу пользовательского решения
         #endregion
 
@@ -38,9 +35,7 @@ namespace SimplePM_Server.SimplePM_Tester
             ref MySqlConnection connection,
             ref List<ICompilerPlugin> _compilerPlugins,
             ref string exeFileUrl,
-            ref SubmissionInfo.SubmissionInfo submissionInfo,
-            ref IniData sCompilersConfig,
-            ref IniData sConfig
+            ref SubmissionInfo.SubmissionInfo submissionInfo
         )
         {
 
@@ -48,8 +43,6 @@ namespace SimplePM_Server.SimplePM_Tester
             this._compilerPlugins = _compilerPlugins;
             this.exeFileUrl = exeFileUrl;
             this.submissionInfo = submissionInfo;
-            this.sConfig = sCompilersConfig;
-            this.sConfig = sConfig;
 
         }
 

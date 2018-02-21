@@ -9,17 +9,8 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
-// Для работы с коллекциями
-
-using System;
 using System.Collections.Generic;
-// Конфигурационный файл
-using IniParser.Model;
-// Работа с файлами
 using System.IO;
-// Работа с запросами Linq
-using System.Linq;
-// Работа с компиляторами
 using CompilerBase;
 
 namespace SimplePM_Server

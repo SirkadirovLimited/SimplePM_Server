@@ -46,11 +46,13 @@ namespace SimplePM_Server
         private MySqlConnection _connection; // Дескриптор соединения с БД
         private SubmissionInfo.SubmissionInfo _submissionInfo; // Ссылка на объект, содержащий информацию о запросе на тестирование
         private dynamic _serverConfiguration;
+        private dynamic _compilerConfigs;
         private List<ICompilerPlugin> _compilerPlugins; // Список загруженных модулей компиляторв
         
         public SimplePM_Officiant(
             MySqlConnection connection,
             ref dynamic serverConfiguration,
+            ref dynamic _compilerConfigs,
             ref List<ICompilerPlugin> _compilerPlugins,
             SubmissionInfo.SubmissionInfo submissionInfo
         )
@@ -58,6 +60,7 @@ namespace SimplePM_Server
             
             _connection = connection;
             _serverConfiguration = serverConfiguration;
+            this._compilerConfigs = _compilerConfigs;
             this._compilerPlugins = _compilerPlugins;
             _submissionInfo = submissionInfo;
 
@@ -131,6 +134,7 @@ namespace SimplePM_Server
 
             // Объявляем экземпляр класса компиляции
             var compiler = new SimplePM_Compiler(
+                ref _compilerConfigs,
                 ref _compilerPlugins,
                 _submissionInfo.SubmissionId.ToString(),
                 fileLocation,
@@ -269,7 +273,7 @@ namespace SimplePM_Server
         /// Используется для экономии оперативной памяти
         /// сервера, на котором работает SimplePM_Server.
         ///////////////////////////////////////////////////
-
+        
         public void ClearCache(string exe_fullname, string fileLocation)
         {
 
