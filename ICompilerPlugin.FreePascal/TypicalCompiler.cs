@@ -48,7 +48,7 @@ namespace CompilerPlugin
 
         }
         
-        public bool SetRunningMethod(ref IniData sCompilersConfig, ref ProcessStartInfo startInfo, string filePath)
+        public bool SetRunningMethod(ref dynamic languageConfiguration, ref ProcessStartInfo startInfo, string filePath)
         {
             try
             {

@@ -12,7 +12,6 @@
 using System;
 using System.Diagnostics;
 using CompilerBase;
-using IniParser.Model;
 
 namespace CompilerPlugin
 {
