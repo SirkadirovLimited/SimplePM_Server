@@ -25,6 +25,7 @@ using NLog.Config;
 using System.IO;
 using System.Reflection;
 using Newtonsoft.Json;
+using SubmissionInfo;
 
 namespace SimplePM_Server
 {
@@ -76,33 +77,20 @@ namespace SimplePM_Server
              */
             _compilerPlugins = new List<ICompilerPlugin>();
 
-            /*
-             * Учитывая тот факт, что каждый раздел  в  конфигурационном
-             * файле сторонних модулей компиляции определяет собственных
-             * модуль компиляции, осуществляем перебор всех секций этого
-             * конфигурационного  файла  и  загружаем найденные  модули,
-             * которые подпадают под все требования и условия поиска.
-             */
-            foreach (var section in sCompilersConfig.Sections)
+            string[] pluginFilesList = Directory.GetFiles(
+                _serverConfiguration.path.ICompilerPlugin,
+                "ICompilerPlugin.*.dll"
+            );
+
+            foreach (var pluginFilePath in pluginFilesList)
             {
-
-                /*
-                 * Формируем полный путь к
-                 * предполагаемому  модулю
-                 * компиляции.
-                 */
-                var compilerPluginPath = "ICompilerPlugin." + section.SectionName + ".dll";
-
-                // Проверка на существование и доступность модуля
-                if (section.Keys["Enabled"] != "true" || !File.Exists(compilerPluginPath))
-                    continue;
-
+                
                 /*
                  * Указываем в логе, что начинаем
                  * загружать  определённый модуль
                  * компиляции.
                  */
-                logger.Debug("Start loading plugin [" + compilerPluginPath + "]...");
+                logger.Debug("Start loading plugin [" + pluginFilePath + "]...");
 
                 try
                 {
@@ -287,10 +275,7 @@ namespace SimplePM_Server
 
             // Очищаем директорию временных файлов
             CleanTempDirectory();
-
-            // Открываем конфигурационный файл для чтения
-            var iniParser = new FileIniDataParser();
-
+            
             _serverConfiguration = JsonConvert.DeserializeObject(
                 File.ReadAllText("./config/server.json")
             );
@@ -459,13 +444,28 @@ namespace SimplePM_Server
                 // Формируем запрос на выборку
                 var querySelect = $@"
                     SELECT 
-                        * 
+                        `spm_problems`.`difficulty`, 
+                        `spm_problems`.`adaptProgramOutput`, 
+                        `spm_submissions`.submissionId, 
+                        `spm_submissions`.classworkId, 
+                        `spm_submissions`.olympId, 
+                        `spm_submissions`.time, 
+                        `spm_submissions`.codeLang, 
+                        `spm_submissions`.userId, 
+                        `spm_submissions`.problemId, 
+                        `spm_submissions`.testType, 
+                        `spm_submissions`.problemCode, 
+                        `spm_submissions`.customTest 
                     FROM 
                         `spm_submissions` 
+                    INNER JOIN
+                        `spm_problems` 
+                    ON
+                        spm_submissions.problemId = spm_problems.id 
                     WHERE 
                         `status` = 'waiting' 
                     AND 
-                        `codeLang` IN ({EnabledLangs})
+                        `codeLang` IN ({EnabledLangs}) 
                     ORDER BY 
                         `submissionId` ASC 
                     LIMIT 
@@ -526,18 +526,48 @@ namespace SimplePM_Server
                      * в него только что полученные данные.
                      */
                     var submissionInfo = new SubmissionInfo.SubmissionInfo
-                    (
-                        int.Parse(dataReader["submissionId"].ToString()),
-                        int.Parse(dataReader["userId"].ToString()),
-                        int.Parse(dataReader["problemId"].ToString()),
-                        int.Parse(dataReader["classworkId"].ToString()),
-                        int.Parse(dataReader["olympId"].ToString()),
-                        dataReader["codeLang"].ToString(),
-                        dataReader["testType"].ToString(),
-                        HttpUtility.HtmlDecode(dataReader["customTest"].ToString()),
-                        (byte[])dataReader["problemCode"]
-                    );
+                    {
 
+                        /*
+                         * Основная информация о запросе
+                         */
+                        SubmissionId = int.Parse(dataReader["submissionId"].ToString()),
+                        UserId = int.Parse(dataReader["userId"].ToString()),
+
+                        /*
+                         * Привязка к уроку и соревнованию
+                         */
+                        ClassworkId = int.Parse(dataReader["classworkId"].ToString()),
+                        OlympId = int.Parse(dataReader["olympId"].ToString()),
+                        
+                        /*
+                         * Тип тестирования и доплнительные поля
+                         */
+                        TestType = dataReader["testType"].ToString(),
+                        CustomTest = HttpUtility.HtmlDecode(dataReader["customTest"].ToString()),
+
+                        /*
+                         * Исходный код решения задачи
+                         * и дополнительная информация
+                         * о нём.
+                         */
+                        ProblemCode = (byte[]) dataReader["problemCode"],
+                        CodeLang = dataReader["codeLang"].ToString(),
+
+                        /*
+                         * Информация о задаче
+                         */
+                        ProblemInformation = new ProblemInfo
+                        {
+
+                            ProblemId = int.Parse(dataReader["problemId"].ToString()),
+                            ProblemDifficulty = int.Parse(dataReader["difficulty"].ToString()),
+                            AdaptProgramOutput = bool.Parse(dataReader["adaptProgramOutput"].ToString())
+
+                        }
+
+                    };
+                    
                     // Закрываем чтение временной таблицы
                     dataReader.Close();
 
@@ -556,26 +586,7 @@ namespace SimplePM_Server
 
                     // Выполняем запрос к базе данных
                     new MySqlCommand(queryUpdate, conn).ExecuteNonQuery();
-
-                    // Получаем сложность поставленной задачи
-                    var queryGetDifficulty = $@"
-                        SELECT 
-                            `difficulty` 
-                        FROM 
-                            `spm_problems` 
-                        WHERE 
-                            `id` = '{submissionInfo.ProblemId}' 
-                        LIMIT 
-                            1
-                        ;
-                    ";
-
-                    var cmdGetProblemDifficulty = new MySqlCommand(queryGetDifficulty, conn);
-
-                    submissionInfo.ProblemDifficulty = int.Parse(
-                        cmdGetProblemDifficulty.ExecuteScalar().ToString()
-                    );
-
+                    
                     /*
                      * Зовём официанта-шляпочника
                      * уж он знает, что делать в таких
@@ -583,7 +594,7 @@ namespace SimplePM_Server
                      */
                     new SimplePM_Officiant(
                         conn,
-                        ref sCompilersConfig,
+                        ref _serverConfiguration,
                         ref _compilerPlugins,
                         submissionInfo
                     ).ServeSubmission();
