@@ -25,14 +25,18 @@ namespace SimplePM_Server.SimplePM_Tester
     {
 
         #region Секция объявления глобальных переменных
-        private SubmissionInfo.SubmissionInfo submissionInfo   ; // ссылка на объект, содержащий информацию о запросе на тестирование
-        private List<ICompilerPlugin>         _compilerPlugins ; // ссылка на список модулей компиляции
-        private MySqlConnection               connection       ; // ссылка на дескриптор соединения к базе данных
-        private string                        exeFileUrl       ; // переменная, содержащая полный путь к exe-файлу пользовательского решения
+        private SubmissionInfo.SubmissionInfo submissionInfo; // ссылка на объект, содержащий информацию о запросе на тестирование
+        private List<ICompilerPlugin> _compilerPlugins; // ссылка на список модулей компиляции
+        private MySqlConnection connection; // ссылка на дескриптор соединения к базе данных
+        private readonly string exeFileUrl; // переменная, содержащая полный путь к exe-файлу пользовательского решения
+        private dynamic _serverConfiguration;
+        private dynamic _languageConfiguration;
         #endregion
 
         public SimplePM_Tester(
             ref MySqlConnection connection,
+            ref dynamic serverConfiguration,
+            ref dynamic languageConfiguration,
             ref List<ICompilerPlugin> _compilerPlugins,
             ref string exeFileUrl,
             ref SubmissionInfo.SubmissionInfo submissionInfo
@@ -40,6 +44,8 @@ namespace SimplePM_Server.SimplePM_Tester
         {
 
             this.connection = connection;
+            _serverConfiguration = serverConfiguration;
+            _languageConfiguration = languageConfiguration;
             this._compilerPlugins = _compilerPlugins;
             this.exeFileUrl = exeFileUrl;
             this.submissionInfo = submissionInfo;
