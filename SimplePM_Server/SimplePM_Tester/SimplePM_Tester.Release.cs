@@ -76,6 +76,7 @@ namespace SimplePM_Server.SimplePM_Tester
                  * нужд.
                  */
                 var currentTestResult = new ProgramTester(
+                    ref _languageConfiguration,
                     ref _compilerPlugins,
                     submissionInfo.CodeLang,
                     exeFileUrl,

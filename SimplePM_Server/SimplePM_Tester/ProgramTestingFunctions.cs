@@ -50,6 +50,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * делать.
              */
             var f = SimplePM_Compiler.GetCompPluginByProgLangName(
+                ref languageConfiguration,
                 ref _compilerPlugins,
                 codeLanguage
             ).SetRunningMethod(

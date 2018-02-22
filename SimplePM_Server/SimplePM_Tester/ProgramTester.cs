@@ -30,7 +30,8 @@ namespace SimplePM_Server.SimplePM_Tester
     {
 
         #region Секция объявления глобальных переменных
-        
+
+        private          dynamic               _compilerConfig;                // 
         private          List<ICompilerPlugin> _compilerPlugins;               // список плагинов компиляторов
         private readonly string                _codeLanguage;                  // наименование языка программирования
         private readonly string                _programPath;                   // путь к исполняемому файлу
@@ -71,6 +72,7 @@ namespace SimplePM_Server.SimplePM_Tester
         #endregion
 
         public ProgramTester(
+            ref dynamic compilerConfig,
             ref List<ICompilerPlugin> _compilerPlugins,
             string codeLanguage,
             string path,
@@ -82,7 +84,8 @@ namespace SimplePM_Server.SimplePM_Tester
             bool adaptOutput = true
         )
         {
-            
+
+            _compilerConfig = compilerConfig;
             this._compilerPlugins = _compilerPlugins;
 
             _codeLanguage = codeLanguage;
@@ -275,6 +278,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
             // Устанавливаем вид запуска
             ProgramTestingFunctions.SetExecInfoByFileExt(
+                ref _compilerConfig,
                 ref _compilerPlugins,
                 ref programStartInfo,
                 _programPath,
@@ -291,7 +295,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Инициализация необходимых для
              * тестирования переменных
              */
-
+            
             _programProcess = new Process
             {
 
