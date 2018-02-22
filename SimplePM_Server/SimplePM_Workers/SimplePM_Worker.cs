@@ -242,11 +242,11 @@ namespace SimplePM_Server
             {
 
                 /* Удаляем все файлы в папке */
-                foreach (var file in Directory.GetFiles(_serverConfiguration.temp_path))
+                foreach (var file in Directory.GetFiles(_serverConfiguration.path.temp))
                     File.Delete(file);
 
                 /* Удаляем все директории в папке */
-                foreach (var dir in Directory.GetDirectories(_serverConfiguration.temp_path))
+                foreach (var dir in Directory.GetDirectories(_serverConfiguration.path.temp))
                     Directory.Delete(dir, true);
 
             }

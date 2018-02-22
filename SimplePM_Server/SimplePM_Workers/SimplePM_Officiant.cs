@@ -77,7 +77,7 @@ namespace SimplePM_Server
         {
 
             // Генерируем имя директории
-            var directoryName = _serverConfiguration.temp_path + 
+            var directoryName = _serverConfiguration.path.temp + 
                                 @"\" + Guid.NewGuid() + 
                                 submissionId + @"\";
 

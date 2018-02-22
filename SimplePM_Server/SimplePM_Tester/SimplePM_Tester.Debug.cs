@@ -52,6 +52,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * пользовательской программы
              */
             var authorTestingResult = new ProgramTester(
+                ref _languageConfiguration,
                 ref _compilerPlugins,
                 authorSolutionCodeLanguage,
                 authorSolutionExePath,
@@ -82,6 +83,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * необходимое для тестирования программы.
              */
             var userTestingResult = new ProgramTester(
+                ref _languageConfiguration,
                 ref _compilerPlugins,
                 submissionInfo.CodeLang,
                 exeFileUrl,
@@ -208,7 +210,7 @@ namespace SimplePM_Server.SimplePM_Tester
             );
 
             // Получаем случайный путь к директории авторского решения
-            var tmpAuthorDir = sConfig["Program"]["temp_path"] + 
+            var tmpAuthorDir = _serverConfiguration.path.temp + 
                 @"\author\" + Guid.NewGuid() + @"\";
 
             // Создаём папку текущего авторского решения задачи
@@ -234,6 +236,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
             // Инициализируем экземпляр класса компилятора
             var compiler = new SimplePM_Compiler(
+                ref _languageConfiguration,
                 ref _compilerPlugins,
                 "a" + submissionInfo.SubmissionId,
                 tmpAuthorSrcLocation,
