@@ -10,11 +10,10 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
-using System.Threading.Tasks;
 using CompilerBase;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace SimplePM_Server.SimplePM_Tester
 {
@@ -31,22 +30,26 @@ namespace SimplePM_Server.SimplePM_Tester
 
         #region Секция объявления глобальных переменных
 
-        private          dynamic               _compilerConfig;                // 
-        private          List<ICompilerPlugin> _compilerPlugins;               // список плагинов компиляторов
-        private readonly string                _codeLanguage;                  // наименование языка программирования
-        private readonly string                _programPath;                   // путь к исполняемому файлу
-        private readonly string                _programArguments;              // аргументы запуска
-        private readonly string                _programInputString;            // данные для инъекции во входной поток
-        private readonly long                  _programMemoryLimit;            // лимит по памяти в байтах
-        private readonly int                   _programProcessorTimeLimit;     // лимит по процессорному времени в миллисекундах
-        private readonly int                   _outputCharsLimit;              // лимит по количеству символов в выходном потоке
-        private          string                _programOutput = "";            // данные из выходного потока программы
-        private          string                _programErrorOutput;            // данные из выходного потока ошибок программы
-        private          Process               _programProcess;                // ссылка на дескриптор процесса
-        private readonly bool                  _adaptOutput;                   // указывает, мягкая или строгая проверка требуется
+        private dynamic _compilerConfiguration;
+        private ICompilerPlugin _compilerPlugin;
 
-        private          bool                  _testingResultReceived;         // указывает, есть ли результат тестирования
-        private          char                  _testingResult;                 // результат тестирования
+        private readonly string _programPath; // путь к исполняемому файлу
+        private readonly string _programArguments; // аргументы запуска
+        private readonly string _programInputString; // данные для инъекции во входной поток
+
+        private readonly long _programMemoryLimit; // лимит по памяти в байтах
+        private readonly int _programProcessorTimeLimit; // лимит по процессорному времени в миллисекундах
+        private readonly int _outputCharsLimit; // лимит по количеству символов в выходном потоке
+
+        private readonly bool _adaptOutput; // указывает, мягкая или строгая проверка требуется
+
+        private string _programOutput = ""; // данные из выходного потока программы
+        private string _programErrorOutput; // данные из выходного потока ошибок программы
+
+        private Process _programProcess; // ссылка на дескриптор процесса
+        
+        private bool _testingResultReceived; // указывает, есть ли результат тестирования
+        private char _testingResult; // результат тестирования
         
         private ProcessStartInfo programStartInfo = new ProcessStartInfo
         {
@@ -58,23 +61,22 @@ namespace SimplePM_Server.SimplePM_Tester
             StandardOutputEncoding = Encoding.UTF8,
             StandardErrorEncoding  = Encoding.UTF8,
             
-            UseShellExecute        = false,
-            LoadUserProfile        = false,
-            CreateNoWindow         = true,
-            WindowStyle            = ProcessWindowStyle.Hidden,
-            ErrorDialog            = false,
+            UseShellExecute = false,
+            LoadUserProfile = false,
+            CreateNoWindow = true,
+            WindowStyle = ProcessWindowStyle.Hidden,
+            ErrorDialog = false,
 
-            Arguments              = "",
-            FileName               = ""
+            Arguments = "",
+            FileName = ""
             
         };
 
         #endregion
 
         public ProgramTester(
-            ref dynamic compilerConfig,
-            ref List<ICompilerPlugin> _compilerPlugins,
-            string codeLanguage,
+            ref dynamic compilerConfiguration,
+            ref ICompilerPlugin _compilerPlugin,
             string path,
             string args,
             long memoryLimit = 0,
@@ -85,10 +87,8 @@ namespace SimplePM_Server.SimplePM_Tester
         )
         {
 
-            _compilerConfig = compilerConfig;
-            this._compilerPlugins = _compilerPlugins;
-
-            _codeLanguage = codeLanguage;
+            _compilerConfiguration = compilerConfiguration;
+            this._compilerPlugin = _compilerPlugin;
 
             _programPath = path;
             _programArguments = args;
@@ -278,12 +278,11 @@ namespace SimplePM_Server.SimplePM_Tester
 
             // Устанавливаем вид запуска
             ProgramTestingFunctions.SetExecInfoByFileExt(
-                ref _compilerConfig,
-                ref _compilerPlugins,
+                ref _compilerConfiguration,
+                ref _compilerPlugin,
                 ref programStartInfo,
                 _programPath,
-                _programArguments,
-                _codeLanguage
+                _programArguments
             );
 
             // Устанавливаем RunAs информацию
