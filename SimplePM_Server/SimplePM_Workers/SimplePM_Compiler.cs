@@ -9,9 +9,9 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
-using System.Collections.Generic;
 using System.IO;
 using CompilerBase;
+using System.Collections.Generic;
 
 namespace SimplePM_Server
 {
@@ -27,16 +27,14 @@ namespace SimplePM_Server
 
         private readonly string _submissionId; // Идентификатор запроса
         private readonly string _fileLocation; // Полный путь к файлу и его расширение
-        private dynamic _compilerConfigs;
-        private List<ICompilerPlugin> _compilerPlugins; // Список загруженных модулей компиляторв
-        private readonly string _codeLang; // Название языка программирования, на котором написан код
+        private dynamic _compilerConfig;
+        private ICompilerPlugin _compilerPlugin; // Список загруженных модулей компиляторв
         
         public SimplePM_Compiler(
-            ref dynamic _compilerConfigs,
-            ref List<ICompilerPlugin> _compilerPlugins,
+            ref dynamic _compilerConfig,
+            ref ICompilerPlugin _compilerPlugin,
             string submissionId,
-            string fileLocation,
-            string codeLang
+            string fileLocation
         )
         {
             
@@ -49,11 +47,10 @@ namespace SimplePM_Server
              * значения локальных  переменных  конструктора
              * класса.
              */
-            this._compilerConfigs = _compilerConfigs;
-            this._compilerPlugins = _compilerPlugins;
+            this._compilerConfig = _compilerConfig;
+            this._compilerPlugin = _compilerPlugin;
             _submissionId = submissionId;
             _fileLocation = fileLocation;
-            _codeLang = codeLang;
 
         }
         
@@ -63,7 +60,7 @@ namespace SimplePM_Server
          * указанном   в    параметрах    функции    языке
          * программирования.
          */
-        public static ICompilerPlugin GetCompPluginByProgLangName(
+        public static ICompilerPlugin FindCompilerPlugin(
             ref dynamic _compilerConfigs,
             ref List<ICompilerPlugin> _compilerPlugins,
             string programmingLanguage
@@ -71,37 +68,41 @@ namespace SimplePM_Server
         {
 
             /*
-             * Производим перебор всех конфигураций компиляторов
+             * Объявляем и инициализируем переменную,
+             * которая будет хранить ссылку на конфи-
+             * гурацию модуля компиляции для данного
+             * языка программирования.
              */
-            foreach (var compilerConfig in _compilerConfigs)
+            var compilerConfig = GetCompilerConfig(
+                ref _compilerConfigs,
+                programmingLanguage
+            );
+
+            /*
+             * Если искомой конфигурации не найдено,
+             * возвращаем   значение  null,  которое
+             * сигнализирует об ошибке   при  поиске
+             * необходимого модуля компиляции.
+             */
+            if (compilerConfig == null)
+                return null;
+
+            /*
+             * В цикле  производим  поиск  необходимого нам
+             * модуля,     ответственного   за   компиляцию
+             * пользовательских    решений   на   указанном
+             * скриптовом языке или языке программирования.
+             */
+            foreach (var compilerPlugin in _compilerPlugins)
             {
 
                 /*
-                 * Если конфигурация не та - продолжаем искать далее
+                 * Если соответствующий плагин найден,
+                 * возвращаем ссылку  на  него, в ином
+                 * случае продолжаем поиск.
                  */
-                if (compilerConfig.language_name != programmingLanguage)
-                    continue;
-
-                /*
-                 * Если верная конфигурация найдена,
-                 * теперь  нашей   задачей  является
-                 * нахождение   модуля   компиляции,
-                 * ответственного   за    компиляцию
-                 * пользовательских    программ   на
-                 * указанном языке программирования.
-                 */
-                foreach (var compilerPlugin in _compilerPlugins)
-                {
-
-                    /*
-                     * Если соответствующий плагин найден,
-                     * возвращаем ссылку  на  него, в ином
-                     * случае продолжаем поиск.
-                     */
-                    if (compilerPlugin.PluginName == compilerConfig.module_name)
-                        return compilerPlugin;
-
-                }
+                if (compilerPlugin.PluginName == compilerConfig.module_name)
+                    return compilerPlugin;
 
             }
 
@@ -112,7 +113,74 @@ namespace SimplePM_Server
             return null;
 
         }
-        
+
+        public static ICompilerPlugin FindCompilerPlugin(
+            ref List<ICompilerPlugin> _compilerPlugins,
+            string pluginName
+        )
+        {
+
+            /*
+             * Производим поиск искомого плагина
+             * в списке доступных модулей компиляции.
+             */
+            foreach (var plugin in _compilerPlugins)
+                if (plugin.PluginName == pluginName)
+                    return plugin;
+
+            /*
+             * Если по запросу  ничего не
+             * найдено - возвращаем null.
+             */
+            return null;
+
+        }
+
+        /*
+         * Метод производит поиск искомой
+         * конфигурации модуля компиляции
+         * пользовательских решений задач
+         * по программированию и передаёт
+         * ссылку на эту конфигурацию.
+         *
+         * Поиск специфической конфигурации
+         * происходит   по   названию языка
+         * программирования.
+         */
+
+        public static dynamic GetCompilerConfig(
+            ref dynamic _compilerConfigs,
+            string languageName
+        )
+        {
+
+            /*
+             * Производим перебор всех конфигураций компиляторов
+             */
+            foreach (var compilerConfig in _compilerConfigs)
+            {
+
+                /*
+                 * Если текущая конфигурация является
+                 * искомой, возвращаем ссылку на неё.
+                 */
+                if (compilerConfig.language_name == languageName)
+                    return compilerConfig;
+                
+                /*
+                 * Иначе продолжаем поиск.
+                 */
+
+            }
+
+            /*
+             * Если соответствующий модуль компиляции
+             * не найден, возвращаем значение null.
+             */
+            return null;
+
+        }
+
         /*
          * Функция, которая по enum-у выбирает и
          * запускает определённый компилятор, а также
@@ -120,24 +188,25 @@ namespace SimplePM_Server
          */
         public CompilerResult ChooseCompilerAndRun()
         {
-
+            
             /*
-             * Получаем экземпляр реализации
-             * интерфейса модуля компиляции.
+             * Выполняем   необходимые   действия  в
+             * случае обнаружения нулевого возврата.
              */
-            var requestedCompiler = GetCompPluginByProgLangName(
-                ref _compilerConfigs,
-                ref _compilerPlugins,
-                _codeLang
-            );
-
-            /*
-             * Выполняем необходимые действия в
-             * случае обнаружения нулевого возврата
-             */
-            if (requestedCompiler == null)
+            if (_compilerPlugin == null)
             {
 
+                /*
+                 * Возвращаем результат выполнения
+                 * компиляции    пользовательского
+                 * решения  поставленной   задачи,
+                 * который сигнализирует о наличии
+                 * ошибки,  которая  возникла  при
+                 * попытке   поиска   необходимого
+                 * модуля компиляции  для  данного
+                 * скриптового  языка   или  языка
+                 * программирования.
+                 */
                 return new CompilerResult
                 {
                     HasErrors = true, // Хьюстон, у нас проблема!
@@ -152,15 +221,14 @@ namespace SimplePM_Server
              * пользовательского        решения
              * поставленной задачи.
              */
-            return requestedCompiler.StartCompiler(
-                ref _compilerConfigs,
+            return _compilerPlugin.StartCompiler(
+                ref _compilerConfig,
                 _submissionId,
                 _fileLocation
             );
 
         }
 
-        ///////////////////////////////////////////////////
-
     }
+
 }

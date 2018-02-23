@@ -11,6 +11,7 @@
 
 using System;
 using System.IO;
+using CompilerBase;
 using MySql.Data.MySqlClient;
 
 namespace SimplePM_Server.SimplePM_Tester
@@ -24,6 +25,7 @@ namespace SimplePM_Server.SimplePM_Tester
          * тестирование   пользовательских
          * решений.
          */
+
         public ProgramTestingResult Debug()
         {
 
@@ -33,7 +35,9 @@ namespace SimplePM_Server.SimplePM_Tester
              * решения задачи
              */
             var authorSolutionExePath = GetAuthorSolutionExePath(
-                out var authorSolutionCodeLanguage
+                out var authorSolutionCodeLanguage,
+                out var authorLanguageConfiguration,
+                out var authorCompilerPlugin
             );
 
             /*
@@ -52,9 +56,8 @@ namespace SimplePM_Server.SimplePM_Tester
              * пользовательской программы
              */
             var authorTestingResult = new ProgramTester(
-                ref _languageConfiguration,
-                ref _compilerPlugins,
-                authorSolutionCodeLanguage,
+                ref authorLanguageConfiguration,
+                ref authorCompilerPlugin,
                 authorSolutionExePath,
                 "-author-solution",
                 memoryLimit,
@@ -76,16 +79,39 @@ namespace SimplePM_Server.SimplePM_Tester
              */
             if (authorTestingResult.Result != Test.MiddleSuccessResult)
                 throw new SimplePM_Exceptions.AuthorSolutionRunningException();
+
+            /*
+             * Получаем ссылку на объект, который
+             * хранит информацию  о  конфигурации
+             * компиляционного модуля для данного
+             * языка программирования.
+             */
             
+            var userLanguageConfiguration = SimplePM_Compiler.GetCompilerConfig(
+                ref _languageConfigurations,
+                submissionInfo.CodeLang
+            );
+
+            /*
+             * Получаем ссылку на объект,
+             * созданный на основании класса,
+             * который, в свою очередь, создан
+             * по подобию интерфейса ICompilerPlugin.
+             */
+
+            ICompilerPlugin userCompilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
+                ref _compilerPlugins,
+                userLanguageConfiguration.module_name
+            );
+
             /*
              * Проводим тестовый запуск пользовательского
              * решения поставленной задачи и получаем всё
              * необходимое для тестирования программы.
              */
             var userTestingResult = new ProgramTester(
-                ref _languageConfiguration,
-                ref _compilerPlugins,
-                submissionInfo.CodeLang,
+                ref userLanguageConfiguration,
+                ref userCompilerPlugin,
                 exeFileUrl,
                 "-user-solution",
                 memoryLimit,
@@ -138,12 +164,17 @@ namespace SimplePM_Server.SimplePM_Tester
          * к  авторскому   решению  поставленной
          * задачи.
          */
-        private string GetAuthorSolutionExePath(out string authorSolutionCodeLanguage)
+
+        private string GetAuthorSolutionExePath(
+            out string authorSolutionCodeLanguage,
+            out dynamic authorLanguageConfiguration,
+            out ICompilerPlugin authorCompilerPlugin
+        )
         {
             
             /*
              * Выборка информации об
-             * авторском решении из
+             * авторском  решении из
              * базы данных SimplePM.
              */
             
@@ -164,7 +195,10 @@ namespace SimplePM_Server.SimplePM_Tester
             ";
             
             var cmdSelect = new MySqlCommand(querySelect, connection);
-            cmdSelect.Parameters.AddWithValue("@problemId", submissionInfo.ProblemInformation.ProblemId);
+            cmdSelect.Parameters.AddWithValue(
+                "@problemId",
+                submissionInfo.ProblemInformation.ProblemId
+            );
 
             // Чтение результатов запроса
             var dataReader = cmdSelect.ExecuteReader();
@@ -196,7 +230,29 @@ namespace SimplePM_Server.SimplePM_Tester
                 throw new SimplePM_Exceptions.AuthorSolutionNotFoundException();
 
             }
-            
+
+            /*
+             * Получаем ссылку на объект, который
+             * хранит информацию  о  конфигурации
+             * компиляционного модуля для данного
+             * языка программирования.
+             */
+            authorLanguageConfiguration = SimplePM_Compiler.GetCompilerConfig(
+                ref _languageConfigurations,
+                authorSolutionCodeLanguage
+            );
+
+            /*
+             * Получаем ссылку на объект,
+             * созданный на основании класса,
+             * который, в свою очередь, создан
+             * по подобию интерфейса ICompilerPlugin.
+             */
+            authorCompilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
+                ref _compilerPlugins,
+                authorLanguageConfiguration.module_name
+            );
+
             /*
              * Компиляция авторского решения
              * поставленной задачи с последующим
@@ -204,10 +260,7 @@ namespace SimplePM_Server.SimplePM_Tester
              */
 
             // Определяем расширение файла
-            var authorFileExt = "." + SimplePM_Submission.GetExtByLang(
-                authorSolutionCodeLanguage,
-                ref _compilerPlugins
-            );
+            var authorFileExt = "." + authorLanguageConfiguration.source_ext;
 
             // Получаем случайный путь к директории авторского решения
             var tmpAuthorDir = _serverConfiguration.path.temp + 
@@ -236,11 +289,10 @@ namespace SimplePM_Server.SimplePM_Tester
 
             // Инициализируем экземпляр класса компилятора
             var compiler = new SimplePM_Compiler(
-                ref _languageConfiguration,
-                ref _compilerPlugins,
+                ref authorLanguageConfiguration,
+                ref authorCompilerPlugin,
                 "a" + submissionInfo.SubmissionId,
-                tmpAuthorSrcLocation,
-                authorSolutionCodeLanguage
+                tmpAuthorSrcLocation
             );
 
             // Получаем структуру результата компиляции
@@ -256,6 +308,10 @@ namespace SimplePM_Server.SimplePM_Tester
             if (cResult.HasErrors)
                 throw new FileLoadException(cResult.ExeFullname);
             
+            /*
+             * Возвращаем  полный  путь к исполняемому
+             * файлу авторского решения данной задачи.
+             */
             return cResult.ExeFullname;
 
         }
@@ -296,7 +352,11 @@ namespace SimplePM_Server.SimplePM_Tester
             ";
 
             var cmdSelect = new MySqlCommand(querySelect, connection);
-            cmdSelect.Parameters.AddWithValue("@problemId", submissionInfo.ProblemInformation.ProblemId);
+
+            cmdSelect.Parameters.AddWithValue(
+                "@problemId",
+                submissionInfo.ProblemInformation.ProblemId
+            );
 
             // Чтение результатов запроса
             var dataReader = cmdSelect.ExecuteReader();
