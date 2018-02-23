@@ -47,10 +47,11 @@ namespace SimplePM_Server
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private dynamic _serverConfiguration; // переменная хранит основную конфигурацию сервера
+        private dynamic _compilerConfigurations; // переменная хранит конфигурацию модулей компиляции
 
-        private ulong _aliveTestersCount;    // Количество текущих обрабатываемых запросов
+        private ulong _aliveTestersCount; // Количество текущих обрабатываемых запросов
         
-        private string EnabledLangs; // Список поддерживаемых ЯП для SQL запросов
+        private string EnabledLangs; // Список поддерживаемых сервером ЯП для SQL запросов
         public List<ICompilerPlugin> _compilerPlugins; // Список, содержащий ссылки на модули компиляторов
         
         /*
@@ -283,8 +284,14 @@ namespace SimplePM_Server
             // Очищаем директорию временных файлов
             CleanTempDirectory();
             
+            // Загружаем конфигурацию сервера в память
             _serverConfiguration = JsonConvert.DeserializeObject(
                 File.ReadAllText("./config/server.json")
+            );
+
+            // Загружаем конфигурации модулей компиляции в память
+            _compilerConfigurations = JsonConvert.DeserializeObject(
+                File.ReadAllText("./config/compilers.json")
             );
             
             // Конфигурируем журнал событий (библиотека NLog)
@@ -301,21 +308,44 @@ namespace SimplePM_Server
                 /* Deal with it */
             }
 
+            /*
+             * В случае запроса на автоматическое
+             * выставление лимитов по обработке
+             * запросов на тестирование, необходимо
+             * их всё-таки выставить. Будем считать,
+             * что максимально возможное число
+             * одновременных проверок будет равняться
+             * общему числу логических процессоров на
+             * данной машине Тьюринга.
+             */
+
             if (_serverConfiguration.submission.rechecks_without_timeout == "auto")
                 _serverConfiguration.submission.rechecks_without_timeout = Environment.ProcessorCount.ToString();
 
             if (_serverConfiguration.submission.max_threads == "auto")
                 _serverConfiguration.submission.max_threads = Environment.ProcessorCount.ToString();
 
-            // Модули компиляторов
+            /*
+             * Вызываем метод, который загружает
+             * модули компиляции в память.
+             */
             LoadCompilerPlugins();
 
-            // Модули сервера
+            /*
+             * Вызываем метод, который загружает
+             * плагины сервера в память.
+             */
             //TODO:LoadServerPlugins();
 
             /*
              * Вызываем функцию получения строчного списка
-             * поддерживаемых языков программирования.
+             * поддерживаемых языков программирования. Это
+             * необходимо для формирования соответствующих
+             * SQL-запросов  к  системе  управления базами
+             * данных, а также для выборки тех запросов на
+             * тестирование, которые соответствуют возмож-
+             * ностям текущего экземпляра сервера проверки
+             * пользовательских решений поставленных задач
              */
             GenerateEnabledLangsList();
 
@@ -602,7 +632,7 @@ namespace SimplePM_Server
                     new SimplePM_Officiant(
                         conn,
                         ref _serverConfiguration,
-                        ref _compilerConfigs,
+                        ref _compilerConfigurations,
                         ref _compilerPlugins,
                         submissionInfo
                     ).ServeSubmission();

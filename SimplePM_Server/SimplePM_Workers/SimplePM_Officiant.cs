@@ -46,21 +46,21 @@ namespace SimplePM_Server
         private MySqlConnection _connection; // Дескриптор соединения с БД
         private SubmissionInfo.SubmissionInfo _submissionInfo; // Ссылка на объект, содержащий информацию о запросе на тестирование
         private dynamic _serverConfiguration;
-        private dynamic _compilerConfigs;
+        private dynamic _compilerConfigurations;
         private List<ICompilerPlugin> _compilerPlugins; // Список загруженных модулей компиляторв
         
         public SimplePM_Officiant(
             MySqlConnection connection,
-            ref dynamic serverConfiguration,
-            ref dynamic _compilerConfigs,
+            ref dynamic _serverConfiguration,
+            ref dynamic _compilerConfigurations,
             ref List<ICompilerPlugin> _compilerPlugins,
             SubmissionInfo.SubmissionInfo submissionInfo
         )
         {
             
             _connection = connection;
-            _serverConfiguration = serverConfiguration;
-            this._compilerConfigs = _compilerConfigs;
+            this._serverConfiguration = _serverConfiguration;
+            this._compilerConfigurations = _compilerConfigurations;
             this._compilerPlugins = _compilerPlugins;
             _submissionInfo = submissionInfo;
 
@@ -89,28 +89,41 @@ namespace SimplePM_Server
 
         }
 
-        ///////////////////////////////////////////////////
-        /// Функция серверует запрос на тестирование,
-        /// контролирует работу компиляторов и
-        /// тестировщиков. Всё необходимое для работы
-        /// функции изымается из глобальных переменных
-        /// класса SimplePM_Officiant (текущего).
-        ///////////////////////////////////////////////////
+        /*
+         * Метод сопровождает пользовательский
+         * запрос на тестирование данного решения
+         * поставленной задачи на всех стадиях
+         * тестирования, и занимается вызовом
+         * всех необходимых для осуществления
+         * тестирования пользовательского решения
+         * методов.
+         */
 
         public void ServeSubmission()
         {
             
             /*
-             * Проводим работу с файлом исходного кода
+             * Определяем соответствующую данному запросу
+             * на тестирование конфигурацию модуля компиляции
              */
 
-            // Определяем расширение файла
-            var fileExt = "." + SimplePM_Submission.GetExtByLang(
-                _submissionInfo.CodeLang,
-                ref _compilerPlugins
+            var compilerConfiguration = SimplePM_Compiler.GetCompilerConfig(
+                ref _compilerConfigurations,
+                _submissionInfo.CodeLang
             );
 
-            // Определяем полный путь к файлу
+            /*
+             * Определяем расширение файла
+             * исходного кода пользовательского
+             * решения поставленной задачи.
+             */
+            var fileExt = "." + compilerConfiguration.source_ext;
+
+            /*
+             * Случайным образом генерируем путь
+             * к файлу исходного кода пользовательского
+             * решения поставленной задачи.
+             */
             var fileLocation = RandomGenSourceFileLocation(
                 _submissionInfo.SubmissionId.ToString(),
                 fileExt
@@ -119,22 +132,36 @@ namespace SimplePM_Server
             /*
              * Записываем в него исходный код,
              * очищаем буфер и закрываем поток
-             * записи.
+             * записи в данный файл.
+             * При этом, осуществляем побайтовую
+             * запись в файл, дабы не повредить его.
              */
             File.WriteAllBytes(
                 fileLocation,
                 _submissionInfo.ProblemCode
             );
 
-            // Устанавливаем его аттрибуты
+            /*
+             * Устанавливаем аттрибуты данного файла
+             * таким образом, дабы исключить возможность
+             * индексирования его содержимого и остальные
+             * не приятные для нас ситуации, которые могут
+             * привести к непредвиденным последствиям.
+             */
             File.SetAttributes(
                 fileLocation,
                 FileAttributes.NotContentIndexed
             );
 
-            // Объявляем экземпляр класса компиляции
+            /*
+             * Объявляем и нициализируем переменную,
+             * в которой будет храниться ссылка на
+             * объект, методы которого осуществляют
+             * все этапы компиляции пользовательского
+             * решения задачи.
+             */
             var compiler = new SimplePM_Compiler(
-                ref _compilerConfigs,
+                ref _compilerConfigurations111,
                 ref _compilerPlugins,
                 _submissionInfo.SubmissionId.ToString(),
                 fileLocation,
@@ -212,9 +239,14 @@ namespace SimplePM_Server
                         case "release":
                             
                             break;
-                    }
+                        default:
 
-                    ///////////////////////////////////////////////////
+                            logger.Error(
+                                "Unsupported test type at submission #" + _submissionInfo.SubmissionId
+                            );
+
+                            break;
+                    }
                     
                 }
                 catch (Exception ex)
@@ -253,7 +285,7 @@ namespace SimplePM_Server
                     cmd.ExecuteNonQuery();
 
                     // Вызываем сборщика мусора
-                    ClearCache(cResult.ExeFullname, fileLocation);
+                    ClearCache(fileLocation);
 
                     // Выходим
                     return;
@@ -262,19 +294,21 @@ namespace SimplePM_Server
 
             }
 
-            //Вызываем сборщика мусора
-            ClearCache(cResult.ExeFullname, fileLocation);
+            /*
+             * Вызываем метод,  который несёт
+             * ответственность  за   удаление
+             * всех временных файлов запросов
+             * на  тестирование,  а  также за
+             * вызов сборщика мусора.
+             */
+            ClearCache(fileLocation);
 
         }
 
-        ///////////////////////////////////////////////////
-        /// Функция очищает кэш, временные файлы и
-        /// совершает вызов системного сборщика мусора.
-        /// Используется для экономии оперативной памяти
-        /// сервера, на котором работает SimplePM_Server.
-        ///////////////////////////////////////////////////
-        
-        public void ClearCache(string exe_fullname, string fileLocation)
+        /*
+         *
+         */
+        public void ClearCache(string fileLocation)
         {
 
             /*
@@ -291,7 +325,7 @@ namespace SimplePM_Server
                 );
 
                 // Вызываем сборщик мусора оптимизированным методом
-                GC.Collect(2, GCCollectionMode.Optimized);
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized);
 
             }
             catch (Exception) { /* Deal with it. */ }
