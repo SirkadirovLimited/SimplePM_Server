@@ -9,7 +9,6 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Security;
@@ -36,11 +35,10 @@ namespace SimplePM_Server.SimplePM_Tester
          */
         public static void SetExecInfoByFileExt(
             ref dynamic languageConfiguration,
-            ref List<ICompilerPlugin> _compilerPlugins,
+            ref ICompilerPlugin _compilerPlugin,
             ref ProcessStartInfo startInfo,
             string filePath,
-            string arguments,
-            string codeLanguage
+            string arguments
         )
         {
             
@@ -49,18 +47,14 @@ namespace SimplePM_Server.SimplePM_Tester
              * который  знает  лучше, как  это
              * делать.
              */
-            var f = SimplePM_Compiler.GetCompPluginByProgLangName(
-                ref languageConfiguration,
-                ref _compilerPlugins,
-                codeLanguage
-            ).SetRunningMethod(
+            var f = _compilerPlugin.SetRunningMethod(
                 ref languageConfiguration,
                 ref startInfo,
                 filePath
             );
 
             /*
-             * Добавляем   к   этому  всему
+             * Добавляем к этому всему
              * аргументы коммандной строки.
              */
             if (startInfo.Arguments.Length > 0)
