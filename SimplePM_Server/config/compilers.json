@@ -13,6 +13,7 @@
 
   {
     "language_name": "csharp",
+    "source_ext": "cs",
     "enabled": true,
     "module_name": "Mono",
     "compiler_path": "C:\\Program Files\\Mono\\lib\\mono\\4.5\\mcs.exe",
@@ -22,6 +23,7 @@
 
   {
     "language_name": "java",
+    "source_ext": "java",
     "enabled": true,
     "module_name": "Java",
     "compiler_path": "C:\\Program Files\\Java\\jdk1.8.0_144\\bin\\javac.exe",
@@ -32,6 +34,7 @@
 
   {
     "language_name": "freepascal",
+    "source_ext": "pas",
     "enabled": true,
     "module_name": "TypicalCompiler",
     "compiler_path": "C:\\Program Files (x86)\\FPC\\bin\\i386-win32\\ppcrossx64.exe",
@@ -40,6 +43,7 @@
 
   {
     "language_name": "c",
+    "source_ext": "c",
     "enabled": true,
     "module_name": "TypicalCompiler",
     "compiler_path": "C:\\MinGW\\bin\\gcc.exe",
@@ -48,6 +52,7 @@
 
   {
     "language_name": "cpp",
+    "source_ext": "cpp",
     "enabled": true,
     "module_name": "TypicalCompiler",
     "compiler_path": "C:\\MinGW\\bin\\g++.exe",
@@ -56,6 +61,7 @@
 
   {
     "language_name": "lua",
+    "source_ext": "lua",
     "enabled": true,
     "module_name": "NoCompiler",
     "compiler_path": "E:\\Lua\\lua.exe",
@@ -64,6 +70,7 @@
 
   {
     "language_name": "python",
+    "source_ext": "py",
     "enabled": true,
     "module_name": "NoCompiler",
     "compiler_path": "C:\\Program Files\\Python36\\python.exe",
@@ -72,6 +79,7 @@
 
   {
     "language_name": "php",
+    "source_ext": "php",
     "enabled": false,
     "module_name": "NoCompiler",
     "compiler_path": "",
