@@ -9,18 +9,12 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
-// Основа всего
-using System;
-// Подключаем коллекции
-using System.Collections.Generic;
-// Подключение к БД
-using MySql.Data.MySqlClient;
-// Работа с файлами
-using System.IO;
-// Работа с компиляторами
-using CompilerBase;
-// Журнал событий
 using NLog;
+using System;
+using System.IO;
+using CompilerBase;
+using MySql.Data.MySqlClient;
+using System.Collections.Generic;
 
 namespace SimplePM_Server
 {
@@ -45,8 +39,8 @@ namespace SimplePM_Server
 
         private MySqlConnection _connection; // Дескриптор соединения с БД
         private SubmissionInfo.SubmissionInfo _submissionInfo; // Ссылка на объект, содержащий информацию о запросе на тестирование
-        private dynamic _serverConfiguration;
-        private dynamic _compilerConfigurations;
+        private dynamic _serverConfiguration; // конфигурация сервера
+        private dynamic _compilerConfigurations; // конфигурация модулей компиляции
         private List<ICompilerPlugin> _compilerPlugins; // Список загруженных модулей компиляторв
         
         public SimplePM_Officiant(
@@ -59,19 +53,23 @@ namespace SimplePM_Server
         {
             
             _connection = connection;
+
             this._serverConfiguration = _serverConfiguration;
             this._compilerConfigurations = _compilerConfigurations;
+
             this._compilerPlugins = _compilerPlugins;
+
             _submissionInfo = submissionInfo;
 
         }
 
-        ///////////////////////////////////////////////////
-        /// Функция, генерирующая случайный путь к файлу,
-        /// содержащему исходный код пользовательского
-        /// решения поставленной задачи. Можно
-        /// использовать данную функцию и в других целях.
-        ///////////////////////////////////////////////////
+        /*
+         * Метод  генерирует  случайный  путь  к  файлу
+         * исходного  кода   пользовательского  решения
+         * поставленной задачи. Случайным  данный  путь
+         * должен  быть для обеспечения  дополнительной
+         * безопасности при запуске сторонних программ.
+         */
 
         public string RandomGenSourceFileLocation(string submissionId, string fileExt)
         {
@@ -112,13 +110,18 @@ namespace SimplePM_Server
                 _submissionInfo.CodeLang
             );
 
+            ICompilerPlugin compilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
+                ref _compilerPlugins,
+                compilerConfiguration.module_name
+            );
+
             /*
              * Определяем расширение файла
              * исходного кода пользовательского
              * решения поставленной задачи.
              */
             var fileExt = "." + compilerConfiguration.source_ext;
-
+            
             /*
              * Случайным образом генерируем путь
              * к файлу исходного кода пользовательского
@@ -161,11 +164,10 @@ namespace SimplePM_Server
              * решения задачи.
              */
             var compiler = new SimplePM_Compiler(
-                ref _compilerConfigurations111,
-                ref _compilerPlugins,
+                ref compilerConfiguration,
+                ref compilerPlugin,
                 _submissionInfo.SubmissionId.ToString(),
-                fileLocation,
-                _submissionInfo.CodeLang
+                fileLocation
             );
             
             /*
@@ -306,7 +308,12 @@ namespace SimplePM_Server
         }
 
         /*
-         *
+         * Метод занимается  очисткой  временных
+         * файлов,  которрые  были  созданы  при
+         * обработке  пользовательского  запроса
+         * на тестирование решения данной задачи
+         * по алгоритмическому  или  спортивному
+         * программированию.
          */
         public void ClearCache(string fileLocation)
         {
@@ -315,6 +322,7 @@ namespace SimplePM_Server
              * Очищаем папку экзешников от мусора.
              * В случае ошибки ничего не делаем.
              */
+
             try
             {
 
@@ -331,8 +339,6 @@ namespace SimplePM_Server
             catch (Exception) { /* Deal with it. */ }
 
         }
-        
-        ///////////////////////////////////////////////////
         
     }
 }
