@@ -147,7 +147,7 @@ namespace SimplePM_Server
          * происходит   по   названию языка
          * программирования.
          */
-
+        
         public static dynamic GetCompilerConfig(
             ref dynamic _compilerConfigs,
             string languageName
