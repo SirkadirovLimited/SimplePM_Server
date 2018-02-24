@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Web;
+using CompilerBase;
 using MySql.Data.MySqlClient;
 using ReleaseTestInfo;
 
@@ -23,9 +24,12 @@ namespace SimplePM_Server.SimplePM_Tester
     {
         
 
-        public ProgramTestingResult Release()
+        public ProgramTestingResult Release(
+            ref dynamic compilerConfiguration,
+            ref ICompilerPlugin compilerPlugin
+        )
         {
-
+            
             /*
              * Получаем информацию о тестах
              * для     release-тестирования
@@ -76,9 +80,8 @@ namespace SimplePM_Server.SimplePM_Tester
                  * нужд.
                  */
                 var currentTestResult = new ProgramTester(
-                    ref _languageConfiguration,
-                    ref _compilerPlugins,
-                    submissionInfo.CodeLang,
+                    ref compilerConfiguration,
+                    ref compilerPlugin,
                     exeFileUrl,
                     "",
                     currentTest.MemoryLimit,
