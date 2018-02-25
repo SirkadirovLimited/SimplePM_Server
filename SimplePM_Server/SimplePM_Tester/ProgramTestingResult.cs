@@ -34,6 +34,28 @@ namespace SimplePM_Server.SimplePM_Tester
         public Test[] TestingResults;
 
         /*
+         * Поле класса, которое возвращает
+         * общее количество тестов.
+         */
+        public int TestsCount => TestingResults.Length;
+
+        /*
+         * Метод определяет количество
+         * успешно пройденных тестов.
+         */
+        public int PassedTestsCount()
+        {
+
+            /*
+             * Вычисляем сумму IsSuccessful значений
+             * всех элементов массива TestingResults
+             * и возвращаем полученное значение.
+             */
+            return TestingResults.Sum(test => Convert.ToInt32(test.IsSuccessful));
+
+        }
+
+        /*
          * Метод  является   переопределением
          * стандартного конструктора текущего
          * класса.
