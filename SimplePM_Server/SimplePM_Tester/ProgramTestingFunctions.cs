@@ -82,12 +82,31 @@ namespace SimplePM_Server.SimplePM_Tester
         {
 
             /*
-             * Считываем параметры безопасности сервера
-             * из конфигурационного файла
+             * Объявляем переменную, которая  будет  хранить
+             * ссылку на объект, который хранит конфигурацию
+             * безопасности сервера проверки решений.
              */
-            dynamic securityConfiguration = JsonConvert.DeserializeObject(
-                File.ReadAllText("./config/security.config")
-            );
+
+            dynamic securityConfiguration;
+
+            /*
+             * Для  обеспечения  безопасности  выполнения
+             * при распараллеливании, требуется временная
+             * блокировка доступа к чтению из файла.
+             */
+            lock (new object())
+            {
+
+                /*
+                 * Производим     чтение    конфигурационного
+                 * файла, после чего произвоим десериализацию
+                 * Json данных в удобный для нас формат.
+                 */
+                securityConfiguration = JsonConvert.DeserializeObject(
+                    File.ReadAllText("./config/security.config")
+                );
+
+            }
 
             /*
              * Проверяем, включена  ли  функция  запуска
@@ -112,7 +131,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Передаём,  что   необходимо
              * вытянуть профайл из реестра
              */
-            proc.StartInfo.LoadUserProfile = false;
+            proc.StartInfo.LoadUserProfile = true;
 
             /*
              * Передаём пароль пользователя
