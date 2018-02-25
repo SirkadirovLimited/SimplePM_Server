@@ -10,6 +10,7 @@
  */
 /*! \file */
 
+using System;
 using System.IO;
 using System.Web;
 using System.Diagnostics;
@@ -34,8 +35,24 @@ namespace CompilerBase
          * возвращает его как строку.
          */
 
-        public string GenerateExeFileLocation(string srcFileLocation, string currentSubmissionId, string outFileExt = null)
+        public string GenerateExeFileLocation(
+            string srcFileLocation,
+            string currentSubmissionId
+        )
         {
+
+            /*
+             * Определяем платформу
+             */
+            int platform = (int)Environment.OSVersion.Platform;
+
+            /*
+             * В зависимости  от  текущей  платформы,
+             * устанавливаем специфическое расширение
+             * запускаемого файла.
+             */
+            string outFileExt = (platform == 4) || (platform == 6) || (platform == 128)
+                ? string.Empty : "exe";
 
             /*
              * Получаем путь родительской
@@ -83,6 +100,7 @@ namespace CompilerBase
             // Устанавливаем информацию о старте процесса
             var pStartInfo = new ProcessStartInfo(compilerFullName, compilerArgs)
             {
+
                 // Никаких ошибок, я сказал!
                 ErrorDialog = false,
 
@@ -109,36 +127,54 @@ namespace CompilerBase
             // Ожидаем завершение процесса компилятора
             cplProc.WaitForExit();
 
-            // Получаем выходной поток компилятора
+            /*
+             * Осуществляем чтение выходных потоков
+             * компилятора в специально созданные
+             * для этого переменные.
+             */
             var standartOutput = cplProc.StandardOutput.ReadToEnd();
             var standartError = cplProc.StandardError.ReadToEnd();
 
-            // Если выходной поток компилятора пуст, заполняем его не нужным барахлом
+            /*
+             * Если выходной поток компилятора
+             * пуст,   заполняем его не нужным
+             * барахлом.
+             */
             if (standartOutput.Length == 0)
                 standartOutput = "SimplePM_Server";
 
             // Объявляем переменную результата компиляции
             var result = new CompilerResult()
             {
-                // Получаем результат выполнения компилятора и записываем
-                // его в переменную сообщения компилятора
+
+                /*
+                 * Получаем полный текст сообщений
+                 * компилятора и записываем его в
+                 * специально отведенную для этого
+                 * переменную.
+                 */
                 CompilerMessage = HttpUtility.HtmlEncode(standartOutput + "\n" + standartError)
+
             };
 
             // Возвращаем результат компиляции
             return result;
+
         }
 
-        ///////////////////////////////////////////////////
-        /// Функция, завершающая генерацию результата
-        /// компиляции пользовательского приложения.
-        ///////////////////////////////////////////////////
+        /*
+         * Метод, завершающий генерацию результата
+         * компиляции пользовательского решения
+         * поставленной задачи по программированию.
+         */
 
         public CompilerResult ReturnCompilerResult(CompilerResult temporaryResult)
         {
 
-            // Проверяем результат компиляции
-            // на предопределённость наличия ошибки
+            /*
+             * Проверка  на   предопределение
+             * наличия ошибок при компиляции.
+             */
             if (!temporaryResult.HasErrors)
             {
                 // Проверяем на наличие исполняемого файла
@@ -149,8 +185,6 @@ namespace CompilerBase
             return temporaryResult;
 
         }
-
-        ///////////////////////////////////////////////////
 
     }
 
