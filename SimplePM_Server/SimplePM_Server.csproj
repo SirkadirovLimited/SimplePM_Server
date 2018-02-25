@@ -137,6 +137,7 @@
     <Compile Include="SimplePM_Tester\ProgramTestingFunctions.cs" />
     <Compile Include="SimplePM_Tester\ProgramTestingResult.cs" />
     <Compile Include="SimplePM_Tester\SimplePM_Tester.cs" />
+    <Compile Include="SimplePM_Tester\SimplePM_Tester.Syntax.cs" />
     <Compile Include="SimplePM_Tester\Test.cs" />
     <Compile Include="SimplePM_Workers\SimplePM_Worker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
