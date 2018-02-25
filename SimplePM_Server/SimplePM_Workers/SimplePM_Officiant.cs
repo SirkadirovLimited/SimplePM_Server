@@ -179,7 +179,47 @@ namespace SimplePM_Server
              */
             var cResult = compiler.ChooseCompilerAndRun();
             
-            SimplePM_Tester.SimplePM_Tester tester = new SimplePM_Tester.SimplePM_Tester(
+            var testingResult = RunTesting(
+                cResult,
+                ref compilerConfiguration,
+                ref compilerPlugin
+            );
+            
+            /*
+             * Вызываем метод,  который несёт
+             * ответственность  за   удаление
+             * всех временных файлов запросов
+             * на  тестирование,  а  также за
+             * вызов сборщика мусора.
+             */
+
+            ClearCache(fileLocation);
+
+        }
+
+        private ProgramTestingResult RunTesting(
+            CompilerResult cResult,
+            ref dynamic compilerConfiguration,
+            ref ICompilerPlugin compilerPlugin
+        )
+        {
+
+            /*
+             * Объявляем временную переменную,
+             * которая будет хранить результат
+             * выполнения тестирования пользо-
+             * вательской программы.
+             */
+            ProgramTestingResult tmpResult = null;
+
+            /*
+             * Объявляем  объект на базе класса
+             * тестировщика, с помощью которого
+             * в скором времени будем выполнять
+             * тестировани пользовательских ре-
+             * шений задач по программированию.
+             */
+            var tester = new SimplePM_Tester.SimplePM_Tester(
                 ref _connection,
                 ref _serverConfiguration,
                 ref _compilerConfigurations,
@@ -187,9 +227,12 @@ namespace SimplePM_Server
                 cResult.ExeFullname,
                 ref _submissionInfo
             );
-
-            ProgramTestingResult testingResult = null;
-
+            
+            /*
+             * В зависимости от выбранного пользователем
+             * типа тестирования выполняем специфические
+             * операции по отношению к решению задачи.
+             */
             switch (_submissionInfo.TestType)
             {
 
@@ -203,10 +246,10 @@ namespace SimplePM_Server
                      * возвращает результаты своей "работы".
                      */
 
-                    testingResult = tester.Syntax(cResult);
+                    tmpResult = tester.Syntax(cResult);
 
                     break;
-                
+
                 /* Debug-тестирование */
                 case "debug":
 
@@ -216,10 +259,10 @@ namespace SimplePM_Server
                      * ленной задачи по программированию
                      */
 
-                    testingResult = tester.Debug();
+                    tmpResult = tester.Debug();
 
                     break;
-                
+
                 /* Release-тестирование */
                 case "release":
 
@@ -229,38 +272,21 @@ namespace SimplePM_Server
                      * ленной задачи  по  программированию
                      */
 
-                    testingResult = tester.Release(
+                    tmpResult = tester.Release(
                         ref compilerConfiguration,
                         ref compilerPlugin
                     );
 
                     break;
-                
-                /* Во всех непонятных случаях становимся страусом */
-                default:
-
-                    /*
-                     * Выбрасываем исключение, сигнализирующее
-                     * ошибку  в  парсинге  типа  тестирования
-                     * (не поддерживаемый режим тестирования).
-                     */
-                    throw new ArgumentException(
-                        "Invalid test type",
-                        _submissionInfo.TestType
-                    );
                     
-                
             }
-            
-            /*
-             * Вызываем метод,  который несёт
-             * ответственность  за   удаление
-             * всех временных файлов запросов
-             * на  тестирование,  а  также за
-             * вызов сборщика мусора.
-             */
 
-            ClearCache(fileLocation);
+            /*
+             * Возвращаем результат выполнения
+             * тестирования  пользовательского
+             * решения данной задачи.
+             */
+            return tmpResult;
 
         }
 
