@@ -15,6 +15,7 @@ using System.IO;
 using CompilerBase;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
+using SimplePM_Server.SimplePM_Tester;
 
 namespace SimplePM_Server
 {
@@ -178,8 +179,79 @@ namespace SimplePM_Server
              */
             var cResult = compiler.ChooseCompilerAndRun();
             
-            throw new NotImplementedException();
+            SimplePM_Tester.SimplePM_Tester tester = new SimplePM_Tester.SimplePM_Tester(
+                ref _connection,
+                ref _serverConfiguration,
+                ref _compilerConfigurations,
+                ref _compilerPlugins,
+                cResult.ExeFullname,
+                ref _submissionInfo
+            );
 
+            ProgramTestingResult testingResult = null;
+
+            switch (_submissionInfo.TestType)
+            {
+
+                /* Проверка синтаксиса */
+                case "syntax":
+
+                    /*
+                     * Вызываем   метод,   который   создаёт
+                     * иллюзию  проверки   пользовательского
+                     * решения    поставленной    задачи   и
+                     * возвращает результаты своей "работы".
+                     */
+
+                    testingResult = tester.Syntax(cResult);
+
+                    break;
+                
+                /* Debug-тестирование */
+                case "debug":
+
+                    /*
+                     * Вызываем метод Debug-тестирования
+                     * пользовательского решения постав-
+                     * ленной задачи по программированию
+                     */
+
+                    testingResult = tester.Debug();
+
+                    break;
+                
+                /* Release-тестирование */
+                case "release":
+
+                    /*
+                     * Вызываем метод Release-тестирования
+                     * пользовательского  решения  постав-
+                     * ленной задачи  по  программированию
+                     */
+
+                    testingResult = tester.Release(
+                        ref compilerConfiguration,
+                        ref compilerPlugin
+                    );
+
+                    break;
+                
+                /* Во всех непонятных случаях становимся страусом */
+                default:
+
+                    /*
+                     * Выбрасываем исключение, сигнализирующее
+                     * ошибку  в  парсинге  типа  тестирования
+                     * (не поддерживаемый режим тестирования).
+                     */
+                    throw new ArgumentException(
+                        "Invalid test type",
+                        _submissionInfo.TestType
+                    );
+                    
+                
+            }
+            
             /*
              * Вызываем метод,  который несёт
              * ответственность  за   удаление
@@ -187,6 +259,7 @@ namespace SimplePM_Server
              * на  тестирование,  а  также за
              * вызов сборщика мусора.
              */
+
             ClearCache(fileLocation);
 
         }
