@@ -121,6 +121,7 @@ namespace SimplePM_Server
              * исходного кода пользовательского
              * решения поставленной задачи.
              */
+
             var fileExt = "." + compilerConfiguration.source_ext;
             
             /*
@@ -128,6 +129,7 @@ namespace SimplePM_Server
              * к файлу исходного кода пользовательского
              * решения поставленной задачи.
              */
+
             var fileLocation = RandomGenSourceFileLocation(
                 _submissionInfo.SubmissionId.ToString(),
                 fileExt
@@ -140,6 +142,7 @@ namespace SimplePM_Server
              * При этом, осуществляем побайтовую
              * запись в файл, дабы не повредить его.
              */
+
             File.WriteAllBytes(
                 fileLocation,
                 _submissionInfo.ProblemCode
@@ -152,6 +155,7 @@ namespace SimplePM_Server
              * не приятные для нас ситуации, которые могут
              * привести к непредвиденным последствиям.
              */
+
             File.SetAttributes(
                 fileLocation,
                 FileAttributes.NotContentIndexed
@@ -164,6 +168,7 @@ namespace SimplePM_Server
              * все этапы компиляции пользовательского
              * решения задачи.
              */
+
             var compiler = new SimplePM_Compiler(
                 ref compilerConfiguration,
                 ref compilerPlugin,
@@ -177,8 +182,16 @@ namespace SimplePM_Server
              * Функция возвращает информацию о результате
              * компиляции пользовательской программы.
              */
+
             var cResult = compiler.ChooseCompilerAndRun();
             
+            /*
+             * Запускаем тестирование пользовательской
+             * программы  по  указанному  его  типу  и
+             * парметрам,   после  чего  получаем  его
+             * результат.
+             */
+
             var testingResult = RunTesting(
                 cResult,
                 ref compilerConfiguration,
@@ -186,13 +199,22 @@ namespace SimplePM_Server
             );
             
             /*
+             * Отправляем результат тестирования
+             * пользовательского решения постав-
+             * ленной  задачи  на  сервер БД для
+             * последующей обработки.
+             */
+
+            SendTestingResult(testingResult, cResult);
+
+            /*
              * Вызываем метод,  который несёт
              * ответственность  за   удаление
              * всех временных файлов запросов
              * на  тестирование,  а  также за
              * вызов сборщика мусора.
              */
-
+            
             ClearCache(fileLocation);
 
         }
@@ -287,6 +309,65 @@ namespace SimplePM_Server
              * решения данной задачи.
              */
             return tmpResult;
+
+        }
+
+        private void SendTestingResult(ProgramTestingResult ptResult, CompilerResult cResult)
+        {
+
+            /*
+             * Формируем запрос к базе данных
+             * на  обновление   информации  о
+             * запросе     на    тестирование
+             * пользовательского      решения
+             * поставленной задачи.
+             */
+
+            const string query_text = @"
+                UPDATE
+                    `spm_submissions`
+                SET
+                    `status` = 'ready',
+                    `hasError` = @param_hasError,
+                    `errorOutput` = @param_errorOutput,
+                    `output` = @param_output,
+                    `exitcodes` = @param_exitcodes,
+                    `usedProcTime` = @param_usedProcTime,
+                    `usedMemory` = @param_usedMemory,
+                    `tests_result` = @param_result,
+                    `rating` = @param_rating,
+                WHERE
+                    `submissionId` = @param_submissionId
+                LIMIT
+                    1
+                ;
+            ";
+
+            /*
+             * Создаём команду для MySQL сервера
+             * на  основе  сформированного  выше
+             * запроса к базе данных.
+             */
+            var updateSqlCommand = new MySqlCommand(query_text, _connection);
+
+            /*
+             * Указываем параметры выше сформированного
+             * запроса к базе данных.
+             */
+            updateSqlCommand.Parameters.AddWithValue("@param_hasError", cResult);
+            updateSqlCommand.Parameters.AddWithValue("@param_errorOutput", ptResult.GetErrorOutputAsLine());
+            updateSqlCommand.Parameters.AddWithValue("@param_output", ptResult.TestingResults[0].Output);
+            updateSqlCommand.Parameters.AddWithValue("@param_exitcodes", ptResult.GetExitCodesAsLine('|'));
+            updateSqlCommand.Parameters.AddWithValue("@param_usedProcTime", ptResult.GetUsedProcessorTimeAsLine('|'));
+            updateSqlCommand.Parameters.AddWithValue("@param_usedMemory", ptResult.GetUsedMemoryAsLine('|'));
+            updateSqlCommand.Parameters.AddWithValue("@param_result", ptResult.GetResultAsLine('|'));
+            updateSqlCommand.Parameters.AddWithValue("@param_rating", null); //TODO
+
+            /*
+             * Выполняем запрос к базе данных
+             */
+
+            updateSqlCommand.ExecuteNonQuery();
 
         }
 
