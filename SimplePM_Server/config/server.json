@@ -4,20 +4,23 @@
  * Licensed under Apache License 2.0 with additional restrictions.
  * 
  * @Author: Kadirov Yurij
- * @Website: https://sirkadirov.com/
+ * @Website: https://spm.sirkadirov.com/
  * @Email: admin@sirkadirov.com
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
 {
+
   "submission": {
     "check_timeout": 100,
     "rechecks_without_timeout": "auto",
     "max_threads": "auto"
   },
+
   "path": {
     "ICompilerPlugin": "./",
     "IServerPlugin": "./",
     "temp": "E:\\SimplePM_Temp\\"
-  } 
+  }
+
 }
