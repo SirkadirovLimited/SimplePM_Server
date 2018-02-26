@@ -67,6 +67,7 @@ namespace SimplePM_Server
              * что  собираемся   подгружать  сторонние
              * модули компиляции.
              */
+
             logger.Debug("ICompilerPlugin modules are being loaded...");
 
             /*
@@ -75,8 +76,8 @@ namespace SimplePM_Server
              */
             _compilerPlugins = new List<ICompilerPlugin>();
 
-            string[] pluginFilesList = Directory.GetFiles(
-                _serverConfiguration.path.ICompilerPlugin,
+            var pluginFilesList = Directory.GetFiles(
+                (string)_serverConfiguration.path.ICompilerPlugin,
                 "ICompilerPlugin.*.dll"
             );
 
@@ -169,19 +170,32 @@ namespace SimplePM_Server
              * приводим список поддерживаемых системой
              * языков к требуемому виду.
              */
-            foreach (var compilerPlugin in _compilerPlugins)
+            foreach (var compilerConfig in _compilerConfigurations)
             {
 
                 // Добавляем язык программирования в список
-                //EnabledLangsList.Add("'" + compilerPlugin.CompilerPluginLanguageName + "'");
-
+                if (compilerConfig.enabled == "true")
+                    EnabledLangsList.Add("'" + compilerConfig.language_name + "'");
+                
             }
 
             /*
-             * Формируем список доступных языков
+             * Формируем список доступных языков в виде строки
              */
+
             EnabledLangs = string.Join(", ", EnabledLangsList);
             
+            /*
+             * Выводим список доступных языков программирования
+             * на данной сессии работы сервера в лог-файл.  Это
+             * возможно  поможет  системному  администратору  с
+             * решением  проблем,   связанных  с  подключаемыми
+             * модулями и другими  изменяемыми частями  сервера
+             * проверки решений SimplePM Server.
+             */
+            
+            logger.Debug(EnabledLangs);
+
         }
         
         /*
@@ -243,11 +257,11 @@ namespace SimplePM_Server
             {
 
                 /* Удаляем все файлы в папке */
-                foreach (var file in Directory.GetFiles(_serverConfiguration.path.temp))
+                foreach (var file in Directory.GetFiles((string)_serverConfiguration.path.temp))
                     File.Delete(file);
 
                 /* Удаляем все директории в папке */
-                foreach (var dir in Directory.GetDirectories(_serverConfiguration.path.temp))
+                foreach (var dir in Directory.GetDirectories((string)_serverConfiguration.path.temp))
                     Directory.Delete(dir, true);
 
             }
@@ -380,12 +394,8 @@ namespace SimplePM_Server
              */
             while (true)
             {
-
-#if DEBUG
-                Console.WriteLine(_customersCount + "/" + _maxCustomersCount);
-#endif
-
-                if (_aliveTestersCount < _serverConfiguration.submission.max_threads)
+                
+                if (_aliveTestersCount < (ulong)_serverConfiguration.submission.max_threads)
                 {
 
                     /*
@@ -432,14 +442,14 @@ namespace SimplePM_Server
                  * процессор, или нет.
                  */
                 var tmpCheck = rechecksCount >= uint.Parse(
-                    _serverConfiguration.submission.rechecks_without_timeout
+                    (string)_serverConfiguration.submission.rechecks_without_timeout
                 );
 
-                if (_aliveTestersCount < _serverConfiguration.submission.max_threads && tmpCheck)
+                if (_aliveTestersCount < (ulong)_serverConfiguration.submission.max_threads && tmpCheck)
                 {
 
                     // Ожидание для уменьшения нагрузки на сервер
-                    Thread.Sleep(_serverConfiguration.submission.check_timeout);
+                    Thread.Sleep((int)_serverConfiguration.submission.check_timeout);
 
                     // Обнуляем итератор
                     rechecksCount = 0;
@@ -449,8 +459,6 @@ namespace SimplePM_Server
                     rechecksCount++;
 
             }
-
-            ///////////////////////////////////////////////////
             
         }
         
@@ -523,7 +531,7 @@ namespace SimplePM_Server
                 lock (new object())
                 {
 
-                    f = _aliveTestersCount >= _serverConfiguration.submission.max_threads | !dataReader.Read();
+                    f = _aliveTestersCount >= (ulong)_serverConfiguration.submission.max_threads | !dataReader.Read();
 
                 }
 
