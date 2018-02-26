@@ -35,7 +35,6 @@ namespace SimplePM_Server.SimplePM_Tester
              * решения задачи
              */
             var authorSolutionExePath = GetAuthorSolutionExePath(
-                out var authorSolutionCodeLanguage,
                 out var authorLanguageConfiguration,
                 out var authorCompilerPlugin
             );
@@ -166,7 +165,6 @@ namespace SimplePM_Server.SimplePM_Tester
          */
 
         private string GetAuthorSolutionExePath(
-            out string authorSolutionCodeLanguage,
             out dynamic authorLanguageConfiguration,
             out ICompilerPlugin authorCompilerPlugin
         )
@@ -205,6 +203,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
             // Объявляем необходимые переменные
             byte[] authorProblemCode;
+            string authorSolutionCodeLanguage;
 
             // Читаем полученные данные
             if (dataReader.Read())
