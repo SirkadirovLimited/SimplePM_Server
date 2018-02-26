@@ -113,7 +113,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * пользовательских программ от имени инного
              * пользователя. Если отключена - выходим.
              */
-            if (securityConfiguration.runas.enabled != true)
+            if ((string)securityConfiguration.runas.enabled != "true")
                 return;
 
             /*
@@ -125,7 +125,7 @@ namespace SimplePM_Server.SimplePM_Tester
             /*
              * Передаём имя пользователя
              */
-            proc.StartInfo.UserName = securityConfiguration.runas.username;
+            proc.StartInfo.UserName = (string)securityConfiguration.runas.username;
 
             /*
              * Передаём,  что   необходимо
@@ -141,7 +141,7 @@ namespace SimplePM_Server.SimplePM_Tester
             var encPassword = new SecureString();
 
             // Добавляем данные в защищённую строку
-            foreach (var c in securityConfiguration.runas.password)
+            foreach (var c in (string)securityConfiguration.runas.password)
                 encPassword.AppendChar(c);
 
             // Устанавливаем пароль пользователя

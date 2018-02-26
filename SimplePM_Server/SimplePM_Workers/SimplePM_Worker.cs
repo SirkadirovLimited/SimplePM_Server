@@ -382,11 +382,7 @@ namespace SimplePM_Server
             
 
             uint rechecksCount = 0; // количество перепроверок без ожидания
-
-#if DEBUG
-            Console.WriteLine(EnabledLangs);
-#endif
-
+            
             /*
              * В бесконечном цикле опрашиваем базу данных
              * на наличие новых не обработанных  запросов
