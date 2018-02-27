@@ -454,15 +454,24 @@ namespace SimplePM_Server
 
                         var conn = StartMysqlConnection();
 
-                        //Вызов чекера (если всё "хорошо")
+                        /*
+                         * В случае успешного подключения к
+                         * базе данных SimplePM Server,
+                         * вызываем метод, который занимается
+                         * поиском и дальнейшей обработкой
+                         * пользовательских запросов на тестирование.
+                         */
+
                         if (conn != null)
                             GetSubIdAndRunCompile(conn);
                         
                     }
+
                     /*
                      * В случае  обнаружения  каких-либо
                      * ошибок, записываем их в лог-файл.
                      */
+
                     catch (Exception ex)
                     {
 
@@ -478,6 +487,7 @@ namespace SimplePM_Server
                  * таймаут для ослабления  нагрузки на
                  * процессор, или нет.
                  */
+
                 var tmpCheck = rechecksCount >= uint.Parse(
                     (string)_serverConfiguration.submission.rechecks_without_timeout
                 );
@@ -502,6 +512,7 @@ namespace SimplePM_Server
         /*
          * Точка входа с автозапуском бесконечного цикла
          */
+
         public void Run(string[] args)
         {
             
@@ -516,6 +527,7 @@ namespace SimplePM_Server
         /*
          * Функция обработки запросов на проверку решений
          */
+
         public void GetSubIdAndRunCompile(MySqlConnection conn)
         {
             
@@ -722,6 +734,7 @@ namespace SimplePM_Server
          * данных  MySQL  используя  данные  аутенфикации,
          * расположенные в конфигурационном файле сервера.
          */
+
         private static MySqlConnection StartMysqlConnection()
         {
 
@@ -729,6 +742,7 @@ namespace SimplePM_Server
              * Объявляем  переменную, которая  будет хранить
              * дескриптор соединения с базой данных системы.
              */
+
             MySqlConnection db = null;
 
             dynamic databaseConfig = JsonConvert.DeserializeObject(File.ReadAllText("./config/database.json"));
