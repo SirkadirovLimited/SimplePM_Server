@@ -162,7 +162,10 @@ namespace SimplePM_Server
              * Инициализируем список строк и собираем
              * поддерживаемые языки программирования в массив
              */
+
             var EnabledLangsList = new List<string>();
+
+            logger.Debug("Generation of enabled programming languages list started.");
 
             /*
              * В цикле перебираем все поддерживаемые языки
@@ -170,13 +173,23 @@ namespace SimplePM_Server
              * приводим список поддерживаемых системой
              * языков к требуемому виду.
              */
+
             foreach (var compilerConfig in _compilerConfigurations)
             {
 
-                // Добавляем язык программирования в список
-                if (compilerConfig.enabled == "true")
-                    EnabledLangsList.Add("'" + compilerConfig.language_name + "'");
-                
+                // Добавляем в список только включённые конфигурации
+                if (compilerConfig.enabled != "true") continue;
+
+                // Добавляем текущую конфигурацию в список
+                EnabledLangsList.Add("'" + compilerConfig.language_name + "'");
+
+                // Записываем информацию об этом в лог-файл
+                logger.Debug(
+                    "Compiler configuration '" +
+                    compilerConfig.language_name +
+                    "' loaded!"
+                );
+
             }
 
             /*
@@ -194,7 +207,7 @@ namespace SimplePM_Server
              * проверки решений SimplePM Server.
              */
             
-            logger.Debug(EnabledLangs);
+            logger.Debug("Enabled compiler configurations list: " + EnabledLangs);
 
         }
         
@@ -482,6 +495,12 @@ namespace SimplePM_Server
             new Task(() =>
             {
                 
+                logger.Trace(
+                    "Starting submission query; Running threads: " +
+                    _aliveTestersCount + " from " +
+                    (ulong)_serverConfiguration.submission.max_threads
+                );
+
                 // Формируем запрос на выборку
                 var querySelect = $@"
                     SELECT 
