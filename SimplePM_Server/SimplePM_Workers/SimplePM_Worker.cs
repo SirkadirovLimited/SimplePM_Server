@@ -745,7 +745,32 @@ namespace SimplePM_Server
 
             MySqlConnection db = null;
 
-            dynamic databaseConfig = JsonConvert.DeserializeObject(File.ReadAllText("./config/database.json"));
+            /*
+             * Объявляем переменную,  которая  будет
+             * хранить конфигурацию подключения к БД
+             */
+
+            dynamic databaseConfig;
+
+            /*
+             * Потоконебезопасные  действия
+             * необходимо синхронизировать.
+             */
+
+            lock (new object())
+            {
+
+                /*
+                 * Получаем информацию о конфигурации подключения
+                 * к базе данных комплекса программных продуктов
+                 * АСПРЗП "SimplePM".
+                 */
+
+                databaseConfig = JsonConvert.DeserializeObject(
+                    File.ReadAllText("./config/database.json")
+                );
+
+            }
             
             try
             {
@@ -782,6 +807,7 @@ namespace SimplePM_Server
              * Возвращаем дескриптор
              * подключения к БД.
              */
+
             return db;
 
         }
