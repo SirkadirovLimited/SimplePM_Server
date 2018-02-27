@@ -59,6 +59,7 @@ namespace SimplePM_Server
          * модули,  которые  собирает  из специально
          * заготовленной директории.
          */
+
         private void LoadCompilerPlugins()
         {
 
@@ -111,6 +112,7 @@ namespace SimplePM_Server
                          * случае  продолжаем  выполнение  необходимых
                          * действий по добавлению плагина в список.
                          */
+
                         if (type.FullName != "CompilerPlugin.Compiler") continue;
                         
                         // Добавляем плагин в список
@@ -134,6 +136,7 @@ namespace SimplePM_Server
                      * записываем информацию о них в
                      * лог-файле.
                      */
+
                     logger.Debug("Plugin loading failed [" + pluginFilePath + "]:");
                     logger.Debug(ex);
 
@@ -145,7 +148,8 @@ namespace SimplePM_Server
              * Записываем в лог-файл информацию о том,
              * что мы завершили процесс загрузки всех
              * модулей компиляции (ну или не всех)
-             **/
+             */
+
             logger.Debug("ICompilerPlugin modules were loaded...");
 
         }
@@ -155,8 +159,20 @@ namespace SimplePM_Server
          * проверки языков программирования, на которых
          * написаны пользовательские программы.
          */
+
         public void GenerateEnabledLangsList()
         {
+
+            /*
+             * Записываем  в  лог, что генерация списка
+             * доступных   на   этом  сервере  проверки
+             * пользовательских   решений    задач   по
+             * программированию   скриптовых  языков  а
+             * также языков программирования начинается
+             * с этого великолепного момента.
+             */
+
+            logger.Debug("Generation of enabled programming languages list started.");
 
             /*
              * Инициализируем список строк и собираем
@@ -164,9 +180,7 @@ namespace SimplePM_Server
              */
 
             var EnabledLangsList = new List<string>();
-
-            logger.Debug("Generation of enabled programming languages list started.");
-
+            
             /*
              * В цикле перебираем все поддерживаемые языки
              * программирования подключаемыми модулями и
