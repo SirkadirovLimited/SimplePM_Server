@@ -18,12 +18,14 @@ namespace SubmissionInfo
      * запросах на тестирование  решений  данных
      * задач по программированию.
      */
+
     public class SubmissionInfo
     {
 
         /*
          * Базовая информация о запросе
          */
+
         public int SubmissionId { get; set; }
         public int UserId { get; set; }
 
@@ -33,12 +35,14 @@ namespace SubmissionInfo
          * указанному   уроку  и / или
          * олимпиаде.
          */
+
         public int ClassworkId { get; set; }
         public int OlympId { get; set; }
         
         /*
          * Информация о параметрах тестирования
          */
+
         public string TestType { get; set; }
         public string CustomTest { get; set; }
 
@@ -46,6 +50,7 @@ namespace SubmissionInfo
          * Информация  об  исходном коде  пользовательского
          * решения поставленной задачи по программированию.
          */
+
         public string CodeLang { get; set; }
         public byte[] ProblemCode { get; set; }
 
@@ -54,6 +59,7 @@ namespace SubmissionInfo
          * помогает обрабатывать пользовательский
          * запрос на тестирование решения.
          */
+
         public ProblemInfo ProblemInformation;
         
     }
@@ -63,8 +69,22 @@ namespace SubmissionInfo
      * которые относятся к данной задаче,
      * по которой пришёл запрос на тестирование.
      */
+
     public class ProblemInfo
     {
+
+        /*
+         * Энумератор   описывает   возможные
+         * виды тестирования пользовательских
+         * решений поставленных задач.
+         */
+
+        public enum RatingType
+        {
+            DEFAULT = 0,
+            FULL = 0,
+            TEST_BY_TEST = 1
+        }
 
         // Уникальный идентификатор задачи
         public int ProblemId { get; set; } = 0;
@@ -72,51 +92,10 @@ namespace SubmissionInfo
         // Сложность задачи
         public int ProblemDifficulty { get; set; } = 0;
 
+        public RatingType ProblemRatingType { get; set; } = RatingType.DEFAULT;
+
         // Указание, не строгая ли проверка выхода
         public bool AdaptProgramOutput { get; set; } = true;
-
-    }
-
-    /*
-     * Класс описывает поля и методы, которые
-     * ответственны за хранение и обработку
-     * результата выполнения проверки пользовательского
-     * решения данной задачи по программированию на
-     * правильность и соответствие всем перечисленным
-     * требованиям.
-     */
-    public class SubmissionResult
-    {
-
-        /*
-         * Выходные потоки компилятора по данному решению
-         */
-        public string CompilerOutput { get; set; } = string.Empty;
-
-        /*
-         * Информация  о  тестах  и  тестировании
-         * пользовательского решения поставленной
-         * задачи по программированию.
-         */
-        public int TestsCount { get; set; } = 0;
-        public int PassedTestsCount { get; set; } = 0;
-        public int FailedTestsCount { get; set; } = 0;
-
-        /*
-         * Тип оценивания пользовательского решения
-         */
-        public RatingType SubmissionRatingType { get; set; } = RatingType.FULL;
-
-        /*
-         * Данный  enum  перечисляет  все  виды
-         * оценивания пользовательского решения
-         * поставленной задачи.
-         */
-        public enum RatingType
-        {
-            TEST_BY_TEST = 0,
-            FULL = 1
-        }
 
     }
 
