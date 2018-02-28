@@ -30,12 +30,19 @@ namespace CompilerPlugin
             // Инициализируем объект CompilerRefs
             var cRefs = new CompilerRefs();
 
-            //Запуск компилятора с заранее определёнными аргументами
+            // Запуск компилятора с заранее определёнными аргументами
             var result = cRefs.RunCompiler(
                 languageConfiguration.compiler_path,
                 languageConfiguration.compiler_arguments
             );
-            
+
+            /*
+             * Выполняем  все  необходимые действия
+             * в  блоке  обработки  исключений  для
+             * исключения возможности возникновения
+             * непредвиденных исключений.
+             */
+
             try
             {
 
@@ -43,7 +50,10 @@ namespace CompilerPlugin
                 var fileInfo = new FileInfo(fileLocation);
 
                 // Указываем полный путь к главному исполняемому файлу
-                result.ExeFullname = fileInfo.DirectoryName + "\\" + languageConfiguration.default_class_name + ".class";
+                result.ExeFullname = fileInfo.DirectoryName +
+                                     "\\" +
+                                     (string)languageConfiguration.default_class_name +
+                                     ".class";
 
                 // Проверяем на существование главного класса
                 if (!File.Exists(result.ExeFullname))
@@ -56,8 +66,11 @@ namespace CompilerPlugin
             catch (Exception)
             {
 
-                // В случае любой ошибки считаем что она
-                // произошла по прямой вине пользователя.
+                /*
+                 * В случае любой ошибки считаем что она
+                 * произошла по прямой вине пользователя
+                 */
+
                 result.HasErrors = true;
 
             }
@@ -70,6 +83,13 @@ namespace CompilerPlugin
         public bool SetRunningMethod(ref dynamic languageConfiguration, ref ProcessStartInfo startInfo, string filePath)
         {
             
+            /*
+             * Выполняем  все  необходимые действия
+             * в  блоке  обработки  исключений  для
+             * исключения возможности возникновения
+             * непредвиденных исключений.
+             */
+            
             try
             {
                 
@@ -77,28 +97,38 @@ namespace CompilerPlugin
                 var fileInfo = new FileInfo(filePath);
 
                 // Устанавливаем рабочую папку процесса
-                startInfo.WorkingDirectory = fileInfo.DirectoryName;
+                startInfo.WorkingDirectory = fileInfo.DirectoryName ?? throw new InvalidOperationException();
 
                 // Устанавливаем имя запускаемой программы
-                startInfo.FileName = languageConfiguration.runtime_path;
+                startInfo.FileName = (string)languageConfiguration.runtime_path;
                 
                 // Аргументы запуска данной программы
-                startInfo.Arguments = "-d64 -cp . " + '"' +
-                                      Path.GetFileNameWithoutExtension(fileInfo.Name) + '"';
+                startInfo.Arguments = "-d64 -cp . " +
+                                      '"' +
+                                      Path.GetFileNameWithoutExtension(fileInfo.Name) +
+                                      '"';
 
             }
             catch
             {
 
-                // В случае ошибки указываем, что работа
-                // была выполнена не успешно.
+                /*
+                 * В случае возникновения каких-либо
+                 * ошибок  сигнализируем  об этом  с
+                 * помощью return false.
+                 */
+
                 return false;
 
             }
             
-            // Возвращаем родителю информацию о том,
-            // что запашиваемая операция была выполнена
-            // самым успешным образом.
+            /*
+             * Возвращаем родителю информацию о
+             * том, что  запашиваемая  операция
+             * была  выполнена  самым  успешным
+             * образом.
+             */
+
             return true;
 
         }

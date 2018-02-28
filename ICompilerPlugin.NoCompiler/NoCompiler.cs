@@ -50,11 +50,19 @@ namespace CompilerPlugin
         
         public bool SetRunningMethod(ref dynamic languageConfiguration, ref ProcessStartInfo startInfo, string filePath)
         {
+
+            /*
+             * Выполняем  все  необходимые действия
+             * в  блоке  обработки  исключений  для
+             * исключения возможности возникновения
+             * непредвиденных исключений.
+             */
+
             try
             {
 
                 // Устанавливаем имя запускаемой программы
-                startInfo.FileName = languageConfiguration.runtime_path;
+                startInfo.FileName = (string)languageConfiguration.runtime_path;
                 
                 // Аргументы запуска данной программы
                 startInfo.Arguments = '"' + filePath + '"';
@@ -63,15 +71,23 @@ namespace CompilerPlugin
             catch
             {
 
-                // В случае ошибки указываем, что работа
-                // была выполнена не успешно.
+                /*
+                 * В случае возникновения каких-либо
+                 * ошибок  сигнализируем  об этом  с
+                 * помощью return false.
+                 */
+
                 return false;
 
             }
-            
-            // Возвращаем родителю информацию о том,
-            // что запашиваемая операция была выполнена
-            // самым успешным образом.
+
+            /*
+             * Возвращаем родителю информацию о
+             * том, что  запашиваемая  операция
+             * была  выполнена  самым  успешным
+             * образом.
+             */
+
             return true;
 
         }

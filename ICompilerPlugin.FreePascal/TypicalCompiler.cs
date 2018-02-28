@@ -28,50 +28,42 @@ namespace CompilerPlugin
             // Инициализируем объект CompilerRefs
             var cRefs = new CompilerRefs();
 
-            //Будущее местонахождение исполняемого файла
+            // Будущее местонахождение исполняемого файла
             var exeLocation = cRefs.GenerateExeFileLocation(
                 fileLocation,
                 submissionId
             );
 
-            //Запуск компилятора с заранее определёнными аргументами
+            // Запуск компилятора с заранее определёнными аргументами
             var result = cRefs.RunCompiler(
                 languageConfiguration.compiler_path,
                 languageConfiguration.compiler_arguments
             );
 
-            //Передаём полный путь к исполняемому файлу
+            // Передаём полный путь к исполняемому файлу
             result.ExeFullname = exeLocation;
 
-            //Возвращаем результат компиляции
+            // Возвращаем результат компиляции
             return cRefs.ReturnCompilerResult(result);
 
         }
         
         public bool SetRunningMethod(ref dynamic languageConfiguration, ref ProcessStartInfo startInfo, string filePath)
         {
-            try
-            {
 
-                // Устанавливаем имя запускаемой программы
-                startInfo.FileName = filePath;
+            // Устанавливаем имя запускаемой программы
+            startInfo.FileName = filePath;
 
-                // Аргументы запуска данной программы
-                startInfo.Arguments = "";
+            // Устанавливаем аргументы запуска данной программы
+            startInfo.Arguments = "";
 
-            }
-            catch
-            {
+            /*
+             * Возвращаем родителю информацию о
+             * том, что  запашиваемая  операция
+             * была  выполнена  самым  успешным
+             * образом.
+             */
 
-                // В случае ошибки указываем, что работа
-                // была выполнена не успешно.
-                return false;
-
-            }
-            
-            // Возвращаем родителю информацию о том,
-            // что запашиваемая операция была выполнена
-            // самым успешным образом.
             return true;
 
         }
