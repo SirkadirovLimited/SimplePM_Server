@@ -218,7 +218,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
         #endregion
 
-        public Test RunTesting()
+        public TestResult RunTesting()
         {
 
             // Инициализация всего необходимого
@@ -365,10 +365,10 @@ namespace SimplePM_Server.SimplePM_Tester
 
         }
 
-        private Test GenerateTestResult()
+        private TestResult GenerateTestResult()
         {
 
-            return new Test
+            return new TestResult
             {
 
                 // Выходные данные
@@ -469,7 +469,7 @@ namespace SimplePM_Server.SimplePM_Tester
             {
 
                 _testingResultReceived = true;
-                _testingResult = Test.MiddleSuccessResult;
+                _testingResult = TestResult.MiddleSuccessResult;
 
             }
 

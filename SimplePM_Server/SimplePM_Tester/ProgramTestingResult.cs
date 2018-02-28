@@ -31,18 +31,21 @@ namespace SimplePM_Server.SimplePM_Tester
          * о тестировании пользовательского
          * решения.
          */
-        public Test[] TestingResults;
+
+        public TestResult[] TestingResults;
 
         /*
          * Поле класса, которое возвращает
          * общее количество тестов.
          */
+
         public int TestsCount => TestingResults.Length;
 
         /*
          * Метод определяет количество
          * успешно пройденных тестов.
          */
+
         public int PassedTestsCount()
         {
 
@@ -51,6 +54,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * всех элементов массива TestingResults
              * и возвращаем полученное значение.
              */
+
             return TestingResults.Sum(test => Convert.ToInt32(test.IsSuccessful));
 
         }
@@ -60,11 +64,12 @@ namespace SimplePM_Server.SimplePM_Tester
          * стандартного конструктора текущего
          * класса.
          */
+
         public ProgramTestingResult(int testsCount)
         {
 
             // Инициализируем массив результатов тестирования
-            TestingResults = new Test[testsCount];
+            TestingResults = new TestResult[testsCount];
 
         }
         
@@ -73,6 +78,7 @@ namespace SimplePM_Server.SimplePM_Tester
          * информацию  о  результатах   тестирования
          * пользовательской программы.
          */
+
         public string GetResultAsLine(char splitter)
         {
 
@@ -80,6 +86,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Объявляем временную переменную, в которой
              * будем хранить результат работы метода
              */
+
             string resultLine;
 
             try
@@ -89,6 +96,7 @@ namespace SimplePM_Server.SimplePM_Tester
                  * С помощью LINQ зароса формируем
                  * строку результата.
                  */
+
                 resultLine = TestingResults.Aggregate(
                     "",
                     (current, test) => current + (test.Result + splitter)
@@ -118,6 +126,7 @@ namespace SimplePM_Server.SimplePM_Tester
          * информацию о кодах выхода пользовательского
          * процесса на всех тестах.
          */
+
         public string GetExitCodesAsLine(char splitter)
         {
 
@@ -125,6 +134,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Объявляем временную переменную, в которой
              * будем хранить результат работы метода
              */
+
             string resultLine;
 
             try
@@ -134,6 +144,7 @@ namespace SimplePM_Server.SimplePM_Tester
                  * С помощью LINQ зароса формируем
                  * строку результата.
                  */
+
                 resultLine = TestingResults.Aggregate(
                     "",
                     (current, test) => current + (test.ExitCode + splitter)
@@ -142,6 +153,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 /*
                  * Удаляем все ненужные символы
                  */
+
                 resultLine = resultLine.Trim('\n', '\r');
 
             }
@@ -163,6 +175,7 @@ namespace SimplePM_Server.SimplePM_Tester
          * информацию  об  использованной  процессом
          * памяти во время каждого теста.
          */
+
         public string GetUsedMemoryAsLine(char splitter)
         {
 
@@ -170,6 +183,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Объявляем временную переменную, в которой
              * будем хранить результат работы метода
              */
+
             string resultLine;
 
             try
@@ -179,6 +193,7 @@ namespace SimplePM_Server.SimplePM_Tester
                  * С помощью LINQ зароса формируем
                  * строку результата.
                  */
+
                 resultLine = TestingResults.Aggregate(
                     "",
                     (current, test) => current + (test.UsedMemory + splitter)
@@ -187,6 +202,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 /*
                  * Удаляем все ненужные символы
                  */
+
                 resultLine = resultLine.Trim('\n', '\r');
 
             }
@@ -209,6 +225,7 @@ namespace SimplePM_Server.SimplePM_Tester
          * процессорного  времени  во  время каждого
          * теста.
          */
+
         public string GetUsedProcessorTimeAsLine(char splitter)
         {
 
@@ -216,6 +233,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Объявляем временную переменную, в которой
              * будем хранить результат работы метода
              */
+
             string resultLine;
 
             try
@@ -225,6 +243,7 @@ namespace SimplePM_Server.SimplePM_Tester
                  * С помощью LINQ зароса формируем
                  * строку результата.
                  */
+
                 resultLine = TestingResults.Aggregate(
                     "",
                     (current, test) => current + (test.UsedProcessorTime + splitter)
@@ -233,6 +252,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 /*
                  * Удаляем все ненужные символы
                  */
+
                 resultLine = resultLine.Trim(splitter);
 
             }
@@ -254,6 +274,7 @@ namespace SimplePM_Server.SimplePM_Tester
          * тестируемой   программы,   которая
          * собрана со всех тестов.
          */
+
         public string GetErrorOutputAsLine()
         {
 
@@ -299,6 +320,7 @@ namespace SimplePM_Server.SimplePM_Tester
          * гласит о том, успешно ли пройдены все тесты,
          * или нет. Ошибок, вроде, не должно возникать.
          */
+
         public bool IsSuccessful()
         {
 
@@ -306,6 +328,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Выполняем LINQ запрос на выборку и проверку, после
              * чего возвращаем результат выполнения метода.
              */
+
             return TestingResults.Aggregate(
                 true,
                 (current, test) => current && test.IsSuccessful
