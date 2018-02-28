@@ -38,11 +38,16 @@ namespace SimplePM_Server
          */
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        private MySqlConnection _connection; // Дескриптор соединения с БД
-        private SubmissionInfo.SubmissionInfo _submissionInfo; // Ссылка на объект, содержащий информацию о запросе на тестирование
-        private dynamic _serverConfiguration; // конфигурация сервера
-        private dynamic _compilerConfigurations; // конфигурация модулей компиляции
-        private List<ICompilerPlugin> _compilerPlugins; // Список загруженных модулей компиляторв
+        // Дескриптор соединения с БД
+        private MySqlConnection _connection;
+        // Содержит информацию о запросе на тестирование
+        private SubmissionInfo.SubmissionInfo _submissionInfo;
+        // Содержит конфигурацию сервера
+        private dynamic _serverConfiguration;
+        // Конфигурация модулей компиляции
+        private dynamic _compilerConfigurations;
+        // Список, содержащий активные модули компиляции
+        private List<ICompilerPlugin> _compilerPlugins;
         
         public SimplePM_Officiant(
             MySqlConnection connection,
@@ -71,8 +76,8 @@ namespace SimplePM_Server
          * должен  быть для обеспечения  дополнительной
          * безопасности при запуске сторонних программ.
          */
-
-        public string RandomGenSourceFileLocation(string submissionId, string fileExt)
+        
+        private string RandomGenSourceFileLocation(string submissionId, string fileExt)
         {
 
             // Генерируем имя директории
