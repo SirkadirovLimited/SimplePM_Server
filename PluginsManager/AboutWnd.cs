@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace PluginsManager
 {
+
     public partial class AboutWnd : Form
     {
 
@@ -26,9 +20,7 @@ namespace PluginsManager
                 "Hello from Sirkadirov! ;)",
                 "There is nothing to see here...",
                 MessageBoxButtons.OK,
-                MessageBoxIcon.Error,
-                MessageBoxDefaultButton.Button1,
-                MessageBoxOptions.DefaultDesktopOnly
+                MessageBoxIcon.Error
             );
 
         }
@@ -37,5 +29,7 @@ namespace PluginsManager
         {
             Close();
         }
+
     }
+
 }

@@ -9,8 +9,6 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
-using System;
-
 namespace SubmissionInfo
 {
 
