@@ -37,7 +37,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 TestingResults =
                 {
                     
-                    [0] = new Test
+                    [0] = new TestResult
                     {
                         
                         Output = compilingResult.CompilerMessage,

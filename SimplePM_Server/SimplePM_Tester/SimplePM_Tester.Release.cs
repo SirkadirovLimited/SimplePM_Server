@@ -9,7 +9,6 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
-using System;
 using System.Web;
 using System.Text;
 using CompilerBase;
@@ -36,6 +35,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * пользовательского    решения
              * посталвенной задачи.
              */
+
             var ReleaseTestsInfo = GetTestsInfo();
 
             /*
@@ -44,6 +44,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * не затерять   эту   информацию  при
              * видоизменении очереди.
              */
+
             var testsCount = ReleaseTestsInfo.Count;
 
             /*
@@ -52,6 +53,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * тестирования пользовательского
              * решения  поставленной  задачи.
              */
+
             var programTestingResult = new ProgramTestingResult(testsCount);
 
             /*
@@ -62,6 +64,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * каждому тесту в специально созданный
              * для этих нужд массив.
              */
+
             for (var currentTestIndex = 0; currentTestIndex < testsCount; currentTestIndex++)
             {
 
@@ -69,6 +72,7 @@ namespace SimplePM_Server.SimplePM_Tester
                  * Делаем выборку  данных о текущем
                  * релизном тесте из очереди тестов
                  */
+
                 var currentTest = ReleaseTestsInfo.Dequeue();
 
                 /*
@@ -79,6 +83,7 @@ namespace SimplePM_Server.SimplePM_Tester
                  * переменную,  созданную специально для этих
                  * нужд.
                  */
+
                 var currentTestResult = new ProgramTester(
                     ref compilerConfiguration,
                     ref compilerPlugin,
@@ -96,11 +101,18 @@ namespace SimplePM_Server.SimplePM_Tester
                  * текущего теста в специальный
                  * массив.
                  */
+
                 programTestingResult.TestingResults[currentTestIndex] = currentTestResult;
 
             }
 
-            throw new NotImplementedException();
+            /*
+             * Возвращаем информацию  о  тестировании
+             * пользовательского решения поставленной
+             * задачи.
+             */
+
+            return programTestingResult;
 
         }
 
@@ -147,6 +159,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * жащие  информацию о релизных
              * тестах для заданной  задачи.
              */
+
             var testsQueue = new Queue<ReleaseTest>();
 
             /*
@@ -156,6 +169,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * и вносим  его  в  специальную
              * очередь тестов.
              */
+
             while (dataReader.Read())
             {
 
@@ -164,6 +178,7 @@ namespace SimplePM_Server.SimplePM_Tester
                  * информацию об одном из  релизных
                  * тестов пользовательских решений.
                  */
+
                 var testInfo = new ReleaseTest(
 
                     // Уникальный идентификатор теста
@@ -203,6 +218,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * тестов  для  заданной
              * задачи.
              */
+            
             return testsQueue;
 
         }

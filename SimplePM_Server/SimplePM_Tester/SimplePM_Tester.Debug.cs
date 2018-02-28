@@ -76,7 +76,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * об  ошибке  в  лог-файлах  сервера и прочих
              * местах, где это важно и необходимо.
              */
-            if (authorTestingResult.Result != Test.MiddleSuccessResult)
+            if (authorTestingResult.Result != TestResult.MiddleSuccessResult)
                 throw new SimplePM_Exceptions.AuthorSolutionRunningException();
 
             /*
@@ -126,7 +126,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * тестам и выдвигаем остаточный результат debug
              * тестирования пользовательского решения задачи.
              */
-            if (userTestingResult.Result == Test.MiddleSuccessResult)
+            if (userTestingResult.Result == TestResult.MiddleSuccessResult)
             {
                 userTestingResult.Result = (
                     userTestingResult.Output == authorTestingResult.Output
