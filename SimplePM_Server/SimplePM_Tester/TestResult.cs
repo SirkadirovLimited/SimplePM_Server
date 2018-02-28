@@ -19,12 +19,12 @@ namespace SimplePM_Server.SimplePM_Tester
      * задачи по программированию.
      */
 
-    internal class Test
+    internal class TestResult
     {
 
-        ///////////////////////////////////////////////////
-        /// Раздел объявления важных констант
-        ///////////////////////////////////////////////////
+        /*
+         * Раздел объявления важных констант
+         */
 
         public const char MiddleSuccessResult = '*';
         public const char TimeLimitResult = 'T';
@@ -32,9 +32,9 @@ namespace SimplePM_Server.SimplePM_Tester
         public const char RuntimeErrorResult = 'R';
         public const char OutputErrorResult = 'O';
         
-        ///////////////////////////////////////////////////
-        /// Раздел объявления используемых переменных
-        ///////////////////////////////////////////////////
+        /*
+         * Раздел объявления переменных
+         */
 
         public string ErrorOutput       { get; set; } // Выходной поток ошибок пользовательской программы
         public string Output            { get; set; } // Выходной поток пользовательской программы
@@ -49,22 +49,15 @@ namespace SimplePM_Server.SimplePM_Tester
             Result == '+' && ExitCode == 0
         ); // Указывает на то, пройден ли тест или нет
 
-        ///////////////////////////////////////////////////
-        /// Метод является переопределением стандартного
-        /// конструктора текущего класса.
-        ///////////////////////////////////////////////////
-
-        public Test()
+        /*
+         * Различные вариации конструкторов
+         */
+        public TestResult()
         {
-            /* Deal with it */
+
         }
 
-        ///////////////////////////////////////////////////
-        /// Метод является дополнением стандартного
-        /// конструктора текущего класса.
-        ///////////////////////////////////////////////////
-
-        public Test(
+        public TestResult(
             char Result,
             int ExitCode,
             long UsedMemory,
@@ -83,9 +76,7 @@ namespace SimplePM_Server.SimplePM_Tester
             this.Output = Output;
 
         }
-
-        ///////////////////////////////////////////////////
-
+        
     }
 
 }
