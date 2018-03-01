@@ -12,7 +12,7 @@
 {
 
   "submission": {
-    "check_timeout": 100,
+    "check_timeout": 500,
     "rechecks_without_timeout": "auto",
     "max_threads": "auto"
   },
@@ -20,7 +20,7 @@
   "path": {
     "ICompilerPlugin": "./",
     "IServerPlugin": "./",
-    "temp": "E:\\SimplePM_Temp\\"
+    "temp": "E:/SimplePM_Temp/"
   }
 
 }
