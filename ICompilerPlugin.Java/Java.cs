@@ -32,8 +32,8 @@ namespace CompilerPlugin
 
             // Запуск компилятора с заранее определёнными аргументами
             var result = cRefs.RunCompiler(
-                languageConfiguration.compiler_path,
-                languageConfiguration.compiler_arguments
+                (string)languageConfiguration.compiler_path,
+                (string)languageConfiguration.compiler_arguments
             );
 
             /*
