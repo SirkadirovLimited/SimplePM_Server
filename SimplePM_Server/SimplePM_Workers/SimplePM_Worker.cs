@@ -540,7 +540,7 @@ namespace SimplePM_Server
                     _aliveTestersCount + " from " +
                     (ulong)_serverConfiguration.submission.max_threads
                 );
-
+                
                 // Формируем запрос на выборку
                 var querySelect = $@"
                     SELECT 
@@ -572,22 +572,19 @@ namespace SimplePM_Server
                         1
                     ;
                 ";
+
+                // Выполняем запрос к БД и получаем ответ
+                MySqlDataReader dataReader = new MySqlCommand(querySelect, conn).ExecuteReader();
                 
-                // Создаём запрос на выборку из базы данных
-                var cmdSelect = new MySqlCommand(querySelect, conn);
-
-                // Производим выборку полученных результатов из временной таблицы
-                var dataReader = cmdSelect.ExecuteReader();
-
                 // Объявляем временную переменную, так называемый "флаг"
                 bool f;
-
+                
                 // Делаем различные проверки в безопасном контексте
                 lock (new object())
                 {
-
+                    
                     f = _aliveTestersCount >= (ulong)_serverConfiguration.submission.max_threads | !dataReader.Read();
-
+                    
                 }
 
                 // Проверка на пустоту полученного результата
@@ -599,11 +596,11 @@ namespace SimplePM_Server
 
                     // Закрываем соединение с БД
                     conn.Close();
-
+                    
                 }
                 else
                 {
-
+                    
                     /* 
                      * Запускаем   секундомер  для  того,
                      * чтобы определить время, за которое
@@ -714,12 +711,10 @@ namespace SimplePM_Server
                      * полученное значение в Debug log поток
                      */
                     sw.Stop();
-
-#if DEBUG
+                    
                     // Выводим затраченное время на экран
-                    Console.WriteLine(sw.ElapsedMilliseconds);
-#endif
-
+                    logger.Trace("Submission checking time (ms): " + sw.ElapsedMilliseconds);
+                    
                     // Закрываем соединение с БД
                     conn.Close();
 
