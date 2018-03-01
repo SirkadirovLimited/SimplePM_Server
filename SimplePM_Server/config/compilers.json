@@ -64,8 +64,8 @@
     "source_ext": "lua",
     "enabled": true,
     "module_name": "NoCompiler",
-    "compiler_path": "E:\\Lua\\lua.exe",
-    "compiler_arguments": "{%fileLocation%}"
+    "runtime_path": "E:\\Lua\\lua.exe",
+    "runtime_arguments": "\"{%fileLocation%}\""
   },
 
   {
@@ -73,8 +73,8 @@
     "source_ext": "py",
     "enabled": true,
     "module_name": "NoCompiler",
-    "compiler_path": "C:\\Program Files\\Python36\\python.exe",
-    "compiler_arguments": "{%fileLocation%}"
+    "runtime_path": "C:\\Program Files\\Python36\\python.exe",
+    "runtime_arguments": "\"{%fileLocation%}\""
   },
 
   {
@@ -82,8 +82,8 @@
     "source_ext": "php",
     "enabled": false,
     "module_name": "NoCompiler",
-    "compiler_path": "",
-    "compiler_arguments": "{%fileLocation%}"
+    "runtime_path": "",
+    "runtime_arguments": "\"{%fileLocation%}\""
   }
 
 ]
