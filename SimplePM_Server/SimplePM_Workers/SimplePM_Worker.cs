@@ -44,7 +44,7 @@ namespace SimplePM_Server
          * присваиваем  ей  указатель  на
          * журнал событий текущего класса
          */
-        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger logger = LogManager.GetLogger("SimplePM_Worker");
 
         private dynamic _serverConfiguration; // переменная хранит основную конфигурацию сервера
         private dynamic _compilerConfigurations; // переменная хранит конфигурацию модулей компиляции
@@ -52,7 +52,7 @@ namespace SimplePM_Server
         private ulong _aliveTestersCount; // Количество текущих обрабатываемых запросов
         
         private string EnabledLangs; // Список поддерживаемых сервером ЯП для SQL запросов
-        public List<ICompilerPlugin> _compilerPlugins; // Список, содержащий ссылки на модули компиляторов
+        private List<ICompilerPlugin> _compilerPlugins; // Список, содержащий ссылки на модули компиляторов
         
         /*
          * Функция загружает в память компиляционные
@@ -160,7 +160,7 @@ namespace SimplePM_Server
          * написаны пользовательские программы.
          */
 
-        public void GenerateEnabledLangsList()
+        private void GenerateEnabledLangsList()
         {
 
             /*
@@ -272,15 +272,8 @@ namespace SimplePM_Server
          * экземпляра сервера  для  избежания конфликтов.
          */
 
-        public bool CleanTempDirectory()
+        private void CleanTempDirectory()
         {
-
-            /*
-             * Объявляем переменную, которая будет
-             * хранить информацию о том, успешна
-             * ли очистка временных файлов или нет.
-             */
-            var f = true;
             
             try
             {
@@ -294,17 +287,14 @@ namespace SimplePM_Server
                     Directory.Delete(dir, true);
 
             }
-            catch
+            catch(Exception ex)
             {
-
-                /* Указываем, что очистка произведена с ошибкой */
-                f = false;
+                
+                // Записываем информацию об исключении в лог-файл
+                logger.Warn("An error occured while trying to clear temp folder: " + ex);
 
             }
-
-            // Возвращаем результат выполнения операции
-            return f;
-
+            
         }
         
         /*
@@ -522,7 +512,7 @@ namespace SimplePM_Server
          * Функция обработки запросов на проверку решений
          */
 
-        public void GetSubIdAndRunCompile(MySqlConnection conn)
+        private void GetSubIdAndRunCompile(MySqlConnection conn)
         {
             
             // Создаём новую задачу, без неё - никак!
@@ -739,7 +729,7 @@ namespace SimplePM_Server
          * расположенные в конфигурационном файле сервера.
          */
 
-        private static MySqlConnection StartMysqlConnection()
+        private MySqlConnection StartMysqlConnection()
         {
 
             /*
@@ -800,10 +790,11 @@ namespace SimplePM_Server
                 db.Open();
 
             }
-            catch (MySqlException)
+            catch (MySqlException ex)
             {
                 
-                /* Deal with it */
+                // Записываем информацию об ошибке в лог-файл
+                logger.Warn("An error occured while trying to connect to MySQL server: " + ex);
 
             }
 
