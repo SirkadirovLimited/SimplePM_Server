@@ -36,7 +36,7 @@ namespace SimplePM_Server
          * присваиваем  ей  указатель  на
          * журнал событий текущего класса
          */
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetLogger("SimplePM_Officiant");
 
         // Дескриптор соединения с БД
         private MySqlConnection _connection;
@@ -106,6 +106,13 @@ namespace SimplePM_Server
         public void ServeSubmission()
         {
             
+            /*
+             * Записываем в лог-файл информацию о том,
+             * что начата обработка данного запроса на
+             * тестирование.
+             */
+            logger.Trace("Serving submission #" + _submissionInfo.SubmissionId + " started!");
+
             /*
              * Определяем соответствующую данному запросу
              * на тестирование конфигурацию модуля компиляции
@@ -222,6 +229,10 @@ namespace SimplePM_Server
             
             ClearCache(fileLocation);
 
+            /*
+             *
+             */
+            
         }
 
         private ProgramTestingResult RunTesting(
@@ -230,6 +241,18 @@ namespace SimplePM_Server
             ref ICompilerPlugin compilerPlugin
         )
         {
+
+            /*
+             * Записываем   в   лог-файл  информацию  о  том,
+             * что в данный  момент  производим  тестирование
+             * пользовательского решения поставленной задачи.
+             */
+            logger.Trace(
+                "#" + _submissionInfo.SubmissionId +
+                ": Running solution testing subsystem (" +
+                _submissionInfo.TestType +
+                " mode)..."
+            );
 
             /*
              * Объявляем временную переменную,
@@ -321,6 +344,13 @@ namespace SimplePM_Server
         {
 
             /*
+             * Указываем в лог-файле о скором
+             * завершении  обработки  данного
+             * запроса на тестирование.
+             */
+            logger.Trace("#" + _submissionInfo.SubmissionId + ": Result is being sent to MySQL server...");
+
+            /*
              * Формируем запрос к базе данных
              * на  обновление   информации  о
              * запросе     на    тестирование
@@ -384,7 +414,7 @@ namespace SimplePM_Server
          * по алгоритмическому  или  спортивному
          * программированию.
          */
-        public void ClearCache(string fileLocation)
+        private static void ClearCache(string fileLocation)
         {
 
             /*
