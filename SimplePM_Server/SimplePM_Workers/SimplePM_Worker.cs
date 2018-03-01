@@ -528,189 +528,204 @@ namespace SimplePM_Server
             // Создаём новую задачу, без неё - никак!
             new Task(() =>
             {
-                
-                logger.Trace(
-                    "Starting submission query; Running threads: " +
-                    _aliveTestersCount + " from " +
-                    (ulong)_serverConfiguration.submission.max_threads
-                );
-                
-                // Формируем запрос на выборку
-                var querySelect = $@"
-                    SELECT 
-                        `spm_problems`.`difficulty`, 
-                        `spm_problems`.`adaptProgramOutput`, 
-                        `spm_submissions`.submissionId, 
-                        `spm_submissions`.classworkId, 
-                        `spm_submissions`.olympId, 
-                        `spm_submissions`.time, 
-                        `spm_submissions`.codeLang, 
-                        `spm_submissions`.userId, 
-                        `spm_submissions`.problemId, 
-                        `spm_submissions`.testType, 
-                        `spm_submissions`.problemCode, 
-                        `spm_submissions`.customTest 
-                    FROM 
-                        `spm_submissions` 
-                    INNER JOIN
-                        `spm_problems` 
-                    ON
-                        spm_submissions.problemId = spm_problems.id 
-                    WHERE 
-                        `status` = 'waiting' 
-                    AND 
-                        `codeLang` IN ({EnabledLangs}) 
-                    ORDER BY 
-                        `submissionId` ASC 
-                    LIMIT 
-                        1
-                    ;
-                ";
 
-                // Выполняем запрос к БД и получаем ответ
-                MySqlDataReader dataReader = new MySqlCommand(querySelect, conn).ExecuteReader();
-                
-                // Объявляем временную переменную, так называемый "флаг"
-                bool f;
-                
-                // Делаем различные проверки в безопасном контексте
-                lock (new object())
-                {
-                    
-                    f = _aliveTestersCount >= (ulong)_serverConfiguration.submission.max_threads | !dataReader.Read();
-                    
-                }
-
-                // Проверка на пустоту полученного результата
-                if (f)
+                try
                 {
 
-                    // Закрываем чтение пустой временной таблицы
-                    dataReader.Close();
-
-                    // Закрываем соединение с БД
-                    conn.Close();
+                    logger.Trace(
+                        "Starting submission query; Running threads: " +
+                        _aliveTestersCount + " from " +
+                        (ulong)_serverConfiguration.submission.max_threads
+                    );
                     
-                }
-                else
-                {
-                    
-                    /* 
-                     * Запускаем   секундомер  для  того,
-                     * чтобы определить время, за которое
-                     * запрос на проверку  обрабатывается
-                     * сервером проверки решений задач.
-                     */
-                    var sw = Stopwatch.StartNew();
+                    var sqlCmd = new MySqlCommand(Properties.Resources.submission_query, conn);
 
-                    // Увеличиваем количество текущих соединений
+                    sqlCmd.Parameters.AddWithValue("@EnabledLanguages", EnabledLangs);
+
+                    // Выполняем запрос к БД и получаем ответ
+                    MySqlDataReader dataReader = sqlCmd.ExecuteReader();
+
+                    // Объявляем временную переменную, так называемый "флаг"
+                    bool f;
+
+                    // Делаем различные проверки в безопасном контексте
                     lock (new object())
                     {
 
-                        _aliveTestersCount++;
+                        f = _aliveTestersCount >= (ulong)_serverConfiguration.submission.max_threads | !dataReader.Read();
 
                     }
 
-                    /*
-                     * Объявляем объект, который будет хранить
-                     * всю информацию об отправке и записываем
-                     * в него только что полученные данные.
-                     */
-                    var submissionInfo = new SubmissionInfo.SubmissionInfo
+                    // Проверка на пустоту полученного результата
+                    if (f)
                     {
 
-                        /*
-                         * Основная информация о запросе
-                         */
-                        SubmissionId = int.Parse(dataReader["submissionId"].ToString()),
-                        UserId = int.Parse(dataReader["userId"].ToString()),
+                        // Закрываем чтение пустой временной таблицы
+                        dataReader.Close();
 
-                        /*
-                         * Привязка к уроку и соревнованию
-                         */
-                        ClassworkId = int.Parse(dataReader["classworkId"].ToString()),
-                        OlympId = int.Parse(dataReader["olympId"].ToString()),
-                        
-                        /*
-                         * Тип тестирования и доплнительные поля
-                         */
-                        TestType = dataReader["testType"].ToString(),
-                        CustomTest = HttpUtility.HtmlDecode(dataReader["customTest"].ToString()),
+                        // Закрываем соединение с БД
+                        conn.Close();
 
-                        /*
-                         * Исходный код решения задачи
-                         * и дополнительная информация
-                         * о нём.
-                         */
-                        ProblemCode = (byte[]) dataReader["problemCode"],
-                        CodeLang = dataReader["codeLang"].ToString(),
+                        // Очищаем не управляемую память
+                        conn.Dispose();
 
-                        /*
-                         * Информация о задаче
+                    }
+                    else
+                    {
+
+                        /* 
+                         * Запускаем   секундомер  для  того,
+                         * чтобы определить время, за которое
+                         * запрос на проверку  обрабатывается
+                         * сервером проверки решений задач.
                          */
-                        ProblemInformation = new ProblemInfo
+                        var sw = Stopwatch.StartNew();
+
+                        // Увеличиваем количество текущих соединений
+                        lock (new object())
                         {
 
-                            ProblemId = int.Parse(dataReader["problemId"].ToString()),
-                            ProblemDifficulty = int.Parse(dataReader["difficulty"].ToString()),
-                            AdaptProgramOutput = bool.Parse(dataReader["adaptProgramOutput"].ToString())
+                            _aliveTestersCount++;
 
                         }
 
-                    };
-                    
-                    // Закрываем чтение временной таблицы
-                    dataReader.Close();
+                        /*
+                         * Объявляем объект, который будет хранить
+                         * всю информацию об отправке и записываем
+                         * в него только что полученные данные.
+                         */
+                        var submissionInfo = new SubmissionInfo.SubmissionInfo
+                        {
 
-                    // Устанавливаем статус запроса на "в обработке"
-                    var queryUpdate = $@"
-                        UPDATE 
-                            `spm_submissions` 
-                        SET 
-                            `status` = 'processing' 
-                        WHERE 
-                            `submissionId` = '{submissionInfo.SubmissionId}'
-                        LIMIT 
-                            1
-                        ;
-                    ";
+                            /*
+                             * Основная информация о запросе
+                             */
+                            SubmissionId = int.Parse(dataReader["submissionId"].ToString()),
+                            UserId = int.Parse(dataReader["userId"].ToString()),
 
-                    // Выполняем запрос к базе данных
-                    new MySqlCommand(queryUpdate, conn).ExecuteNonQuery();
-                    
-                    /*
-                     * Зовём официанта-шляпочника
-                     * уж он знает, что делать в таких
-                     * вот неожиданных ситуациях
-                     */
-                    new SimplePM_Officiant(
-                        conn,
-                        ref _serverConfiguration,
-                        ref _compilerConfigurations,
-                        ref _compilerPlugins,
-                        submissionInfo
-                    ).ServeSubmission();
+                            /*
+                             * Привязка к уроку и соревнованию
+                             */
+                            ClassworkId = int.Parse(dataReader["classworkId"].ToString()),
+                            OlympId = int.Parse(dataReader["olympId"].ToString()),
 
-                    /*
-                     * Уменьшаем количество текущих соединений
-                     * чтобы другие соединения были возможны.
-                     */
-                    lock (new object())
-                    {
-                        _aliveTestersCount--;
+                            /*
+                             * Тип тестирования и доплнительные поля
+                             */
+                            TestType = dataReader["testType"].ToString(),
+                            CustomTest = HttpUtility.HtmlDecode(dataReader["customTest"].ToString()),
+
+                            /*
+                             * Исходный код решения задачи
+                             * и дополнительная информация
+                             * о нём.
+                             */
+                            ProblemCode = (byte[])dataReader["problemCode"],
+                            CodeLang = dataReader["codeLang"].ToString(),
+
+                            /*
+                             * Информация о задаче
+                             */
+                            ProblemInformation = new ProblemInfo
+                            {
+
+                                ProblemId = int.Parse(dataReader["problemId"].ToString()),
+                                ProblemDifficulty = int.Parse(dataReader["difficulty"].ToString()),
+                                AdaptProgramOutput = bool.Parse(dataReader["adaptProgramOutput"].ToString())
+
+                            }
+
+                        };
+
+                        // Закрываем чтение временной таблицы
+                        dataReader.Close();
+
+                        // Устанавливаем статус запроса на "в обработке"
+                        var queryUpdate = $@"
+                            UPDATE 
+                                `spm_submissions` 
+                            SET 
+                                `status` = 'processing' 
+                            WHERE 
+                                `submissionId` = '{submissionInfo.SubmissionId}'
+                            LIMIT 
+                                1
+                            ;
+                        ";
+
+                        // Выполняем запрос к базе данных
+                        new MySqlCommand(queryUpdate, conn).ExecuteNonQuery();
+
+                        /*
+                         * Зовём официанта-шляпочника
+                         * уж он знает, что делать в таких
+                         * вот неожиданных ситуациях.
+                         */
+
+                        new SimplePM_Officiant(
+                            conn,
+                            ref _serverConfiguration,
+                            ref _compilerConfigurations,
+                            ref _compilerPlugins,
+                            submissionInfo
+                        ).ServeSubmission();
+
+                        /*
+                         * Уменьшаем количество текущих соединений
+                         * чтобы другие соединения были возможны.
+                         */
+
+                        lock (new object())
+                        {
+                            _aliveTestersCount--;
+                        }
+
+                        /*
+                         * Останавливаем секундомер и записываем
+                         * полученное значение в Debug log поток
+                         */
+
+                        sw.Stop();
+
+                        // Выводим затраченное время на экран
+                        logger.Trace("Submission checking time (ms): " + sw.ElapsedMilliseconds);
+
+                        // Закрываем соединение с БД
+                        conn.Close();
+
+                        // Очищаем не управляемую память
+                        conn.Dispose();
+
                     }
 
+                }
+                catch (Exception ex)
+                {
+
                     /*
-                     * Останавливаем секундомер и записываем
-                     * полученное значение в Debug log поток
+                     * Записываем информацию об ошибке в лог-файл
                      */
-                    sw.Stop();
-                    
-                    // Выводим затраченное время на экран
-                    logger.Trace("Submission checking time (ms): " + sw.ElapsedMilliseconds);
-                    
-                    // Закрываем соединение с БД
-                    conn.Close();
+
+                    logger.Error(ex);
+
+                    /*
+                     * Пытаемся закрыть соединение с БД
+                     */
+
+                    try
+                    {
+
+                        // Закрываем соединение с БД
+                        conn.Close();
+
+                        // Очищаем не управляемую память
+                        conn.Dispose();
+
+                    }
+                    catch
+                    {
+                        /* Никаких действий не предвидится */
+                    }
 
                 }
 
