@@ -131,7 +131,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SimplePM_Base\SimplePM_Commander.cs" />
     <Compile Include="SimplePM_Base\SimplePM_Main.cs" />
     <Compile Include="SimplePM_Tester\ProgramTester.cs" />
     <Compile Include="SimplePM_Tester\ProgramTestingFunctions.cs" />
@@ -154,7 +153,6 @@
       <DependentUpon>Dockerfile</DependentUpon>
     </None>
     <None Include="App.config" />
-    <EmbeddedResource Include="Program_Data\consoleHeader.pdat" />
     <None Include="app.manifest" />
     <None Include="config\compilers.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -173,9 +171,6 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Program_Data\commanderError.pdat" />
-    <None Include="Program_Data\commanderHelp.pdat" />
-    <None Include="Program_Data\noCompilerRequired.pdat" />
     <None Include="packages.config" />
     <Compile Include="SimplePM_Tester\SimplePM_Tester.Debug.cs" />
     <Compile Include="SimplePM_Tester\SimplePM_Tester.Release.cs" />
@@ -194,6 +189,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="logo-fhd.ico" />
+    <None Include="Program_Data\MySQL\submission_query.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CompilerBase\CompilerBase.csproj">
