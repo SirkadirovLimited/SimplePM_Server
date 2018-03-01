@@ -313,7 +313,7 @@ namespace SimplePM_Server
          * работы сервера проверки решений
          */
 
-        private void LoadResources(string[] args)
+        private void LoadResources()
         {
             
             /*
@@ -392,15 +392,7 @@ namespace SimplePM_Server
              * пользовательских решений поставленных задач
              */
             GenerateEnabledLangsList();
-
-            /*
-             * Вызываем метод, который отвечает за обработку
-             * аргументов   коммандной  строки  для  данного
-             * экземпляра сервера проверки решений SimplePM.
-             */
-
-            new SimplePM_Commander().SplitArguments(args);
-
+            
         }
         
         /*
@@ -507,6 +499,8 @@ namespace SimplePM_Server
 
             }
             
+            // ReSharper disable once FunctionNeverReturns
+
         }
         
         /*
@@ -517,7 +511,7 @@ namespace SimplePM_Server
         {
             
             // Загружаем все необходимые ресурсы
-            LoadResources(args);
+            LoadResources();
 
             // Запускаем основной цикл
             ServerLoop();
