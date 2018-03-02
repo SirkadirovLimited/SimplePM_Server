@@ -19,8 +19,6 @@ ON
 	spm_submissions.problemId = spm_problems.id 
 WHERE 
 	`status` = 'waiting' 
-AND 
-	`codeLang` IN (@EnabledLanguages) 
 ORDER BY 
 	`submissionId` ASC 
 LIMIT 
