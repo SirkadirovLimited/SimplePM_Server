@@ -81,7 +81,7 @@ namespace SimplePM_Server
         {
 
             // Генерируем имя директории
-            var directoryName = _serverConfiguration.path.temp + 
+            var directoryName = (string)_serverConfiguration.path.temp + 
                                 @"\" + Guid.NewGuid() + 
                                 submissionId + @"\";
 
@@ -123,9 +123,9 @@ namespace SimplePM_Server
                 _submissionInfo.CodeLang
             );
 
-            ICompilerPlugin compilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
+            var compilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
                 ref _compilerPlugins,
-                compilerConfiguration.module_name
+                (string)compilerConfiguration.module_name
             );
 
             /*
@@ -230,9 +230,17 @@ namespace SimplePM_Server
             ClearCache(fileLocation);
 
             /*
-             *
+             * Записываем в лог-файл  информацию о том,
+             * что    тестирование    пользовательского
+             * решения завершено, но нам всё равно как.
              */
             
+            logger.Trace(
+                "#" +
+                _submissionInfo.SubmissionId +
+                ": Submission testing completed!"
+            );
+
         }
 
         private ProgramTestingResult RunTesting(
@@ -247,6 +255,7 @@ namespace SimplePM_Server
              * что в данный  момент  производим  тестирование
              * пользовательского решения поставленной задачи.
              */
+
             logger.Trace(
                 "#" + _submissionInfo.SubmissionId +
                 ": Running solution testing subsystem (" +
@@ -260,6 +269,7 @@ namespace SimplePM_Server
              * выполнения тестирования пользо-
              * вательской программы.
              */
+
             ProgramTestingResult tmpResult = null;
 
             /*
@@ -269,6 +279,7 @@ namespace SimplePM_Server
              * тестировани пользовательских ре-
              * шений задач по программированию.
              */
+
             var tester = new SimplePM_Tester.SimplePM_Tester(
                 ref _connection,
                 ref _serverConfiguration,
@@ -283,6 +294,7 @@ namespace SimplePM_Server
              * типа тестирования выполняем специфические
              * операции по отношению к решению задачи.
              */
+
             switch (_submissionInfo.TestType)
             {
 
@@ -336,6 +348,7 @@ namespace SimplePM_Server
              * тестирования  пользовательского
              * решения данной задачи.
              */
+
             return tmpResult;
 
         }
@@ -359,22 +372,22 @@ namespace SimplePM_Server
              */
 
             const string query_text = @"
-                UPDATE
-                    `spm_submissions`
-                SET
-                    `status` = 'ready',
-                    `hasError` = @param_hasError,
-                    `errorOutput` = @param_errorOutput,
-                    `output` = @param_output,
-                    `exitcodes` = @param_exitcodes,
-                    `usedProcTime` = @param_usedProcTime,
-                    `usedMemory` = @param_usedMemory,
-                    `tests_result` = @param_result,
-                    `rating` = @param_rating,
-                WHERE
-                    `submissionId` = @param_submissionId
-                LIMIT
-                    1
+                UPDATE 
+                    `spm_submissions` 
+                SET 
+                    `status` = 'ready', 
+                    `hasError` = @param_hasError, 
+                    `errorOutput` = @param_errorOutput, 
+                    `output` = @param_output, 
+                    `exitcodes` = @param_exitcodes, 
+                    `usedProcTime` = @param_usedProcTime, 
+                    `usedMemory` = @param_usedMemory, 
+                    `tests_result` = @param_result, 
+                    `b` = @param_rating 
+                WHERE 
+                    `submissionId` = @param_submissionId 
+                LIMIT 
+                    1 
                 ;
             ";
 
@@ -383,20 +396,23 @@ namespace SimplePM_Server
              * на  основе  сформированного  выше
              * запроса к базе данных.
              */
+
             var updateSqlCommand = new MySqlCommand(query_text, _connection);
 
             /*
              * Указываем параметры выше сформированного
              * запроса к базе данных.
              */
-            updateSqlCommand.Parameters.AddWithValue("@param_hasError", cResult);
+
+            updateSqlCommand.Parameters.AddWithValue("@param_submissionId", _submissionInfo.SubmissionId);
+            updateSqlCommand.Parameters.AddWithValue("@param_hasError", Convert.ToInt32(cResult.HasErrors));
             updateSqlCommand.Parameters.AddWithValue("@param_errorOutput", ptResult.GetErrorOutputAsLine());
             updateSqlCommand.Parameters.AddWithValue("@param_output", ptResult.TestingResults[0].Output);
             updateSqlCommand.Parameters.AddWithValue("@param_exitcodes", ptResult.GetExitCodesAsLine('|'));
             updateSqlCommand.Parameters.AddWithValue("@param_usedProcTime", ptResult.GetUsedProcessorTimeAsLine('|'));
             updateSqlCommand.Parameters.AddWithValue("@param_usedMemory", ptResult.GetUsedMemoryAsLine('|'));
             updateSqlCommand.Parameters.AddWithValue("@param_result", ptResult.GetResultAsLine('|'));
-            updateSqlCommand.Parameters.AddWithValue("@param_rating", null); //TODO
+            updateSqlCommand.Parameters.AddWithValue("@param_rating", 0); //TODO
 
             /*
              * Выполняем запрос к базе данных
