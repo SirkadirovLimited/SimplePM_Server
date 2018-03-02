@@ -322,7 +322,7 @@ namespace SimplePM_Server
             _serverConfiguration = JsonConvert.DeserializeObject(
                 File.ReadAllText("./config/server.json")
             );
-
+            
             // Загружаем конфигурации модулей компиляции в память
             _compilerConfigurations = JsonConvert.DeserializeObject(
                 File.ReadAllText("./config/compilers.json")

@@ -11,6 +11,7 @@
 
 using System.IO;
 using CompilerBase;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace SimplePM_Server
@@ -101,7 +102,7 @@ namespace SimplePM_Server
                  * возвращаем ссылку  на  него, в ином
                  * случае продолжаем поиск.
                  */
-                if (compilerPlugin.PluginName == compilerConfig.module_name)
+                if (compilerPlugin.PluginName == (string)compilerConfig.module_name)
                     return compilerPlugin;
 
             }
@@ -164,7 +165,7 @@ namespace SimplePM_Server
                  * Если текущая конфигурация является
                  * искомой, возвращаем ссылку на неё.
                  */
-                if (compilerConfig.language_name == languageName)
+                if ((string)compilerConfig.language_name == languageName)
                     return compilerConfig;
                 
                 /*

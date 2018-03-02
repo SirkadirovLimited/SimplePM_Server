@@ -97,10 +97,10 @@ namespace SimplePM_Server.SimplePM_Tester
              * который, в свою очередь, создан
              * по подобию интерфейса ICompilerPlugin.
              */
-
-            ICompilerPlugin userCompilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
+            
+            var userCompilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
                 ref _compilerPlugins,
-                userLanguageConfiguration.module_name
+                (string)userLanguageConfiguration.module_name
             );
 
             /*
