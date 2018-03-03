@@ -367,43 +367,17 @@ namespace SimplePM_Server
                 _submissionInfo.SubmissionId +
                 ": Result is being sent to MySQL server..."
             );
-
-            /*
-             * Формируем запрос к базе данных
-             * на  обновление   информации  о
-             * запросе     на    тестирование
-             * пользовательского      решения
-             * поставленной задачи.
-             */
-
-            const string query_text = @"
-                UPDATE 
-                    `spm_submissions` 
-                SET 
-                    `status` = 'ready', 
-                    `hasError` = @param_hasError, 
-                    `compiler_text` = @param_compiler_text,
-                    `errorOutput` = @param_errorOutput, 
-                    `output` = @param_output, 
-                    `exitcodes` = @param_exitcodes, 
-                    `usedProcTime` = @param_usedProcTime, 
-                    `usedMemory` = @param_usedMemory, 
-                    `tests_result` = @param_result, 
-                    `b` = @param_rating 
-                WHERE 
-                    `submissionId` = @param_submissionId 
-                LIMIT 
-                    1 
-                ;
-            ";
-
+            
             /*
              * Создаём команду для MySQL сервера
-             * на  основе  сформированного  выше
+             * на     основе     сформированного
              * запроса к базе данных.
              */
 
-            var updateSqlCommand = new MySqlCommand(query_text, _connection);
+            var updateSqlCommand = new MySqlCommand(
+                Properties.Resources.submission_result_query,
+                _connection
+            );
 
             /*
              * Указываем параметры выше сформированного

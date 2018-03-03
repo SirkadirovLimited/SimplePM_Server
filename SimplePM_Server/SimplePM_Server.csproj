@@ -189,6 +189,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="logo-fhd.ico" />
+    <None Include="Program_Data\MySQL\submission_result_query.txt" />
     <None Include="Program_Data\MySQL\submission_query.txt" />
   </ItemGroup>
   <ItemGroup>
