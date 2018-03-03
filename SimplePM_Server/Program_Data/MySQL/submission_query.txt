@@ -1,16 +1,18 @@
 SELECT 
 	`spm_problems`.`difficulty`, 
 	`spm_problems`.`adaptProgramOutput`, 
-	`spm_submissions`.submissionId, 
-	`spm_submissions`.classworkId, 
-	`spm_submissions`.olympId, 
-	`spm_submissions`.time, 
-	`spm_submissions`.codeLang, 
-	`spm_submissions`.userId, 
-	`spm_submissions`.problemId, 
-	`spm_submissions`.testType, 
-	`spm_submissions`.problemCode, 
-	`spm_submissions`.customTest
+	`spm_problems`.`authorSolution`, 
+	`spm_problems`.`authorSolutionLanguage`, 
+	`spm_submissions`.`submissionId`, 
+	`spm_submissions`.`classworkId`, 
+	`spm_submissions`.`olympId`, 
+	`spm_submissions`.`time`, 
+	`spm_submissions`.`codeLang`, 
+	`spm_submissions`.`userId`, 
+	`spm_submissions`.`problemId`, 
+	`spm_submissions`.`testType`, 
+	`spm_submissions`.`problemCode`, 
+	`spm_submissions`.`customTest` 
 FROM 
 	`spm_submissions` 
 INNER JOIN
@@ -20,7 +22,8 @@ ON
 WHERE 
 	`status` = 'waiting' 
 ORDER BY 
-	`submissionId` ASC 
+	`submissionId` ASC, 
+	`time` ASC 
 LIMIT 
 	1
 ;

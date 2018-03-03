@@ -409,7 +409,7 @@ namespace SimplePM_Server
             /*
              * Выполняем запрос к базе данных
              */
-
+            
             updateSqlCommand.ExecuteNonQuery();
 
         }

@@ -171,74 +171,15 @@ namespace SimplePM_Server.SimplePM_Tester
         {
             
             /*
-             * Выборка информации об
-             * авторском  решении из
-             * базы данных SimplePM.
-             */
-            
-            // Формируем SQL запрос
-            const string querySelect = @"
-                SELECT 
-                    `codeLang`, 
-                    `code` 
-                FROM 
-                    `spm_problems_ready` 
-                WHERE 
-                    `problemId` = @problemId 
-                ORDER BY 
-                    `problemId` ASC 
-                LIMIT 
-                    1
-                ;
-            ";
-            
-            var cmdSelect = new MySqlCommand(querySelect, connection);
-            cmdSelect.Parameters.AddWithValue(
-                "@problemId",
-                submissionInfo.ProblemInformation.ProblemId
-            );
-
-            // Чтение результатов запроса
-            var dataReader = cmdSelect.ExecuteReader();
-
-            // Объявляем необходимые переменные
-            byte[] authorProblemCode;
-            string authorSolutionCodeLanguage;
-
-            // Читаем полученные данные
-            if (dataReader.Read())
-            {
-
-                // Исходный код авторского решения
-                authorProblemCode = (byte[]) dataReader["code"];
-
-                // Язык авторского решения
-                authorSolutionCodeLanguage = dataReader["codeLang"].ToString();
-
-                // Закрываем data reader
-                dataReader.Close();
-
-            }
-            else
-            {
-
-                // Закрываем data reader
-                dataReader.Close();
-
-                // Авторское решение не найдено
-                throw new SimplePM_Exceptions.AuthorSolutionNotFoundException();
-
-            }
-
-            /*
              * Получаем ссылку на объект, который
              * хранит информацию  о  конфигурации
              * компиляционного модуля для данного
              * языка программирования.
              */
+
             authorLanguageConfiguration = SimplePM_Compiler.GetCompilerConfig(
                 ref _languageConfigurations,
-                authorSolutionCodeLanguage
+                submissionInfo.ProblemInformation.AuthorSolutionCodeLanguage
             );
 
             /*
@@ -247,9 +188,10 @@ namespace SimplePM_Server.SimplePM_Tester
              * который, в свою очередь, создан
              * по подобию интерфейса ICompilerPlugin.
              */
+
             authorCompilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
                 ref _compilerPlugins,
-                authorLanguageConfiguration.module_name
+                (string)authorLanguageConfiguration.module_name
             );
 
             /*
@@ -257,12 +199,12 @@ namespace SimplePM_Server.SimplePM_Tester
              * поставленной задачи с последующим
              * возвращением результатов компиляции.
              */
-
+            
             // Определяем расширение файла
-            var authorFileExt = "." + authorLanguageConfiguration.source_ext;
+            var authorFileExt = "." + (string)authorLanguageConfiguration.source_ext;
 
             // Получаем случайный путь к директории авторского решения
-            var tmpAuthorDir = _serverConfiguration.path.temp + 
+            var tmpAuthorDir = (string)_serverConfiguration.path.temp + 
                 @"\author\" + Guid.NewGuid() + @"\";
 
             // Создаём папку текущего авторского решения задачи
@@ -277,7 +219,7 @@ namespace SimplePM_Server.SimplePM_Tester
             // Записываем исходный код авторского решения в заданный временный файл
             File.WriteAllBytes(
                 tmpAuthorSrcLocation,
-                authorProblemCode
+                submissionInfo.ProblemInformation.AuthorSolutionCode
             );
 
             // Устанавливаем его аттрибуты
@@ -304,6 +246,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * информацию о файле и причине ошибки при  его
              * открытии.
              */
+
             if (cResult.HasErrors)
                 throw new FileLoadException(cResult.ExeFullname);
             
@@ -311,6 +254,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Возвращаем  полный  путь к исполняемому
              * файлу авторского решения данной задачи.
              */
+
             return cResult.ExeFullname;
 
         }

@@ -25,7 +25,7 @@ namespace SubmissionInfo
         /*
          * Базовая информация о запросе
          */
-
+        
         public int SubmissionId { get; set; }
         public int UserId { get; set; }
 
@@ -87,15 +87,22 @@ namespace SubmissionInfo
         }
 
         // Уникальный идентификатор задачи
-        public int ProblemId { get; set; } = 0;
+        public int ProblemId { get; set; }
 
         // Сложность задачи
-        public int ProblemDifficulty { get; set; } = 0;
+        public int ProblemDifficulty { get; set; }
 
+        // Тип оценивания решения задачи
         public RatingType ProblemRatingType { get; set; } = RatingType.DEFAULT;
 
         // Указание, не строгая ли проверка выхода
         public bool AdaptProgramOutput { get; set; } = true;
+
+        /*
+         * Информация об авторском решении данной задачи
+         */
+        public byte[] AuthorSolutionCode { get; set; } = null;
+        public string AuthorSolutionCodeLanguage { get; set; } = "unset";
 
     }
 

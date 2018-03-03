@@ -621,7 +621,10 @@ namespace SimplePM_Server
 
                                 ProblemId = int.Parse(dataReader["problemId"].ToString()),
                                 ProblemDifficulty = int.Parse(dataReader["difficulty"].ToString()),
-                                AdaptProgramOutput = bool.Parse(dataReader["adaptProgramOutput"].ToString())
+                                AdaptProgramOutput = bool.Parse(dataReader["adaptProgramOutput"].ToString()),
+
+                                AuthorSolutionCode = (byte[])dataReader["authorSolution"],
+                                AuthorSolutionCodeLanguage = dataReader["authorSolutionLanguage"].ToString()
 
                             }
 
