@@ -307,8 +307,8 @@ namespace SimplePM_Server
                      * решения    поставленной    задачи   и
                      * возвращает результаты своей "работы".
                      */
-
-                    tmpResult = tester.Syntax(cResult);
+                    
+                    tmpResult = tester.Syntax();
 
                     break;
 

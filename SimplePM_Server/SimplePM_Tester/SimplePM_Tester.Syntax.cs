@@ -17,7 +17,7 @@ namespace SimplePM_Server.SimplePM_Tester
     internal partial class SimplePM_Tester
     {
 
-        public ProgramTestingResult Syntax(CompilerResult compilingResult)
+        public ProgramTestingResult Syntax()
         {
 
             /*
@@ -25,34 +25,8 @@ namespace SimplePM_Server.SimplePM_Tester
              * и возвращаем его  как объект типа
              * ProgramTestingResult.
              */
-            return new ProgramTestingResult(1)
-            {
-
-                /*
-                 * Указываем информацию об единственном тесте,
-                 * который сигнализирует об успешности выполнения
-                 * процесса компиляции пользовательского решения.
-                 */
-                
-                TestingResults =
-                {
-                    
-                    [0] = new TestResult
-                    {
-                        
-                        Output = compilingResult.CompilerMessage,
-                        Result = (!compilingResult.HasErrors) ? '+' : '-',
-                        UsedMemory = 0,
-                        UsedProcessorTime = 0,
-                        ExitCode = 0
-
-                    }
-
-                }
-
-            };
-
-
+            return new ProgramTestingResult(0);
+            
         }
 
     }
