@@ -361,7 +361,12 @@ namespace SimplePM_Server
              * завершении  обработки  данного
              * запроса на тестирование.
              */
-            logger.Trace("#" + _submissionInfo.SubmissionId + ": Result is being sent to MySQL server...");
+
+            logger.Trace(
+                "#" +
+                _submissionInfo.SubmissionId +
+                ": Result is being sent to MySQL server..."
+            );
 
             /*
              * Формируем запрос к базе данных
@@ -377,6 +382,7 @@ namespace SimplePM_Server
                 SET 
                     `status` = 'ready', 
                     `hasError` = @param_hasError, 
+                    `compiler_text` = @param_compiler_text,
                     `errorOutput` = @param_errorOutput, 
                     `output` = @param_output, 
                     `exitcodes` = @param_exitcodes, 
@@ -405,13 +411,19 @@ namespace SimplePM_Server
              */
 
             updateSqlCommand.Parameters.AddWithValue("@param_submissionId", _submissionInfo.SubmissionId);
+            
             updateSqlCommand.Parameters.AddWithValue("@param_hasError", Convert.ToInt32(cResult.HasErrors));
+            updateSqlCommand.Parameters.AddWithValue("@param_compiler_text", cResult.CompilerMessage);
+
             updateSqlCommand.Parameters.AddWithValue("@param_errorOutput", ptResult.GetErrorOutputAsLine());
             updateSqlCommand.Parameters.AddWithValue("@param_output", ptResult.TestingResults[0].Output);
+
             updateSqlCommand.Parameters.AddWithValue("@param_exitcodes", ptResult.GetExitCodesAsLine('|'));
             updateSqlCommand.Parameters.AddWithValue("@param_usedProcTime", ptResult.GetUsedProcessorTimeAsLine('|'));
             updateSqlCommand.Parameters.AddWithValue("@param_usedMemory", ptResult.GetUsedMemoryAsLine('|'));
+
             updateSqlCommand.Parameters.AddWithValue("@param_result", ptResult.GetResultAsLine('|'));
+
             updateSqlCommand.Parameters.AddWithValue("@param_rating", 0); //TODO
 
             /*
