@@ -410,20 +410,26 @@ namespace SimplePM_Server
              * запроса к базе данных.
              */
 
+            // Идентификационные данные
             updateSqlCommand.Parameters.AddWithValue("@param_submissionId", _submissionInfo.SubmissionId);
             
+            // Информация компилятора
             updateSqlCommand.Parameters.AddWithValue("@param_hasError", Convert.ToInt32(cResult.HasErrors));
             updateSqlCommand.Parameters.AddWithValue("@param_compiler_text", cResult.CompilerMessage);
 
+            // Вывод решения
             updateSqlCommand.Parameters.AddWithValue("@param_errorOutput", ptResult.GetErrorOutputAsLine());
             updateSqlCommand.Parameters.AddWithValue("@param_output", ptResult.TestingResults[0].Output);
 
+            // Статистические данные решения
             updateSqlCommand.Parameters.AddWithValue("@param_exitcodes", ptResult.GetExitCodesAsLine('|'));
             updateSqlCommand.Parameters.AddWithValue("@param_usedProcTime", ptResult.GetUsedProcessorTimeAsLine('|'));
             updateSqlCommand.Parameters.AddWithValue("@param_usedMemory", ptResult.GetUsedMemoryAsLine('|'));
 
+            // Результаты тестирования
             updateSqlCommand.Parameters.AddWithValue("@param_result", ptResult.GetResultAsLine('|'));
 
+            // Полученный рейтинг решения
             updateSqlCommand.Parameters.AddWithValue("@param_rating", 0); //TODO
 
             /*
