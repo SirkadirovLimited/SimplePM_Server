@@ -65,8 +65,8 @@ namespace CompilerPlugin
                 startInfo.FileName = (string)languageConfiguration.runtime_path;
                 
                 // Аргументы запуска данной программы
-                startInfo.Arguments = (string)languageConfiguration.runtime_arguments;
-
+                startInfo.Arguments = ((string)languageConfiguration.runtime_arguments).Replace("{%fileLocation%}", filePath);
+                
             }
             catch
             {
