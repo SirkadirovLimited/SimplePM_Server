@@ -9,6 +9,7 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
+using System;
 using System.Web;
 using System.Text;
 using CompilerBase;
@@ -91,17 +92,40 @@ namespace SimplePM_Server.SimplePM_Tester
                     "",
                     currentTest.MemoryLimit,
                     currentTest.ProcessorTimeLimit,
-                    Encoding.UTF8.GetString(currentTest.InputData),
+                    currentTest.InputData,
                     currentTest.OutputData.Length * 2,
                     submissionInfo.ProblemInformation.AdaptProgramOutput
                 ).RunTesting();
+
+                /*
+                 * Если временный  результат  успешен,
+                 * проводим   финальную   перепроверку
+                 * результата тестирования  на  данном
+                 * тесте и выносим финальный результат
+                 * данного теста.
+                 */
+
+                if (currentTestResult.Result == TestResult.MiddleSuccessResult)
+                {
+
+                    /*
+                     * Сравнение выходных потоков
+                     * и вынесение  результата по
+                     * данному тесту.
+                     */
+                    currentTestResult.Result = 
+                        Convert.ToBase64String(currentTestResult.Output) == Convert.ToBase64String(currentTest.OutputData)
+                            ? TestResult.FullSuccessResult
+                            : TestResult.FullNoSuccessResult;
+
+                }
 
                 /*
                  * Заносим результат проведения
                  * текущего теста в специальный
                  * массив.
                  */
-
+                
                 programTestingResult.TestingResults[currentTestIndex] = currentTestResult;
 
             }

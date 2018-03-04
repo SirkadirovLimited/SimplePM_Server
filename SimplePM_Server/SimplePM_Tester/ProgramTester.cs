@@ -13,6 +13,7 @@ using System;
 using System.Text;
 using CompilerBase;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SimplePM_Server.SimplePM_Tester
@@ -35,7 +36,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
         private readonly string _programPath; // путь к исполняемому файлу
         private readonly string _programArguments; // аргументы запуска
-        private readonly string _programInputString; // данные для инъекции во входной поток
+        private readonly byte[] _programInputBytes; // данные для инъекции во входной поток
 
         private readonly long _programMemoryLimit; // лимит по памяти в байтах
         private readonly int _programProcessorTimeLimit; // лимит по процессорному времени в миллисекундах
@@ -81,7 +82,7 @@ namespace SimplePM_Server.SimplePM_Tester
             string args,
             long memoryLimit = 0,
             int processorTimeLimit = 0,
-            string input = null,
+            byte[] input = null,
             int outputCharsLimit = 0,
             bool adaptOutput = true
         )
@@ -96,7 +97,7 @@ namespace SimplePM_Server.SimplePM_Tester
             _programMemoryLimit = memoryLimit;
             _programProcessorTimeLimit = processorTimeLimit;
 
-            _programInputString = input;
+            _programInputBytes = input;
             _outputCharsLimit = outputCharsLimit;
 
             _adaptOutput = adaptOutput;
@@ -224,41 +225,60 @@ namespace SimplePM_Server.SimplePM_Tester
             // Инициализация всего необходимого
             Init();
 
-            // Запускаем пользовательский процесс
-            _programProcess.Start();
-            
-            /*
-             * Записываем входные
-             * данные во  входной
-             * поток.
-             */
-            WriteInputString();
+            // Запись входных данных в файл
+            WriteInputFile();
 
             /*
-             * Вызываем метод, запускающий
-             * слежение за памятью.
+             * Продолжаем тестирование лишь  в  случае
+             * отсутствия предопределённого результата
+             * тестирования.
              */
-            StartProcessorTimeLimitChecker();
 
-            /*
-             * Вызываем метод, запускающий
-             * слежение  за   процессорным
-             * временем.
-             */
-            StartMemoryLimitChecker();
+            if (!_testingResultReceived)
+            {
 
-            /*
-             * Ожидаем завершения
-             * пользовательского
-             * процесса.
-             */
-            _programProcess.WaitForExit();
+                // Запускаем пользовательский процесс
+                _programProcess.Start();
 
-            /*
-             * Освобождаем все связанные
-             * с процессом ресурсы.
-             */
-            _programProcess.Close();
+                /*
+                 * Записываем входные
+                 * данные во  входной
+                 * поток.
+                 */
+
+                WriteInputString();
+
+                /*
+                 * Вызываем метод, запускающий
+                 * слежение за памятью.
+                 */
+
+                StartProcessorTimeLimitChecker();
+
+                /*
+                 * Вызываем метод, запускающий
+                 * слежение  за   процессорным
+                 * временем.
+                 */
+
+                StartMemoryLimitChecker();
+
+                /*
+                 * Ожидаем завершения
+                 * пользовательского
+                 * процесса.
+                 */
+
+                _programProcess.WaitForExit();
+
+                /*
+                 * Освобождаем все связанные
+                 * с процессом ресурсы.
+                 */
+
+                _programProcess.Close();
+                
+            }
 
             /*
              * Возвращаем промежуточный
@@ -325,7 +345,11 @@ namespace SimplePM_Server.SimplePM_Tester
             {
 
                 // Записываем входные данные во входной поток
-                _programProcess.StandardInput.Write(_programInputString);
+                _programProcess.StandardInput.Write(
+                    Encoding.UTF8.GetString(
+                        _programInputBytes
+                    )
+                );
                 
                 // Очищаем буферы
                 _programProcess.StandardInput.Flush();
@@ -357,12 +381,55 @@ namespace SimplePM_Server.SimplePM_Tester
                     _testingResultReceived = true;
 
                     // Указываем результат тестирования
-                    _testingResult = 'I';
+                    _testingResult = TestResult.InputErrorResult;
 
                 }
 
             }
 
+        }
+
+        private void WriteInputFile()
+        {
+
+            /*
+             * Для обеспечения безопасности выполняем все
+             * действия  в  блоке  обработки  исключений.
+             */
+
+            try
+            {
+
+                // Получаем полный путь к файлу с входными данными
+                var inputFilePath = Path.Combine(
+                    new FileInfo(_programPath).DirectoryName,
+                    "input.txt"
+                );
+
+                // Записываем данные в файл input.txt
+                File.WriteAllBytes(
+                    inputFilePath,
+                    _programInputBytes
+                );
+
+                // Указываем аттрибуты этого файла
+                File.SetAttributes(
+                    inputFilePath,
+                    FileAttributes.ReadOnly | FileAttributes.Temporary
+                );
+
+            }
+            catch (Exception)
+            {
+
+                // Указываем, что результат тестирования получен
+                _testingResultReceived = true;
+
+                // Указываем результат тестирования
+                _testingResult = TestResult.InputErrorResult;
+
+            }
+            
         }
 
         private TestResult GenerateTestResult()
@@ -371,9 +438,13 @@ namespace SimplePM_Server.SimplePM_Tester
             return new TestResult
             {
 
-                // Выходные данные
+                // Выходные данные из стандартного потока
                 ErrorOutput = _programErrorOutput,
-                Output = (_adaptOutput) ? _programOutput.TrimEnd('\r', '\n') : _programOutput,
+                Output = Encoding.UTF8.GetBytes(
+                    (_adaptOutput)
+                        ? _programOutput.TrimEnd('\r', '\n')
+                        : _programOutput
+                ),
 
                 // Результаты предварительного тестирования
                 ExitCode = _programProcess.ExitCode,
@@ -406,7 +477,7 @@ namespace SimplePM_Server.SimplePM_Tester
             if (checker)
             {
                 _testingResultReceived = true;
-                _testingResult = 'M';
+                _testingResult = TestResult.MemoryLimitResult;
             }
 
             /*
@@ -424,7 +495,7 @@ namespace SimplePM_Server.SimplePM_Tester
             if (checker)
             {
                 _testingResultReceived = true;
-                _testingResult = 'T';
+                _testingResult = TestResult.TimeLimitResult;
             }
 
             /*
@@ -438,7 +509,7 @@ namespace SimplePM_Server.SimplePM_Tester
             if (checker)
             {
                 _testingResultReceived = true;
-                _testingResult = 'R';
+                _testingResult = TestResult.RuntimeErrorResult;
             }
 
             /*
@@ -456,7 +527,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 {
 
                     _testingResultReceived = true;
-                    _testingResult = 'E';
+                    _testingResult = TestResult.ErrorOutputNotNullResult;
 
                 }
 
@@ -465,6 +536,7 @@ namespace SimplePM_Server.SimplePM_Tester
             /*
              * Если всё хорошо, возвращаем временный результат
              */
+
             if (!_testingResultReceived)
             {
 
@@ -496,7 +568,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 _testingResultReceived = true;
 
                 // Указываем результат тестирования
-                _testingResult = 'O';
+                _testingResult = TestResult.OutputErrorResult;
 
                 // Добавляем сообщение пояснения
                 _programOutput = "=== OUTPUT CHARS LIMIT REACHED ===";
@@ -508,7 +580,7 @@ namespace SimplePM_Server.SimplePM_Tester
             
             /*
              * В ином случае дозаписываем данные
-             * в соответственную переменную
+             * в соответственную переменную.
              */
 
             var adaptedString = (_adaptOutput) ? e.Data.Trim() : e.Data;

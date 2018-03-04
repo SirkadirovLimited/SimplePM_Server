@@ -25,27 +25,31 @@ namespace SimplePM_Server.SimplePM_Tester
         /*
          * Раздел объявления важных констант
          */
-
+        
         public const char MiddleSuccessResult = '*';
+        public const char FullSuccessResult = '+';
+        public const char FullNoSuccessResult = '-';
         public const char TimeLimitResult = 'T';
         public const char MemoryLimitResult = 'M';
         public const char RuntimeErrorResult = 'R';
+        public const char ErrorOutputNotNullResult = 'E';
+        public const char InputErrorResult = 'I';
         public const char OutputErrorResult = 'O';
         
         /*
          * Раздел объявления переменных
          */
 
-        public string ErrorOutput       { get; set; } // Выходной поток ошибок пользовательской программы
-        public string Output            { get; set; } // Выходной поток пользовательской программы
+        public string ErrorOutput { get; set; } // Выходной поток ошибок пользовательской программы
+        public byte[] Output { get; set; } // Выходной поток пользовательской программы
 
-        public int    ExitCode          { get; set; } // Код выхода пользовательской программы
-        public char   Result            { get; set; } // Результат по текущему тесту
+        public int ExitCode { get; set; } // Код выхода пользовательской программы
+        public char Result { get; set; } // Результат по текущему тесту
 
-        public int    UsedProcessorTime { get; set; } // Использование процессорного времени пользовательской программой
-        public long   UsedMemory        { get; set; } // Использование памяти пользовательской программой
+        public int UsedProcessorTime { get; set; } // Использование процессорного времени пользовательской программой
+        public long UsedMemory { get; set; } // Использование памяти пользовательской программой
         
-        public bool   IsSuccessful      => (
+        public bool IsSuccessful => (
             Result == '+' && ExitCode == 0
         ); // Указывает на то, пройден ли тест или нет
 
@@ -63,7 +67,7 @@ namespace SimplePM_Server.SimplePM_Tester
             long UsedMemory,
             int UsedProcessorTime,
             string ErrorOutput,
-            string Output
+            byte[] Output
         )
         {
 
