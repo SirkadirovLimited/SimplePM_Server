@@ -128,9 +128,11 @@ namespace SimplePM_Server.SimplePM_Tester
              */
             if (userTestingResult.Result == TestResult.MiddleSuccessResult)
             {
+
                 userTestingResult.Result = (
-                    userTestingResult.Output == authorTestingResult.Output
+                    Convert.ToBase64String(userTestingResult.Output) == Convert.ToBase64String(authorTestingResult.Output)
                 ) ? '+' : '-';
+
             }
 
             /*
@@ -142,10 +144,12 @@ namespace SimplePM_Server.SimplePM_Tester
              */
             var programTestingResult = new ProgramTestingResult(1)
             {
+
                 TestingResults =
                 {
                     [0] = userTestingResult
                 }
+
             };
 
             /*
