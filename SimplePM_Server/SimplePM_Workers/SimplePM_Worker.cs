@@ -603,7 +603,7 @@ namespace SimplePM_Server
                              * Тип тестирования и доплнительные поля
                              */
                             TestType = dataReader["testType"].ToString(),
-                            CustomTest = HttpUtility.HtmlDecode(dataReader["customTest"].ToString()),
+                            CustomTest = (byte[])dataReader["customTest"],
 
                             /*
                              * Исходный код решения задачи

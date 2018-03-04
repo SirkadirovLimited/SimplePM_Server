@@ -44,7 +44,7 @@ namespace SubmissionInfo
          */
 
         public string TestType { get; set; }
-        public string CustomTest { get; set; }
+        public byte[] CustomTest { get; set; }
 
         /*
          * Информация  об  исходном коде  пользовательского
