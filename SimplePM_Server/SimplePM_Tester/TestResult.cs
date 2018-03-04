@@ -26,15 +26,15 @@ namespace SimplePM_Server.SimplePM_Tester
          * Раздел объявления важных констант
          */
         
-        public const char MiddleSuccessResult = '*';
-        public const char FullSuccessResult = '+';
-        public const char FullNoSuccessResult = '-';
-        public const char TimeLimitResult = 'T';
-        public const char MemoryLimitResult = 'M';
-        public const char RuntimeErrorResult = 'R';
-        public const char ErrorOutputNotNullResult = 'E';
-        public const char InputErrorResult = 'I';
-        public const char OutputErrorResult = 'O';
+        public const char MiddleSuccessResult = '*'; // Предварительный успешный результат
+        public const char FullSuccessResult = '+'; // Успешный результат
+        public const char FullNoSuccessResult = '-'; // Не успешный результат
+        public const char TimeLimitResult = 'T'; // Превышен лимит по использованному процессорному времени
+        public const char MemoryLimitResult = 'M'; // Превышен лимит по использованной памяти
+        public const char RuntimeErrorResult = 'R'; // При выполнении произошла Runtime-ошибка
+        public const char ErrorOutputNotNullResult = 'E'; // Поток ошибок не пустой
+        public const char InputErrorResult = 'I'; // Ошибка записи входного потока
+        public const char OutputErrorResult = 'O'; // Ошибка в формате выходного потока
         
         /*
          * Раздел объявления переменных
@@ -52,34 +52,6 @@ namespace SimplePM_Server.SimplePM_Tester
         public bool IsSuccessful => (
             Result == '+' && ExitCode == 0
         ); // Указывает на то, пройден ли тест или нет
-
-        /*
-         * Различные вариации конструкторов
-         */
-        public TestResult()
-        {
-
-        }
-
-        public TestResult(
-            char Result,
-            int ExitCode,
-            long UsedMemory,
-            int UsedProcessorTime,
-            string ErrorOutput,
-            byte[] Output
-        )
-        {
-
-            /* Присвоение каким-то переменным каких-то значений */
-            this.Result = Result;
-            this.ExitCode = ExitCode;
-            this.UsedMemory = UsedMemory;
-            this.UsedProcessorTime = UsedProcessorTime;
-            this.ErrorOutput = ErrorOutput;
-            this.Output = Output;
-
-        }
         
     }
 
