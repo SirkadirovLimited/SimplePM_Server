@@ -9,8 +9,6 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
-using CompilerBase;
-
 namespace SimplePM_Server.SimplePM_Tester
 {
     
@@ -25,8 +23,17 @@ namespace SimplePM_Server.SimplePM_Tester
              * и возвращаем его  как объект типа
              * ProgramTestingResult.
              */
-            return new ProgramTestingResult(0);
-            
+
+            return new ProgramTestingResult(1)
+            {
+
+                TestingResults =
+                {
+                    [0] = new TestResult()
+                }
+
+            };
+
         }
 
     }
