@@ -15,6 +15,7 @@ using System.IO;
 using CompilerBase;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
+using System.Text;
 using SimplePM_Server.SimplePM_Tester;
 
 namespace SimplePM_Server
@@ -383,7 +384,7 @@ namespace SimplePM_Server
              * Указываем параметры выше сформированного
              * запроса к базе данных.
              */
-
+             logger.Info(Encoding.UTF8.GetString(ptResult.TestingResults[ptResult.TestingResults.Length - 1].Output));
             // Идентификационные данные
             updateSqlCommand.Parameters.AddWithValue("@param_submissionId", _submissionInfo.SubmissionId);
             
@@ -392,10 +393,9 @@ namespace SimplePM_Server
             updateSqlCommand.Parameters.AddWithValue("@param_compiler_text", cResult.CompilerMessage);
 
             // Вывод решения
-            updateSqlCommand.Parameters.AddWithValue("@param_errorOutput", ptResult.GetErrorOutputAsLine());
-            updateSqlCommand.Parameters.AddWithValue("@param_output", ptResult.TestingResults[0].Output);
-
-            // Статистические данные решения
+            updateSqlCommand.Parameters.AddWithValue("@param_errorOutput", Encoding.UTF8.GetBytes(ptResult.GetErrorOutputAsLine()));
+            updateSqlCommand.Parameters.AddWithValue("@param_output",
+                ptResult.TestingResults[ptResult.TestingResults.Length - 1].Output);
             updateSqlCommand.Parameters.AddWithValue("@param_exitcodes", ptResult.GetExitCodesAsLine('|'));
             updateSqlCommand.Parameters.AddWithValue("@param_usedProcTime", ptResult.GetUsedProcessorTimeAsLine('|'));
             updateSqlCommand.Parameters.AddWithValue("@param_usedMemory", ptResult.GetUsedMemoryAsLine('|'));
