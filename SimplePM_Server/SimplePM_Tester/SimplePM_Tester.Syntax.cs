@@ -9,6 +9,8 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
+using System.Text;
+
 namespace SimplePM_Server.SimplePM_Tester
 {
     
@@ -29,7 +31,21 @@ namespace SimplePM_Server.SimplePM_Tester
 
                 TestingResults =
                 {
-                    [0] = new TestResult()
+
+                    [0] = new TestResult
+                    {
+
+                        Output = Encoding.UTF8.GetBytes("NULL"),
+                        ErrorOutput = null,
+
+                        ExitCode = 0,
+                        Result = TestResult.MiddleSuccessResult,
+
+                        UsedMemory = 0,
+                        UsedProcessorTime = 0
+
+                    }
+
                 }
 
             };

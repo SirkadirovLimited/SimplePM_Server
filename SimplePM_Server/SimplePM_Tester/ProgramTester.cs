@@ -270,13 +270,6 @@ namespace SimplePM_Server.SimplePM_Tester
                  */
 
                 _programProcess.WaitForExit();
-
-                /*
-                 * Освобождаем все связанные
-                 * с процессом ресурсы.
-                 */
-
-                _programProcess.Close();
                 
             }
 
@@ -317,10 +310,7 @@ namespace SimplePM_Server.SimplePM_Tester
             
             _programProcess = new Process
             {
-
-                PriorityClass = ProcessPriorityClass.BelowNormal, // устанавливаем низкий приоритет
-                PriorityBoostEnabled = false, // не даём возможности увеличивать приоритет
-
+                
                 StartInfo = programStartInfo, // устанавливаем информацию о программе
                 EnableRaisingEvents = true, // указываем, что хотим обрабатывать события
 
@@ -434,8 +424,14 @@ namespace SimplePM_Server.SimplePM_Tester
 
         private TestResult GenerateTestResult()
         {
+            
+            /*
+             * Генерируем результат тестирования
+             * пользовательской   программы   на
+             * текущем тесте.
+             */
 
-            return new TestResult
+            var result = new TestResult
             {
 
                 // Выходные данные из стандартного потока
@@ -459,6 +455,19 @@ namespace SimplePM_Server.SimplePM_Tester
                 )
 
             };
+
+            /*
+             * Освобождаем все связанные
+             * с процессом ресурсы.
+             */
+
+            _programProcess.Close();
+
+            /*
+             * Возвращаем сгенерированный выше результат
+             */
+
+            return result;
 
         }
 
