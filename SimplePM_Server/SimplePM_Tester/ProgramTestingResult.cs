@@ -99,7 +99,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
                 resultLine = TestingResults.Aggregate(
                     "",
-                    (current, test) => current + (test.Result + splitter)
+                    (current, test) => current + (test.Result.ToString() + splitter.ToString())
                 );
 
                 /*
@@ -147,7 +147,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
                 resultLine = TestingResults.Aggregate(
                     "",
-                    (current, test) => current + (test.ExitCode + splitter)
+                    (current, test) => current + (test.ExitCode.ToString() + splitter.ToString())
                 );
 
                 /*
@@ -196,7 +196,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
                 resultLine = TestingResults.Aggregate(
                     "",
-                    (current, test) => current + (test.UsedMemory + splitter)
+                    (current, test) => current + (test.UsedMemory.ToString() + splitter.ToString())
                 );
 
                 /*
@@ -246,7 +246,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
                 resultLine = TestingResults.Aggregate(
                     "",
-                    (current, test) => current + (test.UsedProcessorTime + splitter)
+                    (current, test) => current + (test.UsedProcessorTime.ToString() + splitter.ToString())
                 );
 
                 /*

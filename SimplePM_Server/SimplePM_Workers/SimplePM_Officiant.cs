@@ -384,7 +384,7 @@ namespace SimplePM_Server
              * Указываем параметры выше сформированного
              * запроса к базе данных.
              */
-             logger.Info(Encoding.UTF8.GetString(ptResult.TestingResults[ptResult.TestingResults.Length - 1].Output));
+            
             // Идентификационные данные
             updateSqlCommand.Parameters.AddWithValue("@param_submissionId", _submissionInfo.SubmissionId);
             
