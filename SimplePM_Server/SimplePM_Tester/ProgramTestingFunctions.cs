@@ -103,7 +103,7 @@ namespace SimplePM_Server.SimplePM_Tester
                  * Json данных в удобный для нас формат.
                  */
                 securityConfiguration = JsonConvert.DeserializeObject(
-                    File.ReadAllText("./config/security.config")
+                    File.ReadAllText("./config/security.json")
                 );
 
             }
