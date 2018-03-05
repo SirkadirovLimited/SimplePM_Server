@@ -34,6 +34,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * к запускаемому файлу авторского
              * решения задачи
              */
+
             var authorSolutionExePath = GetAuthorSolutionExePath(
                 out var authorLanguageConfiguration,
                 out var authorCompilerPlugin
@@ -44,6 +45,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * информацию о лимитах для пользовательского
              * процесса (пользовательского решения задачи)
              */
+
             GetDebugProgramLimits(
                 out var memoryLimit, // переменная, хранящая значение лимита по памяти
                 out var timeLimit // переменная, хранящая значение лимита по процессорному времени
@@ -54,6 +56,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * и получаем всё необходимое для тестирования
              * пользовательской программы
              */
+
             var authorTestingResult = new ProgramTester(
                 ref authorLanguageConfiguration,
                 ref authorCompilerPlugin,
@@ -76,6 +79,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * об  ошибке  в  лог-файлах  сервера и прочих
              * местах, где это важно и необходимо.
              */
+
             if (authorTestingResult.Result != TestResult.MiddleSuccessResult)
                 throw new SimplePM_Exceptions.AuthorSolutionRunningException();
 
@@ -108,6 +112,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * решения поставленной задачи и получаем всё
              * необходимое для тестирования программы.
              */
+
             var userTestingResult = new ProgramTester(
                 ref userLanguageConfiguration,
                 ref userCompilerPlugin,
@@ -126,12 +131,13 @@ namespace SimplePM_Server.SimplePM_Tester
              * тестам и выдвигаем остаточный результат debug
              * тестирования пользовательского решения задачи.
              */
+            
             if (userTestingResult.Result == TestResult.MiddleSuccessResult)
             {
 
                 userTestingResult.Result = (
                     Convert.ToBase64String(userTestingResult.Output) == Convert.ToBase64String(authorTestingResult.Output)
-                ) ? '+' : '-';
+                ) ? TestResult.FullSuccessResult : TestResult.FullNoSuccessResult;
 
             }
 
@@ -142,6 +148,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * непосредственно при тестировании данного
              * пользовательского решения данной задачи.
              */
+
             var programTestingResult = new ProgramTestingResult(1)
             {
 
@@ -157,6 +164,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * тестирования пользовательского
              * решения поставленной задачи.
              */
+
             return programTestingResult;
 
         }

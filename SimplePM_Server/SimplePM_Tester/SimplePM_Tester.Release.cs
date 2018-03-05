@@ -10,8 +10,6 @@
  */
 
 using System;
-using System.Web;
-using System.Text;
 using CompilerBase;
 using ReleaseTestInfo;
 using MySql.Data.MySqlClient;
@@ -163,8 +161,10 @@ namespace SimplePM_Server.SimplePM_Tester
                 ;
             ";
 
-            // Отправляем запрос на сервер БД
+            // Создаём запрос на выборку из БД
             var cmdSelect = new MySqlCommand(querySelect, connection);
+
+            // Добавляем параметры запроса
             cmdSelect.Parameters.AddWithValue(
                 "@problemId",
                 submissionInfo.ProblemInformation.ProblemId
@@ -207,7 +207,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
                     // Уникальный идентификатор теста
                     int.Parse(
-                        HttpUtility.HtmlDecode(dataReader["id"].ToString())
+                        dataReader["id"].ToString()
                     ),
 
                     // Входные данные
@@ -218,12 +218,12 @@ namespace SimplePM_Server.SimplePM_Tester
 
                     // Лимит используемой памяти
                     long.Parse(
-                        HttpUtility.HtmlDecode(dataReader["memoryLimit"].ToString())
+                       dataReader["memoryLimit"].ToString()
                     ),
 
                     // Лимит используемого процессорного времени
                     int.Parse(
-                        HttpUtility.HtmlDecode(dataReader["timeLimit"].ToString())
+                        dataReader["timeLimit"].ToString()
                     )
 
                 );
