@@ -1,0 +1,60 @@
+[DEBREATE-0.7.13]
+<<CTRL>>
+Package: simplepm-server-2
+Version: 2.0
+Maintainer: Sirkadirov Team <admin@sirkadirov.com>
+Section: net
+Source: https://github.com/SirkadirovTeam/SimplePM_Server/
+Homepage: https://spm.sirkadirov.com/
+Architecture: amd64
+Priority: standard
+Recommends: fpc, lua5.2, gcc, mono-complete
+Description: Submissions testing subsystem for SimplePM
+ SimplePM Server - submissions testing subsystem for SimplePM
+
+<</CTRL>>
+<<FILES>>
+0
+<</FILES>>
+<<SCRIPTS>>
+<<PREINST>>
+0
+<</PREINST>>
+<<POSTINST>>
+0
+<</POSTINST>>
+<<PRERM>>
+0
+<</PRERM>>
+<<POSTRM>>
+0
+<</POSTRM>>
+<</SCRIPTS>>
+<<CHANGELOG>>
+<<DEST>>DEFAULT<</DEST>>
+
+<</CHANGELOG>>
+<<COPYRIGHT>>
+Copyright © 2018 Kadirov Yurij, Sirkadirov Team and contributors. All rights reserved.
+
+This software is licensed by SimplePM EULA, for more information visit https://spm.sirkadirov.com/
+
+Source code is licensed under Apache License 2.0 with additional restrictions.
+<</COPYRIGHT>>
+<<MENU>>
+1
+Name=SimplePM_Server
+Version=1.0
+Exec=SimplePM_Server.exe
+Type=Application
+Terminal=true
+StartupNotify=true
+Encoding=UTF-8
+Categories=Wine;Network;Development;Application;Utility;
+<</MENU>>
+<<BUILD>>
+1
+1
+1
+strip
+<</BUILD>>
