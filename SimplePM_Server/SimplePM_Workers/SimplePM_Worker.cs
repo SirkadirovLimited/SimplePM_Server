@@ -541,10 +541,7 @@ namespace SimplePM_Server
                         ),
                         conn
                     );
-
-                    // Добавляем в запрос требуемые параметры
-                    sqlCmd.Parameters.AddWithValue("@EnabledLanguages", EnabledLangs);
-
+                    
                     // Выполняем запрос к БД и получаем ответ
                     var dataReader = sqlCmd.ExecuteReader();
 
