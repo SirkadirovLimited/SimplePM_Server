@@ -289,59 +289,127 @@ namespace SimplePM_Server
                 cResult.ExeFullname,
                 ref _submissionInfo
             );
-            
+
             /*
-             * В зависимости от выбранного пользователем
-             * типа тестирования выполняем специфические
-             * операции по отношению к решению задачи.
+             * Выполняем тестирование в блоке обработки
+             * исключительных систуаций,  и,  в  случае
+             * возникновения такой  ситуации записываем
+             * данные о ней в лог-файл  и  искусственно
+             * создаём     результаты      тестирования
+             * пользовательского решения задачи.
              */
 
-            switch (_submissionInfo.TestType)
+            try
             {
 
-                /* Проверка синтаксиса */
-                case "syntax":
+                /*
+                 * В зависимости от выбранного пользователем
+                 * типа тестирования выполняем специфические
+                 * операции по отношению к решению задачи.
+                 */
+
+                switch (_submissionInfo.TestType)
+                {
+
+                    /* Проверка синтаксиса */
+                    case "syntax":
+
+                        /*
+                         * Вызываем   метод,   который   создаёт
+                         * иллюзию  проверки   пользовательского
+                         * решения    поставленной    задачи   и
+                         * возвращает результаты своей "работы".
+                         */
+
+                        tmpResult = tester.Syntax();
+
+                        break;
+
+                    /* Debug-тестирование */
+                    case "debug":
+
+                        /*
+                         * Вызываем метод Debug-тестирования
+                         * пользовательского решения постав-
+                         * ленной задачи по программированию
+                         */
+
+                        tmpResult = tester.Debug();
+
+                        break;
+
+                    /* Release-тестирование */
+                    case "release":
+
+                        /*
+                         * Вызываем метод Release-тестирования
+                         * пользовательского  решения  постав-
+                         * ленной задачи  по  программированию
+                         */
+
+                        tmpResult = tester.Release(
+                            ref compilerConfiguration,
+                            ref compilerPlugin
+                        );
+
+                        break;
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                // Записываем информацию об исключении в лог
+                logger.Error(ex);
+
+                /*
+                 * Создаём псевдорезультат тестирования,
+                 * который будет содержать информацию о
+                 * возникшем во время тестирования поль-
+                 * зовательского решения задачи исключе-
+                 * нии.
+                 */
+
+                tmpResult = new ProgramTestingResult(1)
+                {
 
                     /*
-                     * Вызываем   метод,   который   создаёт
-                     * иллюзию  проверки   пользовательского
-                     * решения    поставленной    задачи   и
-                     * возвращает результаты своей "работы".
+                     * Создаём превдотест и добавляем его
+                     * в массив результатов тестирования.
                      */
-                    
-                    tmpResult = tester.Syntax();
+                    TestingResults =
+                    {
 
-                    break;
+                        [0] = new TestResult
+                        {
+                            
+                            // За код выхода принимаем номер исклбчения
+                            ExitCode = ex.HResult,
 
-                /* Debug-тестирование */
-                case "debug":
+                            // За выходной поток ошибок принимаем исключение
+                            ErrorOutput = ex.ToString(),
 
-                    /*
-                     * Вызываем метод Debug-тестирования
-                     * пользовательского решения постав-
-                     * ленной задачи по программированию
-                     */
+                            // Заполняем выходные данные информацией (not null)
+                            Output = Encoding.UTF8.GetBytes("An exception occured during testing!"),
 
-                    tmpResult = tester.Debug();
+                            // Устанавливаем результат тестирования
+                            Result = TestResult.ErrorOutputNotNullResult,
 
-                    break;
+                            /*
+                             * Указываем, что память и процессорное
+                             * время не были использованы.
+                             */
 
-                /* Release-тестирование */
-                case "release":
+                            UsedMemory = 0,
+                            UsedProcessorTime = 0
 
-                    /*
-                     * Вызываем метод Release-тестирования
-                     * пользовательского  решения  постав-
-                     * ленной задачи  по  программированию
-                     */
+                        }
 
-                    tmpResult = tester.Release(
-                        ref compilerConfiguration,
-                        ref compilerPlugin
-                    );
+                    }
 
-                    break;
-                    
+                };
+
             }
 
             /*
@@ -385,26 +453,55 @@ namespace SimplePM_Server
              * запроса к базе данных.
              */
             
-            // Идентификационные данные
-            updateSqlCommand.Parameters.AddWithValue("@param_submissionId", _submissionInfo.SubmissionId);
+            updateSqlCommand.Parameters.AddWithValue(
+                "@param_submissionId",
+                _submissionInfo.SubmissionId
+            ); // Идентификатор запроса
             
-            // Информация компилятора
-            updateSqlCommand.Parameters.AddWithValue("@param_hasError", Convert.ToInt32(cResult.HasErrors));
-            updateSqlCommand.Parameters.AddWithValue("@param_compiler_text", cResult.CompilerMessage);
+            updateSqlCommand.Parameters.AddWithValue(
+                "@param_hasError",
+                Convert.ToInt32(cResult.HasErrors)
+            ); // Сигнал об ошибке при компиляции
 
-            // Вывод решения
-            updateSqlCommand.Parameters.AddWithValue("@param_errorOutput", Encoding.UTF8.GetBytes(ptResult.GetErrorOutputAsLine()));
-            updateSqlCommand.Parameters.AddWithValue("@param_output",
-                ptResult.TestingResults[ptResult.TestingResults.Length - 1].Output);
-            updateSqlCommand.Parameters.AddWithValue("@param_exitcodes", ptResult.GetExitCodesAsLine('|'));
-            updateSqlCommand.Parameters.AddWithValue("@param_usedProcTime", ptResult.GetUsedProcessorTimeAsLine('|'));
-            updateSqlCommand.Parameters.AddWithValue("@param_usedMemory", ptResult.GetUsedMemoryAsLine('|'));
+            updateSqlCommand.Parameters.AddWithValue(
+                "@param_compiler_text",
+                cResult.CompilerMessage
+            ); // Вывод компилятора
+            
+            updateSqlCommand.Parameters.AddWithValue(
+                "@param_errorOutput",
+                Encoding.UTF8.GetBytes(ptResult.GetErrorOutputAsLine())
+            ); // Вывод ошибок решения
 
-            // Результаты тестирования
-            updateSqlCommand.Parameters.AddWithValue("@param_result", ptResult.GetResultAsLine('|'));
+            updateSqlCommand.Parameters.AddWithValue(
+                "@param_output",
+                ptResult.TestingResults[ptResult.TestingResults.Length - 1].Output
+            ); // Вывод решения
 
-            // Полученный рейтинг решения
-            updateSqlCommand.Parameters.AddWithValue("@param_rating", 0); //TODO
+            updateSqlCommand.Parameters.AddWithValue(
+                "@param_exitcodes",
+                ptResult.GetExitCodesAsLine('|')
+            ); // Коды выхода решения
+
+            updateSqlCommand.Parameters.AddWithValue(
+                "@param_usedProcTime",
+                ptResult.GetUsedProcessorTimeAsLine('|')
+            ); // Использованное процессорное время решения
+
+            updateSqlCommand.Parameters.AddWithValue(
+                "@param_usedMemory",
+                ptResult.GetUsedMemoryAsLine('|')
+            ); // Использованная память решения
+            
+            updateSqlCommand.Parameters.AddWithValue(
+                "@param_result",
+                ptResult.GetResultAsLine('|')
+            ); // Потестовые результаты решения
+            
+            updateSqlCommand.Parameters.AddWithValue(
+                "@param_rating",
+                0
+            ); // Полученный рейтинг за решение
 
             /*
              * Выполняем запрос к базе данных
@@ -443,7 +540,13 @@ namespace SimplePM_Server
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized);
 
             }
-            catch (Exception) { /* Deal with it. */ }
+            catch (Exception ex)
+            {
+
+                // Записываем исключение в лог
+                logger.Warn("Cache clearing failed: " + ex);
+
+            }
 
         }
         
