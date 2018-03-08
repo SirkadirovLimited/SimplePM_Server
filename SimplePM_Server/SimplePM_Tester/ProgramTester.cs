@@ -478,12 +478,8 @@ namespace SimplePM_Server.SimplePM_Tester
                 Result = _testingResult,
 
                 // Информация об использовании ресурсов
-                UsedMemory = _programProcess.PeakWorkingSet64,
-                UsedProcessorTime = Convert.ToInt32(
-                    Math.Round(
-                        _programProcess.TotalProcessorTime.TotalMilliseconds
-                    )
-                )
+                UsedMemory = UsedMemory,
+                UsedProcessorTime = UsedProcessorTime
 
             };
 

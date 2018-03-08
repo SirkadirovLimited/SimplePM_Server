@@ -188,7 +188,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * компиляционного модуля для данного
              * языка программирования.
              */
-
+            
             authorLanguageConfiguration = SimplePM_Compiler.GetCompilerConfig(
                 ref _languageConfigurations,
                 submissionInfo.ProblemInformation.AuthorSolutionCodeLanguage
@@ -205,7 +205,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 ref _compilerPlugins,
                 (string)authorLanguageConfiguration.module_name
             );
-
+            
             /*
              * Компиляция авторского решения
              * поставленной задачи с последующим
