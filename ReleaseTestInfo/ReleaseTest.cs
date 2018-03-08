@@ -12,7 +12,7 @@
 namespace ReleaseTestInfo
 {
     
-    public class ReleaseTest
+    public class ReleaseTestInfo
     {
 
         public int Id { get; } //!< Уникальный идентификатор теста
@@ -23,7 +23,7 @@ namespace ReleaseTestInfo
         public long MemoryLimit { get; } //!< Лимит по используемой памяти
         public int ProcessorTimeLimit { get; } //!< Лимит по используемому процессорному времени
 
-        public ReleaseTest(int id, byte[] input, byte[] output, long memoryLimit, int timeLimit)
+        public ReleaseTestInfo(int id, byte[] input, byte[] output, long memoryLimit, int timeLimit)
         {
 
             /*

@@ -12,7 +12,6 @@
 using System;
 using System.Text;
 using CompilerBase;
-using ReleaseTestInfo;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 
@@ -139,7 +138,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
         }
 
-        private Queue<ReleaseTest> GetTestsInfo()
+        private Queue<ReleaseTestInfo.ReleaseTestInfo> GetTestsInfo()
         {
 
             /*
@@ -184,8 +183,8 @@ namespace SimplePM_Server.SimplePM_Tester
              * жащие  информацию о релизных
              * тестах для заданной  задачи.
              */
-
-            var testsQueue = new Queue<ReleaseTest>();
+            
+            var testsQueue = new Queue<ReleaseTestInfo.ReleaseTestInfo>();
 
             /*
              * В цикле занимаемся обработкой
@@ -204,7 +203,7 @@ namespace SimplePM_Server.SimplePM_Tester
                  * тестов пользовательских решений.
                  */
 
-                var testInfo = new ReleaseTest(
+                var testInfo = new ReleaseTestInfo.ReleaseTestInfo(
 
                     // Уникальный идентификатор теста
                     int.Parse(
