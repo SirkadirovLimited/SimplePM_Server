@@ -311,6 +311,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Возвращаем промежуточный
              * результат тестирования.
              */
+
             return GenerateTestResult();
 
         }
@@ -357,10 +358,58 @@ namespace SimplePM_Server.SimplePM_Tester
             _programProcess.Exited += ProgramProcess_Exited;
 
         }
+        
+        private TestResult GenerateTestResult()
+        {
+            
+            /*
+             * Генерируем результат тестирования
+             * пользовательской   программы   на
+             * текущем тесте.
+             */
+
+            var result = new TestResult
+            {
+
+                // Выходные данные из стандартного потока
+                ErrorOutput = _programErrorOutput,
+                Output = Encoding.UTF8.GetBytes(
+                    (_adaptOutput)
+                        ? _programOutput.TrimEnd('\r', '\n')
+                        : _programOutput
+                ),
+
+                // Результаты предварительного тестирования
+                ExitCode = _programProcess.ExitCode,
+                Result = _testingResult,
+
+                // Информация об использовании ресурсов
+                UsedMemory = UsedMemory,
+                UsedProcessorTime = UsedProcessorTime
+
+            };
+
+            /*
+             * Освобождаем все связанные
+             * с процессом ресурсы.
+             */
+
+            _programProcess.Close();
+            _programProcess.Dispose();
+
+            /*
+             * Возвращаем сгенерированный выше результат
+             */
+
+            return result;
+
+        }
+
+        #region Методы записи входных данных
 
         private void WriteInputString()
         {
-            
+
             /*
              * Для обеспечения безопасности
              * отлавливаем все исключения.
@@ -374,7 +423,7 @@ namespace SimplePM_Server.SimplePM_Tester
                         _programInputBytes
                     )
                 );
-                
+
                 // Очищаем буферы
                 _programProcess.StandardInput.Flush();
 
@@ -453,54 +502,10 @@ namespace SimplePM_Server.SimplePM_Tester
                 _testingResult = TestResult.InputErrorResult;
 
             }
-            
-        }
-
-        private TestResult GenerateTestResult()
-        {
-            
-            /*
-             * Генерируем результат тестирования
-             * пользовательской   программы   на
-             * текущем тесте.
-             */
-
-            var result = new TestResult
-            {
-
-                // Выходные данные из стандартного потока
-                ErrorOutput = _programErrorOutput,
-                Output = Encoding.UTF8.GetBytes(
-                    (_adaptOutput)
-                        ? _programOutput.TrimEnd('\r', '\n')
-                        : _programOutput
-                ),
-
-                // Результаты предварительного тестирования
-                ExitCode = _programProcess.ExitCode,
-                Result = _testingResult,
-
-                // Информация об использовании ресурсов
-                UsedMemory = UsedMemory,
-                UsedProcessorTime = UsedProcessorTime
-
-            };
-
-            /*
-             * Освобождаем все связанные
-             * с процессом ресурсы.
-             */
-
-            _programProcess.Close();
-            _programProcess.Dispose();
-
-            /*
-             * Возвращаем сгенерированный выше результат
-             */
-
-            return result;
 
         }
+
+        #endregion
 
         #region Обработчики событий
 
@@ -547,8 +552,10 @@ namespace SimplePM_Server.SimplePM_Tester
 
             if (checker)
             {
+
                 _testingResultReceived = true;
                 _testingResult = TestResult.RuntimeErrorResult;
+
             }
 
             /*
@@ -593,6 +600,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Если результат тестирования уже
              * имеется, не стоит ничего делать
              */
+
             if (_testingResultReceived)
                 return;
             
