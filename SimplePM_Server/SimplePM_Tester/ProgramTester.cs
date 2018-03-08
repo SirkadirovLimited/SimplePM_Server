@@ -423,7 +423,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
                 // Получаем полный путь к файлу с входными данными
                 var inputFilePath = Path.Combine(
-                    new FileInfo(_programPath).DirectoryName,
+                    new FileInfo(_programPath).DirectoryName ?? throw new DirectoryNotFoundException(),
                     "input.txt"
                 );
 
@@ -513,12 +513,14 @@ namespace SimplePM_Server.SimplePM_Tester
              */
 
             var checker = !_testingResultReceived && _programMemoryLimit > 0 &&
-                           _programProcess.PeakWorkingSet64 > _programMemoryLimit;
+                           UsedMemory > _programMemoryLimit;
 
             if (checker)
             {
+
                 _testingResultReceived = true;
                 _testingResult = TestResult.MemoryLimitResult;
+
             }
 
             /*
@@ -526,17 +528,14 @@ namespace SimplePM_Server.SimplePM_Tester
              */
 
             checker = !_testingResultReceived && _programProcessorTimeLimit > 0 &&
-                      Convert.ToInt32(
-                          Math.Round(
-                              _programProcess.TotalProcessorTime.TotalMilliseconds
-                          )
-                      ) >
-                        _programProcessorTimeLimit;
+                      UsedProcessorTime >  _programProcessorTimeLimit;
 
             if (checker)
             {
+
                 _testingResultReceived = true;
                 _testingResult = TestResult.TimeLimitResult;
+
             }
 
             /*
