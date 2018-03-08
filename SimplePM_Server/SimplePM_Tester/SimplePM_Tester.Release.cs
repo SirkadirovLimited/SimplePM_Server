@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Text;
 using CompilerBase;
 using ReleaseTestInfo;
 using MySql.Data.MySqlClient;
@@ -91,7 +92,7 @@ namespace SimplePM_Server.SimplePM_Tester
                     currentTest.MemoryLimit,
                     currentTest.ProcessorTimeLimit,
                     currentTest.InputData,
-                    currentTest.OutputData.Length * 2,
+                    Encoding.UTF8.GetString(currentTest.OutputData).Length * 2,
                     submissionInfo.ProblemInformation.AdaptProgramOutput
                 ).RunTesting();
 

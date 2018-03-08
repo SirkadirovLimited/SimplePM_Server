@@ -11,6 +11,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 using CompilerBase;
 using MySql.Data.MySqlClient;
 
@@ -121,7 +122,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 memoryLimit,
                 timeLimit,
                 submissionInfo.CustomTest,
-                authorTestingResult.Output.Length,
+                Encoding.UTF8.GetString(authorTestingResult.Output).Length,
                 submissionInfo.ProblemInformation.AdaptProgramOutput
             ).RunTesting();
             
@@ -135,10 +136,11 @@ namespace SimplePM_Server.SimplePM_Tester
             if (userTestingResult.Result == TestResult.MiddleSuccessResult)
             {
 
-                userTestingResult.Result = (
+                userTestingResult.Result =
                     Convert.ToBase64String(userTestingResult.Output) == Convert.ToBase64String(authorTestingResult.Output)
-                ) ? TestResult.FullSuccessResult : TestResult.FullNoSuccessResult;
-
+                    ? TestResult.FullSuccessResult
+                    : TestResult.FullNoSuccessResult;
+                
             }
 
             /*

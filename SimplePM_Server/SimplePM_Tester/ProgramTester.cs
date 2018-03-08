@@ -271,6 +271,9 @@ namespace SimplePM_Server.SimplePM_Tester
                 // Запускаем пользовательский процесс
                 _programProcess.Start();
 
+                // Сигнализируем о готовности чтения выходного потока
+                _programProcess.BeginOutputReadLine();
+
                 /*
                  * Записываем входные
                  * данные во  входной
@@ -619,9 +622,13 @@ namespace SimplePM_Server.SimplePM_Tester
              * в соответственную переменную.
              */
 
-            var adaptedString = (_adaptOutput) ? e.Data.Trim() : e.Data;
-
-            _programOutput += (_programOutput.Length > 0) ? adaptedString : adaptedString + '\n';
+            var adaptedString = (_adaptOutput)
+                ? e.Data.Trim()
+                : e.Data;
+            
+            _programOutput += (_programOutput.Length > 0)
+                ? adaptedString
+                : adaptedString + '\n';
 
         }
 
