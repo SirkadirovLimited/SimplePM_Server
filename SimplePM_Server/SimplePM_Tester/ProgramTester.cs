@@ -145,6 +145,13 @@ namespace SimplePM_Server.SimplePM_Tester
                             if (_programProcess.PeakWorkingSet64 > _programMemoryLimit)
                                 _programProcess.Kill();
 
+                            /*
+                             * Записываем   преждевременный   результат
+                             * тестирования пользовательской программы.
+                             */
+                            _testingResultReceived = true;
+                            _testingResult = TestResult.MemoryLimitResult;
+
                         }
 
                     }
@@ -200,6 +207,13 @@ namespace SimplePM_Server.SimplePM_Tester
                              */
                             if (Convert.ToInt32(Math.Round(_programProcess.TotalProcessorTime.TotalMilliseconds)) > _programProcessorTimeLimit)
                                 _programProcess.Kill();
+
+                            /*
+                             * Записываем   преждевременный   результат
+                             * тестирования пользовательской программы.
+                             */
+                            _testingResultReceived = true;
+                            _testingResult = TestResult.TimeLimitResult;
 
                         }
 
