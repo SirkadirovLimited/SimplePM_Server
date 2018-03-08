@@ -75,6 +75,13 @@ namespace SimplePM_Server.SimplePM_Tester
 
         #endregion
 
+        #region Секция объявления переменных статистики процесса
+
+        private long UsedMemory;
+        private int UsedProcessorTime;
+
+        #endregion
+
         public ProgramTester(
             ref dynamic compilerConfiguration,
             ref ICompilerPlugin _compilerPlugin,
@@ -110,61 +117,64 @@ namespace SimplePM_Server.SimplePM_Tester
         {
 
             /*
-             * Выполняем необходимые действия
-             * лишь в том случае, когда лимит
-             * по памяти активирован
+             * Создаём  новую  задачу и
+             * ставим её на выполнение.
              */
-            if (_programMemoryLimit > 0)
-            {
 
-                /*
-                 * Создаём  новую  задачу и
-                 * ставим её на выполнение.
-                 */
-                new Task(() => {
+            new Task(() => {
 
-                    // Защита от всевозможных исключений
-                    try
+                // Защита от всевозможных исключений
+
+                try
+                {
+
+                    /*
+                     * Крутим цикл пока пользовательский
+                     * процесс не завершится.
+                     */
+
+                    while (!_programProcess.HasExited)
                     {
 
+                        // Удаляем весь кэш, связанный с компонентом
+                        _programProcess.Refresh();
+
+                        // Получаем текущее значение свойства
+                        UsedMemory = _programProcess.PeakWorkingSet64;
+
                         /*
-                         * Крутим цикл пока пользовательский
-                         * процесс не завершится.
+                         * Проверяем  на  превышение  лимита
+                         * и в случае обнаружения, "убиваем"
+                         * процесс.
                          */
-                        while (!_programProcess.HasExited)
+                        
+                        if (_programMemoryLimit > 0 && UsedMemory > _programMemoryLimit)
                         {
 
-                            // Удаляем весь кэш, связанный с компонентом
-                            _programProcess.Refresh();
-
-                            /*
-                             * Проверяем  на  превышение  лимита
-                             * и в случае обнаружения, "убиваем"
-                             * процесс.
-                             */
-                            if (_programProcess.PeakWorkingSet64 > _programMemoryLimit)
-                                _programProcess.Kill();
+                            // Убиваем процесс
+                            _programProcess.Kill();
 
                             /*
                              * Записываем   преждевременный   результат
                              * тестирования пользовательской программы.
                              */
+
                             _testingResultReceived = true;
                             _testingResult = TestResult.MemoryLimitResult;
 
                         }
-
-                    }
-                    catch (Exception)
-                    {
-
-                        /* Deal with it */
-
+                        
                     }
 
-                }).Start();
+                }
+                catch (Exception)
+                {
 
-            }
+                    /* Deal with it */
+
+                }
+
+            }).Start();
 
         }
 
@@ -172,62 +182,69 @@ namespace SimplePM_Server.SimplePM_Tester
         {
 
             /*
-             * Выполняем необходимые действия
-             * лишь  в  том   случае,   когда
-             * лимит по процессорному времени
-             * активирован
+             * Создаём  новую  задачу и
+             * ставим её на выполнение.
              */
-            if (_programProcessorTimeLimit > 0)
-            {
 
-                /*
-                 * Создаём  новую  задачу и
-                 * ставим её на выполнение.
-                 */
-                new Task(() => {
+            new Task(() => {
 
-                    // Защита от всевозможных исключений
-                    try
+                // Защита от всевозможных исключений
+
+                try
+                {
+
+                    /*
+                     * Крутим цикл пока пользовательский
+                     * процесс не завершится.
+                     */
+
+                    while (!_programProcess.HasExited)
                     {
 
+                        // Удаляем весь кэш, связанный с компонентом
+                        _programProcess.Refresh();
+
+                        // Получаем текущее значение свойства
+                        UsedProcessorTime = Convert.ToInt32(
+                            Math.Round(
+                                _programProcess.TotalProcessorTime.TotalMilliseconds
+                            )
+                        );
+
+
                         /*
-                         * Крутим цикл пока пользовательский
-                         * процесс не завершится.
+                         * Проверяем  на  превышение  лимита
+                         * и в случае обнаружения, "убиваем"
+                         * процесс.
                          */
-                        while (!_programProcess.HasExited)
+
+                        if (_programProcessorTimeLimit > 0 && UsedProcessorTime > _programProcessorTimeLimit)
                         {
 
-                            // Удаляем весь кэш, связанный с компонентом
-                            _programProcess.Refresh();
-
-                            /*
-                             * Проверяем  на  превышение  лимита
-                             * и в случае обнаружения, "убиваем"
-                             * процесс.
-                             */
-                            if (Convert.ToInt32(Math.Round(_programProcess.TotalProcessorTime.TotalMilliseconds)) > _programProcessorTimeLimit)
-                                _programProcess.Kill();
+                            // Убиваем процесс
+                            _programProcess.Kill();
 
                             /*
                              * Записываем   преждевременный   результат
                              * тестирования пользовательской программы.
                              */
+
                             _testingResultReceived = true;
                             _testingResult = TestResult.TimeLimitResult;
 
                         }
 
                     }
-                    catch (Exception)
-                    {
 
-                        /* Deal with it */
+                }
+                catch (Exception)
+                {
 
-                    }
+                    /* Deal with it */
 
-                }).Start();
+                }
 
-            }
+            }).Start();
 
         }
 
@@ -476,6 +493,7 @@ namespace SimplePM_Server.SimplePM_Tester
              */
 
             _programProcess.Close();
+            _programProcess.Dispose();
 
             /*
              * Возвращаем сгенерированный выше результат
