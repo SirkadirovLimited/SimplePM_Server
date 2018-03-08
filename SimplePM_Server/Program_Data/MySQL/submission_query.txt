@@ -1,3 +1,4 @@
+START TRANSACTION; 
 SELECT 
 	`spm_problems`.`difficulty`, 
 	`spm_problems`.`adaptProgramOutput`, 
@@ -28,4 +29,4 @@ ORDER BY
 	`time` ASC 
 LIMIT 
 	1
-;
+FOR UPDATE;
