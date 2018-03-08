@@ -31,8 +31,8 @@ namespace SimplePM_Server.SimplePM_Tester
 
         #region Секция объявления глобальных переменных
 
-        private dynamic _compilerConfiguration;
-        private ICompilerPlugin _compilerPlugin;
+        private dynamic _compilerConfiguration; // конфигурация модулей компиляции
+        private ICompilerPlugin _compilerPlugin; // компиляционные плагины (модули)
 
         private readonly string _programPath; // путь к исполняемому файлу
         private readonly string _programArguments; // аргументы запуска
@@ -69,7 +69,7 @@ namespace SimplePM_Server.SimplePM_Tester
             ErrorDialog = false,
 
             Arguments = "",
-            FileName = ""
+            FileName = "",
             
         };
 
@@ -87,7 +87,7 @@ namespace SimplePM_Server.SimplePM_Tester
             bool adaptOutput = true
         )
         {
-
+            
             _compilerConfiguration = compilerConfiguration;
             this._compilerPlugin = _compilerPlugin;
 
@@ -285,6 +285,19 @@ namespace SimplePM_Server.SimplePM_Tester
         {
 
             /*
+             * Инициализация необходимых для
+             * тестирования переменных
+             */
+            
+            _programProcess = new Process
+            {
+
+                StartInfo = programStartInfo, // устанавливаем информацию о программе
+                EnableRaisingEvents = true, // указываем, что хотим обрабатывать события
+
+            };
+
+            /*
              * Управление методом запуска
              * пользовательского процесса
              */
@@ -302,19 +315,6 @@ namespace SimplePM_Server.SimplePM_Tester
             ProgramTestingFunctions.SetProcessRunAs(
                 ref _programProcess
             );
-
-            /*
-             * Инициализация необходимых для
-             * тестирования переменных
-             */
-            
-            _programProcess = new Process
-            {
-                
-                StartInfo = programStartInfo, // устанавливаем информацию о программе
-                EnableRaisingEvents = true, // указываем, что хотим обрабатывать события
-
-            };
             
             /*
              * Добавляем обработчики для некоторых событий
