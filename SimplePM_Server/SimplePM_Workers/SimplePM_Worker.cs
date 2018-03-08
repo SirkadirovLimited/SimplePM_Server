@@ -12,7 +12,6 @@
 using NLog;
 using System;
 using System.IO;
-using System.Web;
 using NLog.Config;
 using CompilerBase;
 using SubmissionInfo;
@@ -195,12 +194,12 @@ namespace SimplePM_Server
                 if (compilerConfig.enabled != "true") continue;
 
                 // Добавляем текущую конфигурацию в список
-                EnabledLangsList.Add("'" + compilerConfig.language_name + "'");
+                EnabledLangsList.Add("'" + (string)compilerConfig.language_name + "'");
 
                 // Записываем информацию об этом в лог-файл
                 logger.Debug(
                     "Compiler configuration '" +
-                    compilerConfig.language_name +
+                    (string)compilerConfig.language_name +
                     "' loaded!"
                 );
 
@@ -279,11 +278,11 @@ namespace SimplePM_Server
             {
 
                 /* Удаляем все файлы в папке */
-                foreach (var file in Directory.GetFiles((string)_serverConfiguration.path.temp))
+                foreach (var file in Directory.GetFiles((string)(_serverConfiguration.path.temp)))
                     File.Delete(file);
 
                 /* Удаляем все директории в папке */
-                foreach (var dir in Directory.GetDirectories((string)_serverConfiguration.path.temp))
+                foreach (var dir in Directory.GetDirectories((string)(_serverConfiguration.path.temp)))
                     Directory.Delete(dir, true);
 
             }
@@ -522,18 +521,32 @@ namespace SimplePM_Server
                 try
                 {
 
+                    // Записываем в лог информацию о событии
                     logger.Trace(
                         "Starting submission query; Running threads: " +
                         _aliveTestersCount + " from " +
                         (ulong)_serverConfiguration.submission.max_threads
                     );
                     
-                    var sqlCmd = new MySqlCommand(Properties.Resources.submission_query, conn);
+                    /*
+                     * Создаём новый запрос к базе данных на
+                     * выборку из неё информации  о  запросе
+                     * на тестирование.
+                     */
 
+                    var sqlCmd = new MySqlCommand(
+                        Properties.Resources.submission_query.Replace(
+                            "@EnabledLanguages",
+                            EnabledLangs
+                        ),
+                        conn
+                    );
+
+                    // Добавляем в запрос требуемые параметры
                     sqlCmd.Parameters.AddWithValue("@EnabledLanguages", EnabledLangs);
 
                     // Выполняем запрос к БД и получаем ответ
-                    MySqlDataReader dataReader = sqlCmd.ExecuteReader();
+                    var dataReader = sqlCmd.ExecuteReader();
 
                     // Объявляем временную переменную, так называемый "флаг"
                     bool f;
