@@ -29,6 +29,7 @@ namespace SimplePM_Server
              * SimplePM_Worker и вызываем
              * метод запуска сервера.
              */
+
             new SimplePM_Worker().Run(args);
 
         }
