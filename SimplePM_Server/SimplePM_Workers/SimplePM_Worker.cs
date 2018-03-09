@@ -116,6 +116,7 @@ namespace SimplePM_Server
                             (ICompilerPlugin)Activator.CreateInstance(type)
                         );
 
+                        // Записываем сообщение об успехе в лог-файл
                         logger.Debug("Plugin successfully loaded [" + pluginFilePath + "]");
 
                         // Выходим из цикла foreach
@@ -133,8 +134,7 @@ namespace SimplePM_Server
                      * лог-файле.
                      */
 
-                    logger.Debug("Plugin loading failed [" + pluginFilePath + "]:");
-                    logger.Debug(ex);
+                    logger.Debug("Plugin loading failed [" + pluginFilePath + "]:" + ex);
 
                 }
 
@@ -247,7 +247,10 @@ namespace SimplePM_Server
                 /* Deal with it */
             }
 
-            /* Устанавливаем обработчик необработанных исключений */
+            /*
+             * Устанавливаем обработчик необработанных исключений
+             */
+
             AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
             {
 
@@ -255,6 +258,7 @@ namespace SimplePM_Server
                  * Записываем сообщение об
                  * ошибке в журнал событий
                  */
+
                 logger.Fatal(e.ExceptionObject);
 
             };
@@ -271,14 +275,27 @@ namespace SimplePM_Server
         private void CleanTempDirectory()
         {
             
+            /*
+             * Блок обработки исключительных ситуаций
+             * в данном случае  необходим для обеспе-
+             * чения работы сервера проверки  решений
+             * даже без наличия некоторых видов прав.
+             */
+
             try
             {
 
-                /* Удаляем все файлы в папке */
+                /*
+                 * Удаляем все файлы в папке
+                 */
+
                 foreach (var file in Directory.GetFiles((string)(_serverConfiguration.path.temp)))
                     File.Delete(file);
 
-                /* Удаляем все директории в папке */
+                /*
+                 * Удаляем все директории в папке
+                 */
+
                 foreach (var dir in Directory.GetDirectories((string)(_serverConfiguration.path.temp)))
                     Directory.Delete(dir, true);
 
@@ -324,7 +341,10 @@ namespace SimplePM_Server
                 File.ReadAllText("./config/compilers.json")
             );
             
-            // Конфигурируем журнал событий (библиотека NLog)
+            /*
+             * Конфигурируем журнал событий (библиотека NLog)
+             */
+
             try
             {
 
@@ -339,11 +359,11 @@ namespace SimplePM_Server
             }
 
             /*
-             * В случае запроса на автоматическое
-             * выставление лимитов по обработке
-             * запросов на тестирование, необходимо
-             * их всё-таки выставить. Будем считать,
-             * что максимально возможное число
+             * В  случае  запроса  на  автоматическое
+             * выставление   лимитов   по   обработке
+             * запросов  на  тестирование, необходимо
+             * их всё-таки выставить.  Будем считать,
+             * что   максимально    возможное   число
              * одновременных проверок будет равняться
              * общему числу логических процессоров на
              * данной машине Тьюринга.
@@ -359,12 +379,14 @@ namespace SimplePM_Server
              * Вызываем метод, который загружает
              * модули компиляции в память.
              */
+
             LoadCompilerPlugins();
 
             /*
              * Вызываем метод, который загружает
              * плагины сервера в память.
              */
+
             //TODO:LoadServerPlugins();
 
             /*
@@ -377,6 +399,7 @@ namespace SimplePM_Server
              * ностям текущего экземпляра сервера проверки
              * пользовательских решений поставленных задач
              */
+
             GenerateEnabledLangsList();
             
         }
