@@ -501,7 +501,7 @@ namespace SimplePM_Server.SimplePM_Tester
                     // Указываем аттрибуты этого файла
                     File.SetAttributes(
                         inputFilePath,
-                        FileAttributes.Temporary
+                        FileAttributes.Temporary | FileAttributes.NotContentIndexed
                     );
 
                 }

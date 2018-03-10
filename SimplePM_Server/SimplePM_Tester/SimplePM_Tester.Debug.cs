@@ -80,10 +80,10 @@ namespace SimplePM_Server.SimplePM_Tester
              * об  ошибке  в  лог-файлах  сервера и прочих
              * местах, где это важно и необходимо.
              */
-
+            
             if (authorTestingResult.Result != TestResult.MiddleSuccessResult)
                 throw new SimplePM_Exceptions.AuthorSolutionRunningException();
-
+            
             /*
              * Получаем ссылку на объект, который
              * хранит информацию  о  конфигурации
@@ -221,27 +221,49 @@ namespace SimplePM_Server.SimplePM_Tester
             var tmpAuthorDir = (string)_serverConfiguration.path.temp + 
                 @"\author\" + Guid.NewGuid() + @"\";
 
-            // Создаём папку текущего авторского решения задачи
+            /*
+             * Создаём   папку   текущего
+             * авторского решения задачи.
+             */
+
             Directory.CreateDirectory(tmpAuthorDir);
 
-            // Определяем путь хранения файла исходного кода вторского решения
+            /*
+             * Определяем путь хранения
+             * файла   исходного   кода
+             * авторского решения.
+             */
+
             var tmpAuthorSrcLocation = 
                 tmpAuthorDir + "sa" + 
                 submissionInfo.SubmissionId + 
                 authorFileExt;
 
-            // Записываем исходный код авторского решения в заданный временный файл
-            File.WriteAllBytes(
-                tmpAuthorSrcLocation,
-                submissionInfo.ProblemInformation.AuthorSolutionCode
-            );
+            /*
+             * Для обеспечения безопасности синхронизируем потоки
+             */
 
-            // Устанавливаем его аттрибуты
-            File.SetAttributes(
-                tmpAuthorSrcLocation,
-                FileAttributes.Temporary | FileAttributes.NotContentIndexed
-            );
+            lock (new object())
+            {
 
+                /*
+                 * Записываем исходный код авторского
+                 * решения в заданный временный файл.
+                 */
+
+                File.WriteAllBytes(
+                    tmpAuthorSrcLocation,
+                    submissionInfo.ProblemInformation.AuthorSolutionCode
+                );
+
+                // Устанавливаем его аттрибуты
+                File.SetAttributes(
+                    tmpAuthorSrcLocation,
+                    FileAttributes.Temporary | FileAttributes.NotContentIndexed
+                );
+
+            }
+            
             // Инициализируем экземпляр класса компилятора
             var compiler = new SimplePM_Compiler(
                 ref authorLanguageConfiguration,
@@ -279,6 +301,7 @@ namespace SimplePM_Server.SimplePM_Tester
          * тестирования       пользовательских
          * решений  задач по программированию.
          */
+
         private void GetDebugProgramLimits(out int memoryLimit, out int timeLimit)
         {
 
@@ -343,6 +366,7 @@ namespace SimplePM_Server.SimplePM_Tester
                  * присутствие ошибки при попытке получения
                  * информации с базы данных системы.
                  */
+
                 throw new SimplePM_Exceptions.DatabaseQueryException();
 
             }
