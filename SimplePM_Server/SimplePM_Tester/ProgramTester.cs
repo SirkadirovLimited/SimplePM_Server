@@ -317,8 +317,16 @@ namespace SimplePM_Server.SimplePM_Tester
 
                     _programProcess.WaitForExit();
 
-                }
+                    /*
+                     * Формируем     промежуточный
+                     * результат      тестирования
+                     * пользовательской программы.
+                     */
 
+                    FormatTestResult();
+
+                }
+                
             }
             catch (Exception ex)
             {
@@ -344,7 +352,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 _programErrorOutput = ex.ToString();
 
             }
-
+            
             /*
              * Возвращаем промежуточный
              * результат тестирования.
@@ -565,6 +573,63 @@ namespace SimplePM_Server.SimplePM_Tester
         private void ProgramProcess_Exited(object sender, EventArgs e)
         {
             
+            
+
+        }
+        
+        private void ProgramProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+
+            /*
+             * Если результат тестирования уже
+             * имеется, не стоит ничего делать
+             *
+             * Если данные не получены, так же
+             * не стоит ничего делать.
+             */
+            
+            if (e.Data == null || _testingResultReceived)
+                return;
+            
+            /*
+             * Проверка на превышение лимита вывода
+             */
+
+            if (_outputCharsLimit > 0 && _programOutput.Length + e.Data.Length > _outputCharsLimit)
+            {
+
+                // Указываем, что результаты проверки уже есть
+                _testingResultReceived = true;
+
+                // Указываем результат тестирования
+                _testingResult = TestResult.OutputErrorResult;
+
+                // Добавляем сообщение пояснения
+                _programOutput = "=== OUTPUT CHARS LIMIT REACHED ===";
+
+                // Завершаем выполнение метода
+                return;
+
+            }
+
+            /*
+             * В ином случае дозаписываем данные
+             * в соответственную переменную.
+             */
+
+            var adaptedString = (_adaptOutput)
+                ? e.Data.Trim()
+                : e.Data;
+
+            _programOutput += (_programOutput.Length > 0)
+                ? adaptedString
+                : adaptedString + '\n';
+
+        }
+
+        private void FormatTestResult()
+        {
+
             /*
              * Проверка на использованную память
              */
@@ -585,7 +650,7 @@ namespace SimplePM_Server.SimplePM_Tester
              */
 
             checker = !_testingResultReceived && _programProcessorTimeLimit > 0 &&
-                      UsedProcessorTime >  _programProcessorTimeLimit;
+                      UsedProcessorTime > _programProcessorTimeLimit;
 
             if (checker)
             {
@@ -643,56 +708,6 @@ namespace SimplePM_Server.SimplePM_Tester
                 _testingResult = TestResult.MiddleSuccessResult;
 
             }
-
-        }
-
-        private void ProgramProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-
-            /*
-             * Если результат тестирования уже
-             * имеется, не стоит ничего делать
-             *
-             * Если данные не получены, так же
-             * не стоит ничего делать.
-             */
-
-            if (_testingResultReceived || e.Data == null)
-                return;
-            
-            /*
-             * Проверка на превышение лимита вывода
-             */
-
-            if (_outputCharsLimit > 0 && _programOutput.Length + e.Data.Length > _outputCharsLimit)
-            {
-
-                // Указываем, что результаты проверки уже есть
-                _testingResultReceived = true;
-
-                // Указываем результат тестирования
-                _testingResult = TestResult.OutputErrorResult;
-
-                // Добавляем сообщение пояснения
-                _programOutput = "=== OUTPUT CHARS LIMIT REACHED ===";
-
-                // Завершаем выполнение метода
-                return;
-
-            }
-
-            /*
-             * В ином случае дозаписываем данные
-             * в соответственную переменную.
-             */
-
-            var adaptedString = (_adaptOutput)
-                ? e.Data.Trim()
-                : e.Data;
-
-            _programOutput += (_programOutput.Length > 0)
-                ? adaptedString
-                : adaptedString + '\n';
 
         }
 
