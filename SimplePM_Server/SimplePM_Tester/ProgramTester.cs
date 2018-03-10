@@ -9,11 +9,12 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
+using NLog;
 using System;
+using System.IO;
 using System.Text;
 using CompilerBase;
 using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace SimplePM_Server.SimplePM_Tester
@@ -30,6 +31,14 @@ namespace SimplePM_Server.SimplePM_Tester
     {
 
         #region Секция объявления глобальных переменных
+
+        /*
+         * Объявляем переменную указателя
+         * на менеджер  журнала собылий и
+         * присваиваем  ей  указатель  на
+         * журнал событий текущего класса
+         */
+        private static readonly Logger logger = LogManager.GetLogger("SimplePM_Tester.ProgramTester");
 
         private dynamic _compilerConfiguration; // конфигурация модулей компиляции
         private ICompilerPlugin _compilerPlugin; // компиляционные плагины (модули)
@@ -50,7 +59,7 @@ namespace SimplePM_Server.SimplePM_Tester
         private Process _programProcess; // ссылка на дескриптор процесса
         
         private bool _testingResultReceived; // указывает, есть ли результат тестирования
-        private char _testingResult; // результат тестирования
+        private char _testingResult = TestResult.ServerErrorResult; // результат тестирования
         
         private ProcessStartInfo programStartInfo = new ProcessStartInfo
         {
@@ -253,58 +262,87 @@ namespace SimplePM_Server.SimplePM_Tester
         public TestResult RunTesting()
         {
 
-            // Инициализация всего необходимого
-            Init();
-
-            // Запись входных данных в файл
-            WriteInputFile();
-
-            /*
-             * Продолжаем тестирование лишь  в  случае
-             * отсутствия предопределённого результата
-             * тестирования.
-             */
-
-            if (!_testingResultReceived)
+            try
             {
 
-                // Запускаем пользовательский процесс
-                _programProcess.Start();
+                // Инициализация всего необходимого
+                Init();
 
-                // Сигнализируем о готовности чтения выходного потока
-                _programProcess.BeginOutputReadLine();
-
-                /*
-                 * Записываем входные
-                 * данные во  входной
-                 * поток.
-                 */
-
-                WriteInputString();
+                // Запись входных данных в файл
+                WriteInputFile();
 
                 /*
-                 * Вызываем метод, запускающий
-                 * слежение за памятью.
+                 * Продолжаем тестирование лишь  в  случае
+                 * отсутствия предопределённого результата
+                 * тестирования.
                  */
 
-                StartProcessorTimeLimitChecker();
+                if (!_testingResultReceived)
+                {
+
+                    // Запускаем пользовательский процесс
+                    _programProcess.Start();
+
+                    // Сигнализируем о готовности чтения выходного потока
+                    _programProcess.BeginOutputReadLine();
+
+                    /*
+                     * Записываем  входные
+                     * данные  во  входной
+                     * поток.
+                     */
+
+                    WriteInputString();
+
+                    /*
+                     * Вызываем метод, запускающий
+                     * слежение за памятью.
+                     */
+
+                    StartProcessorTimeLimitChecker();
+
+                    /*
+                     * Вызываем метод, запускающий
+                     * слежение  за   процессорным
+                     * временем.
+                     */
+
+                    StartMemoryLimitChecker();
+
+                    /*
+                     * Ожидаем завершения
+                     * пользовательского
+                     * процесса.
+                     */
+
+                    _programProcess.WaitForExit();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                // Записываем информацию об ошибке в лог-файл
+                logger.Error("An exception catched while trying to test user's submission: " + ex);
 
                 /*
-                 * Вызываем метод, запускающий
-                 * слежение  за   процессорным
-                 * временем.
+                 * Создаём псевдорезультаты
+                 * тестирования   пользова-
+                 * тельской программы.
                  */
 
-                StartMemoryLimitChecker();
+                _testingResultReceived = true;
+                _testingResult = TestResult.ErrorOutputNotNullResult;
 
                 /*
-                 * Ожидаем завершения
-                 * пользовательского
-                 * процесса.
+                 * Записываем    информацию  об  исключении
+                 * в выходной поток ошибок пользовательской
+                 * программы.
                  */
 
-                _programProcess.WaitForExit();
-                
+                _programErrorOutput = ex.ToString();
+
             }
 
             /*

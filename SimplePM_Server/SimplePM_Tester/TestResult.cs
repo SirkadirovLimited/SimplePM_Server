@@ -35,6 +35,7 @@ namespace SimplePM_Server.SimplePM_Tester
         public const char ErrorOutputNotNullResult = 'E'; // Поток ошибок не пустой
         public const char InputErrorResult = 'I'; // Ошибка записи входного потока
         public const char OutputErrorResult = 'O'; // Ошибка в формате выходного потока
+        public const char ServerErrorResult = 'C'; // Ошибка сервера проверки решений
         
         /*
          * Раздел объявления переменных
