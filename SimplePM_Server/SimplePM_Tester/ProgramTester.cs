@@ -414,6 +414,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Для обеспечения безопасности
              * отлавливаем все исключения.
              */
+
             try
             {
 
@@ -469,28 +470,42 @@ namespace SimplePM_Server.SimplePM_Tester
              * Для обеспечения безопасности выполняем все
              * действия  в  блоке  обработки  исключений.
              */
-
+            
             try
             {
+                
+                /*
+                 * Получаем полный путь к файлу с входными данными
+                 */
 
-                // Получаем полный путь к файлу с входными данными
                 var inputFilePath = Path.Combine(
                     new FileInfo(_programPath).DirectoryName ?? throw new DirectoryNotFoundException(),
                     "input.txt"
                 );
 
-                // Записываем данные в файл input.txt
-                File.WriteAllBytes(
-                    inputFilePath,
-                    _programInputBytes
-                );
+                /*
+                 * Выполняем действия над файлом в синхронизируемом
+                 * блоке команд для обеспечения  безопасности и для
+                 * снжения нагрузки на накопитель.
+                 */
 
-                // Указываем аттрибуты этого файла
-                File.SetAttributes(
-                    inputFilePath,
-                    FileAttributes.ReadOnly | FileAttributes.Temporary
-                );
+                lock (new object())
+                {
 
+                    // Записываем данные в файл input.txt
+                    File.WriteAllBytes(
+                        inputFilePath,
+                        _programInputBytes
+                    );
+
+                    // Указываем аттрибуты этого файла
+                    File.SetAttributes(
+                        inputFilePath,
+                        FileAttributes.Temporary
+                    );
+
+                }
+                
             }
             catch (Exception)
             {
@@ -599,9 +614,12 @@ namespace SimplePM_Server.SimplePM_Tester
             /*
              * Если результат тестирования уже
              * имеется, не стоит ничего делать
+             *
+             * Если данные не получены, так же
+             * не стоит ничего делать.
              */
 
-            if (_testingResultReceived)
+            if (_testingResultReceived || e.Data == null)
                 return;
             
             /*
@@ -624,7 +642,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 return;
 
             }
-            
+
             /*
              * В ином случае дозаписываем данные
              * в соответственную переменную.
@@ -633,7 +651,7 @@ namespace SimplePM_Server.SimplePM_Tester
             var adaptedString = (_adaptOutput)
                 ? e.Data.Trim()
                 : e.Data;
-            
+
             _programOutput += (_programOutput.Length > 0)
                 ? adaptedString
                 : adaptedString + '\n';

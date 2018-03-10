@@ -530,14 +530,23 @@ namespace SimplePM_Server
             try
             {
 
-                // Удаляем каталог временных файлов
-                Directory.Delete(
-                    new FileInfo(fileLocation).DirectoryName,
-                    true
-                );
+                /*
+                 * Для безопасности синхронизируем потоки
+                 */
 
-                // Вызываем сборщик мусора оптимизированным методом
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized);
+                lock (new object())
+                {
+
+                    // Удаляем каталог временных файлов
+                    Directory.Delete(
+                        new FileInfo(fileLocation).DirectoryName,
+                        true
+                    );
+
+                    // Вызываем сборщик мусора оптимизированным методом
+                    GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized);
+
+                }
 
             }
             catch (Exception ex)
