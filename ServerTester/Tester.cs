@@ -12,13 +12,16 @@ namespace ServerTester
         public void GetSubmissionsList(
             [Option(
                 Description = "Class work identificatior"
-            )] int classworkId = 0,
+            )] long classworkId = 0,
             [Option(
                 Description = "Programming competition identificatior"
-            )] int olympId = 0,
+            )] long olympId = 0,
             [Option(
                 Description = "Status of the submission (waiting, processing, ready)"
-            )] string status = "ready"
+            )] string status = "ready",
+            [Option(
+                Description = "User identificator"
+            )] long userId = -1
         )
         {
 
@@ -34,7 +37,7 @@ namespace ServerTester
             [Argument(
                 Name = "problemid",
                 Description = "Problem identificatior"
-            )] int problemId,
+            )] long problemId,
 
             [Argument(
                 Name = "codepath",
@@ -52,13 +55,13 @@ namespace ServerTester
 
             [Option(
                 Description = "User identificator"
-            )] int userId = 0,
+            )] long userId = 0,
             [Option(
                 Description = "Class work identificator"
-            )] int classworkId = 0,
+            )] long classworkId = 0,
             [Option(
                 Description = "Programming competition identificator"
-            )] int olympId = 0
+            )] long olympId = 0
         )
         {
 
@@ -73,16 +76,16 @@ namespace ServerTester
         public void WaitComplete(
             [Option(
                 Description = "Class work identificatior"
-            )] int classworkId = 0,
+            )] long classworkId = 0,
             [Option(
                 Description = "Programming competition identificatior"
-            )] int olympId = 0,
+            )] long olympId = 0,
             [Option(
                 Description = "Status of the submission (waiting, processing, ready)"
             )] string status = "ready",
             [Option(
                 Description = "Check timeout (in ms)"
-            )] int timeout = 5000
+            )] long timeout = 5000
         )
         {
 
