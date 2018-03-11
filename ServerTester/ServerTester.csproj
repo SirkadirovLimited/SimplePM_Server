@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <Product>SimplePM Server</Product>
+    <Authors>Kadirov Yurij Viktorovich and/or Sikadirov Team</Authors>
+    <PackageProjectUrl>https://spm.sirkadirov.com/</PackageProjectUrl>
+    <RepositoryType>GIT</RepositoryType>
+    <PackageLicenseUrl>https://github.com/SirkadirovTeam/SimplePM_Server/blob/master/LICENSE.md</PackageLicenseUrl>
+    <Copyright>Copyright (C) 2018, Kadirov Yurij Viktorovich. All rights are reserved.</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <RepositoryUrl>https://github.com/SirkadirovTeam/SimplePM_Server/</RepositoryUrl>
+    <StartupObject>ServerTester.Program</StartupObject>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\Build\Tester\</OutputPath>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutputPath>..\Build\Tester\</OutputPath>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommandDotNet" Version="2.0.12" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+</Project>
