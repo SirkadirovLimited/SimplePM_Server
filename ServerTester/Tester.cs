@@ -2,8 +2,13 @@
 
 namespace ServerTester
 {
-    class Tester
+
+    public class Tester
     {
+
+        /*
+         * Получение списка запросов на тестирование
+         */
 
         [ApplicationMetadata(
             Description = "Get submissions list",
@@ -28,6 +33,10 @@ namespace ServerTester
 
 
         }
+
+        /*
+         * Отправка запроса(ов) на тестирование
+         */
 
         [ApplicationMetadata(
             Description = "Send submission to a server",
@@ -61,13 +70,20 @@ namespace ServerTester
             )] long classworkId = 0,
             [Option(
                 Description = "Programming competition identificator"
-            )] long olympId = 0
+            )] long olympId = 0,
+            [Option(
+                Description = "Programming competition identificator"
+            )] long submCount = 1
         )
         {
 
 
 
         }
+
+        /*
+         * Ожидание завершения тестирования
+         */
 
         [ApplicationMetadata(
             Description = "Active wait a period of time to the completion of submissions checking",
@@ -94,4 +110,5 @@ namespace ServerTester
         }
 
     }
+
 }
