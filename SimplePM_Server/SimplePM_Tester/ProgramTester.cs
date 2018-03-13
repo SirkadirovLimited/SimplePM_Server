@@ -86,7 +86,17 @@ namespace SimplePM_Server.SimplePM_Tester
 
         #region Секция объявления переменных статистики процесса
 
+        /*
+         * Переменная хранит количество
+         * использованной памяти.
+         */
         private long UsedMemory;
+        
+        /*
+         * Переменная  хранит  количество
+         * использованного  процессорного
+         * времени.
+         */
         private int UsedProcessorTime;
 
         #endregion
@@ -104,18 +114,31 @@ namespace SimplePM_Server.SimplePM_Tester
         )
         {
             
+            // Получаем конфигурации компиляторов
             _compilerConfiguration = compilerConfiguration;
+
+            // Получаем список модулей компиляции
             this._compilerPlugin = _compilerPlugin;
 
+            // Получаем полный путь к программе
             _programPath = path;
+
+            // Получаем аргументы запуска программы
             _programArguments = args;
 
+            // Получаем лимит по памяти
             _programMemoryLimit = memoryLimit;
+
+            // Получаем лимит по процессорному времени
             _programProcessorTimeLimit = processorTimeLimit;
 
+            // Получаем данные для входного потока
             _programInputBytes = input;
+
+            // Получаем лимит по количеству данных в выходном потоке
             _outputCharsLimit = outputCharsLimit;
 
+            // Узнаём, необходимо ли упрощать выходной поток
             _adaptOutput = adaptOutput;
 
         }
