@@ -41,12 +41,16 @@ namespace SimplePM_Server
 
         // Дескриптор соединения с БД
         private MySqlConnection _connection;
+
         // Содержит информацию о запросе на тестирование
         private SubmissionInfo.SubmissionInfo _submissionInfo;
+
         // Содержит конфигурацию сервера
         private dynamic _serverConfiguration;
+
         // Конфигурация модулей компиляции
         private dynamic _compilerConfigurations;
+
         // Список, содержащий активные модули компиляции
         private List<ICompilerPlugin> _compilerPlugins;
         
@@ -59,13 +63,19 @@ namespace SimplePM_Server
         )
         {
             
+            // Получаем дескриптор соединения с БД
             _connection = connection;
 
+            // Получаем конфигурацию сервера
             this._serverConfiguration = _serverConfiguration;
+
+            // Получаем конфигурации модулей компиляции
             this._compilerConfigurations = _compilerConfigurations;
 
+            // Получаем список модулей компиляции
             this._compilerPlugins = _compilerPlugins;
 
+            // Получаем информацию о запросе на тестирование
             _submissionInfo = submissionInfo;
 
         }
@@ -204,7 +214,7 @@ namespace SimplePM_Server
              * парметрам,   после  чего  получаем  его
              * результат.
              */
-
+            //TODO: Добавить проверку на успешность компиляции пользовательского решения перед дальнейшим его тестированием
             var testingResult = RunTesting(
                 cResult,
                 ref compilerConfiguration,
@@ -537,14 +547,24 @@ namespace SimplePM_Server
                 lock (new object())
                 {
 
-                    // Удаляем каталог временных файлов
+                    /*
+                     * Удаляем каталог временных файлов
+                     */
+
                     Directory.Delete(
-                        new FileInfo(fileLocation).DirectoryName,
+                        new FileInfo(fileLocation).DirectoryName
+                            ?? throw new DirectoryNotFoundException(),
                         true
                     );
 
-                    // Вызываем сборщик мусора оптимизированным методом
-                    GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized);
+                    /*
+                     * Вызываем сборщик мусора с
+                     * оптимизированным методом.
+                     */
+                    GC.Collect(
+                        GC.MaxGeneration,
+                        GCCollectionMode.Optimized
+                    );
 
                 }
 
