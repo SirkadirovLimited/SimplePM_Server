@@ -9,11 +9,11 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
-using System.Diagnostics;
 using System.IO;
-using System.Security;
 using CompilerBase;
+using System.Security;
 using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace SimplePM_Server.SimplePM_Tester
 {
@@ -25,7 +25,7 @@ namespace SimplePM_Server.SimplePM_Tester
      * программированию.
      */
     
-    internal class ProgramTestingFunctions
+    internal static class ProgramTestingFunctions
     {
         
         /*
