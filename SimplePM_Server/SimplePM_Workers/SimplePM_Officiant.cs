@@ -275,6 +275,14 @@ namespace SimplePM_Server
             );
 
             /*
+             * Если компиляция пользовательского решения
+             * поставленной задачи произошла с ошибками,
+             * изменяем тип тестирования на syntax.
+             */
+            if (cResult.HasErrors)
+                _submissionInfo.TestType = "syntax";
+
+            /*
              * Объявляем временную переменную,
              * которая будет хранить результат
              * выполнения тестирования пользо-
@@ -467,7 +475,12 @@ namespace SimplePM_Server
                 "@param_submissionId",
                 _submissionInfo.SubmissionId
             ); // Идентификатор запроса
-            
+
+            updateSqlCommand.Parameters.AddWithValue(
+                "@param_testType",
+                _submissionInfo.TestType
+            ); // Тип тестирования
+
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_hasError",
                 Convert.ToInt32(cResult.HasErrors)

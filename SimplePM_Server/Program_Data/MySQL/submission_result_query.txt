@@ -2,6 +2,7 @@ UPDATE
 	`spm_submissions` 
 SET 
 	`status` = 'ready', 
+	`testType` = @param_testType, 
 	`hasError` = @param_hasError, 
 	`compiler_text` = @param_compiler_text,
 	`errorOutput` = @param_errorOutput, 
