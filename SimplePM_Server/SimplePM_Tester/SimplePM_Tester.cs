@@ -21,6 +21,7 @@ namespace SimplePM_Server.SimplePM_Tester
      * решений   поставленных   задач   по
      * программированию.
      */
+
     internal partial class SimplePM_Tester
     {
 
@@ -35,6 +36,10 @@ namespace SimplePM_Server.SimplePM_Tester
         private MySqlConnection connection; // соединение с БД
         private readonly string exeFileUrl; // путь к исполняемому файлу
         #endregion
+
+        /*
+         * Основной конструктор данного класса.
+         */
 
         public SimplePM_Tester(
             ref MySqlConnection connection,

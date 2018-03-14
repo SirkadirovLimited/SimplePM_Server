@@ -282,6 +282,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Объявляем временную переменную, в которой
              * будем хранить результат работы метода
              */
+
             string resultLine;
 
             try
@@ -291,6 +292,7 @@ namespace SimplePM_Server.SimplePM_Tester
                  * С помощью LINQ зароса формируем
                  * строку результата.
                  */
+
                 resultLine = TestingResults.Aggregate(
                     "",
                     (current, test) => current + (test.ErrorOutput + "\r\n")
@@ -299,6 +301,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 /*
                  * Удаляем все ненужные символы
                  */
+
                 resultLine = resultLine.Trim('\n', '\r');
 
             }

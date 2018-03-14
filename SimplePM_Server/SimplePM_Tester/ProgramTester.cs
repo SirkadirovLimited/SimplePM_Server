@@ -101,6 +101,10 @@ namespace SimplePM_Server.SimplePM_Tester
 
         #endregion
 
+        /*
+         * Основной конструктор данного класса.
+         */
+
         public ProgramTester(
             ref dynamic compilerConfiguration,
             ref ICompilerPlugin _compilerPlugin,
@@ -145,6 +149,12 @@ namespace SimplePM_Server.SimplePM_Tester
 
         #region Чекеры на достижение лимитов
 
+        /*
+         * Метод отвечает за запуск чекера  на
+         * достижение лимита по использованной
+         * памяти.
+         */
+
         private void StartMemoryLimitChecker()
         {
 
@@ -155,7 +165,9 @@ namespace SimplePM_Server.SimplePM_Tester
 
             new Task(() => {
 
-                // Защита от всевозможных исключений
+                /*
+                 * Защищаемся от всех возможных угроз
+                 */
 
                 try
                 {
@@ -210,6 +222,12 @@ namespace SimplePM_Server.SimplePM_Tester
 
         }
 
+        /*
+         * Метод отвечает  за  запуск чекера на
+         * достижение лимита по использованному
+         * процессорному времени.
+         */
+
         private void StartProcessorTimeLimitChecker()
         {
 
@@ -220,8 +238,10 @@ namespace SimplePM_Server.SimplePM_Tester
 
             new Task(() => {
 
-                // Защита от всевозможных исключений
-
+                /*
+                 * Защищаемся от всех возможных угроз
+                 */
+                
                 try
                 {
 
@@ -282,9 +302,19 @@ namespace SimplePM_Server.SimplePM_Tester
 
         #endregion
 
+        /*
+         * Метод, ответственный за выполнение
+         * тестирования      пользовательской
+         * программы.
+         */
+
         public TestResult RunTesting()
         {
 
+            /*
+             * Защищаемся от всех возможных угроз
+             */
+            
             try
             {
 
@@ -354,7 +384,10 @@ namespace SimplePM_Server.SimplePM_Tester
             catch (Exception ex)
             {
 
-                // Записываем информацию об ошибке в лог-файл
+                /*
+                 * Записываем информацию об ошибке в лог-файл
+                 */
+
                 logger.Error("An exception catched while trying to test user's submission: " + ex);
 
                 /*
@@ -384,6 +417,13 @@ namespace SimplePM_Server.SimplePM_Tester
             return GenerateTestResult();
 
         }
+
+        /*
+         * Метод отвечает за инициализацию всех
+         * необходимых  факторов   для   начала
+         * тестирования        пользовательской
+         * программы.
+         */
 
         private void Init()
         {
@@ -424,10 +464,15 @@ namespace SimplePM_Server.SimplePM_Tester
              * Добавляем обработчики для некоторых событий
              */
             _programProcess.OutputDataReceived += ProgramProcess_OutputDataReceived;
-            _programProcess.Exited += ProgramProcess_Exited;
 
         }
         
+        /*
+         * Метод  несёт ответственность за генерацию
+         * результатов тестирования пользовательской
+         * программы.
+         */
+
         private TestResult GenerateTestResult()
         {
             
@@ -476,6 +521,12 @@ namespace SimplePM_Server.SimplePM_Tester
 
         #region Методы записи входных данных
 
+        /*
+         * Метод  несёт ответственность за ввод
+         * входных данных в стандартный входной
+         * поток пользовательской программы.
+         */
+
         private void WriteInputString()
         {
 
@@ -504,6 +555,11 @@ namespace SimplePM_Server.SimplePM_Tester
             catch (Exception)
             {
 
+                /*
+                 * Если что-то пошло не так,
+                 * как планировалось ранее.
+                 */
+
                 try
                 {
 
@@ -531,6 +587,12 @@ namespace SimplePM_Server.SimplePM_Tester
             }
 
         }
+
+        /*
+         * Метод несёт ответственность за
+         * запись   входных   данных   во
+         * входной файл.
+         */
 
         private void WriteInputFile()
         {
@@ -592,14 +654,12 @@ namespace SimplePM_Server.SimplePM_Tester
         #endregion
 
         #region Обработчики событий
-
-        private void ProgramProcess_Exited(object sender, EventArgs e)
-        {
-            
-            
-
-        }
         
+        /*
+         * Метод отвечает за обработку выходного
+         * потока пользовательской программы.
+         */
+
         private void ProgramProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
 
@@ -649,6 +709,12 @@ namespace SimplePM_Server.SimplePM_Tester
                 : adaptedString + '\n';
 
         }
+
+        /*
+         * Метод несёт ответственность за подготовку
+         * к  формированию  результата  тестирования
+         * пользовательской программы.
+         */
 
         private void FormatTestResult()
         {

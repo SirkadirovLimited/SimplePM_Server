@@ -12,10 +12,10 @@
 using NLog;
 using System;
 using System.IO;
+using System.Text;
 using CompilerBase;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
-using System.Text;
 using SimplePM_Server.SimplePM_Tester;
 
 namespace SimplePM_Server
@@ -37,6 +37,7 @@ namespace SimplePM_Server
          * присваиваем  ей  указатель  на
          * журнал событий текущего класса
          */
+
         private static readonly Logger logger = LogManager.GetLogger("SimplePM_Officiant");
 
         // Дескриптор соединения с БД
@@ -54,6 +55,10 @@ namespace SimplePM_Server
         // Список, содержащий активные модули компиляции
         private List<ICompilerPlugin> _compilerPlugins;
         
+        /*
+         * Основной конструктор данного класса
+         */
+
         public SimplePM_Officiant(
             MySqlConnection connection,
             ref dynamic _serverConfiguration,
@@ -122,11 +127,12 @@ namespace SimplePM_Server
              * что начата обработка данного запроса на
              * тестирование.
              */
+
             logger.Trace("Serving submission #" + _submissionInfo.SubmissionId + " started!");
 
             /*
-             * Определяем соответствующую данному запросу
-             * на тестирование конфигурацию модуля компиляции
+             * Определяем   соответствующую  данному   запросу
+             * на тестирование конфигурацию модуля компиляции.
              */
 
             var compilerConfiguration = SimplePM_Compiler.GetCompilerConfig(
@@ -214,7 +220,7 @@ namespace SimplePM_Server
              * парметрам,   после  чего  получаем  его
              * результат.
              */
-            //TODO: Добавить проверку на успешность компиляции пользовательского решения перед дальнейшим его тестированием
+
             var testingResult = RunTesting(
                 cResult,
                 ref compilerConfiguration,
@@ -279,6 +285,7 @@ namespace SimplePM_Server
              * поставленной задачи произошла с ошибками,
              * изменяем тип тестирования на syntax.
              */
+
             if (cResult.HasErrors)
                 _submissionInfo.TestType = "syntax";
 
@@ -440,6 +447,13 @@ namespace SimplePM_Server
 
         }
 
+        /*
+         * Метод занимается  отправкой результата
+         * проверки   пользовательского   решения
+         * поставленной задачи на удалённый MySQL
+         * сервер.
+         */
+
         private void SendTestingResult(ProgramTestingResult ptResult, CompilerResult cResult)
         {
 
@@ -542,6 +556,7 @@ namespace SimplePM_Server
          * по алгоритмическому  или  спортивному
          * программированию.
          */
+
         private static void ClearCache(string fileLocation)
         {
 
@@ -574,6 +589,7 @@ namespace SimplePM_Server
                      * Вызываем сборщик мусора с
                      * оптимизированным методом.
                      */
+
                     GC.Collect(
                         GC.MaxGeneration,
                         GCCollectionMode.Optimized

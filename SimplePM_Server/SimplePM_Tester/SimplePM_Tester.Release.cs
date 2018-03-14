@@ -21,6 +21,11 @@ namespace SimplePM_Server.SimplePM_Tester
     internal partial class SimplePM_Tester
     {
         
+        /*
+         * Метод отвечает за выполнение релизного
+         * тестирования пользовательского решения
+         * поставленной задачи.
+         */
 
         public ProgramTestingResult Release(
             ref dynamic compilerConfiguration,
@@ -137,6 +142,11 @@ namespace SimplePM_Server.SimplePM_Tester
             return programTestingResult;
 
         }
+
+        /*
+         * Метод получает и обрабатывает информацию
+         * о релизных тестах для данной задачи.
+         */
 
         private Queue<ReleaseTestInfo.ReleaseTestInfo> GetTestsInfo()
         {

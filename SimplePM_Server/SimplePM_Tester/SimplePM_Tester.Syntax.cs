@@ -17,6 +17,11 @@ namespace SimplePM_Server.SimplePM_Tester
     internal partial class SimplePM_Tester
     {
 
+        /*
+         * Метод отвечает за выполнение проверки
+         * синтаксиса пользовательского решения.
+         */
+
         public ProgramTestingResult Syntax()
         {
 

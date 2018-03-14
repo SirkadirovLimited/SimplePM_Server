@@ -33,6 +33,7 @@ namespace SimplePM_Server.SimplePM_Tester
          * при запуске  процесса пользовательского
          * или авторского решения задачи.
          */
+
         public static void SetExecInfoByFileExt(
             ref dynamic languageConfiguration,
             ref ICompilerPlugin _compilerPlugin,
@@ -78,6 +79,7 @@ namespace SimplePM_Server.SimplePM_Tester
          * пользователь, либо тот же,  от имени которого
          * запущен сервер проверки решений задач.
          */
+
         public static void SetProcessRunAs(ref Process proc)
         {
 
@@ -102,6 +104,7 @@ namespace SimplePM_Server.SimplePM_Tester
                  * файла, после чего произвоим десериализацию
                  * Json данных в удобный для нас формат.
                  */
+
                 securityConfiguration = JsonConvert.DeserializeObject(
                     File.ReadAllText("./config/security.json")
                 );
@@ -113,6 +116,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * пользовательских программ от имени инного
              * пользователя. Если отключена - выходим.
              */
+
             if ((string)securityConfiguration.runas.enabled != "true")
                 return;
 
@@ -120,17 +124,20 @@ namespace SimplePM_Server.SimplePM_Tester
              * Указываем, что будем запускать процесс
              * от имени другого пользователя.
              */
+
             proc.StartInfo.Verb = "runas";
 
             /*
              * Передаём имя пользователя
              */
+
             proc.StartInfo.UserName = (string)securityConfiguration.runas.username;
 
             /*
              * Передаём,  что   необходимо
              * вытянуть профайл из реестра
              */
+
             proc.StartInfo.LoadUserProfile = true;
 
             /*
