@@ -11,7 +11,6 @@
 
 using System.IO;
 using CompilerBase;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace SimplePM_Server
@@ -55,66 +54,6 @@ namespace SimplePM_Server
 
         }
         
-        /*
-         * Функция возвращает объект типа ICompilerPlugin,
-         * который  отвечает  за  компиляцию  программ  на
-         * указанном   в    параметрах    функции    языке
-         * программирования.
-         */
-        public static ICompilerPlugin FindCompilerPlugin(
-            ref dynamic _compilerConfigs,
-            ref List<ICompilerPlugin> _compilerPlugins,
-            string programmingLanguage
-        )
-        {
-
-            /*
-             * Объявляем и инициализируем переменную,
-             * которая будет хранить ссылку на конфи-
-             * гурацию модуля компиляции для данного
-             * языка программирования.
-             */
-            var compilerConfig = GetCompilerConfig(
-                ref _compilerConfigs,
-                programmingLanguage
-            );
-
-            /*
-             * Если искомой конфигурации не найдено,
-             * возвращаем   значение  null,  которое
-             * сигнализирует об ошибке   при  поиске
-             * необходимого модуля компиляции.
-             */
-            if (compilerConfig == null)
-                return null;
-
-            /*
-             * В цикле  производим  поиск  необходимого нам
-             * модуля,     ответственного   за   компиляцию
-             * пользовательских    решений   на   указанном
-             * скриптовом языке или языке программирования.
-             */
-            foreach (var compilerPlugin in _compilerPlugins)
-            {
-
-                /*
-                 * Если соответствующий плагин найден,
-                 * возвращаем ссылку  на  него, в ином
-                 * случае продолжаем поиск.
-                 */
-                if (compilerPlugin.PluginName == (string)compilerConfig.module_name)
-                    return compilerPlugin;
-
-            }
-
-            /*
-             * Если соответствующий модуль компиляции
-             * не найден, возвращаем значение null.
-             */
-            return null;
-
-        }
-
         public static ICompilerPlugin FindCompilerPlugin(
             ref List<ICompilerPlugin> _compilerPlugins,
             string pluginName
