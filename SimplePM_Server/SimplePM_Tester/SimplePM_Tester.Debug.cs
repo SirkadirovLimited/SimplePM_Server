@@ -122,7 +122,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 memoryLimit,
                 timeLimit,
                 submissionInfo.CustomTest,
-                Encoding.UTF8.GetString(authorTestingResult.Output).Length,
+                Encoding.UTF8.GetString(authorTestingResult.Output).Length * 2,
                 submissionInfo.ProblemInformation.AdaptProgramOutput
             ).RunTesting();
             
