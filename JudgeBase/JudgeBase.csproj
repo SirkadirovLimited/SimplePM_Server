@@ -44,10 +44,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IJudgePlugin.cs" />
+    <Compile Include="JudgeResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="logo-fhd.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ProgramTesting\ProgramTesting.csproj">
+      <Project>{c9edc5a6-4c50-4b0b-ab46-37797ac40739}</Project>
+      <Name>ProgramTesting</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

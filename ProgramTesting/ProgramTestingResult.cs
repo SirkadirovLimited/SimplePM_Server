@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2017, Kadirov Yurij.
+ * Copyright (C) 2018, Kadirov Yurij.
  * All rights are reserved.
  * Licensed under Apache License 2.0 with additional restrictions.
  * 

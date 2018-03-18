@@ -9,19 +9,15 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
-using ProgramTesting;
-
 namespace JudgeBase
 {
 
-    public interface IJudgePlugin
+    public struct JudgeResult
     {
 
-        string JudgeType { get; }
-        string JudgeAuthor { get; }
-        string JudgeSupportUrl { get; }
+        public string JudgeName { get; set; }
 
-        JudgeResult GenerateJudgeResult(ref ProgramTestingResult programTestingResult);
+        public float Rating { get; set; }
 
     }
 
