@@ -134,10 +134,8 @@
     <Compile Include="SimplePM_Base\SimplePM_Main.cs" />
     <Compile Include="SimplePM_Tester\ProgramTester.cs" />
     <Compile Include="SimplePM_Tester\ProgramTestingFunctions.cs" />
-    <Compile Include="SimplePM_Tester\ProgramTestingResult.cs" />
     <Compile Include="SimplePM_Tester\SimplePM_Tester.cs" />
     <Compile Include="SimplePM_Tester\SimplePM_Tester.Syntax.cs" />
-    <Compile Include="SimplePM_Tester\TestResult.cs" />
     <Compile Include="SimplePM_Workers\SimplePM_Worker-Part2.cs" />
     <Compile Include="SimplePM_Workers\SimplePM_Worker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -201,6 +199,10 @@
     <ProjectReference Include="..\PluginBase\PluginBase.csproj">
       <Project>{310e02f7-2d77-43fa-9ae1-9edf2af605ca}</Project>
       <Name>PluginBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ProgramTesting\ProgramTesting.csproj">
+      <Project>{c9edc5a6-4c50-4b0b-ab46-37797ac40739}</Project>
+      <Name>ProgramTesting</Name>
     </ProjectReference>
     <ProjectReference Include="..\ReleaseTestInfo\ReleaseTestInfo.csproj">
       <Project>{e25f67e4-58d5-4a8e-885c-7098745bdea4}</Project>
