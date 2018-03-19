@@ -35,7 +35,10 @@ namespace SimplePM_Server
                 try
                 {
 
-                    // Записываем в лог информацию о событии
+                    /*
+                     * Записываем в лог информацию о событии
+                     */
+
                     logger.Trace(
                         "Starting submission query; Running threads: " +
                         _aliveTestersCount + " from " +
@@ -62,7 +65,10 @@ namespace SimplePM_Server
                     // Объявляем временную переменную, так называемый "флаг"
                     bool f;
 
-                    // Делаем различные проверки в безопасном контексте
+                    /*
+                     * Делаем различные проверки в безопасном контексте
+                     */
+
                     lock (new object())
                     {
 
@@ -70,7 +76,10 @@ namespace SimplePM_Server
 
                     }
 
-                    // Проверка на пустоту полученного результата
+                    /*
+                     * Проверка на пустоту полученного результата
+                     */
+
                     if (f)
                     {
 
@@ -93,9 +102,13 @@ namespace SimplePM_Server
                          * запрос на проверку  обрабатывается
                          * сервером проверки решений задач.
                          */
+
                         var sw = Stopwatch.StartNew();
 
-                        // Увеличиваем количество текущих соединений
+                        /*
+                         * Увеличиваем количество текущих соединений
+                         */
+
                         lock (new object())
                         {
 
@@ -108,24 +121,28 @@ namespace SimplePM_Server
                          * всю информацию об отправке и записываем
                          * в него только что полученные данные.
                          */
+
                         var submissionInfo = new SubmissionInfo.SubmissionInfo
                         {
 
                             /*
                              * Основная информация о запросе
                              */
+
                             SubmissionId = int.Parse(dataReader["submissionId"].ToString()),
                             UserId = int.Parse(dataReader["userId"].ToString()),
 
                             /*
                              * Привязка к уроку и соревнованию
                              */
+
                             ClassworkId = int.Parse(dataReader["classworkId"].ToString()),
                             OlympId = int.Parse(dataReader["olympId"].ToString()),
 
                             /*
                              * Тип тестирования и доплнительные поля
                              */
+
                             TestType = dataReader["testType"].ToString(),
                             CustomTest = (byte[])dataReader["customTest"],
 
@@ -134,12 +151,14 @@ namespace SimplePM_Server
                              * и дополнительная информация
                              * о нём.
                              */
+
                             ProblemCode = (byte[])dataReader["problemCode"],
                             CodeLang = dataReader["codeLang"].ToString(),
 
                             /*
                              * Информация о задаче
                              */
+
                             ProblemInformation = new ProblemInfo
                             {
 
@@ -157,7 +176,10 @@ namespace SimplePM_Server
                         // Закрываем чтение временной таблицы
                         dataReader.Close();
 
-                        // Устанавливаем статус запроса на "в обработке"
+                        /*
+                         * Устанавливаем статус запроса на "в обработке"
+                         */
+
                         var queryUpdate = $@"
                             UPDATE 
                                 `spm_submissions` 

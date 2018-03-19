@@ -39,6 +39,7 @@ namespace SimplePM_Server
          * присваиваем  ей  указатель  на
          * журнал событий текущего класса
          */
+
         private readonly Logger logger = LogManager.GetLogger("SimplePM_Worker");
 
         private dynamic _serverConfiguration; // переменная хранит основную конфигурацию сервера

@@ -27,6 +27,7 @@ namespace SimplePM_Server
          * присваиваем  ей  указатель  на
          * журнал событий текущего класса
          */
+
         private static readonly Logger logger = LogManager.GetLogger("SimplePM_PluginsLoader");
 
         /*
