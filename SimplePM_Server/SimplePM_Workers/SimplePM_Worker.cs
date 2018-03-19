@@ -47,7 +47,8 @@ namespace SimplePM_Server
         private ulong _aliveTestersCount; // Количество текущих обрабатываемых запросов
         
         private string EnabledLangs; // Список поддерживаемых сервером ЯП для SQL запросов
-        private List<ICompilerPlugin> _compilerPlugins; // Список, содержащий ссылки на модули компиляторов
+
+        public static List<ICompilerPlugin> _compilerPlugins; // Список, содержащий ссылки на модули компиляторов
         
         /*
          * Функция загружает в память компиляционные
