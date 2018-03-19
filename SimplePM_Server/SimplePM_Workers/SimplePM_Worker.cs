@@ -59,94 +59,10 @@ namespace SimplePM_Server
         private void LoadCompilerPlugins()
         {
 
-            /*
-             * Записываем в лог-файл информацию о том,
-             * что  собираемся   подгружать  сторонние
-             * модули компиляции.
-             */
-
-            logger.Debug("ICompilerPlugin modules are being loaded...");
-
-            /*
-             * Проводим инициализацию необходимых
-             * для продолжения работы переменных.
-             */
-            _compilerPlugins = new List<ICompilerPlugin>();
-
-            var pluginFilesList = Directory.GetFiles(
+            _compilerPlugins = SimplePM_PluginsLoader.LoadPlugins<ICompilerPlugin>(
                 (string)_serverConfiguration.path.ICompilerPlugin,
-                "ICompilerPlugin.*.dll"
+                "CompilerPlugin.Compiler"
             );
-
-            foreach (var pluginFilePath in pluginFilesList)
-            {
-                
-                /*
-                 * Указываем в логе, что начинаем
-                 * загружать  определённый модуль
-                 * компиляции.
-                 */
-                logger.Debug("Start loading plugin [" + pluginFilePath + "]...");
-
-                try
-                {
-
-                    /*
-                     * Загружаем сборку из файла по указанному пути
-                     */
-                    var assembly = Assembly.LoadFrom(pluginFilePath);
-
-                    /*
-                     * Ищем необходимую для нас реализацию интерфейса
-                     */
-                    foreach (var type in assembly.GetTypes())
-                    {
-
-                        /*
-                         * Если мы не нашли то, что искали - переходим
-                         * к следующей итерации цикла foreach,  в ином
-                         * случае  продолжаем  выполнение  необходимых
-                         * действий по добавлению плагина в список.
-                         */
-
-                        if (type.FullName != "CompilerPlugin.Compiler") continue;
-                        
-                        // Добавляем плагин в список
-                        _compilerPlugins.Add(
-                            (ICompilerPlugin)Activator.CreateInstance(type)
-                        );
-
-                        // Записываем сообщение об успехе в лог-файл
-                        logger.Debug("Plugin successfully loaded [" + pluginFilePath + "]");
-
-                        // Выходим из цикла foreach
-                        break;
-
-                    }
-
-                }
-                catch (Exception ex)
-                {
-
-                    /*
-                     * В случае возникновения ошибок
-                     * записываем информацию о них в
-                     * лог-файле.
-                     */
-
-                    logger.Debug("Plugin loading failed [" + pluginFilePath + "]:" + ex);
-
-                }
-
-            }
-
-            /*
-             * Записываем в лог-файл информацию о том,
-             * что мы завершили процесс загрузки всех
-             * модулей компиляции (ну или не всех)
-             */
-
-            logger.Debug("ICompilerPlugin modules were loaded...");
 
         }
         
