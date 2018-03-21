@@ -219,8 +219,11 @@ namespace SimplePM_Server.SimplePM_Tester
             var authorFileExt = "." + (string)authorLanguageConfiguration.source_ext;
 
             // Получаем случайный путь к директории авторского решения
-            var tmpAuthorDir = (string)_serverConfiguration.path.temp + 
-                @"\author\" + Guid.NewGuid() + @"\";
+            var tmpAuthorDir = Path.Combine(
+                (string)_serverConfiguration.path.temp,
+                "author",
+                Guid.NewGuid().ToString()
+            );
 
             /*
              * Создаём   папку   текущего
@@ -235,10 +238,10 @@ namespace SimplePM_Server.SimplePM_Tester
              * авторского решения.
              */
 
-            var tmpAuthorSrcLocation = 
-                tmpAuthorDir + "sa" + 
-                submissionInfo.SubmissionId + 
-                authorFileExt;
+            var tmpAuthorSrcLocation = Path.Combine(
+                tmpAuthorDir,
+                "sa" + submissionInfo.SubmissionId + authorFileExt
+            );
 
             /*
              * Для обеспечения безопасности синхронизируем потоки
