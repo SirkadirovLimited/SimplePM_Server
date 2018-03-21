@@ -97,15 +97,17 @@ namespace SimplePM_Server
         {
 
             // Генерируем имя директории
-            var directoryName = (string)_serverConfiguration.path.temp + 
-                                @"\" + Guid.NewGuid() + 
-                                submissionId + @"\";
+            var directoryName = Path.Combine(
+                (string)_serverConfiguration.path.temp,
+                Guid.NewGuid().ToString(),
+                ""
+            );
 
             // Создаём все необходимые каталоги
             Directory.CreateDirectory(directoryName);
 
             // Возвращаем результат работы функции
-            return directoryName + "s" + submissionId + fileExt;
+            return Path.Combine(directoryName, "s" + submissionId + fileExt);
 
         }
 
