@@ -14,6 +14,7 @@ using System;
 using System.IO;
 using System.Web;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace CompilerBase
 {
@@ -54,7 +55,7 @@ namespace CompilerBase
              */
 
             string outFileExt = (platform == 4) || (platform == 6) || (platform == 128)
-                ? string.Empty : "exe";
+                ? string.Empty : ".exe";
 
             /*
              * Получаем путь родительской
@@ -70,7 +71,10 @@ namespace CompilerBase
              * исполняемого файла.
              */
 
-            var exePath = Path.Combine(parentDirectoryFullName, 's' + currentSubmissionId);
+            var exePath = Path.Combine(
+                parentDirectoryFullName,
+                's' + currentSubmissionId
+            );
 
             /*
              * В  случае,  если  расширение
@@ -80,7 +84,7 @@ namespace CompilerBase
              */
 
             if (!string.IsNullOrWhiteSpace(outFileExt))
-                exePath += '.' + outFileExt;
+                exePath += outFileExt;
 
             /*
              * Возвращаем сформированный путь
@@ -159,13 +163,13 @@ namespace CompilerBase
              */
 
             if (standartOutput.Length == 0)
-                standartOutput = "SimplePM_Server";
+                standartOutput = "SimplePM Server v" + Assembly.GetExecutingAssembly().GetName().Version + " on " + Environment.OSVersion;
 
             /*
              * Объявляем переменную результата компиляции
              */
 
-            var result = new CompilerResult()
+            var result = new CompilerResult
             {
 
                 /*
