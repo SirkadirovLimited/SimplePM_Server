@@ -40,7 +40,7 @@ namespace SimplePM_Server
             
             // Проверяем путь к исходному коду на ошибки
             if (string.IsNullOrEmpty(fileLocation) || string.IsNullOrWhiteSpace(fileLocation) || !File.Exists(fileLocation))
-                throw new FileNotFoundException("File not found!", "fileLocation");
+                throw new FileNotFoundException("File not found!", fileLocation);
 
             /*
              * Присваиваем глобальным для класса переменным
