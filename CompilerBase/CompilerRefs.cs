@@ -44,6 +44,7 @@ namespace CompilerBase
             /*
              * Определяем платформу
              */
+
             int platform = (int)Environment.OSVersion.Platform;
 
             /*
@@ -51,6 +52,7 @@ namespace CompilerBase
              * устанавливаем специфическое расширение
              * запускаемого файла.
              */
+
             string outFileExt = (platform == 4) || (platform == 6) || (platform == 128)
                 ? string.Empty : "exe";
 
@@ -59,13 +61,16 @@ namespace CompilerBase
              * директории файла исходного
              * кода.
              */
-            var parentDirectoryFullName = new FileInfo(srcFileLocation).DirectoryName + @"\";
+
+            var parentDirectoryFullName = new FileInfo(srcFileLocation).DirectoryName
+                                          ?? throw new DirectoryNotFoundException(srcFileLocation + " parent");
 
             /*
              * Формируем начальный путь
              * исполняемого файла.
              */
-            var exePath = parentDirectoryFullName + 's' + currentSubmissionId;
+
+            var exePath = Path.Combine(parentDirectoryFullName, 's' + currentSubmissionId);
 
             /*
              * В  случае,  если  расширение
@@ -73,6 +78,7 @@ namespace CompilerBase
              * ОС не нулевое, добавляем его
              * к имени файла.
              */
+
             if (!string.IsNullOrWhiteSpace(outFileExt))
                 exePath += '.' + outFileExt;
 
@@ -80,6 +86,7 @@ namespace CompilerBase
              * Возвращаем сформированный путь
              * к искомому исполняемому файлу.
              */
+
             return exePath;
 
         }
@@ -94,10 +101,15 @@ namespace CompilerBase
 
         public CompilerResult RunCompiler(string compilerFullName, string compilerArgs)
         {
-            // Создаём новый экземпляр процесса компилятора
+
+            /*
+             * Создаём новый экземпляр процесса компилятора
+             */
             var cplProc = new Process();
 
-            // Устанавливаем информацию о старте процесса
+            /*
+             * Устанавливаем информацию о старте процесса
+             */
             var pStartInfo = new ProcessStartInfo(compilerFullName, compilerArgs)
             {
 
@@ -118,7 +130,11 @@ namespace CompilerBase
 
             };
 
-            // Устанавливаем информацию о старте процесса в дескриптор процесса компилятора
+            /*
+             * Устанавливаем информацию о старте
+             * процесса  в  дескриптор  процесса
+             * компилятора.
+             */
             cplProc.StartInfo = pStartInfo;
 
             // Запускаем процесс компилятора
@@ -132,6 +148,7 @@ namespace CompilerBase
              * компилятора в специально созданные
              * для этого переменные.
              */
+
             var standartOutput = cplProc.StandardOutput.ReadToEnd();
             var standartError = cplProc.StandardError.ReadToEnd();
 
@@ -140,10 +157,14 @@ namespace CompilerBase
              * пуст,   заполняем его не нужным
              * барахлом.
              */
+
             if (standartOutput.Length == 0)
                 standartOutput = "SimplePM_Server";
 
-            // Объявляем переменную результата компиляции
+            /*
+             * Объявляем переменную результата компиляции
+             */
+
             var result = new CompilerResult()
             {
 
@@ -153,6 +174,7 @@ namespace CompilerBase
                  * специально отведенную для этого
                  * переменную.
                  */
+
                 CompilerMessage = HttpUtility.HtmlEncode(standartOutput + "\n" + standartError)
 
             };
@@ -175,6 +197,7 @@ namespace CompilerBase
              * Проверка  на   предопределение
              * наличия ошибок при компиляции.
              */
+
             if (!temporaryResult.HasErrors)
             {
                 // Проверяем на наличие исполняемого файла
