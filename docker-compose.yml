@@ -1,8 +1,0 @@
-version: '3'
-
-services:
-  simplepm_server:
-    image: simplepm_server
-    build:
-      context: .\SimplePM_Server
-      dockerfile: Dockerfile
