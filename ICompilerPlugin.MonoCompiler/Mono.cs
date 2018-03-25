@@ -1,17 +1,17 @@
 ﻿/*
- * Copyright (C) 2017, Kadirov Yurij.
+ * Copyright (C) 2018, Yurij Kadirov.
  * All rights are reserved.
  * Licensed under Apache License 2.0 with additional restrictions.
  * 
- * @Author: Kadirov Yurij
- * @Website: https://sirkadirov.com/
+ * @Author: Yurij Kadirov
+ * @Website: https://spm.sirkadirov.com/
  * @Email: admin@sirkadirov.com
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
 using System;
-using System.Diagnostics;
 using CompilerBase;
+using System.Diagnostics;
 
 namespace CompilerPlugin
 {
