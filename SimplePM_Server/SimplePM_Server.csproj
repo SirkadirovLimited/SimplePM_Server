@@ -141,7 +141,7 @@
     <Compile Include="SimplePM_Workers\SimplePM_Worker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimplePM_Workers\SimplePM_Compiler.cs" />
-    <Compile Include="SimplePM_Workers\SimplePM_Officiant.cs" />
+    <Compile Include="SimplePM_Workers\SimplePM_Waiter.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

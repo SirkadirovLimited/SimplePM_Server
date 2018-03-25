@@ -28,7 +28,7 @@ namespace SimplePM_Server
      * программированию.
      */
 
-    internal class SimplePM_Officiant
+    internal class SimplePM_Waiter
     {
 
         /*
@@ -59,7 +59,7 @@ namespace SimplePM_Server
          * Основной конструктор данного класса
          */
 
-        public SimplePM_Officiant(
+        public SimplePM_Waiter(
             MySqlConnection connection,
             ref dynamic _serverConfiguration,
             ref dynamic _compilerConfigurations,

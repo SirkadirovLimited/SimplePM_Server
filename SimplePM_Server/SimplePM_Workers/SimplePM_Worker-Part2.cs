@@ -202,7 +202,7 @@ namespace SimplePM_Server
                          * вот неожиданных ситуациях.
                          */
 
-                        new SimplePM_Officiant(
+                        new SimplePM_Waiter(
                             conn,
                             ref _serverConfiguration,
                             ref _compilerConfigurations,
