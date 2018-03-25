@@ -56,7 +56,7 @@
     "enabled": true,
     "module_name": "TypicalCompiler",
     "compiler_path": "C:\\MinGW\\bin\\g++.exe",
-    "compiler_arguments": "-v -o {%fileLocation%}"
+    "compiler_arguments": "\"{%fileLocation%}\" -o \"{%exeLocation%}\""
   },
 
   {
