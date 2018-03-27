@@ -41,13 +41,22 @@ namespace SimplePM_Server.SimplePM_Tester
                     [0] = new TestResult
                     {
 
+                        // Выходные данные заполняем кракозябрами
                         Output = Encoding.UTF8.GetBytes("NULL"),
+
+                        // Выходные данные исключений устанавливаем в null
                         ErrorOutput = null,
 
+                        // Код выхода - стандартный
                         ExitCode = 0,
+
+                        // Результатом будет промежуточный успешный
                         Result = TestResult.MiddleSuccessResult,
 
+                        // Использованная память
                         UsedMemory = 0,
+
+                        // Использованное процессорное время
                         UsedProcessorTime = 0
 
                     }

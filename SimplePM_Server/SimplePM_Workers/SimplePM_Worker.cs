@@ -148,7 +148,7 @@ namespace SimplePM_Server
 
             /*
              * На всякий случай создаём директорию
-             * для хранения лог-файлов, так как
+             * для  хранения  лог-файлов, так  как
              * некоторые версии NLog не создают
              * её автоматически.
              */
@@ -161,11 +161,15 @@ namespace SimplePM_Server
             }
             catch
             {
-                /* Deal with it */
+
+                /*
+                 * Выполнения дополнительных действий не требуется
+                 */
             }
 
             /*
-             * Устанавливаем обработчик необработанных исключений
+             * Устанавливаем глобальный
+             * обработчик исключений.
              */
 
             AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
@@ -393,7 +397,7 @@ namespace SimplePM_Server
                     catch (Exception ex)
                     {
 
-                        // Записываем все исключения как ошибки
+                        // Записываем все исключения как ошибки в лог
                         logger.Error(ex);
 
                     }
@@ -497,6 +501,7 @@ namespace SimplePM_Server
                  * MySQL  сервере  и  получаем  дескриптор
                  * подключения к ней.
                  */
+
                 db = new MySqlConnection(
                     $@"
                         server={databaseConfig.hostname};
