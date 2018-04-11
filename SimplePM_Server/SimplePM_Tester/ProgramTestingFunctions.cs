@@ -9,6 +9,7 @@
  * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
  */
 
+using System;
 using System.IO;
 using CompilerBase;
 using System.Security;
@@ -117,7 +118,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * пользователя. Если отключена - выходим.
              */
 
-            if ((string)securityConfiguration.runas.enabled != "true")
+            if ((string)(securityConfiguration.runas.enabled) != "true")
                 return;
 
             /*
@@ -125,20 +126,22 @@ namespace SimplePM_Server.SimplePM_Tester
              * от имени другого пользователя.
              */
 
-            proc.StartInfo.Verb = "runas";
+            //proc.StartInfo.Verb = "runas";
 
             /*
              * Передаём имя пользователя
              */
+            
+            proc.StartInfo.UserName = (string)(securityConfiguration.runas.username);
 
-            proc.StartInfo.UserName = (string)securityConfiguration.runas.username;
+            //proc.StartInfo.Domain = Environment.MachineName;
 
             /*
              * Передаём,  что   необходимо
              * вытянуть профайл из реестра
              */
 
-            proc.StartInfo.LoadUserProfile = true;
+            proc.StartInfo.LoadUserProfile = false;
 
             /*
              * Передаём пароль пользователя

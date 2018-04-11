@@ -11,7 +11,7 @@
 
 {
   "runas": {
-    "enabled": true,
+    "enabled": "true",
     "username": "SimplePM_StartUser",
     "password": "1234567890"
   },

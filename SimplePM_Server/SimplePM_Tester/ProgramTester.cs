@@ -443,6 +443,18 @@ namespace SimplePM_Server.SimplePM_Tester
             };
 
             /*
+             * Указываем текущую рабочую директорию.
+             *
+             * Это необходимо  по  большей части для
+             * поддержки   запуска  пользовательских
+             * программ от имени иного  от  текущего
+             * пользователя.
+             */
+
+            _programProcess.StartInfo.WorkingDirectory =
+                new FileInfo(_programPath).DirectoryName ?? throw new DirectoryNotFoundException();
+
+            /*
              * Управление методом запуска
              * пользовательского процесса
              */
