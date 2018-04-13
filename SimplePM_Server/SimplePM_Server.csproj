@@ -188,8 +188,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="logo-fhd.ico" />
-    <None Include="program_pata\mysql\submission_result_query.txt" />
-    <None Include="program_pata\mysql\submission_query.txt" />
+    <None Include="program_data\mysql\submission_query.txt" />
+    <None Include="program_data\mysql\submission_result_query.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CompilerBase\CompilerBase.csproj">
