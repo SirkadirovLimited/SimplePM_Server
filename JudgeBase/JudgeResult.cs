@@ -23,10 +23,10 @@ namespace JudgeBase
     {
 
         /*
-         * Предоставленный рейтинг для решения.
+         * Предоставленный множитель рейтинга для решения
          */
 
-        public float Rating { get; set; }
+        public float RatingMult { get; set; }
 
     }
 
