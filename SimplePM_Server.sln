@@ -43,6 +43,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginsManager", "PluginsMa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerTester", "ServerTester\ServerTester.csproj", "{8F850857-8C2A-4BE4-856B-BF4B8180E2C9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IJudgePlugin", "IJudgePlugin", "{F1E5D391-6437-4DA1-9023-D1298D7F855F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IJudgePlugin.Full", "IJudgePlugin.Full\IJudgePlugin.Full.csproj", "{4D4B1DD1-3EA3-4CC1-89BC-A8AFD40E078A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -103,6 +107,10 @@ Global
 		{8F850857-8C2A-4BE4-856B-BF4B8180E2C9}.Debug|x64.ActiveCfg = Debug|x64
 		{8F850857-8C2A-4BE4-856B-BF4B8180E2C9}.Debug|x64.Build.0 = Debug|x64
 		{8F850857-8C2A-4BE4-856B-BF4B8180E2C9}.Release|x64.ActiveCfg = Release|x64
+		{4D4B1DD1-3EA3-4CC1-89BC-A8AFD40E078A}.Debug|x64.ActiveCfg = Debug|x64
+		{4D4B1DD1-3EA3-4CC1-89BC-A8AFD40E078A}.Debug|x64.Build.0 = Debug|x64
+		{4D4B1DD1-3EA3-4CC1-89BC-A8AFD40E078A}.Release|x64.ActiveCfg = Release|x64
+		{4D4B1DD1-3EA3-4CC1-89BC-A8AFD40E078A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -122,6 +130,7 @@ Global
 		{C9EDC5A6-4C50-4B0B-AB46-37797AC40739} = {260918EF-3103-4A98-8DA5-BCB40DEA37A3}
 		{7DB15A91-C319-4C83-BE51-F1D093E2D2F3} = {8B717D39-531F-4AEC-A339-32AEBD29EFF5}
 		{8F850857-8C2A-4BE4-856B-BF4B8180E2C9} = {8B717D39-531F-4AEC-A339-32AEBD29EFF5}
+		{4D4B1DD1-3EA3-4CC1-89BC-A8AFD40E078A} = {F1E5D391-6437-4DA1-9023-D1298D7F855F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56F31401-B3C0-4807-AE6F-109275F9E051}
