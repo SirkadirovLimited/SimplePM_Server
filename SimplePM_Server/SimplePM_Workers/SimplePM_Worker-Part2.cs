@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Data;
 using SubmissionInfo;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -175,6 +176,8 @@ namespace SimplePM_Server
                                 ProblemId = int.Parse(dataReader["problemId"].ToString()),
                                 ProblemDifficulty = int.Parse(dataReader["difficulty"].ToString()),
                                 AdaptProgramOutput = bool.Parse(dataReader["adaptProgramOutput"].ToString()),
+
+                                ProblemRatingType = dataReader["judge"].ToString(),
 
                                 AuthorSolutionCode = (byte[])dataReader["authorSolution"],
                                 AuthorSolutionCodeLanguage = dataReader["authorSolutionLanguage"].ToString()
