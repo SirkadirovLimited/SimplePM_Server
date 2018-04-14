@@ -35,8 +35,7 @@ namespace SubmissionInfo
          * указанному   уроку  и / или
          * олимпиаде.
          */
-
-        public int ClassworkId { get; set; }
+        
         public int OlympId { get; set; }
         
         /*
@@ -72,20 +71,7 @@ namespace SubmissionInfo
 
     public class ProblemInfo
     {
-
-        /*
-         * Энумератор   описывает   возможные
-         * виды тестирования пользовательских
-         * решений поставленных задач.
-         */
-
-        public enum RatingType
-        {
-            DEFAULT = 0,
-            FULL = 0,
-            TEST_BY_TEST = 1
-        }
-
+        
         // Уникальный идентификатор задачи
         public int ProblemId { get; set; }
 
@@ -93,7 +79,7 @@ namespace SubmissionInfo
         public int ProblemDifficulty { get; set; }
 
         // Тип оценивания решения задачи
-        public RatingType ProblemRatingType { get; set; } = RatingType.DEFAULT;
+        public string ProblemRatingType { get; set; }
 
         // Указание, не строгая ли проверка выхода
         public bool AdaptProgramOutput { get; set; } = true;
@@ -101,8 +87,8 @@ namespace SubmissionInfo
         /*
          * Информация об авторском решении данной задачи
          */
-        public byte[] AuthorSolutionCode { get; set; } = null;
-        public string AuthorSolutionCodeLanguage { get; set; } = "unset";
+        public byte[] AuthorSolutionCode { get; set; }
+        public string AuthorSolutionCodeLanguage { get; set; }
 
     }
 

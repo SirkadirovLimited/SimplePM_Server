@@ -144,10 +144,9 @@ namespace SimplePM_Server
                             UserId = int.Parse(dataReader["userId"].ToString()),
 
                             /*
-                             * Привязка к уроку и соревнованию
+                             * Привязка к соревнованию
                              */
 
-                            ClassworkId = int.Parse(dataReader["classworkId"].ToString()),
                             OlympId = int.Parse(dataReader["olympId"].ToString()),
 
                             /*

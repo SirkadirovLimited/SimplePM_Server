@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using System.Threading;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
+using JudgeBase;
 
 namespace SimplePM_Server
 {
@@ -50,6 +51,7 @@ namespace SimplePM_Server
         private string EnabledLangs; // Список поддерживаемых сервером ЯП для SQL запросов
 
         public static List<ICompilerPlugin> _compilerPlugins; // Список, содержащий ссылки на модули компиляторов
+        public static List<IJudgePlugin> _judgePlugins; // Список, содержащий ссылки на модули оценивания
         
         /*
          * Функция загружает в память компиляционные
