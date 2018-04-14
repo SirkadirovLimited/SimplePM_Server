@@ -17,6 +17,7 @@ using CompilerBase;
 using ProgramTesting;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
+using JudgeBase;
 
 namespace SimplePM_Server
 {
@@ -236,7 +237,7 @@ namespace SimplePM_Server
              * последующей обработки.
              */
 
-            SendTestingResult(testingResult, cResult);
+            SendTestingResult(ref testingResult, cResult);
 
             /*
              * Вызываем метод,  который несёт
@@ -450,13 +451,83 @@ namespace SimplePM_Server
         }
 
         /*
+         * Метод занимается вычислением
+         * рейтинговой  оценки текущего
+         * пользовательского решения по
+         * савленной задачи.
+         */
+
+        private float GetSolutionRating(ref ProgramTestingResult programTestingResult)
+        {
+
+            /*
+             * Выполняем все действия в блоке
+             * обработки происходящих исключе
+             * ний,  чтобы избежать возможных
+             * "вылетов" сервера проверки реш
+             * ений во время проверки пользов
+             * ательских решений поставленных
+             * задач по программированию.
+             */
+
+            try
+            {
+
+                /*
+                 * Получаем ссылку на объект
+                 * модуля оценивания пользов
+                 * ательских решений поставл
+                 * енных задач по программир
+                 * ованию.
+                 */
+
+                IJudgePlugin currentJudgePlugin = new SimplePM_Judge().GetJudgePluginByName(
+                    _submissionInfo.ProblemInformation.ProblemRatingType
+                );
+
+                /*
+                 * Выполняем генерацию оценочного
+                 * рейтинга пользовательского реш
+                 * ения  и  возвращаем полученный
+                 * рейтинг.
+                 */
+                
+                return currentJudgePlugin.GenerateJudgeResult(
+                           ref programTestingResult
+                       ).RatingMult * _submissionInfo.ProblemInformation.ProblemDifficulty;
+
+            }
+            catch (Exception ex)
+            {
+
+                /*
+                 * В случае возникновения ошибки
+                 * записываем информацию о ней в
+                 * лог-файл,  дабы администратор
+                 * системы мог узнать её причину
+                 */
+
+                logger.Error(
+                    "Error while generating rating for submission #" +
+                    _submissionInfo.SubmissionId
+                    + ": " + ex
+                );
+
+                // Считаем, что рейтинг - 0
+                return 0;
+
+            }
+
+        }
+
+        /*
          * Метод занимается  отправкой результата
          * проверки   пользовательского   решения
          * поставленной задачи на удалённый MySQL
          * сервер.
          */
 
-        private void SendTestingResult(ProgramTestingResult ptResult, CompilerResult cResult)
+        private void SendTestingResult(ref ProgramTestingResult ptResult, CompilerResult cResult)
         {
 
             /*
@@ -539,7 +610,7 @@ namespace SimplePM_Server
             
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_rating",
-                0
+                GetSolutionRating(ref ptResult)
             ); // Полученный рейтинг за решение
 
             /*
