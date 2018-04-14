@@ -62,9 +62,21 @@ namespace SimplePM_Server
         private void LoadCompilerPlugins()
         {
 
+            // Получаем список модулей компиляции
             _compilerPlugins = SimplePM_PluginsLoader.LoadPlugins<ICompilerPlugin>(
                 (string)_serverConfiguration.path.ICompilerPlugin,
                 "CompilerPlugin.Compiler"
+            );
+
+        }
+
+        private void LoadJudgePlugins()
+        {
+
+            // Получаем список модулей оценивания
+            _judgePlugins = SimplePM_PluginsLoader.LoadPlugins<IJudgePlugin>(
+                (string)_serverConfiguration.path.IJudgePlugin,
+                "JudgePlugin.Judge"
             );
 
         }

@@ -20,6 +20,7 @@
   "path": {
     "ICompilerPlugin": "./",
     "IServerPlugin": "./",
+    "IJudgePlugin": "./",
     "temp": "E:/SimplePM_Temp/"
   }
 
