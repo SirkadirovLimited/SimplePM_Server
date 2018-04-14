@@ -139,6 +139,7 @@
     <Compile Include="SimplePM_Tester\ProgramTestingFunctions.cs" />
     <Compile Include="SimplePM_Tester\SimplePM_Tester.cs" />
     <Compile Include="SimplePM_Tester\SimplePM_Tester.Syntax.cs" />
+    <Compile Include="SimplePM_Workers\SimplePM_Judge.cs" />
     <Compile Include="SimplePM_Workers\SimplePM_PluginsLoader.cs" />
     <Compile Include="SimplePM_Workers\SimplePM_Worker-Part2.cs" />
     <Compile Include="SimplePM_Workers\SimplePM_Worker.cs" />
@@ -195,6 +196,10 @@
     <ProjectReference Include="..\CompilerBase\CompilerBase.csproj">
       <Project>{baec96c2-d35e-40de-99a8-8162174082ac}</Project>
       <Name>CompilerBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JudgeBase\JudgeBase.csproj">
+      <Project>{8e1e1dc7-cbeb-49fe-955d-2f1186eeaabb}</Project>
+      <Name>JudgeBase</Name>
     </ProjectReference>
     <ProjectReference Include="..\PluginBase\PluginBase.csproj">
       <Project>{310e02f7-2d77-43fa-9ae1-9edf2af605ca}</Project>
