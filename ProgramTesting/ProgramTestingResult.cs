@@ -150,12 +150,6 @@ namespace ProgramTesting
                     (current, test) => current + (test.ExitCode.ToString() + splitter.ToString())
                 );
 
-                /*
-                 * Удаляем все ненужные символы
-                 */
-
-                resultLine = resultLine.Trim('\n', '\r');
-
             }
             catch (Exception)
             {
@@ -198,12 +192,6 @@ namespace ProgramTesting
                     "",
                     (current, test) => current + (test.UsedMemory.ToString() + splitter.ToString())
                 );
-
-                /*
-                 * Удаляем все ненужные символы
-                 */
-
-                resultLine = resultLine.Trim('\n', '\r');
 
             }
             catch (Exception)
@@ -248,12 +236,6 @@ namespace ProgramTesting
                     "",
                     (current, test) => current + (test.UsedProcessorTime.ToString() + splitter.ToString())
                 );
-
-                /*
-                 * Удаляем все ненужные символы
-                 */
-
-                resultLine = resultLine.Trim(splitter);
 
             }
             catch (Exception)
