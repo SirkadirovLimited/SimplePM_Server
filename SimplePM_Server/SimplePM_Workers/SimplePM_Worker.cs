@@ -70,6 +70,10 @@ namespace SimplePM_Server
 
         }
 
+        /*
+         * Функция загружает в память что-то зачем-то.
+         */
+
         private void LoadJudgePlugins()
         {
 
@@ -316,6 +320,13 @@ namespace SimplePM_Server
              */
 
             LoadCompilerPlugins();
+
+            /*
+             * Вызываем метод, который загружает
+             * модули оценивания в память.
+             */
+
+            LoadJudgePlugins();
 
             /*
              * Вызываем метод, который загружает

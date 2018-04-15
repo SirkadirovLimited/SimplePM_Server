@@ -515,7 +515,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 UsedProcessorTime = UsedProcessorTime
 
             };
-
+            
             /*
              * Освобождаем все связанные
              * с процессом ресурсы.
