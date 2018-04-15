@@ -12,12 +12,12 @@
 using NLog;
 using System;
 using System.IO;
+using JudgeBase;
 using System.Text;
 using CompilerBase;
 using ProgramTesting;
 using MySql.Data.MySqlClient;
-using System.Collections.Generic;
-using JudgeBase;
+
 
 namespace SimplePM_Server
 {
@@ -52,9 +52,6 @@ namespace SimplePM_Server
 
         // Конфигурация модулей компиляции
         private dynamic _compilerConfigurations;
-
-        // Список, содержащий активные модули компиляции
-        private List<ICompilerPlugin> _compilerPlugins;
         
         /*
          * Основной конструктор данного класса
@@ -64,7 +61,6 @@ namespace SimplePM_Server
             MySqlConnection connection,
             ref dynamic _serverConfiguration,
             ref dynamic _compilerConfigurations,
-            ref List<ICompilerPlugin> _compilerPlugins,
             SubmissionInfo.SubmissionInfo submissionInfo
         )
         {
@@ -77,9 +73,6 @@ namespace SimplePM_Server
 
             // Получаем конфигурации модулей компиляции
             this._compilerConfigurations = _compilerConfigurations;
-
-            // Получаем список модулей компиляции
-            this._compilerPlugins = _compilerPlugins;
 
             // Получаем информацию о запросе на тестирование
             _submissionInfo = submissionInfo;
@@ -144,7 +137,6 @@ namespace SimplePM_Server
             );
 
             var compilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
-                ref _compilerPlugins,
                 (string)compilerConfiguration.module_name
             );
 
@@ -313,7 +305,6 @@ namespace SimplePM_Server
                 ref _connection,
                 ref _serverConfiguration,
                 ref _compilerConfigurations,
-                ref _compilerPlugins,
                 cResult.ExeFullname,
                 ref _submissionInfo
             );
@@ -461,62 +452,83 @@ namespace SimplePM_Server
         {
 
             /*
-             * Выполняем все действия в блоке
-             * обработки происходящих исключе
-             * ний,  чтобы избежать возможных
-             * "вылетов" сервера проверки реш
-             * ений во время проверки пользов
-             * ательских решений поставленных
-             * задач по программированию.
+             * Выполняем расчёт рейтинга
+             * пользовательского решения
+             * лишь  в  том случае, если
+             * типом тестирования выбран
+             * старый добрый "release".
+             */
+            
+            if (_submissionInfo.TestType == "release")
+            {
+
+                /*
+                 * Выполняем все действия в блоке
+                 * обработки происходящих исключе
+                 * ний,  чтобы избежать возможных
+                 * "вылетов" сервера проверки реш
+                 * ений во время проверки пользов
+                 * ательских решений поставленных
+                 * задач по программированию.
+                 */
+
+                try
+                {
+
+                    /*
+                     * Получаем ссылку на объект
+                     * модуля оценивания пользов
+                     * ательских решений поставл
+                     * енных задач по программир
+                     * ованию.
+                     */
+
+                    IJudgePlugin currentJudgePlugin = new SimplePM_Judge().GetJudgePluginByName(
+                        _submissionInfo.ProblemInformation.ProblemRatingType
+                    );
+
+                    /*
+                     * Выполняем генерацию оценочного
+                     * рейтинга пользовательского реш
+                     * ения  и  возвращаем полученный
+                     * рейтинг.
+                     */
+
+                    return currentJudgePlugin.GenerateJudgeResult(
+                               ref programTestingResult
+                           ).RatingMult * _submissionInfo.ProblemInformation.ProblemDifficulty;
+
+                }
+                catch (Exception ex)
+                {
+
+                    /*
+                     * В случае возникновения ошибки
+                     * записываем информацию о ней в
+                     * лог-файл,  дабы администратор
+                     * системы мог узнать её причину
+                     */
+
+                    logger.Error(
+                        "Error while generating rating for submission #" +
+                        _submissionInfo.SubmissionId
+                        + ": " + ex
+                    );
+
+                    // Считаем, что рейтинг - 0
+                    return 0;
+
+                }
+
+            }
+
+            /*
+             * В других случаях низко оцениваем
+             * старания пользователя решить эту
+             * задачу, ведь нельзя же так!
              */
 
-            try
-            {
-
-                /*
-                 * Получаем ссылку на объект
-                 * модуля оценивания пользов
-                 * ательских решений поставл
-                 * енных задач по программир
-                 * ованию.
-                 */
-
-                IJudgePlugin currentJudgePlugin = new SimplePM_Judge().GetJudgePluginByName(
-                    _submissionInfo.ProblemInformation.ProblemRatingType
-                );
-
-                /*
-                 * Выполняем генерацию оценочного
-                 * рейтинга пользовательского реш
-                 * ения  и  возвращаем полученный
-                 * рейтинг.
-                 */
-                
-                return currentJudgePlugin.GenerateJudgeResult(
-                           ref programTestingResult
-                       ).RatingMult * _submissionInfo.ProblemInformation.ProblemDifficulty;
-
-            }
-            catch (Exception ex)
-            {
-
-                /*
-                 * В случае возникновения ошибки
-                 * записываем информацию о ней в
-                 * лог-файл,  дабы администратор
-                 * системы мог узнать её причину
-                 */
-
-                logger.Error(
-                    "Error while generating rating for submission #" +
-                    _submissionInfo.SubmissionId
-                    + ": " + ex
-                );
-
-                // Считаем, что рейтинг - 0
-                return 0;
-
-            }
+            return 0;
 
         }
 

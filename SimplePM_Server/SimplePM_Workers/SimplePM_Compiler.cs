@@ -11,7 +11,6 @@
 
 using System.IO;
 using CompilerBase;
-using System.Collections.Generic;
 
 namespace SimplePM_Server
 {
@@ -55,7 +54,6 @@ namespace SimplePM_Server
         }
         
         public static ICompilerPlugin FindCompilerPlugin(
-            ref List<ICompilerPlugin> _compilerPlugins,
             string pluginName
         )
         {
@@ -64,7 +62,7 @@ namespace SimplePM_Server
              * Производим поиск искомого плагина
              * в списке доступных модулей компиляции.
              */
-            foreach (var plugin in _compilerPlugins)
+            foreach (var plugin in SimplePM_Worker._compilerPlugins)
                 if (plugin.PluginName == pluginName)
                     return plugin;
 

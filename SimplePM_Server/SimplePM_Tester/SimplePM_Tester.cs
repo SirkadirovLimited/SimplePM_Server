@@ -28,8 +28,6 @@ namespace SimplePM_Server.SimplePM_Tester
         #region Секция объявления глобальных переменных
         private SubmissionInfo.SubmissionInfo submissionInfo; // информация о запросе
 
-        private List<ICompilerPlugin> _compilerPlugins; // ссылка на список модулей компиляции
-
         private dynamic _serverConfiguration;
         private dynamic _languageConfigurations;
 
@@ -45,7 +43,6 @@ namespace SimplePM_Server.SimplePM_Tester
             ref MySqlConnection connection,
             ref dynamic serverConfiguration,
             ref dynamic languageConfigurations,
-            ref List<ICompilerPlugin> _compilerPlugins,
             string exeFileUrl,
             ref SubmissionInfo.SubmissionInfo submissionInfo
         )
@@ -55,8 +52,6 @@ namespace SimplePM_Server.SimplePM_Tester
 
             _serverConfiguration = serverConfiguration;
             _languageConfigurations = languageConfigurations;
-
-            this._compilerPlugins = _compilerPlugins;
 
             this.exeFileUrl = exeFileUrl;
             this.submissionInfo = submissionInfo;

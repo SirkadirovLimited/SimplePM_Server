@@ -10,7 +10,6 @@
  */
 
 using System;
-using System.Data;
 using SubmissionInfo;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -219,7 +218,6 @@ namespace SimplePM_Server
                             conn,
                             ref _serverConfiguration,
                             ref _compilerConfigurations,
-                            ref _compilerPlugins,
                             submissionInfo
                         ).ServeSubmission();
 

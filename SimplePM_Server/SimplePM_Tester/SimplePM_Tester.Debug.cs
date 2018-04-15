@@ -105,7 +105,6 @@ namespace SimplePM_Server.SimplePM_Tester
              */
             
             var userCompilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
-                ref _compilerPlugins,
                 (string)userLanguageConfiguration.module_name
             );
 
@@ -205,7 +204,6 @@ namespace SimplePM_Server.SimplePM_Tester
              */
 
             authorCompilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
-                ref _compilerPlugins,
                 (string)authorLanguageConfiguration.module_name
             );
             
