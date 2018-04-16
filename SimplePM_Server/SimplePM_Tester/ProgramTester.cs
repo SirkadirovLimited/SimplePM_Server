@@ -717,9 +717,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 ? e.Data.Trim()
                 : e.Data;
 
-            _programOutput += (_programOutput.Length > 0)
-                ? adaptedString
-                : adaptedString + '\n';
+            _programOutput += adaptedString + '\n';
 
         }
 
