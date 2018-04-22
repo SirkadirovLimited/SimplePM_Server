@@ -64,7 +64,7 @@
     "source_ext": "lua",
     "enabled": true,
     "module_name": "NoCompiler",
-    "runtime_path": "E:\\Lua\\lua.exe",
+    "runtime_path": "C:\\Program Files (x86)\\Lua\\5.1\\lua.exe",
     "runtime_arguments": "\"{%fileLocation%}\""
   },
 
