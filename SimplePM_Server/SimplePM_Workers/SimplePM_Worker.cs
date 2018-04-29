@@ -12,13 +12,14 @@
 using NLog;
 using System;
 using System.IO;
+using JudgeBase;
+using PluginBase;
 using NLog.Config;
 using CompilerBase;
 using Newtonsoft.Json;
 using System.Threading;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
-using JudgeBase;
 
 namespace SimplePM_Server
 {
@@ -50,40 +51,11 @@ namespace SimplePM_Server
         
         private string EnabledLangs; // Список поддерживаемых сервером ЯП для SQL запросов
 
+        public static List<IServerPlugin> _serverPlugins; // Список, содержащий ссылки на модули сервера проверки решений
         public static List<ICompilerPlugin> _compilerPlugins; // Список, содержащий ссылки на модули компиляторов
         public static List<IJudgePlugin> _judgePlugins; // Список, содержащий ссылки на модули оценивания
         
-        /*
-         * Функция загружает в память компиляционные
-         * модули,  которые  собирает  из специально
-         * заготовленной директории.
-         */
-
-        private void LoadCompilerPlugins()
-        {
-
-            // Получаем список модулей компиляции
-            _compilerPlugins = SimplePM_PluginsLoader.LoadPlugins<ICompilerPlugin>(
-                (string)_serverConfiguration.path.ICompilerPlugin,
-                "CompilerPlugin.Compiler"
-            );
-
-        }
-
-        /*
-         * Функция загружает в память что-то зачем-то.
-         */
-
-        private void LoadJudgePlugins()
-        {
-
-            // Получаем список модулей оценивания
-            _judgePlugins = SimplePM_PluginsLoader.LoadPlugins<IJudgePlugin>(
-                (string)_serverConfiguration.path.IJudgePlugin,
-                "JudgePlugin.Judge"
-            );
-
-        }
+        
         
         /*
          * Функция генерирует  строку из допустимых для
@@ -319,7 +291,7 @@ namespace SimplePM_Server
              * плагины сервера в память.
              */
 
-            //TODO:LoadServerPlugins();
+            LoadServerPlugins();
             
             /*
              * Вызываем метод, который загружает

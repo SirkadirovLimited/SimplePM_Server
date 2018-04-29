@@ -141,6 +141,7 @@
     <Compile Include="SimplePM_Tester\SimplePM_Tester.Syntax.cs" />
     <Compile Include="SimplePM_Workers\SimplePM_Judge.cs" />
     <Compile Include="SimplePM_Workers\SimplePM_PluginsLoader.cs" />
+    <Compile Include="SimplePM_Workers\SimplePM_Worker-Plugins.cs" />
     <Compile Include="SimplePM_Workers\SimplePM_Worker-Submission.cs" />
     <Compile Include="SimplePM_Workers\SimplePM_Worker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
