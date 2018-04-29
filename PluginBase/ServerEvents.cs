@@ -19,30 +19,19 @@ namespace PluginBase
     {
 
         /* Basic server events */
-        public event EventHandler ServerStarted;
-        public event EventHandler ServerShutdown;
+        public event EventHandler<DateTime> ServerStarted;
+        public event EventHandler<DateTime> ServerShutdown;
 
         /* Server exception events */
-        public event EventHandler<UnhandledExceptionCatchedEventArgs> UnhandledExceptionCatched;
-
-        public class UnhandledExceptionCatchedEventArgs : EventArgs
-        {
-            public Exception ex;
-            public DateTime errorTime;
-        }
+        public event EventHandler<Exception> UnhandledExceptionCatched;
 
         /* Submission checking */
-        public event EventHandler SubmissionChekingStarted;
-        public event EventHandler SubmissionChekingFinished;
+        public event EventHandler<SubmissionInfo.SubmissionInfo> SubmissionChekingStarted;
+        public event EventHandler<SubmissionInfo.SubmissionInfo> SubmissionChekingFinished;
 
         /* User process testing */
-        public event EventHandler UserProcessTestingStarted;
-        public event EventHandler UserProcessTestingFinished;
-
-        public class UserProcessTestingEventArgs : EventArgs
-        {
-            public Process userProcess;
-        }
+        public event EventHandler<Process> UserProcessTestingStarted;
+        public event EventHandler<Process> UserProcessTestingFinished;
 
     }
 

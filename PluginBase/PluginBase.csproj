@@ -54,5 +54,11 @@
   <ItemGroup>
     <Content Include="logo-fhd.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SubmissionInfo\SubmissionInfo.csproj">
+      <Project>{88a8832a-cb6f-49b6-b9da-2e882e6df482}</Project>
+      <Name>SubmissionInfo</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
