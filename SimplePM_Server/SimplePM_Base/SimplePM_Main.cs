@@ -18,7 +18,7 @@ namespace SimplePM_Server
      * и вызывает метод инициализации сервера.
      */
     
-    class SimplePM_Main
+    internal class SimplePM_Main
     {
 
         public static void Main(string[] args)
