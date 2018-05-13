@@ -50,10 +50,16 @@ namespace CompilerPlugin
                 var fileInfo = new FileInfo(fileLocation);
 
                 // Указываем полный путь к главному исполняемому файлу
-                result.ExeFullname = fileInfo.DirectoryName +
-                                     "\\" +
-                                     (string)languageConfiguration.default_class_name +
-                                     ".class";
+                result.ExeFullname = Path.Combine(
+                    fileInfo.DirectoryName ?? throw new DirectoryNotFoundException(
+                        "inner",
+                        new FileNotFoundException(
+                            "ICompilerPlugin.Java",
+                            fileLocation
+                        )
+                    ),
+                    (string)languageConfiguration.default_class_name + ".class"
+                );
 
                 // Проверяем на существование главного класса
                 if (!File.Exists(result.ExeFullname))
@@ -97,7 +103,14 @@ namespace CompilerPlugin
                 var fileInfo = new FileInfo(filePath);
 
                 // Устанавливаем рабочую папку процесса
-                startInfo.WorkingDirectory = fileInfo.DirectoryName ?? throw new InvalidOperationException();
+                startInfo.WorkingDirectory = fileInfo.DirectoryName
+                                             ?? throw new DirectoryNotFoundException(
+                                                 "inner",
+                                                 new FileNotFoundException(
+                                                     "ICompilerPlugin.Java",
+                                                     filePath
+                                                 )
+                                             );
 
                 // Устанавливаем имя запускаемой программы
                 startInfo.FileName = (string)languageConfiguration.runtime_path;
