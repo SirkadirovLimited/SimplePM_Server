@@ -45,6 +45,10 @@ namespace CompilerPlugin
             // Передаём полный путь к исполняемому файлу
             result.ExeFullname = exeLocation;
 
+            // Фикс для GNU/Linux-based систем
+            if (!Platform.IsWindows)
+                result.ExeFullname += ".exe";
+
             // Возвращаем результат компиляции
             return cRefs.ReturnCompilerResult(result);
 
@@ -78,7 +82,7 @@ namespace CompilerPlugin
                     startInfo.FileName = languageConfiguration.runtime_path;
 
                     // Указываем аргументы запуска
-                    startInfo.Arguments = '"' + filePath + ".exe" + '"';
+                    startInfo.Arguments = '"' + filePath + '"';
 
                 }
                 else
