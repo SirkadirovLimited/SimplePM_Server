@@ -11,6 +11,7 @@
 
 using System;
 using CompilerBase;
+using PlatformChecker;
 using System.Diagnostics;
 
 namespace CompilerPlugin
@@ -62,9 +63,6 @@ namespace CompilerPlugin
             try
             {
                 
-                // Получаем информацию о платформе запуска
-                var platform = (int)Environment.OSVersion.Platform;
-                
                 /*
                  * В зависимости от установленной на машине
                  * операционной системы, выполняем специфи-
@@ -73,14 +71,14 @@ namespace CompilerPlugin
                  * поставленной задачи.
                  */
 
-                if (platform == 4 || platform == 6 || platform == 128)
+                if (Platform.IsLovelyLinux || Platform.IsUglyMac)
                 {
 
                     // Указываем имя запускаемой программы (полный путь к ней)
                     startInfo.FileName = languageConfiguration.runtime_path;
 
                     // Указываем аргументы запуска
-                    startInfo.Arguments = '"' + filePath + '"';
+                    startInfo.Arguments = '"' + filePath + ".exe" + '"';
 
                 }
                 else

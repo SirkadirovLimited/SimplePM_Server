@@ -57,6 +57,10 @@
       <Project>{BAEC96C2-D35E-40DE-99A8-8162174082AC}</Project>
       <Name>CompilerBase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PlatformChecker\PlatformChecker.csproj">
+      <Project>{269708aa-a7ee-4417-aba4-065069f67e74}</Project>
+      <Name>PlatformChecker</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.manifest" />

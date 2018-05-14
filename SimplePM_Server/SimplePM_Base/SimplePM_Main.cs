@@ -33,7 +33,6 @@ namespace SimplePM_Server
             new SimplePM_Worker().Run(args);
 
         }
-
     }
 
 }
