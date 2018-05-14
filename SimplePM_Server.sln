@@ -51,6 +51,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IJudgePlugin.TestByTest", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IJudgePlugin.None", "IJudgePlugin.None\IJudgePlugin.None.csproj", "{00054508-0FB9-4DC1-98A7-CAF7D609EE22}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformChecker", "PlatformChecker\PlatformChecker.csproj", "{269708AA-A7EE-4417-ABA4-065069F67E74}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -123,6 +125,10 @@ Global
 		{00054508-0FB9-4DC1-98A7-CAF7D609EE22}.Debug|x64.Build.0 = Debug|x64
 		{00054508-0FB9-4DC1-98A7-CAF7D609EE22}.Release|x64.ActiveCfg = Release|x64
 		{00054508-0FB9-4DC1-98A7-CAF7D609EE22}.Release|x64.Build.0 = Release|x64
+		{269708AA-A7EE-4417-ABA4-065069F67E74}.Debug|x64.ActiveCfg = Debug|x64
+		{269708AA-A7EE-4417-ABA4-065069F67E74}.Debug|x64.Build.0 = Debug|x64
+		{269708AA-A7EE-4417-ABA4-065069F67E74}.Release|x64.ActiveCfg = Release|x64
+		{269708AA-A7EE-4417-ABA4-065069F67E74}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -145,6 +151,7 @@ Global
 		{4D4B1DD1-3EA3-4CC1-89BC-A8AFD40E078A} = {F1E5D391-6437-4DA1-9023-D1298D7F855F}
 		{7B73FCEB-3CAB-4BA4-A9F7-96833563785B} = {F1E5D391-6437-4DA1-9023-D1298D7F855F}
 		{00054508-0FB9-4DC1-98A7-CAF7D609EE22} = {F1E5D391-6437-4DA1-9023-D1298D7F855F}
+		{269708AA-A7EE-4417-ABA4-065069F67E74} = {260918EF-3103-4A98-8DA5-BCB40DEA37A3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {56F31401-B3C0-4807-AE6F-109275F9E051}
