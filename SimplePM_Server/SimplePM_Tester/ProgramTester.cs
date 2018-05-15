@@ -350,15 +350,15 @@ namespace SimplePM_Server.SimplePM_Tester
 
                     /*
                      * Вызываем метод, запускающий
-                     * слежение за памятью.
+                     * слежение  за   процессорным
+                     * временем.
                      */
-
+                    
                     StartProcessorTimeLimitChecker();
 
                     /*
                      * Вызываем метод, запускающий
-                     * слежение  за   процессорным
-                     * временем.
+                     * слежение за памятью.
                      */
 
                     StartMemoryLimitChecker();
