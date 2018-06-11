@@ -29,6 +29,8 @@
 using NLog;
 using System;
 using System.IO;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using JudgeBase;
 using System.Text;
 using CompilerBase;
@@ -109,7 +111,7 @@ namespace SimplePM_Server
 
             // Генерируем имя директории
             var directoryName = Path.Combine(
-                (string)_serverConfiguration.path.temp,
+                (string)(_serverConfiguration.path.temp),
                 Guid.NewGuid().ToString(),
                 ""
             );
@@ -154,7 +156,7 @@ namespace SimplePM_Server
             );
 
             var compilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
-                (string)compilerConfiguration.module_name
+                (string)(compilerConfiguration.module_name)
             );
 
             /*
@@ -272,6 +274,13 @@ namespace SimplePM_Server
 
         }
 
+        /*
+         * Метод занимается тем, что запускает
+         * тестирование пользовательского реше
+         * ния поставленной задачи и обрабатыв
+         * ает результаты этого тестирования.
+         */
+        
         private ProgramTestingResult RunTesting(
             CompilerResult cResult,
             ref dynamic compilerConfiguration,
@@ -458,6 +467,33 @@ namespace SimplePM_Server
 
         }
 
+        public static bool SetSourceFileAttributes(string fileLocation)
+        {
+            
+            // Устанавливаем его аттрибуты
+            File.SetAttributes(
+                fileLocation,
+                FileAttributes.Temporary | FileAttributes.NotContentIndexed
+            );
+
+            /*
+             * Устанавливаем права доступа
+             * к указанному файлу.
+             */
+            
+            if ((string) (SimplePM_Worker._securityConfiguration.runas.enabled) == "true")
+            {
+                
+                var fs = new FileSecurity(fileLocation, AccessControlSections.All);
+            
+                //fs.AddAccessRule(new FileSystemAccessRule(new NTAccount((string)(SimplePM_Worker._securityConfiguration.runas.username)), FileSystemRights.ChangePermissions | File, AccessControlType.Deny));
+            
+                File.SetAccessControl(fileLocation, fs);
+                
+            }
+            
+        }
+        
         /*
          * Метод занимается вычислением
          * рейтинговой  оценки текущего

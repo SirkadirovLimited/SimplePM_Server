@@ -101,54 +101,19 @@ namespace SimplePM_Server.SimplePM_Tester
         {
 
             /*
-             * Объявляем переменную, которая  будет  хранить
-             * ссылку на объект, который хранит конфигурацию
-             * безопасности сервера проверки решений.
-             */
-
-            dynamic securityConfiguration;
-
-            /*
-             * Для  обеспечения  безопасности  выполнения
-             * при распараллеливании, требуется временная
-             * блокировка доступа к чтению из файла.
-             */
-            lock (new object())
-            {
-
-                /*
-                 * Производим     чтение    конфигурационного
-                 * файла, после чего произвоим десериализацию
-                 * Json данных в удобный для нас формат.
-                 */
-
-                securityConfiguration = JsonConvert.DeserializeObject(
-                    File.ReadAllText("./config/security.json")
-                );
-
-            }
-
-            /*
              * Проверяем, включена  ли  функция  запуска
              * пользовательских программ от имени инного
              * пользователя. Если отключена - выходим.
              */
 
-            if ((string)(securityConfiguration.runas.enabled) != "true")
+            if ((string)(SimplePM_Worker._securityConfiguration.runas.enabled) != "true")
                 return;
-
-            /*
-             * Указываем, что будем запускать процесс
-             * от имени другого пользователя.
-             */
-
-            //proc.StartInfo.Verb = "runas";
 
             /*
              * Передаём имя пользователя
              */
             
-            proc.StartInfo.UserName = (string)(securityConfiguration.runas.username);
+            proc.StartInfo.UserName = (string)(SimplePM_Worker._securityConfiguration.runas.username);
 
             //proc.StartInfo.Domain = Environment.MachineName;
 
@@ -167,7 +132,7 @@ namespace SimplePM_Server.SimplePM_Tester
             var encPassword = new SecureString();
 
             // Добавляем данные в защищённую строку
-            foreach (var c in (string)securityConfiguration.runas.password)
+            foreach (var c in (string)(SimplePM_Worker._securityConfiguration.runas.password))
                 encPassword.AppendChar(c);
 
             // Устанавливаем пароль пользователя
