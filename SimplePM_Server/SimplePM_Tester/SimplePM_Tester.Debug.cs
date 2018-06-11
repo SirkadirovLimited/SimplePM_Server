@@ -122,7 +122,7 @@ namespace SimplePM_Server.SimplePM_Tester
              */
             
             var userCompilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
-                (string)userLanguageConfiguration.module_name
+                (string)(userLanguageConfiguration.module_name)
             );
 
             /*
@@ -221,7 +221,7 @@ namespace SimplePM_Server.SimplePM_Tester
              */
 
             authorCompilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
-                (string)authorLanguageConfiguration.module_name
+                (string)(authorLanguageConfiguration.module_name)
             );
             
             /*
@@ -231,7 +231,7 @@ namespace SimplePM_Server.SimplePM_Tester
              */
             
             // Определяем расширение файла
-            var authorFileExt = "." + (string)authorLanguageConfiguration.source_ext;
+            var authorFileExt = "." + (string)(authorLanguageConfiguration.source_ext);
 
             // Получаем случайный путь к директории авторского решения
             var tmpAuthorDir = Path.Combine(
@@ -276,11 +276,8 @@ namespace SimplePM_Server.SimplePM_Tester
                 );
 
                 // Устанавливаем его аттрибуты
-                File.SetAttributes(
-                    tmpAuthorSrcLocation,
-                    FileAttributes.Temporary | FileAttributes.NotContentIndexed
-                );
-
+                SimplePM_Waiter.SetSourceFileAttributes(tmpAuthorSrcLocation);
+                
             }
             
             // Инициализируем экземпляр класса компилятора
@@ -342,8 +339,6 @@ namespace SimplePM_Server.SimplePM_Tester
                 WHERE 
                     `problemId` = @problemId 
                 ORDER BY 
-                    `timeLimit` DESC,
-                    `memoryLimit` DESC,
                     `id` ASC 
                 LIMIT 
                     1

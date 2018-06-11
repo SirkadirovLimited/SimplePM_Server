@@ -61,8 +61,9 @@ namespace SimplePM_Server
 
         private readonly Logger logger = LogManager.GetLogger("SimplePM_Worker");
 
-        private dynamic _serverConfiguration; // переменная хранит основную конфигурацию сервера
-        private dynamic _compilerConfigurations; // переменная хранит конфигурацию модулей компиляции
+        public static dynamic _serverConfiguration; // переменная хранит основную конфигурацию сервера
+        public static dynamic _securityConfiguration; // переменная хранит конфигурацию безопасности сервера
+        public static dynamic _compilerConfigurations; // переменная хранит конфигурацию модулей компиляции
 
         private ulong _aliveTestersCount; // Количество текущих обрабатываемых запросов
         
@@ -71,8 +72,6 @@ namespace SimplePM_Server
         public static List<IServerPlugin> _serverPlugins; // Список, содержащий ссылки на модули сервера проверки решений
         public static List<ICompilerPlugin> _compilerPlugins; // Список, содержащий ссылки на модули компиляторов
         public static List<IJudgePlugin> _judgePlugins; // Список, содержащий ссылки на модули оценивания
-        
-        
         
         /*
          * Функция генерирует  строку из допустимых для
@@ -115,12 +114,12 @@ namespace SimplePM_Server
                 if (compilerConfig.enabled != "true") continue;
 
                 // Добавляем текущую конфигурацию в список
-                EnabledLangsList.Add("'" + (string)compilerConfig.language_name + "'");
+                EnabledLangsList.Add("'" + (string)(compilerConfig.language_name) + "'");
 
                 // Записываем информацию об этом в лог-файл
                 logger.Debug(
                     "Compiler configuration '" +
-                    (string)compilerConfig.language_name +
+                    (string)(compilerConfig.language_name) +
                     "' loaded!"
                 );
 
@@ -264,6 +263,11 @@ namespace SimplePM_Server
                 File.ReadAllText("./config/server.json")
             );
             
+            // Загружаем конфигурацию безопасности сервера в память
+            _securityConfiguration = JsonConvert.DeserializeObject(
+                File.ReadAllText("./config/security.json")
+            );
+            
             // Загружаем конфигурации модулей компиляции в память
             _compilerConfigurations = JsonConvert.DeserializeObject(
                 File.ReadAllText("./config/compilers.json")
@@ -297,9 +301,11 @@ namespace SimplePM_Server
              * данной машине Тьюринга.
              */
 
+            // rechecks without timeout
             if (_serverConfiguration.submission.rechecks_without_timeout == "auto")
                 _serverConfiguration.submission.rechecks_without_timeout = Environment.ProcessorCount.ToString();
 
+            // max threads
             if (_serverConfiguration.submission.max_threads == "auto")
                 _serverConfiguration.submission.max_threads = Environment.ProcessorCount.ToString();
 
@@ -366,7 +372,7 @@ namespace SimplePM_Server
             while (true)
             {
                 
-                if (_aliveTestersCount < (ulong)_serverConfiguration.submission.max_threads)
+                if (_aliveTestersCount < (ulong)(_serverConfiguration.submission.max_threads))
                 {
 
                     /*
@@ -425,14 +431,14 @@ namespace SimplePM_Server
                  */
 
                 var tmpCheck = rechecksCount >= uint.Parse(
-                    (string)_serverConfiguration.submission.rechecks_without_timeout
+                    (string)(_serverConfiguration.submission.rechecks_without_timeout)
                 );
 
-                if (_aliveTestersCount < (ulong)_serverConfiguration.submission.max_threads && tmpCheck)
+                if (_aliveTestersCount < (ulong)(_serverConfiguration.submission.max_threads) && tmpCheck)
                 {
 
                     // Ожидание для уменьшения нагрузки на сервер
-                    Thread.Sleep((int)_serverConfiguration.submission.check_timeout);
+                    Thread.Sleep((int)(_serverConfiguration.submission.check_timeout));
 
                     // Обнуляем итератор
                     rechecksCount = 0;

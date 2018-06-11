@@ -70,7 +70,7 @@ namespace SimplePM_Server
                     logger.Trace(
                         "Starting submission query; Running threads: " +
                         _aliveTestersCount + " from " +
-                        (ulong)_serverConfiguration.submission.max_threads
+                        (ulong)(_serverConfiguration.submission.max_threads)
                     );
 
                     /*
@@ -100,7 +100,7 @@ namespace SimplePM_Server
                     lock (new object())
                     {
 
-                        f = _aliveTestersCount >= (ulong)_serverConfiguration.submission.max_threads | !dataReader.Read();
+                        f = _aliveTestersCount >= (ulong)(_serverConfiguration.submission.max_threads) | !dataReader.Read();
 
                     }
 
