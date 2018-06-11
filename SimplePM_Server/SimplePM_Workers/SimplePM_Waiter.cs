@@ -160,7 +160,7 @@ namespace SimplePM_Server
             );
 
             /*
-             * Определяем расширение файла
+             * Определяем   расширение    файла
              * исходного кода пользовательского
              * решения поставленной задачи.
              */
@@ -168,7 +168,7 @@ namespace SimplePM_Server
             var fileExt = "." + compilerConfiguration.source_ext;
             
             /*
-             * Случайным образом генерируем путь
+             * Случайным   образом   генерируем    путь
              * к файлу исходного кода пользовательского
              * решения поставленной задачи.
              */
@@ -179,10 +179,10 @@ namespace SimplePM_Server
             );
             
             /*
-             * Записываем в него исходный код,
-             * очищаем буфер и закрываем поток
+             * Записываем  в  него   исходный   код,
+             * очищаем  буфер   и   закрываем  поток
              * записи в данный файл.
-             * При этом, осуществляем побайтовую
+             * При  этом,   осуществляем  побайтовую
              * запись в файл, дабы не повредить его.
              */
 
@@ -192,17 +192,14 @@ namespace SimplePM_Server
             );
 
             /*
-             * Устанавливаем аттрибуты данного файла
-             * таким образом, дабы исключить возможность
-             * индексирования его содержимого и остальные
+             * Устанавливаем   аттрибуты   данного   файла
+             * таким образом, дабы  исключить  возможность
+             * индексирования  его содержимого и остальные
              * не приятные для нас ситуации, которые могут
              * привести к непредвиденным последствиям.
              */
 
-            File.SetAttributes(
-                fileLocation,
-                FileAttributes.NotContentIndexed
-            );
+            SetSourceFileAttributes(fileLocation);
 
             /*
              * Объявляем и нициализируем переменную,
@@ -469,29 +466,24 @@ namespace SimplePM_Server
 
         public static bool SetSourceFileAttributes(string fileLocation)
         {
-            
-            // Устанавливаем его аттрибуты
-            File.SetAttributes(
-                fileLocation,
-                FileAttributes.Temporary | FileAttributes.NotContentIndexed
-            );
 
-            /*
-             * Устанавливаем права доступа
-             * к указанному файлу.
-             */
-            
-            if ((string) (SimplePM_Worker._securityConfiguration.runas.enabled) == "true")
+            try
             {
                 
-                var fs = new FileSecurity(fileLocation, AccessControlSections.All);
-            
-                //fs.AddAccessRule(new FileSystemAccessRule(new NTAccount((string)(SimplePM_Worker._securityConfiguration.runas.username)), FileSystemRights.ChangePermissions | File, AccessControlType.Deny));
-            
-                File.SetAccessControl(fileLocation, fs);
+                // Устанавливаем его аттрибуты
+                File.SetAttributes(
+                    fileLocation,
+                    FileAttributes.Temporary | FileAttributes.NotContentIndexed
+                );
                 
             }
-            
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return true;
+
         }
         
         /*
@@ -503,7 +495,7 @@ namespace SimplePM_Server
 
         private float GetSolutionRating(ref ProgramTestingResult programTestingResult)
         {
-
+            
             /*
              * Выполняем расчёт рейтинга
              * пользовательского решения
