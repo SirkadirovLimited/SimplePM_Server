@@ -1,5 +1,5 @@
 ﻿# Объявление и инициализация некоторых переменных
-$url = https://raw.githubusercontent.com/SirkadirovTeam/SimplePM_WebApp/master/!DUMPS!/simplepm2.sql"
+$url = "https://raw.githubusercontent.com/SirkadirovTeam/SimplePM_WebApp/master/!DUMPS!/simplepm2.sql"
 $output = "$PSScriptRoot\simplepm.sql"
 $start_time = Get-Date
 
