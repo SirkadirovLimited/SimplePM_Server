@@ -156,6 +156,7 @@
     </EmbeddedResource>
     <None Include="App.config" />
     <None Include="app.manifest" />
+    <None Include="server_classes.cd" />
     <None Include="config\compilers.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
