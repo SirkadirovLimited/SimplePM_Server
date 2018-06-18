@@ -65,6 +65,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * который  знает  лучше, как  это
              * делать.
              */
+            
             var f = _compilerPlugin.SetRunningMethod(
                 ref languageConfiguration,
                 ref startInfo,
@@ -75,6 +76,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * Добавляем к этому всему
              * аргументы коммандной строки.
              */
+            
             if (startInfo.Arguments.Length > 0)
                 startInfo.Arguments += " " + arguments;
             else
@@ -84,6 +86,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * В случае возникновения непредвиденных
              * ошибок выбрасываем исключение.
              */
+            
             if (!f)
                 throw new SimplePM_Exceptions.UnknownException("SetRunningMethod() failed!");
 
@@ -115,11 +118,9 @@ namespace SimplePM_Server.SimplePM_Tester
             
             proc.StartInfo.UserName = (string)(SimplePM_Worker._securityConfiguration.runas.username);
 
-            //proc.StartInfo.Domain = Environment.MachineName;
-
             /*
-             * Передаём,  что   необходимо
-             * вытянуть профайл из реестра
+             * Передаём, что загружать пользова-
+             * тельский профайл не нужно.
              */
 
             proc.StartInfo.LoadUserProfile = false;
