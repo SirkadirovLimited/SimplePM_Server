@@ -53,6 +53,7 @@ namespace ProgramTesting
         public const char InputErrorResult = 'I'; // Ошибка записи входного потока
         public const char OutputErrorResult = 'O'; // Ошибка в формате выходного потока
         public const char ServerErrorResult = 'C'; // Ошибка сервера проверки решений
+        public const char WaitErrorResult = 'W'; // Слишком длинное выполнение программы
 
         /*
          * Раздел объявления переменных

@@ -67,6 +67,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
         private readonly long _programMemoryLimit; // лимит по памяти в байтах
         private readonly int _programProcessorTimeLimit; // лимит по процессорному времени в миллисекундах
+        private readonly int _programRuntimeLimit; // лимит по времени исполнения программы в миллисекундах
         private readonly int _outputCharsLimit; // лимит по количеству символов в выходном потоке
 
         private readonly bool _adaptOutput; // указывает, мягкая или строгая проверка требуется
@@ -132,7 +133,8 @@ namespace SimplePM_Server.SimplePM_Tester
             int processorTimeLimit = 0,
             byte[] input = null,
             int outputCharsLimit = 0,
-            bool adaptOutput = true
+            bool adaptOutput = true,
+            int programRuntimeLimit = 0
         )
         {
             
@@ -162,6 +164,9 @@ namespace SimplePM_Server.SimplePM_Tester
 
             // Узнаём, необходимо ли упрощать выходной поток
             _adaptOutput = adaptOutput;
+
+            // Получаем лимит на время исполнения программы в миллисекундах
+            _programRuntimeLimit = (programRuntimeLimit <= 0) ? processorTimeLimit * 3 : programRuntimeLimit;
 
         }
 
@@ -381,12 +386,41 @@ namespace SimplePM_Server.SimplePM_Tester
                     StartMemoryLimitChecker();
 
                     /*
-                     * Ожидаем завершения
-                     * пользовательского
+                     * Ожидаем  завершения  пользовательского
                      * процесса.
+                     * Если этого не произошло, предпринимаем
+                     * необходимые действия  по  потношению к
+                     * нему.
                      */
 
-                    _programProcess.WaitForExit();
+                    if (!_programProcess.WaitForExit(_programRuntimeLimit))
+                    {
+
+                        /*
+                         * Обрабатываем возможные исключения
+                         */
+                        
+                        try
+                        {
+
+                            // Насильно "убиваем" пользовательский процесс
+                            _programProcess.Kill();
+
+                        }
+                        catch
+                        {
+                            
+                            /* Нет необходимости обработки */
+                            
+                        }
+                        
+                        // Указываем, что результат тестирования уже получен
+                        _testingResultReceived = true;
+                        
+                        // Устанавливаем неудачный результат тестирования
+                        _testingResult = TestResult.WaitErrorResult;
+                        
+                    }
 
                     /*
                      * Формируем     промежуточный
