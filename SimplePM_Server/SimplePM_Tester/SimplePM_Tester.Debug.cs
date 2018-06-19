@@ -32,6 +32,7 @@ using System.Text;
 using CompilerBase;
 using ProgramTesting;
 using MySql.Data.MySqlClient;
+using SimplePM_Exceptions;
 
 namespace SimplePM_Server.SimplePM_Tester
 {
@@ -49,9 +50,9 @@ namespace SimplePM_Server.SimplePM_Tester
         {
 
             /*
-             * Переменная хранит полный путь
+             * Переменная  хранит  полный путь
              * к запускаемому файлу авторского
-             * решения задачи
+             * решения задачи.
              */
 
             var authorSolutionExePath = GetAuthorSolutionExePath(
@@ -60,9 +61,9 @@ namespace SimplePM_Server.SimplePM_Tester
             );
 
             /*
-             * Передаём новосозданным переменным
-             * информацию о лимитах для пользовательского
-             * процесса (пользовательского решения задачи)
+             * Передаём       новосозданным      переменным
+             * информацию  о  лимитах для пользовательского
+             * процесса (пользовательского решения задачи).
              */
 
             GetDebugProgramLimits(
@@ -72,15 +73,15 @@ namespace SimplePM_Server.SimplePM_Tester
             
             /*
              * Проводим нетестовый запуск авторского решения
-             * и получаем всё необходимое для тестирования
-             * пользовательской программы
+             * и получаем всё необходимое  для  тестирования
+             * пользовательской программы.
              */
 
             var authorTestingResult = new ProgramTester(
                 ref authorLanguageConfiguration,
                 ref authorCompilerPlugin,
                 authorSolutionExePath,
-                "-author-solution",
+                "--author-solution",
                 memoryLimit,
                 timeLimit,
                 submissionInfo.CustomTest,
@@ -115,9 +116,9 @@ namespace SimplePM_Server.SimplePM_Tester
             );
 
             /*
-             * Получаем ссылку на объект,
-             * созданный на основании класса,
-             * который, в свою очередь, создан
+             * Получаем     ссылку     на     объект,
+             * созданный    на    основании   класса,
+             * который,   в   свою  очередь,   создан
              * по подобию интерфейса ICompilerPlugin.
              */
             
@@ -135,7 +136,7 @@ namespace SimplePM_Server.SimplePM_Tester
                 ref userLanguageConfiguration,
                 ref userCompilerPlugin,
                 exeFileUrl,
-                "-user-solution",
+                "--user-solution",
                 memoryLimit,
                 timeLimit,
                 submissionInfo.CustomTest,
@@ -144,15 +145,17 @@ namespace SimplePM_Server.SimplePM_Tester
             ).RunTesting();
             
             /*
-             * Если результат тестирования не полностью
+             * Если   результат    тестирования   не   полностью
              * известен, осуществляем проверку по дополнительным
-             * тестам и выдвигаем остаточный результат debug
+             * тестам  и  выдвигаем  остаточный  результат debug
              * тестирования пользовательского решения задачи.
              */
             
             if (userTestingResult.Result == TestResult.MiddleSuccessResult)
             {
 
+                // TODO: Implement checkers
+                
                 userTestingResult.Result =
                     Convert.ToBase64String(userTestingResult.Output) == Convert.ToBase64String(authorTestingResult.Output)
                     ? TestResult.FullSuccessResult
@@ -161,11 +164,27 @@ namespace SimplePM_Server.SimplePM_Tester
             }
 
             /*
+             * Производим удаление директории
+             * авторского решения поставленно
+             * й задачи для экономии места на
+             * диске.
+             */
+            
+            Directory.Delete(
+                new FileInfo(authorSolutionExePath).Directory?.FullName
+                    ?? throw new AuthorSolutionNotFoundException(
+                        "",
+                        new DirectoryNotFoundException()
+                    ),
+                true
+            );
+            
+            /*
              * Формируем результат тестирования пользовательского
-             * решения поставленной задачи, добавляем информацию
-             * о единственном тесте, который был проведен
-             * непосредственно при тестировании данного
-             * пользовательского решения данной задачи.
+             * решения поставленной задачи,  добавляем информацию
+             * о  единственном  тесте,   который   был   проведен
+             * непосредственно    при    тестировании     данного
+             * пользовательского решения поставленной задачи.
              */
 
             var programTestingResult = new ProgramTestingResult(1)
@@ -180,7 +199,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
             /*
              * Возвращаем сформированный результат
-             * тестирования пользовательского
+             * тестирования      пользовательского
              * решения поставленной задачи.
              */
 
