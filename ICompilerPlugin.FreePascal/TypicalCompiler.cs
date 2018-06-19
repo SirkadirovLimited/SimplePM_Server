@@ -54,7 +54,9 @@ namespace CompilerPlugin
             // Запуск компилятора с заранее определёнными аргументами
             var result = cRefs.RunCompiler(
                 (string)languageConfiguration.compiler_path,
-                ((string)languageConfiguration.compiler_arguments).Replace("{%fileLocation%}", fileLocation).Replace("{%exeLocation%}", exeLocation)
+                ((string)languageConfiguration.compiler_arguments)
+                    .Replace("{%fileLocation%}", fileLocation)
+                        .Replace("{%exeLocation%}", exeLocation)
             );
 
             // Передаём полный путь к исполняемому файлу

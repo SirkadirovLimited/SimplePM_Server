@@ -255,7 +255,7 @@ namespace SimplePM_Server.SimplePM_Tester
 
             var tmpAuthorSrcLocation = Path.Combine(
                 tmpAuthorDir,
-                "sa" + submissionInfo.SubmissionId + authorFileExt
+                "sa" + authorFileExt
             );
 
             /*
@@ -284,7 +284,7 @@ namespace SimplePM_Server.SimplePM_Tester
             var compiler = new SimplePM_Compiler(
                 ref authorLanguageConfiguration,
                 ref authorCompilerPlugin,
-                "a" + submissionInfo.SubmissionId,
+                "a",
                 tmpAuthorSrcLocation
             );
 
