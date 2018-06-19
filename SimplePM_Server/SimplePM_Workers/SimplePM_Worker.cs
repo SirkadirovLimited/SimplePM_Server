@@ -254,9 +254,6 @@ namespace SimplePM_Server
 
             // Устанавливаем "улавливатель исключений"
             SetExceptionHandler();
-
-            // Очищаем директорию временных файлов
-            CleanTempDirectory();
             
             // Загружаем конфигурацию сервера в память
             _serverConfiguration = JsonConvert.DeserializeObject(
@@ -272,6 +269,9 @@ namespace SimplePM_Server
             _compilerConfigurations = JsonConvert.DeserializeObject(
                 File.ReadAllText("./config/compilers.json")
             );
+            
+            // Очищаем директорию временных файлов
+            CleanTempDirectory();
             
             /*
              * Конфигурируем журнал событий (библиотека NLog)
