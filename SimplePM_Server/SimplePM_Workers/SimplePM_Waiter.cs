@@ -528,7 +528,7 @@ namespace SimplePM_Server
                      * ованию.
                      */
 
-                    IJudgePlugin currentJudgePlugin = new SimplePM_Judge().GetJudgePluginByName(
+                    var currentJudgePlugin = new SimplePM_Judge().GetJudgePluginByName(
                         _submissionInfo.ProblemInformation.ProblemRatingType
                     );
 
@@ -649,16 +649,6 @@ namespace SimplePM_Server
                 "@param_exitcodes",
                 ptResult.GetExitCodesAsLine('|')
             ); // Коды выхода решения
-
-            updateSqlCommand.Parameters.AddWithValue(
-                "@param_usedProcTime",
-                ptResult.GetUsedProcessorTimeAsLine('|')
-            ); // Использованное процессорное время решения
-
-            updateSqlCommand.Parameters.AddWithValue(
-                "@param_usedMemory",
-                ptResult.GetUsedMemoryAsLine('|')
-            ); // Использованная память решения
             
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_result",

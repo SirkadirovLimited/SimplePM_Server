@@ -8,8 +8,6 @@ SET
 	`errorOutput` = @param_errorOutput, 
 	`output` = @param_output, 
 	`exitcodes` = @param_exitcodes, 
-	`usedProcTime` = @param_usedProcTime, 
-	`usedMemory` = @param_usedMemory, 
 	`tests_result` = @param_result, 
 	`b` = @param_rating 
 WHERE 
