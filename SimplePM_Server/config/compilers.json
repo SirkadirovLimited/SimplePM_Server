@@ -12,16 +12,22 @@
 [
 
   {
+    "display_name": "Mono/C# (latest)",
+    "editor_mode": "csharp",
+    
     "language_name": "csharp",
     "source_ext": "cs",
     "enabled": true,
     "module_name": "Mono",
-    "compiler_path": "C:\\Program Files\\Mono\\lib\\mono\\4.5\\mcs.exe",
+    "compiler_path": "mcs.exe",
     "compiler_arguments": "{%fileLocation%}",
-    "runtime_path": "C:\\Program Files\\Mono\\bin\\mono.exe"
+    "runtime_path": "mono.exe"
   },
 
   {
+    "display_name": "Java SE (latest)",
+    "editor_mode": "java",
+    
     "language_name": "java",
     "source_ext": "java",
     "enabled": true,
@@ -33,6 +39,9 @@
   },
 
   {
+    "display_name": "Free Pascal 3.x",
+    "editor_mode": "pascal",
+    
     "language_name": "freepascal",
     "source_ext": "pas",
     "enabled": true,
@@ -42,6 +51,9 @@
   },
 
   {
+    "display_name": "GNU C (MinGW)",
+    "editor_mode": "c_cpp",
+    
     "language_name": "c",
     "source_ext": "c",
     "enabled": true,
@@ -51,6 +63,9 @@
   },
 
   {
+    "display_name": "GNU C++ (MinGW)",
+    "editor_mode": "c_cpp",
+    
     "language_name": "cpp",
     "source_ext": "cpp",
     "enabled": true,
@@ -60,6 +75,9 @@
   },
 
   {
+    "display_name": "Lua 5.1",
+    "editor_mode": "lua",
+    
     "language_name": "lua",
     "source_ext": "lua",
     "enabled": true,
@@ -69,6 +87,9 @@
   },
 
   {
+    "display_name": "Python 3.6",
+    "editor_mode": "python",
+    
     "language_name": "python",
     "source_ext": "py",
     "enabled": true,
@@ -78,6 +99,9 @@
   },
 
   {
+    "display_name": "PHP 7.x",
+    "editor_mode": "php",
+    
     "language_name": "php",
     "source_ext": "php",
     "enabled": false,

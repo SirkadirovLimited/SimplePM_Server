@@ -10,9 +10,11 @@
  */
 
 {
-  "hostname": "localhost",
+  "hostname": "127.0.0.1",
   "username": "Sirkadirov",
   "password": "Dam900000zaua",
   "basename": "simplepm2",
-  "mainchst": "utf8"
+  "mainchst": "utf8",
+  
+  "sslmode": "none"
 }
