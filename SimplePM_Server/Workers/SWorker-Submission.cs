@@ -35,7 +35,7 @@ using MySql.Data.MySqlClient;
 namespace SimplePM_Server
 {
 
-    public partial class SimplePM_Worker
+    public partial class SWorker
     {
 
         /*
@@ -106,6 +106,7 @@ namespace SimplePM_Server
 
                     /*
                      * Проверка на пустоту полученного результата
+                     * или на переполнение очереди проверки.
                      */
 
                     if (f)
@@ -231,7 +232,7 @@ namespace SimplePM_Server
                          * вот неожиданных ситуациях.
                          */
 
-                        new SimplePM_Waiter(
+                        new SWaiter(
                             conn,
                             ref _serverConfiguration,
                             ref _compilerConfigurations,

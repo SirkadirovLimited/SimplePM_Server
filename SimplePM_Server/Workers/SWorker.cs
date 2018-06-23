@@ -49,7 +49,7 @@ namespace SimplePM_Server
      * множество переменных и т.д.
      */
 
-    public partial class SimplePM_Worker
+    public partial class SWorker
     {
         
         /*
@@ -468,8 +468,6 @@ namespace SimplePM_Server
             
         }
         
-        
-        
         /*
          * Функция   инициализирует   соединение  с  базой
          * данных  MySQL  используя  данные  аутенфикации,
@@ -529,8 +527,7 @@ namespace SimplePM_Server
                         pwd={databaseConfig.password};
                         database={databaseConfig.basename};
                         Charset={databaseConfig.mainchst};
-                        SslMode=Preferred;
-                        Pooling=False;
+                        SslMode={databaseConfig.sslmode};
                     "
                 );
 

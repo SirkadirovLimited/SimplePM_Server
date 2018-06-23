@@ -35,7 +35,7 @@ using System.Collections.Generic;
 namespace SimplePM_Server
 {
 
-    public static class SimplePM_PluginsLoader
+    public static class SPluginsLoader
     {
 
         /*

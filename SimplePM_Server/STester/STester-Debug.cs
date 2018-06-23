@@ -34,10 +34,10 @@ using ProgramTesting;
 using MySql.Data.MySqlClient;
 using SimplePM_Exceptions;
 
-namespace SimplePM_Server.SimplePM_Tester
+namespace SimplePM_Server.STester
 {
     
-    internal partial class SimplePM_Tester
+    internal partial class STester
     {
         
         /*
@@ -101,7 +101,7 @@ namespace SimplePM_Server.SimplePM_Tester
              */
             
             if (authorTestingResult.Result != TestResult.MiddleSuccessResult)
-                throw new SimplePM_Exceptions.AuthorSolutionRunningException();
+                throw new AuthorSolutionRunningException();
             
             /*
              * Получаем ссылку на объект, который
@@ -110,7 +110,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * языка программирования.
              */
             
-            var userLanguageConfiguration = SimplePM_Compiler.GetCompilerConfig(
+            var userLanguageConfiguration = SCompiler.GetCompilerConfig(
                 ref _languageConfigurations,
                 submissionInfo.CodeLang
             );
@@ -122,7 +122,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * по подобию интерфейса ICompilerPlugin.
              */
             
-            var userCompilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
+            var userCompilerPlugin = SCompiler.FindCompilerPlugin(
                 (string)(userLanguageConfiguration.module_name)
             );
 
@@ -227,7 +227,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * языка программирования.
              */
             
-            authorLanguageConfiguration = SimplePM_Compiler.GetCompilerConfig(
+            authorLanguageConfiguration = SCompiler.GetCompilerConfig(
                 ref _languageConfigurations,
                 submissionInfo.ProblemInformation.AuthorSolutionCodeLanguage
             );
@@ -239,7 +239,7 @@ namespace SimplePM_Server.SimplePM_Tester
              * по подобию интерфейса ICompilerPlugin.
              */
 
-            authorCompilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
+            authorCompilerPlugin = SCompiler.FindCompilerPlugin(
                 (string)(authorLanguageConfiguration.module_name)
             );
             
@@ -295,12 +295,12 @@ namespace SimplePM_Server.SimplePM_Tester
                 );
 
                 // Устанавливаем его аттрибуты
-                SimplePM_Waiter.SetSourceFileAttributes(tmpAuthorSrcLocation);
+                SWaiter.SetSourceFileAttributes(tmpAuthorSrcLocation);
                 
             }
             
             // Инициализируем экземпляр класса компилятора
-            var compiler = new SimplePM_Compiler(
+            var compiler = new SCompiler(
                 ref authorLanguageConfiguration,
                 ref authorCompilerPlugin,
                 "a",
@@ -400,7 +400,7 @@ namespace SimplePM_Server.SimplePM_Tester
                  * информации с базы данных системы.
                  */
 
-                throw new SimplePM_Exceptions.DatabaseQueryException();
+                throw new DatabaseQueryException();
 
             }
 

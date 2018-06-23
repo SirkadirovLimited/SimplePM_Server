@@ -26,61 +26,50 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using System.Text;
-using ProgramTesting;
+using MySql.Data.MySqlClient;
 
-namespace SimplePM_Server.SimplePM_Tester
+namespace SimplePM_Server.STester
 {
-    
-    internal partial class SimplePM_Tester
+
+    /*
+     * Класс тестирования пользовательских
+     * решений   поставленных   задач   по
+     * программированию.
+     */
+
+    internal partial class STester
     {
 
+        #region Секция объявления глобальных переменных
+        private SubmissionInfo.SubmissionInfo submissionInfo; // информация о запросе
+
+        private dynamic _serverConfiguration;
+        private dynamic _languageConfigurations;
+
+        private MySqlConnection connection; // соединение с БД
+        private readonly string exeFileUrl; // путь к исполняемому файлу
+        #endregion
+
         /*
-         * Метод отвечает за выполнение проверки
-         * синтаксиса пользовательского решения.
+         * Основной конструктор данного класса.
          */
 
-        public ProgramTestingResult Syntax()
+        public STester(
+            ref MySqlConnection connection,
+            ref dynamic serverConfiguration,
+            ref dynamic languageConfigurations,
+            string exeFileUrl,
+            ref SubmissionInfo.SubmissionInfo submissionInfo
+        )
         {
 
-            /*
-             * Генерируем результат тестирования
-             * и возвращаем его  как объект типа
-             * ProgramTestingResult.
-             */
+            this.connection = connection;
 
-            return new ProgramTestingResult(1)
-            {
+            _serverConfiguration = serverConfiguration;
+            _languageConfigurations = languageConfigurations;
 
-                TestingResults =
-                {
-
-                    [0] = new TestResult
-                    {
-
-                        // Выходные данные заполняем кракозябрами
-                        Output = Encoding.UTF8.GetBytes("NULL"),
-
-                        // Выходные данные исключений устанавливаем в null
-                        ErrorOutput = null,
-
-                        // Код выхода - стандартный
-                        ExitCode = 0,
-
-                        // Результатом будет промежуточный успешный
-                        Result = TestResult.MiddleSuccessResult,
-
-                        // Использованная память
-                        UsedMemory = 0,
-
-                        // Использованное процессорное время
-                        UsedProcessorTime = 0
-
-                    }
-
-                }
-
-            };
+            this.exeFileUrl = exeFileUrl;
+            this.submissionInfo = submissionInfo;
 
         }
 

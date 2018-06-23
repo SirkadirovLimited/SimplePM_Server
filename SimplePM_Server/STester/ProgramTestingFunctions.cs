@@ -26,13 +26,11 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using System.IO;
 using CompilerBase;
 using System.Security;
-using Newtonsoft.Json;
 using System.Diagnostics;
 
-namespace SimplePM_Server.SimplePM_Tester
+namespace SimplePM_Server.STester
 {
 
     /*
@@ -109,14 +107,14 @@ namespace SimplePM_Server.SimplePM_Tester
              * пользователя. Если отключена - выходим.
              */
 
-            if ((string)(SimplePM_Worker._securityConfiguration.runas.enabled) != "true")
+            if ((string)(SWorker._securityConfiguration.runas.enabled) != "true")
                 return;
 
             /*
              * Передаём имя пользователя
              */
             
-            proc.StartInfo.UserName = (string)(SimplePM_Worker._securityConfiguration.runas.username);
+            proc.StartInfo.UserName = (string)(SWorker._securityConfiguration.runas.username);
 
             /*
              * Передаём, что загружать пользова-
@@ -133,7 +131,7 @@ namespace SimplePM_Server.SimplePM_Tester
             var encPassword = new SecureString();
 
             // Добавляем данные в защищённую строку
-            foreach (var c in (string)(SimplePM_Worker._securityConfiguration.runas.password))
+            foreach (var c in (string)(SWorker._securityConfiguration.runas.password))
                 encPassword.AppendChar(c);
 
             // Устанавливаем пароль пользователя

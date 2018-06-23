@@ -33,10 +33,10 @@ using ProgramTesting;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 
-namespace SimplePM_Server.SimplePM_Tester
+namespace SimplePM_Server.STester
 {
 
-    internal partial class SimplePM_Tester
+    internal partial class STester
     {
         
         /*

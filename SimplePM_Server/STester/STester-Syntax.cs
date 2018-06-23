@@ -26,24 +26,62 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using System;
-using System.Windows.Forms;
+using System.Text;
+using ProgramTesting;
 
-namespace PluginsManager
+namespace SimplePM_Server.STester
 {
-
-    static class Program
+    
+    internal partial class STester
     {
 
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
+        /*
+         * Метод отвечает за выполнение проверки
+         * синтаксиса пользовательского решения.
+         */
+
+        public ProgramTestingResult Syntax()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainWindow());
+
+            /*
+             * Генерируем результат тестирования
+             * и возвращаем его  как объект типа
+             * ProgramTestingResult.
+             */
+
+            return new ProgramTestingResult(1)
+            {
+
+                TestingResults =
+                {
+
+                    [0] = new TestResult
+                    {
+
+                        // Выходные данные заполняем кракозябрами
+                        Output = Encoding.UTF8.GetBytes("NULL"),
+
+                        // Выходные данные исключений устанавливаем в null
+                        ErrorOutput = null,
+
+                        // Код выхода - стандартный
+                        ExitCode = 0,
+
+                        // Результатом будет промежуточный успешный
+                        Result = TestResult.MiddleSuccessResult,
+
+                        // Использованная память
+                        UsedMemory = 0,
+
+                        // Использованное процессорное время
+                        UsedProcessorTime = 0
+
+                    }
+
+                }
+
+            };
+
         }
 
     }

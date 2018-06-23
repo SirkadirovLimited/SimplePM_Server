@@ -38,15 +38,15 @@ namespace SimplePM_Server
      * вызывается функциями класса-официанта.
      */
 
-    internal class SimplePM_Compiler
+    internal class SCompiler
     {
 
         private readonly string _submissionId; // Идентификатор запроса
         private readonly string _fileLocation; // Полный путь к файлу и его расширение
         private dynamic _compilerConfig;
-        private ICompilerPlugin _compilerPlugin; // Список загруженных модулей компиляторв
+        private readonly ICompilerPlugin _compilerPlugin; // Список загруженных модулей компиляторв
         
-        public SimplePM_Compiler(
+        public SCompiler(
             ref dynamic _compilerConfig,
             ref ICompilerPlugin _compilerPlugin,
             string submissionId,
@@ -79,7 +79,7 @@ namespace SimplePM_Server
              * Производим поиск искомого плагина
              * в списке доступных модулей компиляции.
              */
-            foreach (var plugin in SimplePM_Worker._compilerPlugins)
+            foreach (var plugin in SWorker._compilerPlugins)
                 if (plugin.PluginName == pluginName)
                     return plugin;
 

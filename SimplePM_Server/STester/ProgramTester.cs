@@ -35,7 +35,7 @@ using ProgramTesting;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace SimplePM_Server.SimplePM_Tester
+namespace SimplePM_Server.STester
 {
 
     /*
@@ -166,7 +166,7 @@ namespace SimplePM_Server.SimplePM_Tester
             _adaptOutput = adaptOutput;
 
             // Получаем лимит на время исполнения программы в миллисекундах
-            _programRuntimeLimit = (programRuntimeLimit <= 0) ? processorTimeLimit * 3 : programRuntimeLimit;
+            _programRuntimeLimit = (programRuntimeLimit <= 0) ? processorTimeLimit * 5 : programRuntimeLimit;
 
         }
 

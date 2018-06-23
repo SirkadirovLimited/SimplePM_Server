@@ -29,9 +29,6 @@
 using NLog;
 using System;
 using System.IO;
-using System.Security.AccessControl;
-using System.Security.Principal;
-using JudgeBase;
 using System.Text;
 using CompilerBase;
 using ProgramTesting;
@@ -48,7 +45,7 @@ namespace SimplePM_Server
      * программированию.
      */
 
-    internal class SimplePM_Waiter
+    internal class SWaiter
     {
 
         /*
@@ -76,7 +73,7 @@ namespace SimplePM_Server
          * Основной конструктор данного класса
          */
 
-        public SimplePM_Waiter(
+        public SWaiter(
             MySqlConnection connection,
             ref dynamic _serverConfiguration,
             ref dynamic _compilerConfigurations,
@@ -150,12 +147,12 @@ namespace SimplePM_Server
              * на тестирование конфигурацию модуля компиляции.
              */
 
-            var compilerConfiguration = SimplePM_Compiler.GetCompilerConfig(
+            var compilerConfiguration = SCompiler.GetCompilerConfig(
                 ref _compilerConfigurations,
                 _submissionInfo.CodeLang
             );
 
-            var compilerPlugin = SimplePM_Compiler.FindCompilerPlugin(
+            var compilerPlugin = SCompiler.FindCompilerPlugin(
                 (string)(compilerConfiguration.module_name)
             );
 
@@ -209,7 +206,7 @@ namespace SimplePM_Server
              * решения задачи.
              */
 
-            var compiler = new SimplePM_Compiler(
+            var compiler = new SCompiler(
                 ref compilerConfiguration,
                 ref compilerPlugin,
                 _submissionInfo.SubmissionId.ToString(),
@@ -324,7 +321,7 @@ namespace SimplePM_Server
              * шений задач по программированию.
              */
 
-            var tester = new SimplePM_Tester.SimplePM_Tester(
+            var tester = new STester.STester(
                 ref _connection,
                 ref _serverConfiguration,
                 ref _compilerConfigurations,
@@ -464,7 +461,7 @@ namespace SimplePM_Server
 
         }
 
-        public static bool SetSourceFileAttributes(string fileLocation)
+        public static void SetSourceFileAttributes(string fileLocation)
         {
 
             try
@@ -479,10 +476,13 @@ namespace SimplePM_Server
             }
             catch (Exception)
             {
-                return false;
+                
+                /*
+                 * Никаких дополнительных действий
+                 * предпринимать не нужно.
+                 */
+                
             }
-
-            return true;
 
         }
         

@@ -27,68 +27,45 @@
  */
 
 using JudgeBase;
-using CompilerBase;
 
 namespace SimplePM_Server
 {
 
-    public partial class SimplePM_Worker
+    internal class SimplePM_Judge
     {
 
         /*
-         * Функция загружает в память
-         * модули сервера проверки ре
-         * шений, которые собирает из
-         * специально   заготовленной
-         * директории на диске.
+         * Метод осуществляет поиск
+         * модуля оценивания пользо
+         * вательского решения пост
+         * авленной задачи  по  его
+         * названию.
          */
 
-        private void LoadServerPlugins()
-        {
-            
-            // Получаем список плагинов сервера
-            _compilerPlugins = SimplePM_PluginsLoader.LoadPlugins<ICompilerPlugin>(
-                (string)_serverConfiguration.path.ICompilerPlugin,
-                "ServerPlugin"
-            );
-            
-        }
-        
-        /*
-         * Функция загружает в память компиляционные
-         * модули,  которые  собирает  из специально
-         * заготовленной директории на диске.
-         */
-
-        private void LoadCompilerPlugins()
+        public IJudgePlugin GetJudgePluginByName(string judgeName)
         {
 
-            // Получаем список модулей компиляции
-            _compilerPlugins = SimplePM_PluginsLoader.LoadPlugins<ICompilerPlugin>(
-                (string)_serverConfiguration.path.ICompilerPlugin,
-                "CompilerPlugin.Compiler"
-            );
+            /*
+             * В цикле производим поиск
+             * по списку плагинов оцени
+             * вания  пользовательского
+             * решения.
+             */
+
+            foreach (IJudgePlugin judgePlugin in SWorker._judgePlugins)
+            {
+
+                // Если мы нашли то, что искали, то это хорошо
+                if (judgePlugin.JudgeName == judgeName)
+                    return judgePlugin;
+
+            }
+
+            // Всё плохо, мы ничего не нашли!
+            return null;
 
         }
 
-        /*
-         * Функция загружает в память
-         * модули оценивания пользова
-         * тельского решения поставле
-         * нной задачи.
-         */
-
-        private void LoadJudgePlugins()
-        {
-
-            // Получаем список модулей оценивания
-            _judgePlugins = SimplePM_PluginsLoader.LoadPlugins<IJudgePlugin>(
-                (string)_serverConfiguration.path.IJudgePlugin,
-                "JudgePlugin.Judge"
-            );
-
-        }
-        
     }
 
 }

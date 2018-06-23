@@ -26,53 +26,30 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using MySql.Data.MySqlClient;
-
-namespace SimplePM_Server.SimplePM_Tester
+namespace SimplePM_Server
 {
 
     /*
-     * Класс тестирования пользовательских
-     * решений   поставленных   задач   по
-     * программированию.
+     * Основной класс, метод Main которого инициализирует объект
+     * базового класса сервера проверки пользовательских решений
+     * и вызывает метод инициализации сервера.
      */
-
-    internal partial class SimplePM_Tester
+    
+    internal class SMain
     {
 
-        #region Секция объявления глобальных переменных
-        private SubmissionInfo.SubmissionInfo submissionInfo; // информация о запросе
-
-        private dynamic _serverConfiguration;
-        private dynamic _languageConfigurations;
-
-        private MySqlConnection connection; // соединение с БД
-        private readonly string exeFileUrl; // путь к исполняемому файлу
-        #endregion
-
-        /*
-         * Основной конструктор данного класса.
-         */
-
-        public SimplePM_Tester(
-            ref MySqlConnection connection,
-            ref dynamic serverConfiguration,
-            ref dynamic languageConfigurations,
-            string exeFileUrl,
-            ref SubmissionInfo.SubmissionInfo submissionInfo
-        )
+        public static void Main(string[] args)
         {
+            
+            /*
+             * Инициализируем объект типа
+             * SWorker  и  вызываем метод
+             * запуска сервера.
+             */
 
-            this.connection = connection;
-
-            _serverConfiguration = serverConfiguration;
-            _languageConfigurations = languageConfigurations;
-
-            this.exeFileUrl = exeFileUrl;
-            this.submissionInfo = submissionInfo;
+            new SWorker().Run(args);
 
         }
-
     }
 
 }
