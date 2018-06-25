@@ -3,7 +3,7 @@ Official repository of SimplePM Server, submissions checking subsystem of softwa
 
 Detailed information about the project you can get at project's official website: https://spm.sirkadirov.com/
 
-[![GitHub (pre-)release version](https://img.shields.io/github/release/SirkadirovTeam/SimplePM_WebClient/all.svg)](https://github.com/SirkadirovTeam/SimplePM_WebClient/releases)
+[![GitHub (pre-)release version](https://img.shields.io/github/release/SirkadirovTeam/SimplePM_Server/all.svg)](https://github.com/SirkadirovTeam/SimplePM_Server/releases)
 [![Build status](https://ci.appveyor.com/api/projects/status/35hk5hpsn70j6vq0?svg=true)](https://ci.appveyor.com/project/sirkadirov/simplepm-server)
 [![CodeFactor](https://www.codefactor.io/repository/github/sirkadirovteam/simplepm_server/badge)](https://www.codefactor.io/repository/github/sirkadirovteam/simplepm_server)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1230/badge)](https://bestpractices.coreinfrastructure.org/projects/1230)
