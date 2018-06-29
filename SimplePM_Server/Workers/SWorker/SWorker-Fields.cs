@@ -6,12 +6,13 @@
  * ███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗██║     ██║ ╚═╝ ██║
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
- * SimplePM Server
- * A part of SimplePM programming contests management system.
+ * SimplePM Server is a part of software product "Automated
+ * vefification system for programming tasks "SimplePM".
  *
- * Copyright 2017 Yurij Kadirov
+ * Copyright 2018 Yurij Kadirov
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Source code of the product licensed under the Apache License,
+ * Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -26,30 +27,32 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-namespace SimplePM_Server
+using NLog;
+using JudgePlugin;
+using ServerPlugin;
+using CompilerPlugin;
+using System.Collections.Generic;
+
+namespace SimplePM_Server.Workers
 {
-
-    /*
-     * Основной класс, метод Main которого инициализирует объект
-     * базового класса сервера проверки пользовательских решений
-     * и вызывает метод инициализации сервера.
-     */
     
-    internal class SMain
+    public partial class SWorker
     {
+        
+        private readonly Logger logger = LogManager.GetLogger("SimplePM_Server.Workers.SWorker");
 
-        public static void Main(string[] args)
-        {
-            
-            /*
-             * Инициализируем объект типа
-             * SWorker  и  вызываем метод
-             * запуска сервера.
-             */
+        public static dynamic _serverConfiguration { get; set; }
+        public static dynamic _databaseConfiguration { get; set; }
+        public static dynamic _securityConfiguration { get; set; }
+        public static dynamic _compilerConfigurations { get; set; }
 
-            new SWorker().Run(args);
+        private sbyte _aliveTestersCount;
+        private string _enabledLanguagesString;
 
-        }
+        public static List<IServerPlugin> _serverPlugins;
+        public static List<ICompilerPlugin> _compilerPlugins;
+        public static List<IJudgePlugin> _judgePlugins;
+        
     }
-
+    
 }

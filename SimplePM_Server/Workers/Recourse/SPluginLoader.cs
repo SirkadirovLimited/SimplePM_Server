@@ -6,12 +6,13 @@
  * ███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗██║     ██║ ╚═╝ ██║
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
- * SimplePM Server
- * A part of SimplePM programming contests management system.
+ * SimplePM Server is a part of software product "Automated
+ * vefification system for programming tasks "SimplePM".
  *
- * Copyright 2017 Yurij Kadirov
+ * Copyright 2018 Yurij Kadirov
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Source code of the product licensed under the Apache License,
+ * Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -32,12 +33,12 @@ using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace SimplePM_Server
+namespace SimplePM_Server.Workers.Recourse
 {
-
-    public static class SPluginsLoader
+    
+    public class SPluginsLoader
     {
-
+        
         /*
          * Объявляем переменную указателя
          * на менеджер  журнала собылий и
@@ -45,7 +46,7 @@ namespace SimplePM_Server
          * журнал событий текущего класса
          */
 
-        private static readonly Logger logger = LogManager.GetLogger("SimplePM_PluginsLoader");
+        private static readonly Logger logger = LogManager.GetLogger("SimplePM_Server.Workers.SPluginLoader");
 
         /*
          * Метод занимается  выборкой указанных
@@ -182,7 +183,7 @@ namespace SimplePM_Server
             return _pluginsList;
 
         }
-
+        
     }
-
+    
 }

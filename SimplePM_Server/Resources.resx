@@ -117,4 +117,71 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="submission_query" xml:space="preserve">
+    <value>
+        START TRANSACTION; 
+        SELECT 
+            `spm_problems`.`difficulty`, 
+        
+            `spm_problems`.`authorSolution`, 
+            `spm_problems`.`authorSolutionLanguage`, 
+        
+            `spm_problems`.`adaptProgramOutput`, 
+        
+            `spm_submissions`.`submissionId`, 
+        
+            `spm_submissions`.`olympId`, 
+        
+            `spm_submissions`.`time`, 
+        
+            `spm_submissions`.`userId`, 
+            `spm_submissions`.`problemId`, 
+        
+            `spm_submissions`.`testType`, 
+            `spm_submissions`.`judge`, 
+            `spm_submissions`.`customTest`, 
+        
+            `spm_submissions`.`codeLang`, 
+            `spm_submissions`.`problemCode` 
+        FROM 
+            `spm_submissions` 
+        INNER JOIN 
+            `spm_problems` 
+        ON 
+            spm_submissions.problemId = spm_problems.id 
+        WHERE 
+            `status` = 'waiting' 
+        AND 
+            `codeLang` IN (@EnabledLanguages) 
+        AND 
+            `authorSolutionLanguage` IN (@EnabledLanguages) 
+        ORDER BY 
+            `submissionId` ASC, 
+            `time` ASC 
+        LIMIT 
+            1 
+        FOR UPDATE; 
+    </value>
+  </data>
+  <data name="submission_result_query" xml:space="preserve">
+    <value>
+        UPDATE 
+	        `spm_submissions` 
+        SET 
+            `status` = 'ready', 
+            `testType` = @param_testType, 
+            `hasError` = @param_hasError, 
+            `compiler_text` = @param_compiler_text, 
+            `errorOutput` = @param_errorOutput, 
+            `output` = @param_output, 
+            `exitcodes` = @param_exitcodes, 
+            `tests_result` = @param_result, 
+            `b` = @param_rating 
+        WHERE 
+            `submissionId` = @param_submissionId 
+        LIMIT 
+            1 
+        ;
+    </value>
+  </data>
 </root>

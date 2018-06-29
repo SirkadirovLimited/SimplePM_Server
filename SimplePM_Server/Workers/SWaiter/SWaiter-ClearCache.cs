@@ -6,12 +6,13 @@
  * ███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗██║     ██║ ╚═╝ ██║
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
- * SimplePM Server
- * A part of SimplePM programming contests management system.
+ * SimplePM Server is a part of software product "Automated
+ * vefification system for programming tasks "SimplePM".
  *
- * Copyright 2017 Yurij Kadirov
+ * Copyright 2018 Yurij Kadirov
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Source code of the product licensed under the Apache License,
+ * Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -27,29 +28,53 @@
  */
 
 using System;
-using System.Diagnostics;
+using System.IO;
 
-namespace PluginBase
+namespace SimplePM_Server.Workers
 {
-
-    public class ServerEvents
+    
+    public partial class SWaiter
     {
+        
+        private static void ClearCache(string fileLocation)
+        {
 
-        /* Basic server events */
-        public event EventHandler<DateTime> ServerStarted;
-        public event EventHandler<DateTime> ServerShutdown;
+            try
+            {
 
-        /* Server exception events */
-        public event EventHandler<Exception> UnhandledExceptionCatched;
+                /*
+                 * Для безопасности синхронизируем потоки
+                 */
 
-        /* Submission checking */
-        public event EventHandler<SubmissionInfo.SubmissionInfo> SubmissionChekingStarted;
-        public event EventHandler<SubmissionInfo.SubmissionInfo> SubmissionChekingFinished;
+                lock (new object())
+                {
 
-        /* User process testing */
-        public event EventHandler<Process> UserProcessTestingStarted;
-        public event EventHandler<Process> UserProcessTestingFinished;
+                    // Удаляем каталог временных файлов
+                    Directory.Delete(
+                        new FileInfo(fileLocation).DirectoryName
+                        ?? throw new DirectoryNotFoundException(),
+                        true
+                    );
 
+                    // Вызываем сборщик мусора
+                    GC.Collect(
+                        GC.MaxGeneration,
+                        GCCollectionMode.Forced
+                    );
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                // Записываем исключение в лог-файл
+                logger.Warn("Cache clearing failed: " + ex);
+
+            }
+
+        }
+        
     }
-
+    
 }

@@ -6,12 +6,13 @@
  * ███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗██║     ██║ ╚═╝ ██║
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
- * SimplePM Server
- * A part of SimplePM programming contests management system.
+ * SimplePM Server is a part of software product "Automated
+ * vefification system for programming tasks "SimplePM".
  *
- * Copyright 2017 Yurij Kadirov
+ * Copyright 2018 Yurij Kadirov
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Source code of the product licensed under the Apache License,
+ * Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -26,46 +27,35 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using JudgeBase;
+using NLog;
+using MySql.Data.MySqlClient;
 
-namespace SimplePM_Server
+namespace SimplePM_Server.Workers
 {
-
-    internal class SimplePM_Judge
+    
+    public partial class SWaiter
     {
+        
+        private static readonly Logger logger = LogManager.GetLogger("SimplePM_Server.Workers.SWaiter");
 
-        /*
-         * Метод осуществляет поиск
-         * модуля оценивания пользо
-         * вательского решения пост
-         * авленной задачи  по  его
-         * названию.
-         */
+        private MySqlConnection _connection;
 
-        public IJudgePlugin GetJudgePluginByName(string judgeName)
+        private SubmissionInfo.SubmissionInfo _submissionInfo;
+
+        public SWaiter(
+            MySqlConnection connection,
+            SubmissionInfo.SubmissionInfo submissionInfo
+        )
         {
+            
+            // Получаем дескриптор соединения с БД
+            _connection = connection;
 
-            /*
-             * В цикле производим поиск
-             * по списку плагинов оцени
-             * вания  пользовательского
-             * решения.
-             */
-
-            foreach (IJudgePlugin judgePlugin in SWorker._judgePlugins)
-            {
-
-                // Если мы нашли то, что искали, то это хорошо
-                if (judgePlugin.JudgeName == judgeName)
-                    return judgePlugin;
-
-            }
-
-            // Всё плохо, мы ничего не нашли!
-            return null;
+            // Получаем информацию о запросе на тестирование
+            _submissionInfo = submissionInfo;
 
         }
-
+        
     }
-
+    
 }

@@ -6,12 +6,13 @@
  * ███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗██║     ██║ ╚═╝ ██║
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
- * SimplePM Server
- * A part of SimplePM programming contests management system.
+ * SimplePM Server is a part of software product "Automated
+ * vefification system for programming tasks "SimplePM".
  *
- * Copyright 2017 Yurij Kadirov
+ * Copyright 2018 Yurij Kadirov
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Source code of the product licensed under the Apache License,
+ * Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -27,29 +28,51 @@
  */
 
 using System;
-using JudgeBase;
-using ProgramTesting;
+using System.IO;
 
-namespace JudgePlugin
+namespace SimplePM_Server.Workers
 {
-    public class Judge : IJudgePlugin
+    
+    public partial class SWorker
     {
-
-        public string JudgeName => "full";
-
-        public string JudgeAuthor => "Yurij Kadirov";
-
-        public string JudgeSupportUrl => "https://spm.sirkadirov.com/";
-
-        public JudgeResult GenerateJudgeResult(ref ProgramTestingResult programTestingResult)
+        
+        private void SetExceptionHandler()
         {
 
-            return new JudgeResult
+            /*
+             * На всякий случай создаём директорию
+             * для  хранения  лог-файлов, так  как
+             * некоторые версии NLog не создают её
+             * автоматически.
+             */
+            
+            try
             {
-                RatingMult = Convert.ToInt32(programTestingResult.PassedTestsCount() >= programTestingResult.TestsCount)
+
+                Directory.CreateDirectory("./log/");
+
+            }
+            catch
+            {
+
+                // Выполнения дополнительных действий не требуется
+                
+            }
+
+            /*
+             * Устанавливаем глобальный обработчик исключений
+             */
+
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+
+                // Записываем сообщение об ошибке в журнал событий
+                logger.Fatal(e.ExceptionObject);
+
             };
 
         }
-
+        
     }
+    
 }

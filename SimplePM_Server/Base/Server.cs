@@ -6,12 +6,13 @@
  * ███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗██║     ██║ ╚═╝ ██║
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
- * SimplePM Server
- * A part of SimplePM programming contests management system.
+ * SimplePM Server is a part of software product "Automated
+ * vefification system for programming tasks "SimplePM".
  *
- * Copyright 2017 Yurij Kadirov
+ * Copyright 2018 Yurij Kadirov
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Source code of the product licensed under the Apache License,
+ * Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -26,51 +27,21 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using System;
+using SimplePM_Server.Workers;
 
-namespace PlatformChecker
+namespace SimplePM_Server
 {
-
-    /// <summary>
-    /// Данный класс содержит необходимый
-    /// инструментарий для определения
-    /// используемой пользователем
-    /// операционной системы.
-    /// </summary>
-
-    public class Platform
+    
+    class Server
     {
-
-        /// <summary>
-        /// Проверка на Windows-подорбную платформу
-        /// </summary>
-
-        public static bool IsWindows => !IsLovelyLinux && !IsUglyMac;
-
-        /// <summary>
-        /// Проверка на GNU/Linux подобную платформу
-        /// </summary>
-
-        public static bool IsLovelyLinux
+        
+        public static void Main(string[] args)
         {
-
-            get
-            {
-
-                int platform = (int)Environment.OSVersion.Platform;
-
-                return (platform == 4) || (platform == 128);
-
-            }
-
+            
+            new SWorker().RunServer();
+            
         }
-
-        /// <summary>
-        /// Проверка на надкушенное яблоко
-        /// </summary>
-
-        public static bool IsUglyMac => (int)Environment.OSVersion.Platform == 6;
-
+        
     }
-
+    
 }
