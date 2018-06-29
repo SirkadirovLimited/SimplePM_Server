@@ -24,8 +24,7 @@
     <ProjectReference Include="..\SubmissionInfo\SubmissionInfo.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ProgramsTesting\SRunner" />
-    <Folder Include="ProgramsTesting\STester" />
+    <Folder Include="ProgramTesting\STester" />
   </ItemGroup>
   <ItemGroup>
     <None Update="config\database.json">

@@ -30,7 +30,7 @@
 using System;
 using System.Text;
 using CompilerPlugin;
-using ProgramsTesting;
+using ProgramTesting;
 using ProgramTestingAdditions;
 
 namespace SimplePM_Server.Workers
