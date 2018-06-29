@@ -6,12 +6,13 @@
  * ███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗██║     ██║ ╚═╝ ██║
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
- * SimplePM Server
- * A part of SimplePM programming contests management system.
+ * SimplePM Server is a part of software product "Automated
+ * vefification system for programming tasks "SimplePM".
  *
- * Copyright 2017 Yurij Kadirov
+ * Copyright 2018 Yurij Kadirov
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Source code of the product licensed under the Apache License,
+ * Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -26,27 +27,27 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using System.Diagnostics;
-
-namespace CompilerBase
+namespace CompilerPlugin
 {
-
-    /*
-     * Интерфейс, который предоставляет возможность
-     * создания собственных модулей компиляторов
-     * для различных языков программирования.
-     */
     
-    public interface ICompilerPlugin
-    {
-        
-        string PluginName { get; }
-        string AuthorName { get; }
-        string SupportUri { get; }
+    /*
+     * Структура, которая  позволяет  хранить
+     * информацию   о   результате компиляции
+     * пользовательского решения поставленной
+     * задачи по программированию.
+     */
 
-        CompilerResult StartCompiler(ref dynamic languageConfiguration, string submissionId, string fileLocation);
-        
-        bool SetRunningMethod(ref dynamic languageConfiguration, ref ProcessStartInfo startInfo, string filePath);
+    public struct CompilationResult
+    {
+
+        // Успешно ли прошла компиляция или нет
+        public bool HasErrors { get; set; }
+
+        // Полный путь к запускаемой программе
+        public string ExeFullname { get; set; }
+
+        // Выходной поток компилятора
+        public string CompilerOutput { get; set; }
 
     }
     

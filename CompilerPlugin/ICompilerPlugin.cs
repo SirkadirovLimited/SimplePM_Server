@@ -6,12 +6,13 @@
  * ███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗██║     ██║ ╚═╝ ██║
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
- * SimplePM Server
- * A part of SimplePM programming contests management system.
+ * SimplePM Server is a part of software product "Automated
+ * vefification system for programming tasks "SimplePM".
  *
- * Copyright 2017 Yurij Kadirov
+ * Copyright 2018 Yurij Kadirov
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Source code of the product licensed under the Apache License,
+ * Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -26,31 +27,21 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-namespace CompilerBase
+using Plugin;
+using System.Diagnostics;
+
+namespace CompilerPlugin
 {
     
-    /*
-     * Структура, которая позволяет хранить
-     * информацию о результате компиляции
-     * пользовательского решения поставленной
-     * задачи по программированию.
-     */
-
-    public struct CompilerResult
+    public interface ICompilerPlugin : IPlugin
     {
-
-        // Поле указывает, возникли ли ошибки при компиляции
-        // пользовательской программы
-        public bool HasErrors;
-
-        // Поле хранит полный путь к запускаемому файлу
-        // пользовательского решения поставленной задачи
-        public string ExeFullname;
-
-        // Поле хранит выходной поток компилятора для
-        // пользовательского решения поставленной задачи
-        public string CompilerMessage;
-
+        
+        // Метод производит необходимые действия для компиляции
+        CompilationResult RunCompiler(ref dynamic languageConfiguration, string submissionId, string fileLocation);
+        
+        // Метод устанавливает необходимые параметры для запуска программ
+        bool SetRunningMethod(ref dynamic languageConfiguration, ref ProcessStartInfo startInfo, string filePath);
+        
     }
-
+    
 }
