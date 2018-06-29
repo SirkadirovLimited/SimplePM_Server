@@ -6,12 +6,13 @@
  * ███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗██║     ██║ ╚═╝ ██║
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
- * SimplePM Server
- * A part of SimplePM programming contests management system.
+ * SimplePM Server is a part of software product "Automated
+ * vefification system for programming tasks "SimplePM".
  *
- * Copyright 2017 Yurij Kadirov
+ * Copyright 2018 Yurij Kadirov
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Source code of the product licensed under the Apache License,
+ * Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -26,29 +27,15 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using JudgeBase;
-using ProgramTesting;
-
-namespace JudgePlugin
+namespace Plugin
 {
-    public class Judge : IJudgePlugin
+    
+    public interface IPlugin
     {
-
-        public string JudgeName => "none";
-
-        public string JudgeAuthor => "Yurij Kadirov";
-
-        public string JudgeSupportUrl => "https://spm.sirkadirov.com/";
-
-        public JudgeResult GenerateJudgeResult(ref ProgramTestingResult programTestingResult)
-        {
-
-            return new JudgeResult
-            {
-                RatingMult = 0
-            };
-
-        }
-
+        
+        // Базовая информация о плагине
+        PluginInfo PluginInformation { get; }
+        
     }
+    
 }
