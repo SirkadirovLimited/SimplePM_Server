@@ -6,12 +6,13 @@
  * ███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗██║     ██║ ╚═╝ ██║
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
- * SimplePM Server
- * A part of SimplePM programming contests management system.
+ * SimplePM Server is a part of software product "Automated
+ * vefification system for programming tasks "SimplePM".
  *
- * Copyright 2017 Yurij Kadirov
+ * Copyright 2018 Yurij Kadirov
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Source code of the product licensed under the Apache License,
+ * Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -26,25 +27,23 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-namespace JudgeBase
+using Plugin;
+using ProgramTestingAdditions;
+
+namespace JudgePlugin
 {
-
-    /*
-     * Структура предназначена  для  хранения
-     * данных о предоставленном  рейтинге для
-     * пользовательского решения поставленной
-     * задачи.
-     */
-
-    public struct JudgeResult
+    
+    public interface IJudgePlugin : IPlugin
     {
-
+        
         /*
-         * Предоставленный множитель рейтинга для решения
+         * Метод, который несёт ответственность
+         * за  вынесение  вердикта  о  рейтинге
+         * данного решения поставленной задачи.
          */
 
-        public float RatingMult { get; set; }
-
+        JudgingResult GenerateJudgeResult(ref ProgramTestingResult programTestingResult);
+        
     }
-
+    
 }
