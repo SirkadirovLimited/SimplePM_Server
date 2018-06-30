@@ -24,9 +24,6 @@
     <ProjectReference Include="..\SubmissionInfo\SubmissionInfo.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ProgramTesting\STester" />
-  </ItemGroup>
-  <ItemGroup>
     <None Update="config\database.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
