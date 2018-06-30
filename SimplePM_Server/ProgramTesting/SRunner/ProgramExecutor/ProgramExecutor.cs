@@ -36,8 +36,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
     {
 
         public ProgramExecutor(
-            ref dynamic compilerConfiguration,
-            ref ICompilerPlugin _compilerPlugin,
+            dynamic compilerConfiguration,
+            ICompilerPlugin _compilerPlugin,
             string path,
             string args,
             long memoryLimit = 0,

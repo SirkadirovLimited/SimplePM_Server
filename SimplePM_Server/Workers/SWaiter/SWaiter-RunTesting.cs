@@ -31,6 +31,7 @@ using System;
 using System.Text;
 using CompilerPlugin;
 using ProgramTestingAdditions;
+using SimplePM_Server.ProgramTesting.STester;
 
 namespace SimplePM_Server.Workers
 {
@@ -75,20 +76,6 @@ namespace SimplePM_Server.Workers
             ProgramTestingResult tmpResult = null;
 
             /*
-             * Объявляем  объект на базе класса
-             * тестировщика, с помощью которого
-             * в скором времени будем выполнять
-             * тестировани пользовательских ре-
-             * шений задач по программированию.
-             */
-
-            var tester = new STester(
-                ref _connection,
-                cResult.ExeFullname,
-                ref _submissionInfo
-            );
-
-            /*
              * Выполняем тестирование в блоке обработки
              * исключительных систуаций,  и,  в  случае
              * возникновения такой  ситуации записываем
@@ -112,21 +99,33 @@ namespace SimplePM_Server.Workers
                     /* Проверка синтаксиса */
                     case "syntax":
 
-                        tmpResult = tester.Syntax();
+                        tmpResult = new SyntaxTesting(
+                            ref _connection,
+                            cResult.ExeFullname,
+                            ref _submissionInfo
+                        ).RunTesting();
 
                         break;
 
                     /* Debug-тестирование */
                     case "debug":
 
-                        tmpResult = tester.Debug();
+                        tmpResult = new DebugTesting(
+                            ref _connection,
+                            cResult.ExeFullname,
+                            ref _submissionInfo
+                        ).RunTesting();
 
                         break;
 
                     /* Release-тестирование */
                     case "release":
 
-                        tmpResult = tester.Release();
+                        tmpResult = new ReleaseTesting(
+                            ref _connection,
+                            cResult.ExeFullname,
+                            ref _submissionInfo
+                        ).RunTesting();
 
                         break;
 
