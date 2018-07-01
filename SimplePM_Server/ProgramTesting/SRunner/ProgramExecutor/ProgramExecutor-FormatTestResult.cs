@@ -35,6 +35,12 @@ namespace SimplePM_Server.ProgramTesting.SRunner
     public partial class ProgramExecutor
     {
 
+        /*
+         * Метод обрабатывает имеющиеся данные
+         * и предоставляет данные о результатах
+         * тестирования.
+         */
+        
         private void FormatTestResult()
         {
 
@@ -71,7 +77,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             /*
              * Проверка на обнаружение Runtime-ошибок
              */
-
+            
             checker = !_testingResultReceived &&
                 _programProcess.ExitCode != 0 &&
                 _programProcess.ExitCode != -1;
@@ -84,10 +90,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
 
             }
 
-            /*
-             * Проверка на наличие текста в выходном потоке ошибок
-             */
-
+            // Проверка на наличие текста в выходном потоке ошибок
             if (!_testingResultReceived)
             {
 
@@ -105,10 +108,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
 
             }
 
-            /*
-             * Если всё хорошо, возвращаем временный результат
-             */
-
+            // Если всё хорошо, возвращаем временный результат
             if (!_testingResultReceived)
             {
 

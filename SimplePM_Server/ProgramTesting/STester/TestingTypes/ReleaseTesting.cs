@@ -80,24 +80,15 @@ namespace SimplePM_Server.ProgramTesting.STester
              */
 
             var programTestingResult = new ProgramTestingResult(testsCount);
-
+            
             /*
-             * Получаем ссылку на объект, который
-             * хранит информацию  о  конфигурации
-             * компиляционного модуля для данного
-             * языка программирования.
+             * Получаем информацию о плагине, который
+             * отвечает за компиляцию и его конфигурацию.
              */
             
             var languageConfiguration = SCompiler.GetCompilerConfig(
                 submissionInfo.CodeLang
             );
-            
-            /*
-             * Получаем     ссылку     на     объект,
-             * созданный    на    основании   класса,
-             * который,   в   свою  очередь,   создан
-             * по подобию интерфейса ICompilerPlugin.
-             */
             
             var compilerPlugin = SCompiler.FindCompilerPlugin(
                 (string)(languageConfiguration.module_name)
@@ -154,11 +145,15 @@ namespace SimplePM_Server.ProgramTesting.STester
                 if (currentTestResult.Result == SingleTestResult.PossibleResult.MiddleSuccessResult)
                 {
 
+                    // TODO: Implement checkers
+                    // TODO: Одинаковые части кода с DebugTesting!
+                    
                     /*
                      * Сравнение выходных потоков
                      * и вынесение  результата по
                      * данному тесту.
                      */
+                    
                     currentTestResult.Result = 
                         Convert.ToBase64String(currentTestResult.Output) == Convert.ToBase64String(currentTest.OutputData)
                             ? SingleTestResult.PossibleResult.FullSuccessResult

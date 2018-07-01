@@ -47,10 +47,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         )
         {
             
-            /*
-             * Вызываем метод, отвечающий за установку
-             * дополнительных параметров запуска.
-             */
+            // Устанавливаем дополнительные параметры запуска
             var f = _compilerPlugin.SetRunningMethod(
                 ref languageConfiguration,
                 ref startInfo,
@@ -84,11 +81,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             // Указываем имя пользователя
             proc.StartInfo.UserName = (string)(SWorker._securityConfiguration.runas.username);
 
-            /*
-             * Передаём, что загружать пользова-
-             * тельский профайл не нужно.
-             */
-
+            // Передаём, что загружать пользовательский профайл не нужно
             proc.StartInfo.LoadUserProfile = false;
 
             /*

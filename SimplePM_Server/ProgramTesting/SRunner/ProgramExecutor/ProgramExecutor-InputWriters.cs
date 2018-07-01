@@ -61,11 +61,6 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             catch (Exception)
             {
 
-                /*
-                 * Если что-то пошло не так,
-                 * как планировалось ранее.
-                 */
-
                 try
                 {
 
@@ -100,10 +95,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             try
             {
                 
-                /*
-                 * Получаем полный путь к файлу с входными данными
-                 */
-
+                // Получаем полный путь к файлу с входными данными
                 var inputFilePath = Path.Combine(
                     new FileInfo(_programPath).DirectoryName ?? throw new DirectoryNotFoundException(),
                     "input.txt"

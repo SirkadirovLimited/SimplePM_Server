@@ -69,9 +69,9 @@ namespace SimplePM_Server.ProgramTesting.STester
             );
 
             /*
-             * Передаём       новосозданным      переменным
-             * информацию  о  лимитах для пользовательского
-             * процесса (пользовательского решения задачи).
+             * Передаём новосозданным переменным информацию
+             * о лимитах для пользовательского процесса
+             * (пользовательского решения задачи).
              */
 
             GetDebugProgramLimits(
@@ -81,7 +81,7 @@ namespace SimplePM_Server.ProgramTesting.STester
             
             /*
              * Проводим нетестовый запуск авторского решения
-             * и получаем всё необходимое  для  тестирования
+             * и получаем всё необходимое для тестирования
              * пользовательской программы.
              */
 
@@ -97,37 +97,17 @@ namespace SimplePM_Server.ProgramTesting.STester
                 submissionInfo.ProblemInformation.AdaptProgramOutput
             ).RunTesting();
 
-            /*
-             * Проверяем,    успешно  ли  проведен  запуск
-             * авторского   решения     задачи.   В случае
-             * обнаружения  каких-либо  ошибок выбрасываем
-             * исключение  AuthorSolutionRunningException,
-             * которое информирует улавливатель исключений
-             * о необходимости  предоставления  информации
-             * об  ошибке  в  лог-файлах  сервера и прочих
-             * местах, где это важно и необходимо.
-             */
-            
+            // Осуществляем проверки на наличие ошибок
             if (authorTestingResult.Result != SingleTestResult.PossibleResult.MiddleSuccessResult)
                 throw new AuthorSolutionRunningException();
             
             /*
-             * Получаем ссылку на объект, который
-             * хранит информацию  о  конфигурации
-             * компиляционного модуля для данного
-             * языка программирования.
+             * Получаем конфигурации компиляционных модулей
              */
             
             var userLanguageConfiguration = SCompiler.GetCompilerConfig(
                 submissionInfo.CodeLang
             );
-
-            /*
-             * Получаем     ссылку     на     объект,
-             * созданный    на    основании   класса,
-             * который,   в   свою  очередь,   создан
-             * по подобию интерфейса ICompilerPlugin.
-             */
             
             var userCompilerPlugin = SCompiler.FindCompilerPlugin(
                 (string)(userLanguageConfiguration.module_name)
@@ -151,17 +131,18 @@ namespace SimplePM_Server.ProgramTesting.STester
                 submissionInfo.ProblemInformation.AdaptProgramOutput
             ).RunTesting();
             
-            /*
-             * Если   результат    тестирования   не   полностью
-             * известен, осуществляем проверку по дополнительным
-             * тестам  и  выдвигаем  остаточный  результат debug
-             * тестирования пользовательского решения задачи.
-             */
-            
+            // В некоторых случаях необходимо произвести "допроверку"
             if (userTestingResult.Result == SingleTestResult.PossibleResult.MiddleSuccessResult)
             {
 
                 // TODO: Implement checkers
+                // TODO: Одинаковые части кода с ReleaseTesting!
+                
+                /*
+                 * Сравнение выходных потоков
+                 * и вынесение  результата по
+                 * данному тесту.
+                 */
                 
                 userTestingResult.Result =
                     Convert.ToBase64String(userTestingResult.Output) == Convert.ToBase64String(authorTestingResult.Output)
@@ -171,10 +152,8 @@ namespace SimplePM_Server.ProgramTesting.STester
             }
 
             /*
-             * Производим удаление директории
-             * авторского решения поставленно
-             * й задачи для экономии места на
-             * диске.
+             * Производим удаление директории авторского решения
+             * поставленной задачи для экономии места на диске.
              */
             
             Directory.Delete(
@@ -188,9 +167,9 @@ namespace SimplePM_Server.ProgramTesting.STester
             
             /*
              * Формируем результат тестирования пользовательского
-             * решения поставленной задачи,  добавляем информацию
-             * о  единственном  тесте,   который   был   проведен
-             * непосредственно    при    тестировании     данного
+             * решения поставленной задачи, добавляем информацию
+             * о единственномтесте, который был проведен
+             * непосредственно при тестировании данного
              * пользовательского решения поставленной задачи.
              */
 
@@ -205,9 +184,8 @@ namespace SimplePM_Server.ProgramTesting.STester
             };
 
             /*
-             * Возвращаем сформированный результат
-             * тестирования      пользовательского
-             * решения поставленной задачи.
+             * Возвращаем сформированный результат тестирования
+             * пользовательского решения поставленной задачи.
              */
 
             return programTestingResult;
@@ -221,30 +199,20 @@ namespace SimplePM_Server.ProgramTesting.STester
         {
             
             /*
-             * Получаем ссылку на объект, который
-             * хранит информацию  о  конфигурации
-             * компиляционного модуля для данного
-             * языка программирования.
+             * Получаем информацию о плагине, который
+             * отвечает за компиляцию и его конфигурацию.
              */
             
             authorLanguageConfiguration = SCompiler.GetCompilerConfig(
                 submissionInfo.ProblemInformation.AuthorSolutionCodeLanguage
             );
 
-            /*
-             * Получаем ссылку на объект,
-             * созданный на основании класса,
-             * который, в свою очередь, создан
-             * по подобию интерфейса ICompilerPlugin.
-             */
-
             authorCompilerPlugin = SCompiler.FindCompilerPlugin(
                 (string)(authorLanguageConfiguration.module_name)
             );
             
             /*
-             * Компиляция авторского решения
-             * поставленной задачи с последующим
+             * Компиляция авторского решения с последующим
              * возвращением результатов компиляции.
              */
             
@@ -258,28 +226,16 @@ namespace SimplePM_Server.ProgramTesting.STester
                 Guid.NewGuid().ToString()
             );
 
-            /*
-             * Создаём   папку   текущего
-             * авторского решения задачи.
-             */
-
+            // Создаём папку текущего авторского решения задачи
             Directory.CreateDirectory(tmpAuthorDir);
 
-            /*
-             * Определяем путь хранения
-             * файла   исходного   кода
-             * авторского решения.
-             */
-
+            // Определяем путь хранения файла исходного кода авторского решения
             var tmpAuthorSrcLocation = Path.Combine(
                 tmpAuthorDir,
                 "sa" + authorFileExt
             );
 
-            /*
-             * Для обеспечения безопасности синхронизируем потоки
-             */
-
+            // Для обеспечения безопасности синхронизируем потоки
             lock (new object())
             {
 

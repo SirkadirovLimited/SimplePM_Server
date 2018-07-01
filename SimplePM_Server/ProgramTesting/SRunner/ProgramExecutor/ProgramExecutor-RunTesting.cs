@@ -39,10 +39,6 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         public SingleTestResult RunTesting()
         {
 
-            /*
-             * Защищаемся от всех возможных угроз
-             */
-            
             try
             {
 
@@ -67,44 +63,24 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                     // Сигнализируем о готовности чтения выходного потока
                     _programProcess.BeginOutputReadLine();
 
-                    /*
-                     * Записываем  входные
-                     * данные  во  входной
-                     * поток.
-                     */
-
+                    // Записываем входные данные
                     WriteInputString();
 
-                    /*
-                     * Вызываем метод, запускающий
-                     * слежение  за   процессорным
-                     * временем.
-                     */
-                    
+                    // Запускаем слежение за процессорным временем
                     StartProcessorTimeLimitChecker();
 
-                    /*
-                     * Вызываем метод, запускающий
-                     * слежение за памятью.
-                     */
-
+                    // Запускаем слежение за используемой памятью
                     StartMemoryLimitChecker();
 
                     /*
-                     * Ожидаем  завершения  пользовательского
-                     * процесса.
-                     * Если этого не произошло, предпринимаем
-                     * необходимые действия  по  потношению к
-                     * нему.
+                     * Ожидаем завершения пользовательского процесса.
+                     * Если этого не произошло, предпринимаем необходимые
+                     * действия по потношению к нему.
                      */
 
                     if (!_programProcess.WaitForExit(_programRuntimeLimit))
                     {
 
-                        /*
-                         * Обрабатываем возможные исключения
-                         */
-                        
                         try
                         {
 
@@ -112,12 +88,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                             _programProcess.Kill();
 
                         }
-                        catch
-                        {
-                            
-                            /* Нет необходимости обработки */
-                            
-                        }
+                        catch { /* Нет необходимости обработки */ }
                         
                         // Указываем, что результат тестирования уже получен
                         _testingResultReceived = true;
@@ -127,12 +98,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                         
                     }
 
-                    /*
-                     * Формируем     промежуточный
-                     * результат      тестирования
-                     * пользовательской программы.
-                     */
-
+                    // Формируем промежуточный результат тестирования
                     FormatTestResult();
 
                 }
@@ -141,24 +107,19 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             catch (Exception ex)
             {
 
-                /*
-                 * Записываем информацию об ошибке в лог-файл
-                 */
-
+                // Записываем информацию об ошибке в лог-файл
                 logger.Error("An exception catched while trying to test user's submission: " + ex);
 
                 /*
-                 * Создаём псевдорезультаты
-                 * тестирования   пользова-
-                 * тельской программы.
+                 * Создаём псевдорезультаты тестирования пользовательской программы.
                  */
 
                 _testingResultReceived = true;
                 _testingResult = SingleTestResult.PossibleResult.ErrorOutputNotNullResult;
 
                 /*
-                 * Записываем    информацию  об  исключении
-                 * в выходной поток ошибок пользовательской
+                 * Записываем информацию об исключении в
+                 * выходной поток ошибок пользовательской
                  * программы.
                  */
 
@@ -166,11 +127,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
 
             }
             
-            /*
-             * Возвращаем промежуточный
-             * результат тестирования.
-             */
-
+            // Возвращаем промежуточный результат  тестирования
             return GenerateTestResult();
 
         }

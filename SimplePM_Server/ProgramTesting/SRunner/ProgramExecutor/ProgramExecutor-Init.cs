@@ -65,8 +65,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                 new FileInfo(_programPath).DirectoryName ?? throw new DirectoryNotFoundException();
 
             /*
-             * Управление методом запуска
-             * пользовательского процесса
+             * Управление методом запуска пользовательского процесса
              */
 
             // Устанавливаем вид запуска
@@ -86,6 +85,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             /*
              * Добавляем обработчики для некоторых событий
              */
+            
+            // Добавляем обработчик события записи данных в выходной поток
             _programProcess.OutputDataReceived += ProgramProcess_OutputDataReceived;
 
         }

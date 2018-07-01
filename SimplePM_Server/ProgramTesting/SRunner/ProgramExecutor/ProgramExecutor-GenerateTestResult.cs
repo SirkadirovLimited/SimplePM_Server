@@ -39,12 +39,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         private SingleTestResult GenerateTestResult()
         {
             
-            /*
-             * Генерируем результат тестирования
-             * пользовательской   программы   на
-             * текущем тесте.
-             */
-
+            // Генерируем результат тестирования программы
             var result = new SingleTestResult
             {
 
@@ -67,17 +62,13 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             };
             
             /*
-             * Освобождаем все связанные
-             * с процессом ресурсы.
+             * Освобождаем все связанные с процессом ресурсы.
              */
 
             _programProcess.Close();
             _programProcess.Dispose();
 
-            /*
-             * Возвращаем сгенерированный выше результат
-             */
-
+            // Возвращаем сгенерированный результат
             return result;
 
         }

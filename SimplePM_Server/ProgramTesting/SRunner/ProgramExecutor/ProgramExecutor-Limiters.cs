@@ -40,6 +40,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         private void StartMemoryLimitChecker()
         {
 
+            //TODO: Создавать задачу при вызове, а не тут
             new Task(() => {
 
                 try
@@ -93,6 +94,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         private void StartProcessorTimeLimitChecker()
         {
 
+            //TODO: Создавать задачу при вызове, а не тут
             new Task(() => {
 
                 try

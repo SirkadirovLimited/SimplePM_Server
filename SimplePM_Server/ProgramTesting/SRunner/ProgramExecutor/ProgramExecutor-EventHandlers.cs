@@ -36,24 +36,18 @@ namespace SimplePM_Server.ProgramTesting.SRunner
     public partial class ProgramExecutor
     {
 
+        /*
+         * Обработка поступающих выходных данных приложения
+         */
+        
         private void ProgramProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
 
-            /*
-             * Если результат тестирования уже
-             * имеется, не стоит ничего делать
-             *
-             * Если данные не получены, так же
-             * не стоит ничего делать.
-             */
-            
+            // Различные проверки безопасности
             if (e.Data == null || _testingResultReceived)
                 return;
             
-            /*
-             * Проверка на превышение лимита вывода
-             */
-
+            // Проверка на превышение лимитов вывода данных
             if (_outputCharsLimit > 0 && _programOutput.Length + e.Data.Length > _outputCharsLimit)
             {
 
@@ -71,15 +65,12 @@ namespace SimplePM_Server.ProgramTesting.SRunner
 
             }
 
-            /*
-             * В ином случае дозаписываем данные
-             * в соответственную переменную.
-             */
-
+            // Производим дозапись выходных данных
             var adaptedString = (_adaptOutput)
                 ? e.Data.Trim()
                 : e.Data;
 
+            // Записываем символ окончания строки
             _programOutput += adaptedString + '\n';
 
         }
