@@ -29,7 +29,7 @@
 
 using System;
 
-namespace SimplePM_Exceptions
+namespace ServerExceptions
 {
 
     [Serializable]

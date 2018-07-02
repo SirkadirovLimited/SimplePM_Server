@@ -27,18 +27,17 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
+using NLog;
 using System;
 using System.IO;
 using System.Text;
 using CompilerPlugin;
-using NLog;
+using ServerExceptions;
 using MySql.Data.MySqlClient;
-
 using ProgramTestingAdditions;
-using SimplePM_Exceptions;
-using SimplePM_Server.ProgramTesting.SRunner;
 using SimplePM_Server.Workers;
 using SimplePM_Server.Workers.Recourse;
+using SimplePM_Server.ProgramTesting.SRunner;
 
 namespace SimplePM_Server.ProgramTesting.STester
 {
@@ -57,34 +56,19 @@ namespace SimplePM_Server.ProgramTesting.STester
         public override ProgramTestingResult RunTesting()
         {
 
-            /*
-             * Переменная  хранит  полный путь
-             * к запускаемому файлу авторского
-             * решения задачи.
-             */
-
+            // Получаем путь к авторскому решению поставленной задачи
             var authorSolutionExePath = GetAuthorSolutionExePath(
                 out var authorLanguageConfiguration,
                 out var authorCompilerPlugin
             );
 
-            /*
-             * Передаём новосозданным переменным информацию
-             * о лимитах для пользовательского процесса
-             * (пользовательского решения задачи).
-             */
-
+            // Получаем лимиты для пользовательского решения
             GetDebugProgramLimits(
                 out var memoryLimit, // переменная, хранящая значение лимита по памяти
                 out var timeLimit // переменная, хранящая значение лимита по процессорному времени
             );
             
-            /*
-             * Проводим нетестовый запуск авторского решения
-             * и получаем всё необходимое для тестирования
-             * пользовательской программы.
-             */
-
+            // Запуск авторского решения поставленной задачи
             var authorTestingResult = new ProgramExecutor(
                 authorLanguageConfiguration,
                 authorCompilerPlugin,
@@ -101,24 +85,17 @@ namespace SimplePM_Server.ProgramTesting.STester
             if (authorTestingResult.Result != SingleTestResult.PossibleResult.MiddleSuccessResult)
                 throw new AuthorSolutionRunningException();
             
-            /*
-             * Получаем конфигурации компиляционных модулей
-             */
-            
+            // Определяем конфигурацию компиляционного плагина
             var userLanguageConfiguration = SCompiler.GetCompilerConfig(
                 submissionInfo.CodeLang
             );
             
+            // Получаем экземпляр компиляционного плагина
             var userCompilerPlugin = SCompiler.FindCompilerPlugin(
                 (string)(userLanguageConfiguration.module_name)
             );
 
-            /*
-             * Проводим тестовый запуск пользовательского
-             * решения поставленной задачи и получаем всё
-             * необходимое для тестирования программы.
-             */
-
+            // Запуск пользовательского решения поставленной задачи
             var userTestingResult = new ProgramExecutor(
                 userLanguageConfiguration,
                 userCompilerPlugin,
@@ -151,11 +128,7 @@ namespace SimplePM_Server.ProgramTesting.STester
                 
             }
 
-            /*
-             * Производим удаление директории авторского решения
-             * поставленной задачи для экономии места на диске.
-             */
-            
+            // Удаляем директорию с авторским решением
             Directory.Delete(
                 new FileInfo(authorSolutionExePath).Directory?.FullName
                     ?? throw new AuthorSolutionNotFoundException(
@@ -165,14 +138,7 @@ namespace SimplePM_Server.ProgramTesting.STester
                 true
             );
             
-            /*
-             * Формируем результат тестирования пользовательского
-             * решения поставленной задачи, добавляем информацию
-             * о единственномтесте, который был проведен
-             * непосредственно при тестировании данного
-             * пользовательского решения поставленной задачи.
-             */
-
+            // Формируем результат тестирования пользовательского решения
             var programTestingResult = new ProgramTestingResult(1)
             {
 
@@ -198,15 +164,12 @@ namespace SimplePM_Server.ProgramTesting.STester
         )
         {
             
-            /*
-             * Получаем информацию о плагине, который
-             * отвечает за компиляцию и его конфигурацию.
-             */
-            
+            // Определяем конфигурацию компиляционного плагина
             authorLanguageConfiguration = SCompiler.GetCompilerConfig(
                 submissionInfo.ProblemInformation.AuthorSolutionCodeLanguage
             );
 
+            // Получаем экземпляр компиляционного плагина
             authorCompilerPlugin = SCompiler.FindCompilerPlugin(
                 (string)(authorLanguageConfiguration.module_name)
             );
@@ -216,9 +179,6 @@ namespace SimplePM_Server.ProgramTesting.STester
              * возвращением результатов компиляции.
              */
             
-            // Определяем расширение файла
-            var authorFileExt = "." + (string)(authorLanguageConfiguration.source_ext);
-
             // Получаем случайный путь к директории авторского решения
             var tmpAuthorDir = Path.Combine(
                 (string)(SWorker._serverConfiguration.path.temp),
@@ -232,18 +192,13 @@ namespace SimplePM_Server.ProgramTesting.STester
             // Определяем путь хранения файла исходного кода авторского решения
             var tmpAuthorSrcLocation = Path.Combine(
                 tmpAuthorDir,
-                "sa" + authorFileExt
+                "sa" + ("." + (string)(authorLanguageConfiguration.source_ext))
             );
 
-            // Для обеспечения безопасности синхронизируем потоки
             lock (new object())
             {
 
-                /*
-                 * Записываем исходный код авторского
-                 * решения в заданный временный файл.
-                 */
-
+                // Производим запись в файл исходного кода
                 File.WriteAllBytes(
                     tmpAuthorSrcLocation,
                     submissionInfo.ProblemInformation.AuthorSolutionCode
@@ -262,22 +217,11 @@ namespace SimplePM_Server.ProgramTesting.STester
                 tmpAuthorSrcLocation
             );
 
-            /*
-             * В случае возникновения ошибки при компиляции
-             * авторского решения аварийно завершаем работу
-             * функции и выбрасываем исключение, содержащее
-             * информацию о файле и причине ошибки при  его
-             * открытии.
-             */
-
+            // Производим проверку на наличие ошибок
             if (cResult.HasErrors)
                 throw new FileLoadException(cResult.ExeFullname);
             
-            /*
-             * Возвращаем  полный  путь к исполняемому
-             * файлу авторского решения данной задачи.
-             */
-
+            // Возвращаем полный путь к исполняемому файлу
             return cResult.ExeFullname;
 
         }
@@ -285,32 +229,10 @@ namespace SimplePM_Server.ProgramTesting.STester
         private void GetDebugProgramLimits(out int memoryLimit, out int timeLimit)
         {
 
-            /*
-             * Формируем и выполняем запрос к
-             * базе  данных  системы, который
-             * позволит нам узнать информацию
-             * о лимитах для пользовательской
-             * программы.
-             */
+            // Создаём команду для СУБД
+            var cmdSelect = new MySqlCommand(Resources.get_debug_limits, conn);
 
-            // Формируем SQL запрос
-            const string querySelect = @"
-                SELECT 
-                    `memoryLimit`, 
-                    `timeLimit` 
-                FROM 
-                    `spm_problems_tests` 
-                WHERE 
-                    `problemId` = @problemId 
-                ORDER BY 
-                    `id` ASC 
-                LIMIT 
-                    1
-                ;
-            ";
-
-            var cmdSelect = new MySqlCommand(querySelect, conn);
-
+            // Добавляем параметры запроса
             cmdSelect.Parameters.AddWithValue(
                 "@problemId",
                 submissionInfo.ProblemInformation.ProblemId
@@ -339,12 +261,7 @@ namespace SimplePM_Server.ProgramTesting.STester
                 // Закрываем data reader
                 dataReader.Close();
 
-                /*
-                 * Выбрасываем исключение, которое означает
-                 * присутствие ошибки при попытке получения
-                 * информации с базы данных системы.
-                 */
-
+                // Выбрасываем исключение
                 throw new DatabaseQueryException();
 
             }

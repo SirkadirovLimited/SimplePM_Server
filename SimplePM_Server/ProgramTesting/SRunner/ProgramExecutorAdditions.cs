@@ -35,7 +35,7 @@ using SimplePM_Server.Workers;
 namespace SimplePM_Server.ProgramTesting.SRunner
 {
     
-    public class ProgramExecutorAdditions
+    public static class ProgramExecutorAdditions
     {
         
         public static void SetExecInfoByFileExt(
@@ -56,7 +56,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             
             // В случае возникновения ошибок выбрасываем исключение
             if (!f)
-                throw new SimplePM_Exceptions.UnknownException("SetRunningMethod() failed!");
+                throw new ServerExceptions.UnknownException("SetRunningMethod() failed!");
 
             // Обрабатываем аргументы запуска
             if (startInfo.Arguments.Length > 0)
@@ -69,12 +69,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         public static void SetProcessRunAs(ref Process proc)
         {
 
-            /*
-             * Проверяем, включена  ли  функция  запуска
-             * пользовательских программ от имени инного
-             * пользователя. Если отключена - выходим.
-             */
-
+            // Проверка на активизацию функции
             if ((string)(SWorker._securityConfiguration.runas.enabled) != "true")
                 return;
 
