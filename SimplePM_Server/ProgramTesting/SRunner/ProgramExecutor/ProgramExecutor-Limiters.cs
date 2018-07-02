@@ -40,112 +40,92 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         private void StartMemoryLimitChecker()
         {
 
-            //TODO: Создавать задачу при вызове, а не тут
-            new Task(() => {
+            try
+            {
 
-                try
+                while (!_programProcess.HasExited)
                 {
 
-                    while (!_programProcess.HasExited)
+                    // Удаляем весь кэш, связанный с компонентом
+                    _programProcess.Refresh();
+
+                    // Получаем текущее значение свойства
+                    UsedMemory = _programProcess.PeakWorkingSet64;
+
+                    /*
+                     * Проверяем  на  превышение  лимита
+                     * и в случае обнаружения, "убиваем"
+                     * процесс.
+                     */
+                        
+                    if (_programMemoryLimit > 0 && UsedMemory > _programMemoryLimit)
                     {
 
-                        // Удаляем весь кэш, связанный с компонентом
-                        _programProcess.Refresh();
-
-                        // Получаем текущее значение свойства
-                        UsedMemory = _programProcess.PeakWorkingSet64;
+                        // Убиваем процесс
+                        _programProcess.Kill();
 
                         /*
-                         * Проверяем  на  превышение  лимита
-                         * и в случае обнаружения, "убиваем"
-                         * процесс.
+                         * Записываем   преждевременный   результат
+                         * тестирования пользовательской программы.
                          */
-                        
-                        if (_programMemoryLimit > 0 && UsedMemory > _programMemoryLimit)
-                        {
 
-                            // Убиваем процесс
-                            _programProcess.Kill();
+                        _testingResultReceived = true;
+                        _testingResult = SingleTestResult.PossibleResult.MemoryLimitResult;
 
-                            /*
-                             * Записываем   преждевременный   результат
-                             * тестирования пользовательской программы.
-                             */
-
-                            _testingResultReceived = true;
-                            _testingResult = SingleTestResult.PossibleResult.MemoryLimitResult;
-
-                        }
-                        
                     }
-
-                }
-                catch (Exception)
-                {
-
-                    /* Deal with it */
-
+                        
                 }
 
-            }).Start();
+            }
+            catch { /* Дополнительных действий не предусмотрено */ }
 
         }
 
         private void StartProcessorTimeLimitChecker()
         {
 
-            //TODO: Создавать задачу при вызове, а не тут
-            new Task(() => {
+            try
+            {
 
-                try
+                while (!_programProcess.HasExited)
                 {
 
-                    while (!_programProcess.HasExited)
+                    // Удаляем весь кэш, связанный с компонентом
+                    _programProcess.Refresh();
+
+                    // Получаем текущее значение свойства
+                    UsedProcessorTime = Convert.ToInt32(
+                        Math.Round(
+                            _programProcess.TotalProcessorTime.TotalMilliseconds
+                        )
+                    );
+
+                    /*
+                     * Проверяем  на  превышение  лимита
+                     * и в случае обнаружения, "убиваем"
+                     * процесс.
+                     */
+
+                    if (_programProcessorTimeLimit > 0 && UsedProcessorTime > _programProcessorTimeLimit)
                     {
 
-                        // Удаляем весь кэш, связанный с компонентом
-                        _programProcess.Refresh();
-
-                        // Получаем текущее значение свойства
-                        UsedProcessorTime = Convert.ToInt32(
-                            Math.Round(
-                                _programProcess.TotalProcessorTime.TotalMilliseconds
-                            )
-                        );
+                        // Убиваем процесс
+                        _programProcess.Kill();
 
                         /*
-                         * Проверяем  на  превышение  лимита
-                         * и в случае обнаружения, "убиваем"
-                         * процесс.
+                         * Записываем   преждевременный   результат
+                         * тестирования пользовательской программы.
                          */
 
-                        if (_programProcessorTimeLimit > 0 && UsedProcessorTime > _programProcessorTimeLimit)
-                        {
-
-                            // Убиваем процесс
-                            _programProcess.Kill();
-
-                            /*
-                             * Записываем   преждевременный   результат
-                             * тестирования пользовательской программы.
-                             */
-
-                            _testingResultReceived = true;
-                            _testingResult = SingleTestResult.PossibleResult.TimeLimitResult;
-
-                        }
+                        _testingResultReceived = true;
+                        _testingResult = SingleTestResult.PossibleResult.TimeLimitResult;
 
                     }
 
                 }
-                catch (Exception)
-                {
 
-                    /* Deal with it */
-
-                }
-
-            }).Start();
+            }
+            catch { /* Дополнительных действий не предусмотрено */ }
 
         }
 

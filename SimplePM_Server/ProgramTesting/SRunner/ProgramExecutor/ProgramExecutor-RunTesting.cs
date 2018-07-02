@@ -28,6 +28,7 @@
  */
 
 using System;
+using System.Threading.Tasks;
 using ProgramTestingAdditions;
 
 namespace SimplePM_Server.ProgramTesting.SRunner
@@ -49,7 +50,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                 WriteInputFile();
 
                 /*
-                 * Продолжаем тестирование лишь  в  случае
+                 * Продолжаем тестирование лишь в случае
                  * отсутствия предопределённого результата
                  * тестирования.
                  */
@@ -67,15 +68,15 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                     WriteInputString();
 
                     // Запускаем слежение за процессорным временем
-                    StartProcessorTimeLimitChecker();
+                    new Task(StartProcessorTimeLimitChecker).Start();
 
                     // Запускаем слежение за используемой памятью
-                    StartMemoryLimitChecker();
+                    new Task(StartMemoryLimitChecker).Start();
 
                     /*
                      * Ожидаем завершения пользовательского процесса.
-                     * Если этого не произошло, предпринимаем необходимые
-                     * действия по потношению к нему.
+                     * Если этого не произошло, предпринимаем
+                     * необходимые действия по потношению к нему.
                      */
 
                     if (!_programProcess.WaitForExit(_programRuntimeLimit))
