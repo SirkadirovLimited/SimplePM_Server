@@ -184,4 +184,20 @@
         ;
     </value>
   </data>
+  <data name="get_debug_limits" xml:space="preserve">
+    <value>
+        SELECT 
+            `memoryLimit`, 
+            `timeLimit` 
+        FROM 
+            `spm_problems_tests` 
+        WHERE 
+            `problemId` = @problemId 
+        ORDER BY 
+            `id` ASC 
+        LIMIT 
+            1
+        ;
+    </value>
+  </data>
 </root>

@@ -62,6 +62,28 @@ namespace SimplePM_Server {
         
         /// <summary>
         ///   Looks up a localized string similar to 
+        ///        SELECT 
+        ///            `memoryLimit`, 
+        ///            `timeLimit` 
+        ///        FROM 
+        ///            `spm_problems_tests` 
+        ///        WHERE 
+        ///            `problemId` = @problemId 
+        ///        ORDER BY 
+        ///            `id` ASC 
+        ///        LIMIT 
+        ///            1
+        ///        ;
+        ///    .
+        /// </summary>
+        public static string get_debug_limits {
+            get {
+                return ResourceManager.GetString("get_debug_limits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 
         ///        START TRANSACTION; 
         ///        SELECT 
         ///            `spm_problems`.`difficulty`, 

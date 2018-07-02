@@ -38,6 +38,7 @@ namespace SimplePM_Server
         public static void Main(string[] args)
         {
             
+            // Запускаем сервер проверки решений
             new SWorker().RunServer();
             
         }

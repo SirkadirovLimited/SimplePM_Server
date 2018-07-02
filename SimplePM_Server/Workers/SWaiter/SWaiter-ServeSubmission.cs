@@ -28,7 +28,6 @@
  */
 
 using System.IO;
-using ProgramTestingAdditions;
 using SimplePM_Server.Workers.Recourse;
 
 namespace SimplePM_Server.Workers
@@ -40,76 +39,23 @@ namespace SimplePM_Server.Workers
         public void ServeSubmission()
         {
             
-            /*
-             * Записываем в лог-файл информацию о том,
-             * что начата обработка данного запроса на
-             * тестирование.
-             */
-
+            // Запись информации о начале обработки запроса на проверку в лог-файл
             logger.Trace("Serving submission #" + _submissionInfo.SubmissionId + " started!");
 
-            /*
-             * Определяем   соответствующую  данному   запросу
-             * на тестирование конфигурацию модуля компиляции.
-             */
-
+            // Определяем конфигурацию компиляционного плагина
             var compilerConfiguration = SCompiler.GetCompilerConfig(
                 _submissionInfo.CodeLang
             );
 
+            // Получаем экземпляр компиляционного плагина
             var compilerPlugin = SCompiler.FindCompilerPlugin(
                 (string)(compilerConfiguration.module_name)
             );
-
-            /*
-             * Определяем   расширение    файла
-             * исходного кода пользовательского
-             * решения поставленной задачи.
-             */
-
-            var fileExt = "." + compilerConfiguration.source_ext;
             
-            /*
-             * Случайным   образом   генерируем    путь
-             * к файлу исходного кода пользовательского
-             * решения поставленной задачи.
-             */
-
-            var fileLocation = RandomGenSourceFileLocation(
-                _submissionInfo.SubmissionId.ToString(),
-                fileExt
-            );
+            // Получаем полный путь к файлу исходного кода
+            CreateSourceFile(ref compilerConfiguration, out var fileLocation);
             
-            /*
-             * Записываем  в  него   исходный   код,
-             * очищаем  буфер   и   закрываем  поток
-             * записи в данный файл.
-             * При  этом,   осуществляем  побайтовую
-             * запись в файл, дабы не повредить его.
-             */
-
-            File.WriteAllBytes(
-                fileLocation,
-                _submissionInfo.ProblemCode
-            );
-
-            /*
-             * Устанавливаем   аттрибуты   данного   файла
-             * таким образом, дабы  исключить  возможность
-             * индексирования  его содержимого и остальные
-             * не приятные для нас ситуации, которые могут
-             * привести к непредвиденным последствиям.
-             */
-
-            SetSourceFileAttributes(fileLocation);
-
-            /*
-             * Вызываем функцию  запуска  компилятора для
-             * данного языка программирования.
-             * Функция возвращает информацию о результате
-             * компиляции пользовательской программы.
-             */
-
+            // Производим компиляцию пользовательского решения
             var cResult = SCompiler.ChooseCompilerAndRun(
                 ref compilerConfiguration,
                 ref compilerPlugin,
@@ -117,48 +63,39 @@ namespace SimplePM_Server.Workers
                 fileLocation
             );
             
-            /*
-             * Запускаем тестирование пользовательской
-             * программы  по  указанному  его  типу  и
-             * парметрам,   после  чего  получаем  его
-             * результат.
-             */
-
-            ProgramTestingResult testingResult = RunTesting(
-                cResult
-            );
+            // Выполняем тестирование пользовательского решения
+            var testingResult = RunTesting(cResult);
             
-            /*
-             * Отправляем результат тестирования
-             * пользовательского решения постав-
-             * ленной  задачи  на  сервер БД для
-             * последующей обработки.
-             */
-
+            // Производим отправку результатов тестирования
             SendTestingResult(ref testingResult, cResult);
 
-            /*
-             * Вызываем метод,  который несёт
-             * ответственность  за   удаление
-             * всех временных файлов запросов
-             * на  тестирование,  а  также за
-             * вызов сборщика мусора.
-             */
-            
+            // Удаляем все временные файлы, связанные с данной отправкой
             ClearCache(fileLocation);
 
-            /*
-             * Записываем в лог-файл  информацию о том,
-             * что    тестирование    пользовательского
-             * решения завершено, но нам всё равно как.
-             */
-            
+            // Запись сведений об окончании отправки в лог-файл
             logger.Trace(
                 "#" +
                 _submissionInfo.SubmissionId +
                 ": Submission testing completed!"
             );
 
+        }
+
+        private void CreateSourceFile(ref dynamic compilerConfiguration, out string fileLocation)
+        {
+            
+            // Генерируем случайный путь для файла исходного кода
+            fileLocation = RandomGenSourceFileLocation(
+                _submissionInfo.SubmissionId.ToString(),
+                "." + compilerConfiguration.source_ext
+            );
+            
+            // Запись данных в файл исходного кода
+            File.WriteAllBytes(fileLocation, _submissionInfo.ProblemCode);
+
+            // Установка аттрибутов файла исходного кода
+            SetSourceFileAttributes(fileLocation);
+            
         }
         
     }
