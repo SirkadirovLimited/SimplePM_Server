@@ -33,26 +33,12 @@ namespace ServerExceptions
 {
 
     [Serializable]
-    public class AuthorSolutionRunningException : Exception
+    public class AuthorSolutionException : Exception
     {
 
-        public AuthorSolutionRunningException() { }
+        public AuthorSolutionException(string message) : base(message) { }
 
-        public AuthorSolutionRunningException(string message) : base(message) { }
-
-        public AuthorSolutionRunningException(string message, Exception inner) : base(message, inner) { }
-
-    }
-
-    [Serializable]
-    public class AuthorSolutionNotFoundException : Exception
-    {
-
-        public AuthorSolutionNotFoundException() { }
-
-        public AuthorSolutionNotFoundException(string message) : base(message) { }
-
-        public AuthorSolutionNotFoundException(string message, Exception inner) : base(message, inner) { }
+        public AuthorSolutionException(Exception inner) : base("AuthorSolutionException", inner) { }
 
     }
 
@@ -65,18 +51,6 @@ namespace ServerExceptions
         public PluginLoadingException(string message) : base(message) { }
 
         public PluginLoadingException(string message, Exception inner) : base(message, inner) { }
-
-    }
-
-    [Serializable]
-    public class OutputLengthLimitException : Exception
-    {
-
-        public OutputLengthLimitException() { }
-
-        public OutputLengthLimitException(string message) : base(message) { }
-
-        public OutputLengthLimitException(string message, Exception inner) : base(message, inner) { }
 
     }
 

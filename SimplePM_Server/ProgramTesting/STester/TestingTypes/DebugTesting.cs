@@ -56,6 +56,8 @@ namespace SimplePM_Server.ProgramTesting.STester
         public override ProgramTestingResult RunTesting()
         {
 
+            logger.Trace("#" + submissionInfo.SubmissionId + ": DebugTesting.RunTesting() [started]");
+            
             // Получаем путь к авторскому решению поставленной задачи
             var authorSolutionExePath = GetAuthorSolutionExePath(
                 out var authorLanguageConfiguration,
@@ -83,7 +85,7 @@ namespace SimplePM_Server.ProgramTesting.STester
 
             // Осуществляем проверки на наличие ошибок
             if (authorTestingResult.Result != SingleTestResult.PossibleResult.MiddleSuccessResult)
-                throw new AuthorSolutionRunningException();
+                throw new AuthorSolutionException("AUTHOR_SOLUTION_RUNTIME_EXCEPTION");
             
             // Определяем конфигурацию компиляционного плагина
             var userLanguageConfiguration = SCompiler.GetCompilerConfig(
@@ -131,9 +133,8 @@ namespace SimplePM_Server.ProgramTesting.STester
             // Удаляем директорию с авторским решением
             Directory.Delete(
                 new FileInfo(authorSolutionExePath).Directory?.FullName
-                    ?? throw new AuthorSolutionNotFoundException(
-                        "",
-                        new DirectoryNotFoundException()
+                    ?? throw new AuthorSolutionException(
+                        new DirectoryNotFoundException("", new NullReferenceException())
                     ),
                 true
             );
@@ -149,11 +150,9 @@ namespace SimplePM_Server.ProgramTesting.STester
 
             };
 
-            /*
-             * Возвращаем сформированный результат тестирования
-             * пользовательского решения поставленной задачи.
-             */
-
+            logger.Trace("#" + submissionInfo.SubmissionId + ": DebugTesting.RunTesting() [finished]");
+            
+            // Возвращаем результат тестирования пользовательского решения
             return programTestingResult;
 
         }
@@ -163,6 +162,8 @@ namespace SimplePM_Server.ProgramTesting.STester
             out ICompilerPlugin authorCompilerPlugin
         )
         {
+            
+            logger.Trace("GetAuthorSolutionExePath for submission #" + submissionInfo.SubmissionId + " [started]");
             
             // Определяем конфигурацию компиляционного плагина
             authorLanguageConfiguration = SCompiler.GetCompilerConfig(
@@ -221,6 +222,8 @@ namespace SimplePM_Server.ProgramTesting.STester
             if (cResult.HasErrors)
                 throw new FileLoadException(cResult.ExeFullname);
             
+            logger.Trace("GetAuthorSolutionExePath for submission #" + submissionInfo.SubmissionId + " [finished]");
+            
             // Возвращаем полный путь к исполняемому файлу
             return cResult.ExeFullname;
 
@@ -229,6 +232,8 @@ namespace SimplePM_Server.ProgramTesting.STester
         private void GetDebugProgramLimits(out int memoryLimit, out int timeLimit)
         {
 
+            logger.Trace("GetDebugProgramLimits for submission #" + submissionInfo.SubmissionId + " [started]");
+            
             // Создаём команду для СУБД
             var cmdSelect = new MySqlCommand(Resources.get_debug_limits, conn);
 
@@ -262,9 +267,11 @@ namespace SimplePM_Server.ProgramTesting.STester
                 dataReader.Close();
 
                 // Выбрасываем исключение
-                throw new DatabaseQueryException();
+                throw new DatabaseQueryException("MySQL query in DebugTesting.GetDebugProgramLimits() failed!");
 
             }
+            
+            logger.Trace("GetDebugProgramLimits for submission #" + submissionInfo.SubmissionId + " [finished]");
 
         }
         

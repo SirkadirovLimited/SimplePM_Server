@@ -54,6 +54,8 @@ namespace SimplePM_Server.ProgramTesting.STester
         public override ProgramTestingResult RunTesting()
         {
 
+            logger.Trace("#" + submissionInfo.SubmissionId + ": ReleaseTesting.RunTesting() [started]");
+            
             // Получаем информацию о всех тестах для данной задачи
             var ReleaseTestsInfo = GetTestsInfo();
 
@@ -100,12 +102,7 @@ namespace SimplePM_Server.ProgramTesting.STester
                     // TODO: Implement checkers
                     // TODO: Одинаковые части кода с DebugTesting!
                     
-                    /*
-                     * Сравнение выходных потоков
-                     * и вынесение  результата по
-                     * данному тесту.
-                     */
-                    
+                    // Сравнение выходных потоков и вынесение  результата по данному тесту
                     currentTestResult.Result = 
                         Convert.ToBase64String(currentTestResult.Output) == Convert.ToBase64String(currentTest.OutputData)
                             ? SingleTestResult.PossibleResult.FullSuccessResult
@@ -113,35 +110,20 @@ namespace SimplePM_Server.ProgramTesting.STester
 
                 }
 
-                /*
-                 * Заносим результат проведения
-                 * текущего теста в специальный
-                 * массив.
-                 */
-                
+                // Записываем результат на текущем тесте в массив
                 programTestingResult.TestingResults[currentTestIndex] = currentTestResult;
 
             }
 
-            /*
-             * Возвращаем информацию  о  тестировании
-             * пользовательского решения поставленной
-             * задачи.
-             */
-
+            logger.Trace("#" + submissionInfo.SubmissionId + ": ReleaseTesting.RunTesting() [finished]");
+            
+            // Возвращаем результаты тестирования пользовательского решения
             return programTestingResult;
 
         }
         
         private Queue<ReleaseTestInfo.ReleaseTestInfo> GetTestsInfo()
         {
-
-            /*
-             * Производим выборку всех данных,
-             * необходимых для формирования
-             * релизных тестов пользовательского
-             * решения поставленной задачи
-             */
             
             // Формируем SQL-запрос
             const string querySelect = @"

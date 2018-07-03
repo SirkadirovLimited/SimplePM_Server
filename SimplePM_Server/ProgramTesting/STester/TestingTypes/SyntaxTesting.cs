@@ -49,6 +49,8 @@ namespace SimplePM_Server.ProgramTesting.STester
         public override ProgramTestingResult RunTesting()
         {
             
+            logger.Trace("#" + submissionInfo.SubmissionId + ": SyntaxTesting.RunTesting() [started|finished]");
+            
             return new ProgramTestingResult(1)
             {
 
