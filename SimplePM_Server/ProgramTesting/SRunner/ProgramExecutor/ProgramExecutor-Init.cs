@@ -39,9 +39,10 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         private void Init()
         {
 
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: Init() [started]");
+            
             /*
-             * Инициализация необходимых для
-             * тестирования переменных
+             * Инициализация необходимых для тестирования переменных
              */
             
             _programProcess = new Process
@@ -52,15 +53,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
 
             };
 
-            /*
-             * Указываем текущую рабочую директорию.
-             *
-             * Это необходимо  по  большей части для
-             * поддержки   запуска  пользовательских
-             * программ от имени иного  от  текущего
-             * пользователя.
-             */
-
+            // Устанавливаем рабочую директорию для пользовательской программы
             _programProcess.StartInfo.WorkingDirectory =
                 new FileInfo(_programPath).DirectoryName ?? throw new DirectoryNotFoundException();
 
@@ -68,7 +61,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
              * Управление методом запуска пользовательского процесса
              */
 
-            // Устанавливаем вид запуска
+            // Устанавливаем служебную информацию о типе запуска
             ProgramExecutorAdditions.SetExecInfoByFileExt(
                 ref _compilerConfiguration,
                 ref _compilerPlugin,
@@ -77,7 +70,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                 _programArguments
             );
 
-            // Устанавливаем RunAs информацию
+            // Устанавливаем информацию для запуска от имени иного пользователя
             ProgramExecutorAdditions.SetProcessRunAs(
                 ref _programProcess
             );
@@ -88,6 +81,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             
             // Добавляем обработчик события записи данных в выходной поток
             _programProcess.OutputDataReceived += ProgramProcess_OutputDataReceived;
+            
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: Init() [finished]");
 
         }
         

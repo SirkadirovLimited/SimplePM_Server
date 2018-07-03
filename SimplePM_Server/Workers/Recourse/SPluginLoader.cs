@@ -32,20 +32,14 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
+using ServerExceptions;
 
 namespace SimplePM_Server.Workers.Recourse
 {
     
-    public class SPluginsLoader
+    public static class SPluginsLoader
     {
         
-        /*
-         * Объявляем переменную указателя
-         * на менеджер  журнала собылий и
-         * присваиваем  ей  указатель  на
-         * журнал событий текущего класса
-         */
-
         private static readonly Logger logger = LogManager.GetLogger("SimplePM_Server.Workers.SPluginLoader");
 
         /*
@@ -60,19 +54,10 @@ namespace SimplePM_Server.Workers.Recourse
         public static List<TPlugin> LoadPlugins<TPlugin>(string pluginsDirectoryPath, string typeFullName)
         {
 
-            /*
-             * Записываем в лог-файл информацию о том,
-             * что  собираемся   подгружать  сторонние
-             * модули компиляции.
-             */
-
+            // Записываем информацию о начале выполнения операции в лог-файл
             logger.Debug(typeof(TPlugin).Name + " modules are being loaded...");
 
-            /*
-             * Проводим инициализацию необходимых
-             * для продолжения работы переменных.
-             */
-
+            // Создаём новый типизированный список плагинов
             var _pluginsList = new List<TPlugin>();
 
             /*
@@ -99,34 +84,16 @@ namespace SimplePM_Server.Workers.Recourse
             foreach (var pluginFilePath in pluginFilesList)
             {
 
-                /*
-                 * Указываем в логе, что начинаем
-                 * загружать  определённый модуль
-                 * компиляции.
-                 */
-
+                // Начало загрузки плагина освещаем в лог-файле
                 logger.Debug("Start loading plugin [" + pluginFilePath + "]...");
 
-                /*
-                 * Выполняем все небезопасные действия
-                 * в блоке  обработки  исключений  для
-                 * обеспечения      отказоустойчивости
-                 * сервера проверки решений задач.
-                 */
-                
                 try
                 {
 
-                    /*
-                     * Загружаем сборку из файла по указанному пути
-                     */
-
+                    // Загружаем сборку из файла по указанному пути
                     var assembly = Assembly.LoadFrom(pluginFilePath);
 
-                    /*
-                     * Ищем необходимую для нас реализацию интерфейса
-                     */
-
+                    // Ищем необходимую для нас реализацию интерфейса
                     foreach (var type in assembly.GetTypes())
                     {
 
@@ -156,30 +123,17 @@ namespace SimplePM_Server.Workers.Recourse
                 catch (Exception ex)
                 {
 
-                    /*
-                     * В случае возникновения ошибок
-                     * записываем информацию о них в
-                     * лог-файле.
-                     */
-
-                    logger.Warn("Plugin loading failed [" + pluginFilePath + "]:" + ex);
+                    // Записываем информацию о возникшем исключении в лог-файл
+                    logger.Error("Plugin loading failed [" + pluginFilePath + "]:" + new PluginLoadingException(ex));
 
                 }
 
             }
 
-            /*
-             * Записываем  в  лог-файл информацию о том,
-             * что  мы  завершили процесс загрузки  всех
-             * модулей компиляции (ну или не всех).
-             */
-            
+            // Информируем об успешности выполнения операциий
             logger.Debug(typeof(TPlugin).Name + " modules were loaded...");
 
-            /*
-             * Возвращаем список найденных плагинов.
-             */
-
+            // Возвращаем список найденных плагинов
             return _pluginsList;
 
         }

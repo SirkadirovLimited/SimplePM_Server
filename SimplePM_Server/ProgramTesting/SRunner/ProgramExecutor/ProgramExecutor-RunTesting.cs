@@ -40,6 +40,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         public SingleTestResult RunTesting()
         {
 
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: RunTesting() [started]");
+            
             try
             {
 
@@ -109,10 +111,10 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             {
 
                 // Записываем информацию об ошибке в лог-файл
-                logger.Error("An exception catched while trying to test user's submission: " + ex);
+                logger.Trace("ProgramExecutor for <" + _programPath + ">: " + ex);
 
                 /*
-                 * Создаём псевдорезультаты тестирования пользовательской программы.
+                 * Создаём псевдорезультаты тестирования пользовательской программы
                  */
 
                 _testingResultReceived = true;
@@ -128,7 +130,9 @@ namespace SimplePM_Server.ProgramTesting.SRunner
 
             }
             
-            // Возвращаем промежуточный результат  тестирования
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: RunTesting() [finished]");
+            
+            // Возвращаем промежуточный результат тестирования
             return GenerateTestResult();
 
         }

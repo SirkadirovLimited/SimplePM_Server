@@ -39,6 +39,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         private SingleTestResult GenerateTestResult()
         {
             
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: GenerateTestResult() [started]");
+            
             // Генерируем результат тестирования программы
             var result = new SingleTestResult
             {
@@ -68,6 +70,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             _programProcess.Close();
             _programProcess.Dispose();
 
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: GenerateTestResult() [finished]");
+            
             // Возвращаем сгенерированный результат
             return result;
 

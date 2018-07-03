@@ -44,10 +44,14 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         private void FormatTestResult()
         {
 
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: FormatTestResult() [started]");
+            
             /*
              * Проверка на использованную память
              */
 
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: memory check");
+            
             var checker = !_testingResultReceived && _programMemoryLimit > 0 &&
                            UsedMemory > _programMemoryLimit;
 
@@ -63,6 +67,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
              * Проверка достижения лимита по процессорному времени
              */
 
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: processor time limit check");
+            
             checker = !_testingResultReceived && _programProcessorTimeLimit > 0 &&
                       UsedProcessorTime > _programProcessorTimeLimit;
 
@@ -77,6 +83,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             /*
              * Проверка на обнаружение Runtime-ошибок
              */
+            
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: runtime errors check");
             
             checker = !_testingResultReceived &&
                 _programProcess.ExitCode != 0 &&
@@ -94,6 +102,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             if (!_testingResultReceived)
             {
 
+                logger.Trace("ProgramExecutor for <" + _programPath + ">: stderr check");
+                
                 // Читаем выходной поток ошибок
                 _programErrorOutput = _programProcess.StandardError.ReadToEnd();
 
@@ -116,7 +126,9 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                 _testingResult = SingleTestResult.PossibleResult.MiddleSuccessResult;
 
             }
-
+            
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: FormatTestResult() [finished]");
+           
         }
 
     }

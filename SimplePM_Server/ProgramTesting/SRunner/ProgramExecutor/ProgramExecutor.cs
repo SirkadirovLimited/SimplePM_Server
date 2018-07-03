@@ -49,6 +49,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         )
         {
             
+            logger.Trace("ProgramExecutor for <" + path + "> created...");
+            
             // Получаем конфигурации компиляторов
             _compilerConfiguration = compilerConfiguration;
 

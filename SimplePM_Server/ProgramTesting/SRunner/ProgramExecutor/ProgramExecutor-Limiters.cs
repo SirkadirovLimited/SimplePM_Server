@@ -40,6 +40,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         private void StartMemoryLimitChecker()
         {
 
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: StartMemoryLimitChecker() [started]");
+            
             try
             {
 
@@ -79,11 +81,15 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             }
             catch { /* Дополнительных действий не предусмотрено */ }
 
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: StartMemoryLimitChecker() [finished]");
+            
         }
 
         private void StartProcessorTimeLimitChecker()
         {
 
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: StartProcessorTimeLimitChecker() [started]");
+            
             try
             {
 
@@ -127,6 +133,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             }
             catch { /* Дополнительных действий не предусмотрено */ }
 
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: StartProcessorTimeLimitChecker() [finished]");
+            
         }
 
     }

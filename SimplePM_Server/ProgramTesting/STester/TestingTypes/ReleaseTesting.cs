@@ -125,6 +125,8 @@ namespace SimplePM_Server.ProgramTesting.STester
         private Queue<ReleaseTestInfo.ReleaseTestInfo> GetTestsInfo()
         {
             
+            logger.Trace("GetTestsInfo for submission #" + submissionInfo.SubmissionId + " [started]");
+            
             // Формируем SQL-запрос
             const string querySelect = @"
                 SELECT 
@@ -191,6 +193,8 @@ namespace SimplePM_Server.ProgramTesting.STester
             // Завершаем чтение потока
             dataReader.Close();
 
+            logger.Trace("GetTestsInfo for submission #" + submissionInfo.SubmissionId + " [finished]");
+            
             // Возвращаем все тесты для данной задачи в виде очереди
             return testsQueue;
 

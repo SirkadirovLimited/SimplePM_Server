@@ -41,6 +41,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         private void WriteInputString()
         {
 
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: WriteInputString() [started]");
+            
             try
             {
 
@@ -58,9 +60,11 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                 _programProcess.StandardInput.Close();
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
+                logger.Error("ProgramExecutor for <" + _programPath + ">: " + ex);
+                
                 try
                 {
 
@@ -68,12 +72,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                     _programProcess.Kill();
 
                 }
-                catch (Exception)
-                {
-
-                    /* Deal with it */
-
-                }
+                catch (Exception) { /* Выполнение дополнительных действий не предусмотрено */ }
                 finally
                 {
 
@@ -86,12 +85,16 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                 }
 
             }
+            
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: WriteInputString() [finished]");
 
         }
 
         private void WriteInputFile()
         {
 
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: WriteInputFile() [started]");
+            
             try
             {
                 
@@ -125,9 +128,12 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                 }
                 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
+                // Записываем информацию об ошибке в лог-файл
+                logger.Error("ProgramExecutor for <" + _programPath + ">: " + ex);
+                
                 // Указываем, что результат тестирования получен
                 _testingResultReceived = true;
 
@@ -135,6 +141,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                 _testingResult = SingleTestResult.PossibleResult.InputErrorResult;
 
             }
+            
+            logger.Trace("ProgramExecutor for <" + _programPath + ">: WriteInputFile() [finished]");
 
         }
 
