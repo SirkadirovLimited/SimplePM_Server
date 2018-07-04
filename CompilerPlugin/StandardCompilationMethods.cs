@@ -81,67 +81,81 @@ namespace CompilerPlugin
         public static CompilationResult RunCompiler(string compilerFullName, string compilerArgs)
         {
 
-            // Создаём новый экземпляр процесса компилятора
-            var cplProc = new Process();
-
-            // Устанавливаем информацию о старте процесса
-            var pStartInfo = new ProcessStartInfo(compilerFullName, compilerArgs)
+            //TODO: Реализовать возможность установки рабочей папки компилятора
+            
+            try
             {
 
-                // Никаких ошибок, я сказал!
-                ErrorDialog = false,
+                // Создаём новый экземпляр процесса компилятора
+                var cplProc = new Process
+                {
+                    
+                    // Устанавливаем стартовую информацию
+                    StartInfo = new ProcessStartInfo(compilerFullName, compilerArgs)
+                    {
+                        
+                        // Никаких ошибок, я сказал!
+                        ErrorDialog = false,
 
-                // Минимизируем его, ибо не достоен он почестей!
-                WindowStyle = ProcessWindowStyle.Minimized,
+                        // Минимизируем его, ибо не достоен он почестей!
+                        WindowStyle = ProcessWindowStyle.Minimized,
 
-                // Перехватываем выходной поток
-                RedirectStandardOutput = true,
+                        // Перехватываем выходной поток
+                        RedirectStandardOutput = true,
 
-                // Перехватываем поток ошибок
-                RedirectStandardError = true,
+                        // Перехватываем поток ошибок
+                        RedirectStandardError = true,
 
-                // Для перехвата делаем процесс демоном
-                UseShellExecute = false
+                        // Для перехвата делаем процесс демоном
+                        UseShellExecute = false
+                        
+                    }
+                    
+                };
 
-            };
+                // Запускаем процесс компилятора
+                cplProc.Start();
 
-            // Передаём стартовую информацию
-            cplProc.StartInfo = pStartInfo;
-
-            // Запускаем процесс компилятора
-            cplProc.Start();
-
-            // Ожидаем завершения процесса компилятора
-            cplProc.WaitForExit();
-
-            /*
-             * Осуществляем чтение выходных потоков
-             * компилятора в специально созданные
-             * для этого переменные.
-             */
-
-            var standartOutput = cplProc.StandardOutput.ReadToEnd();
-            var standartError = cplProc.StandardError.ReadToEnd();
-
-            // Стандартный выход компилятора
-            if (standartOutput.Length == 0)
-                standartOutput = "SimplePM Server v" + Assembly.GetExecutingAssembly().GetName().Version + " on " + Environment.OSVersion;
-
-            // Объявляем и инициализируем переменную результата компиляции
-            var result = new CompilationResult
-            {
+                // Ожидаем завершения процесса компилятора
+                cplProc.WaitForExit();
 
                 /*
-                 * Получаем полный текст сообщений компилятора и записываем его в
-                 * специально отведенную для этого переменную.
+                 * Осуществляем чтение выходных потоков
+                 * компилятора в специально созданные
+                 * для этого переменные.
                  */
 
-                CompilerOutput = HttpUtility.HtmlEncode(standartOutput + "\n" + standartError)
+                var standartOutput = cplProc.StandardOutput.ReadToEnd();
+                var standartError = cplProc.StandardError.ReadToEnd();
 
-            };
+                // Стандартный выход компилятора
+                if (standartOutput.Length == 0)
+                    standartOutput = "SimplePM Server v" + Assembly.GetExecutingAssembly().GetName().Version + " on " +
+                                     Environment.OSVersion;
 
-            // Возвращаем результат компиляции
-            return result;
+                // Возвращаем результат компиляции
+                return new CompilationResult
+                {
+
+                    // Записываем данные с выходного потока компилятора
+                    CompilerOutput = HttpUtility.HtmlEncode(standartOutput + "\n" + standartError)
+
+                };
+
+            }
+            catch (Exception ex)
+            {
+                
+                // Возвращаем провальный результат компиляции
+                return new CompilationResult
+                {
+                    
+                    HasErrors = true,
+                    CompilerOutput = ex.ToString()
+                    
+                };
+
+            }
 
         }
 
