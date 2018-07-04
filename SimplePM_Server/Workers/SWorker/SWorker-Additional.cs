@@ -34,6 +34,7 @@ using NLog.Config;
 using JudgePlugin;
 using CompilerPlugin;
 using Newtonsoft.Json;
+using ServerPlugin;
 using SimplePM_Server.Workers.Recourse;
 
 namespace SimplePM_Server.Workers
@@ -105,9 +106,9 @@ namespace SimplePM_Server.Workers
             {
                 
                 // Получаем список плагинов сервера
-                _compilerPlugins = SPluginsLoader.LoadPlugins<ICompilerPlugin>(
+                _serverPlugins = SPluginsLoader.LoadPlugins<IServerPlugin>(
                     (string)_serverConfiguration.path.ICompilerPlugin,
-                    "ServerPlugin"
+                    "ServerPlugin.Main"
                 );
                 
             }

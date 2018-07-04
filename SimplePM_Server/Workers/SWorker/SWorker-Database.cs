@@ -27,10 +27,7 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using System;
-using System.IO;
 using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
 
 namespace SimplePM_Server.Workers
 {

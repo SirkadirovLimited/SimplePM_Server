@@ -125,7 +125,7 @@ namespace SimplePM_Server.Workers
                  */
                 
                 if (conn != null)
-                    new Thread(new ParameterizedThreadStart(RunPreWaiter)).Start(conn);
+                    new Thread(RunPreWaiter).Start(conn);
             }
                 
             /*

@@ -27,9 +27,7 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using System;
 using Plugin;
-using System.IO;
 using System.Diagnostics;
 
 namespace CompilerPlugin

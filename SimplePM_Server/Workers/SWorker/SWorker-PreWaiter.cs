@@ -44,10 +44,6 @@ namespace SimplePM_Server.Workers
             // Объявляем отдельную переменную для удобства
             var conn = (MySqlConnection) connObject;
             
-            /*
-             * Обрабатываем все возможные исключения
-             */
-            
             try
             {
                 
@@ -268,10 +264,7 @@ namespace SimplePM_Server.Workers
                     conn.Dispose();
 
                 }
-                catch
-                {
-                    /* Никаких действий не предвидится */
-                }
+                catch { /* Никаких дополнительных действий не предусмотрено */ }
 
             }
 

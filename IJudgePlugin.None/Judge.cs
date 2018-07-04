@@ -33,6 +33,7 @@ using ProgramTestingAdditions;
 namespace JudgePlugin
 {
     
+    // ReSharper disable once UnusedMember.Global
     public class Judge : IJudgePlugin
     {
         
