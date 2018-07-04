@@ -1,27 +1,56 @@
 ﻿/*
- * Copyright (C) 2018, Yurij Kadirov.
- * All rights are reserved.
- * Licensed under Apache License 2.0 with additional restrictions.
+ * ███████╗██╗███╗   ███╗██████╗ ██╗     ███████╗██████╗ ███╗   ███╗
+ * ██╔════╝██║████╗ ████║██╔══██╗██║     ██╔════╝██╔══██╗████╗ ████║
+ * ███████╗██║██╔████╔██║██████╔╝██║     █████╗  ██████╔╝██╔████╔██║
+ * ╚════██║██║██║╚██╔╝██║██╔═══╝ ██║     ██╔══╝  ██╔═══╝ ██║╚██╔╝██║
+ * ███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗██║     ██║ ╚═╝ ██║
+ * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
+ *
+ * SimplePM Server is a part of software product "Automated
+ * vefification system for programming tasks "SimplePM".
+ *
+ * Copyright 2018 Yurij Kadirov
+ *
+ * Source code of the product licensed under the Apache License,
+ * Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * @Author: Yurij Kadirov
- * @Website: https://spm.sirkadirov.com/
- * @Email: admin@sirkadirov.com
- * @Repo: https://github.com/SirkadirovTeam/SimplePM_Server
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Visit website for more details: https://spm.sirkadirov.com/
  */
 
 [
 
   {
-    "display_name": "Mono/C# (latest)",
+    "display_name": ".NET C# (latest)",
     "editor_mode": "csharp",
     
     "language_name": "csharp",
     "source_ext": "cs",
     "enabled": false,
-    "module_name": "Mono",
-    "compiler_path": "mcs.exe",
-    "compiler_arguments": "{%fileLocation%}",
-    "runtime_path": "mono.exe"
+    "module_name": "TypicalCompiler",
+    "compiler_path": "msbuild",
+    "compiler_arguments": "{%fileLocation%}"
+  },
+
+  {
+    "display_name": "Free Pascal 3.x",
+    "editor_mode": "pascal",
+
+    "language_name": "freepascal",
+    "source_ext": "pas",
+    "enabled": true,
+    "module_name": "TypicalCompiler",
+    "compiler_path": "C:\\Program Files (x86)\\FPC\\bin\\i386-win32\\ppcrossx64.exe",
+    "compiler_arguments": "-ve -vw -vi -vx -Sc -C3 \"{%fileLocation%}\""
   },
 
   {
@@ -30,7 +59,7 @@
     
     "language_name": "java",
     "source_ext": "java",
-    "enabled": false,
+    "enabled": true,
     "module_name": "Java",
     "compiler_path": "C:\\Program Files\\Java\\jdk1.8.0_144\\bin\\javac.exe",
     "compiler_arguments": "{%fileLocation%}",
@@ -80,8 +109,8 @@
     
     "language_name": "lua",
     "source_ext": "lua",
-    "enabled": false,
-    "module_name": "NoCompiler",
+    "enabled": true,
+    "module_name": "ScriptLanguage",
     "runtime_path": "C:\\Program Files (x86)\\Lua\\5.1\\lua.exe",
     "runtime_arguments": "\"{%fileLocation%}\""
   },
@@ -92,8 +121,8 @@
     
     "language_name": "python",
     "source_ext": "py",
-    "enabled": false,
-    "module_name": "NoCompiler",
+    "enabled": true,
+    "module_name": "ScriptLanguage",
     "runtime_path": "C:\\Program Files\\Python36\\python.exe",
     "runtime_arguments": "\"{%fileLocation%}\""
   },
@@ -104,8 +133,8 @@
     
     "language_name": "php",
     "source_ext": "php",
-    "enabled": false,
-    "module_name": "NoCompiler",
+    "enabled": true,
+    "module_name": "ScriptLanguage",
     "runtime_path": "",
     "runtime_arguments": "\"{%fileLocation%}\""
   }

@@ -50,6 +50,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.Java", "ICo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.TypicalCompiler", "ICompilerPlugin.TypicalCompiler\ICompilerPlugin.TypicalCompiler.csproj", "{E5B320E8-8301-4925-A62C-B7B3F87CC85C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.ScriptLanguage", "ICompilerPlugin.ScriptLanguage\ICompilerPlugin.ScriptLanguage.csproj", "{7E868A66-F2DC-42B3-91B6-DC5B6A2DA3EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
@@ -112,6 +114,10 @@ Global
 		{E5B320E8-8301-4925-A62C-B7B3F87CC85C}.Release|x64.Build.0 = Release|x64
 		{E5B320E8-8301-4925-A62C-B7B3F87CC85C}.Debug|x64.ActiveCfg = Debug|x64
 		{E5B320E8-8301-4925-A62C-B7B3F87CC85C}.Debug|x64.Build.0 = Debug|x64
+		{7E868A66-F2DC-42B3-91B6-DC5B6A2DA3EA}.Release|x64.ActiveCfg = Release|x64
+		{7E868A66-F2DC-42B3-91B6-DC5B6A2DA3EA}.Release|x64.Build.0 = Release|x64
+		{7E868A66-F2DC-42B3-91B6-DC5B6A2DA3EA}.Debug|x64.ActiveCfg = Debug|x64
+		{7E868A66-F2DC-42B3-91B6-DC5B6A2DA3EA}.Debug|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6086B6E8-3A97-4035-BE17-8906D4ED6975} = {E3F6547F-B667-4D0A-85D5-1F43FD8FD07A}
@@ -136,5 +142,6 @@ Global
 		{507C9252-0953-43C2-9656-EF1A061D18D7} = {B45A0CA1-5FDD-4922-A3FA-0D5CD1237ED9}
 		{0F956DB4-4DEE-40D6-905A-790EE16FEE3F} = {E12ED158-6FCC-43F3-83A5-B78312084155}
 		{E5B320E8-8301-4925-A62C-B7B3F87CC85C} = {E12ED158-6FCC-43F3-83A5-B78312084155}
+		{7E868A66-F2DC-42B3-91B6-DC5B6A2DA3EA} = {E12ED158-6FCC-43F3-83A5-B78312084155}
 	EndGlobalSection
 EndGlobal
