@@ -9,6 +9,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <OutputPath>../Build/</OutputPath>
+    <DebugType>none</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <OutputPath>../Build/</OutputPath>
@@ -24,18 +25,6 @@
     <ProjectReference Include="..\SubmissionInfo\SubmissionInfo.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="config\database.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="config\logger.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="config\security.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="config\server.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Remove="SimplePM_Server.csproj.DotSettings" />
   </ItemGroup>
   <ItemGroup>
@@ -48,5 +37,27 @@
     <Resource Include="Resources\MySQL\submission_result_query.txt" />
     <None Remove="Resources\MySQL\submission_query.txt" />
     <Resource Include="Resources\MySQL\submission_query.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="config\compilers.json" />
+    <Content Include="config\compilers.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Remove="config\database.json" />
+    <Content Include="config\database.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Remove="config\logger.config" />
+    <Content Include="config\logger.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Remove="config\security.json" />
+    <Content Include="config\security.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Remove="config\server.json" />
+    <Content Include="config\server.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>
