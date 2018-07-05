@@ -6,12 +6,13 @@
  * ███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗██║     ██║ ╚═╝ ██║
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
- * SimplePM Server
- * A part of SimplePM programming contests management system.
+ * SimplePM Server is a part of software product "Automated
+ * vefification system for programming tasks "SimplePM".
  *
- * Copyright 2017 Yurij Kadirov
+ * Copyright 2018 Yurij Kadirov
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Source code of the product licensed under the Apache License,
+ * Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -27,38 +28,31 @@
  */
 
 using System;
+using Plugin;
 using System.IO;
-using CompilerBase;
 using System.Diagnostics;
 
 namespace CompilerPlugin
 {
     
+    // ReSharper disable once UnusedMember.Global
     public class Compiler : ICompilerPlugin
     {
 
-        public string PluginName => "Java";
-        public string AuthorName => "Kadirov Yurij";
-        public string SupportUri => "https://spm.sirkadirov.com/";
+        public PluginInfo PluginInformation => new PluginInfo(
+            "Java",
+            "Yurij Kadirov (Sirkadirov)",
+            "https://spm.sirkadirov.com/"
+        );
 
-        public CompilerResult StartCompiler(ref dynamic languageConfiguration, string submissionId, string fileLocation)
+        public CompilationResult RunCompiler(ref dynamic languageConfiguration, string submissionId, string fileLocation)
         {
 
-            // Инициализируем объект CompilerRefs
-            var cRefs = new CompilerRefs();
-
             // Запуск компилятора с заранее определёнными аргументами
-            var result = cRefs.RunCompiler(
-                (string)languageConfiguration.compiler_path,
-                ((string)languageConfiguration.compiler_arguments).Replace("{%fileLocation%}", fileLocation)
+            var result = StandardCompilationMethods.RunCompiler(
+                (string)(languageConfiguration.compiler_path),
+                (string)(languageConfiguration.compiler_arguments).Replace("{%fileLocation%}", fileLocation)
             );
-
-            /*
-             * Выполняем  все  необходимые действия
-             * в  блоке  обработки  исключений  для
-             * исключения возможности возникновения
-             * непредвиденных исключений.
-             */
 
             try
             {
@@ -75,7 +69,7 @@ namespace CompilerPlugin
                             fileLocation
                         )
                     ),
-                    (string)languageConfiguration.default_class_name + ".class"
+                    (string)(languageConfiguration.default_class_name) + ".class"
                 );
 
                 // Проверяем на существование главного класса
@@ -89,29 +83,18 @@ namespace CompilerPlugin
             catch (Exception)
             {
 
-                /*
-                 * В случае любой ошибки считаем что она
-                 * произошла по прямой вине пользователя
-                 */
-
+                // Будем считать, что исключение выброшено по вине пользователя
                 result.HasErrors = true;
 
             }
 
             // Возвращаем результат компиляции
-            return cRefs.ReturnCompilerResult(result);
+            return StandardCompilationMethods.ReturnCompilerResult(result);
 
         }
         
         public bool SetRunningMethod(ref dynamic languageConfiguration, ref ProcessStartInfo startInfo, string filePath)
         {
-            
-            /*
-             * Выполняем  все  необходимые действия
-             * в  блоке  обработки  исключений  для
-             * исключения возможности возникновения
-             * непредвиденных исключений.
-             */
             
             try
             {
@@ -130,7 +113,7 @@ namespace CompilerPlugin
                                              );
 
                 // Устанавливаем имя запускаемой программы
-                startInfo.FileName = (string)languageConfiguration.runtime_path;
+                startInfo.FileName = (string)(languageConfiguration.runtime_path);
                 
                 // Аргументы запуска данной программы
                 startInfo.Arguments = "-d64 -cp . " +
@@ -142,23 +125,12 @@ namespace CompilerPlugin
             catch
             {
 
-                /*
-                 * В случае возникновения каких-либо
-                 * ошибок  сигнализируем  об этом  с
-                 * помощью return false.
-                 */
-
+                // Сигнализируем о наличии ошибок в процессе операции
                 return false;
 
             }
             
-            /*
-             * Возвращаем родителю информацию о
-             * том, что  запашиваемая  операция
-             * была  выполнена  самым  успешным
-             * образом.
-             */
-
+            // Сигнализируем об успешном выполнении операции
             return true;
 
         }
