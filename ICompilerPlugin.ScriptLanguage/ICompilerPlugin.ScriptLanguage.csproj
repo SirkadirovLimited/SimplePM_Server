@@ -14,6 +14,9 @@
     <OutputPath>../Build/</OutputPath>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\CompilerPlugin\CompilerPlugin.csproj" />
   </ItemGroup>

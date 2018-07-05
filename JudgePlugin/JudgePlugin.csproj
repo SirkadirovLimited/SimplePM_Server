@@ -14,6 +14,9 @@
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <DebugType>none</DebugType>
   </PropertyGroup>
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Plugin\Plugin.csproj" />
     <ProjectReference Include="..\ProgramTestingAdditions\ProgramTestingAdditions.csproj" />

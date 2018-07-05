@@ -14,6 +14,9 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <OutputPath>../Build/</OutputPath>
   </PropertyGroup>
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\CompilerPlugin\CompilerPlugin.csproj" />
     <ProjectReference Include="..\JudgePlugin\JudgePlugin.csproj" />
