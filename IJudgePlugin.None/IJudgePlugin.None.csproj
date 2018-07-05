@@ -14,6 +14,9 @@
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <OutputPath>../Build/</OutputPath>
   </PropertyGroup>
+  <PropertyGroup>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\JudgePlugin\JudgePlugin.csproj" />
   </ItemGroup>
