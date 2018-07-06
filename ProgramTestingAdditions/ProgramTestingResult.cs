@@ -33,37 +33,27 @@ using System.Linq;
 namespace ProgramTestingAdditions
 {
 
-    /*
-     * Класс, который является хостом
-     * для  результатов  тестирования
-     * пользовательского      решения
-     * поставленной     задачи     по
-     * программированию.
-     */
-
+    /// <summary>
+    /// Класс, содержащий свойства и методы, необходимые для обработки
+    /// результатов тестирования пользовательской программы.
+    /// </summary>
     public class ProgramTestingResult
     {
 
-        /*
-         * Массив,   содержащий  информацию
-         * о тестировании пользовательского
-         * решения.
-         */
+        /// <summary>
+        /// Массив результатов тестирования
+        /// </summary>
+        public SingleTestResult[] TestingResults { get; set; }
 
-        public SingleTestResult[] TestingResults;
-
-        /*
-         * Поле класса, которое возвращает
-         * общее количество тестов.
-         */
-
+        /// <summary>
+        /// Количество тестов
+        /// </summary>
         public int TestsCount => TestingResults.Length;
 
-        /*
-         * Метод определяет количество
-         * успешно пройденных тестов.
-         */
-
+        /// <summary>
+        /// Количество успешно пройденных тестов.
+        /// </summary>
+        /// <returns>Возвращает количество успешно пройденных тестов.</returns>
         public int PassedTestsCount()
         {
 
@@ -77,12 +67,11 @@ namespace ProgramTestingAdditions
 
         }
 
-        /*
-         * Метод  является   переопределением
-         * стандартного конструктора текущего
-         * класса.
-         */
-
+        /// <summary>
+        /// Главный конструктор класса результатов тестирования.
+        /// Инициализирует массив результатов <c>SingleTestResult</c>
+        /// </summary>
+        /// <param name="testsCount">Количество тестов</param>
         public ProgramTestingResult(int testsCount)
         {
 
@@ -91,247 +80,113 @@ namespace ProgramTestingAdditions
 
         }
 
-        /*
-         * Метод возвращает строку, которая содержит
-         * информацию  о  результатах   тестирования
-         * пользовательской программы.
-         */
+        /// <summary>
+        /// Перечисление для работы метода <c>GetTestingResultInfoString(...)</c>
+        /// </summary>
+        public enum TestingResultInfo
+        {
+            
+            TestsResults,
+            
+            UsedMemory,
+            UsedProcessorTime,
+            
+            ErrorOutput,
+            ExitCodes
+            
+        }
 
-        public string GetResultAsLine(char splitter)
+        /// <summary>
+        /// Метод возвращает запрашиваемые данные о результатах
+        /// тестирования в виде строки с разделителями.
+        /// </summary>
+        /// <param name="queriedInfo">Запрашиваемая информация (единственный параметр)</param>
+        /// <param name="splitter">Разделитель</param>
+        /// <returns>
+        /// В случае успеха возвращает запрашиваемые данные
+        /// в виде строки с разделителями, иначе возвращает
+        /// пустую строку.
+        /// </returns>
+        public string GetTestingResultInfoString(TestingResultInfo queriedInfo, char splitter = '|')
         {
 
-            /*
-             * Объявляем временную переменную, в которой
-             * будем хранить результат работы метода
-             */
-
-            string resultLine;
+            // Объявляем переменную результата выполнения операции
+            string resultString;
 
             try
             {
 
-                /*
-                 * С помощью LINQ зароса формируем
-                 * строку результата.
-                 */
+                // Получаем результат выполнения операции
+                resultString = TestingResults.Aggregate("", (current, test) =>
+                {
 
-                resultLine = TestingResults.Aggregate(
-                    "",
-                    (current, test) => current + (test.Result.ToString() + splitter.ToString())
-                );
+                    // Объявляем временную переменную результата выполнения операции
+                    string aggTmpString;
+                    
+                    // В зависимости от запрашиваемой информации получаем те или иные значения
+                    switch (queriedInfo)
+                    {
+                        
+                        // Результат по текущему тесту
+                        case TestingResultInfo.TestsResults:
+                            aggTmpString = test.Result.ToString();
+                            break;
+                        
+                        // Использованная память
+                        case TestingResultInfo.UsedMemory:
+                            aggTmpString = test.UsedMemory.ToString();
+                            break;
+                        
+                        // Использованное процессорное время
+                        case TestingResultInfo.UsedProcessorTime:
+                            aggTmpString = test.UsedProcessorTime.ToString();
+                            break;
+                        
+                        // Данные с потока stderr
+                        case TestingResultInfo.ErrorOutput:
+                            aggTmpString = test.ErrorOutput;
+                            break;
+                        
+                        // Выходной код программы на тесте
+                        case TestingResultInfo.ExitCodes:
+                            aggTmpString = test.ExitCode.ToString();
+                            break;
+                        
+                        // Обработка исключительной ситуации
+                        default:
+                            aggTmpString = string.Empty;
+                            break;
+                        
+                    }
 
-                /*
-                 * Удаляем все ненужные символы
-                 */
-                resultLine = resultLine.Trim('\n', '\r');
+                    // Возвращаем результат выполнения операции с некоторыми изменениями
+                    return (current + aggTmpString + splitter.ToString()).Trim(' ', '\r', '\n', splitter);
+
+                });
 
             }
-            catch (Exception)
+            catch
             {
 
-                // Если что-то сломалось, возвращаем пустоту
-                resultLine = "";
+                // В исключительной ситуации возвращаем пустую строку
+                resultString = string.Empty;
 
             }
 
-            // Возвращаем сформированную строку
-            return resultLine;
+            // Возвращаем результат выполнения операции
+            return resultString;
 
         }
-
-        /*
-         * Метод возвращает строку,  которая  содержит
-         * информацию о кодах выхода пользовательского
-         * процесса на всех тестах.
-         */
-
-        public string GetExitCodesAsLine(char splitter)
-        {
-
-            /*
-             * Объявляем временную переменную, в которой
-             * будем хранить результат работы метода
-             */
-
-            string resultLine;
-
-            try
-            {
-
-                /*
-                 * С помощью LINQ зароса формируем
-                 * строку результата.
-                 */
-
-                resultLine = TestingResults.Aggregate(
-                    "",
-                    (current, test) => current + (test.ExitCode.ToString() + splitter.ToString())
-                );
-
-            }
-            catch (Exception)
-            {
-
-                // Если что-то сломалось, возвращаем пустоту
-                resultLine = "";
-
-            }
-
-            // Возвращаем сформированную строку
-            return resultLine;
-
-        }
-
-        /*
-         * Метод возвращает строку, которая содержит
-         * информацию  об  использованной  процессом
-         * памяти во время каждого теста.
-         */
-
-        public string GetUsedMemoryAsLine(char splitter)
-        {
-
-            /*
-             * Объявляем временную переменную, в которой
-             * будем хранить результат работы метода
-             */
-
-            string resultLine;
-
-            try
-            {
-
-                /*
-                 * С помощью LINQ зароса формируем
-                 * строку результата.
-                 */
-
-                resultLine = TestingResults.Aggregate(
-                    "",
-                    (current, test) => current + (test.UsedMemory.ToString() + splitter.ToString())
-                );
-
-            }
-            catch (Exception)
-            {
-
-                // Если что-то сломалось, возвращаем пустоту
-                resultLine = "";
-
-            }
-
-            // Возвращаем сформированную строку
-            return resultLine;
-
-        }
-
-        /*
-         * Метод возвращает строку, которая содержит
-         * информацию  об  использованной  процессом
-         * процессорного  времени  во  время каждого
-         * теста.
-         */
-
-        public string GetUsedProcessorTimeAsLine(char splitter)
-        {
-
-            /*
-             * Объявляем временную переменную, в которой
-             * будем хранить результат работы метода
-             */
-
-            string resultLine;
-
-            try
-            {
-
-                /*
-                 * С помощью LINQ зароса формируем
-                 * строку результата.
-                 */
-
-                resultLine = TestingResults.Aggregate(
-                    "",
-                    (current, test) => current + (test.UsedProcessorTime.ToString() + splitter.ToString())
-                );
-
-            }
-            catch (Exception)
-            {
-
-                // Если что-то сломалось, возвращаем пустоту
-                resultLine = "";
-
-            }
-
-            // Возвращаем сформированную строку
-            return resultLine;
-
-        }
-
-        /*
-         * Метод возвращает строку исключений
-         * тестируемой   программы,   которая
-         * собрана со всех тестов.
-         */
-
-        public string GetErrorOutputAsLine()
-        {
-
-            /*
-             * Объявляем временную переменную, в которой
-             * будем хранить результат работы метода
-             */
-
-            string resultLine;
-
-            try
-            {
-
-                /*
-                 * С помощью LINQ зароса формируем
-                 * строку результата.
-                 */
-
-                resultLine = TestingResults.Aggregate(
-                    "",
-                    (current, test) => current + (test.ErrorOutput + "\r\n")
-                );
-
-                /*
-                 * Удаляем все ненужные символы
-                 */
-
-                resultLine = resultLine.Trim('\n', '\r');
-
-            }
-            catch (Exception)
-            {
-
-                // Если что-то сломалось, возвращаем пустоту
-                resultLine = "";
-
-            }
-
-            // Возвращаем сформированную строку
-            return resultLine;
-
-        }
-
-        /*
-         * Метод возвращает булевое значение,   которое
-         * гласит о том, успешно ли пройдены все тесты,
-         * или нет. Ошибок, вроде, не должно возникать.
-         */
-
+        
+        /// <summary>
+        /// Метод осуществляет проверку на успешность прохождения пользовательской программой тестирования.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">Что-то не так с данными результата тестирования</exception>
+        /// <returns>Возвращает значение, которое сигнализирует об успешности прохождения всех тестов.</returns>
         public bool IsSuccessful()
         {
 
-            /*
-             * Выполняем LINQ запрос на выборку и проверку, после
-             * чего возвращаем результат выполнения метода.
-             */
-
+            // Обрабатываем данные и возвращаем результат
             return TestingResults.Aggregate(
                 true,
                 (current, test) => current && test.IsSuccessful

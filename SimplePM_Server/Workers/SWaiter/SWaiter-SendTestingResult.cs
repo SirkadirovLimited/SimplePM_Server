@@ -44,7 +44,7 @@ namespace SimplePM_Server.Workers
 
             /*
              * Указываем в лог-файле о скором
-             * завершении  обработки  данного
+             * завершении обработки данного
              * запроса на тестирование.
              */
 
@@ -56,8 +56,8 @@ namespace SimplePM_Server.Workers
             
             /*
              * Создаём команду для MySQL сервера
-             * на     основе     сформированного
-             * запроса к базе данных.
+             * на основе сформированного запроса
+             * к базе данных системы.
              */
 
             var updateSqlCommand = new MySqlCommand(
@@ -92,7 +92,7 @@ namespace SimplePM_Server.Workers
             
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_errorOutput",
-                Encoding.UTF8.GetBytes(ptResult.GetErrorOutputAsLine())
+                Encoding.UTF8.GetBytes(ptResult.GetTestingResultInfoString(ProgramTestingResult.TestingResultInfo.ErrorOutput, '\n'))
             ); // Вывод ошибок решения
 
             updateSqlCommand.Parameters.AddWithValue(
@@ -102,12 +102,12 @@ namespace SimplePM_Server.Workers
 
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_exitcodes",
-                ptResult.GetExitCodesAsLine('|')
+                ptResult.GetTestingResultInfoString(ProgramTestingResult.TestingResultInfo.ExitCodes)
             ); // Коды выхода решения
             
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_result",
-                ptResult.GetResultAsLine('|')
+                ptResult.GetTestingResultInfoString(ProgramTestingResult.TestingResultInfo.TestsResults)
             ); // Потестовые результаты решения
             
             updateSqlCommand.Parameters.AddWithValue(
