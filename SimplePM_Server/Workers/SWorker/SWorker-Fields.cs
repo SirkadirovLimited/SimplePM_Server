@@ -41,17 +41,17 @@ namespace SimplePM_Server.Workers
         
         private readonly Logger logger = LogManager.GetLogger("SimplePM_Server.Workers.SWorker");
 
-        public static dynamic _serverConfiguration { get; set; }
-        public static dynamic _databaseConfiguration { get; set; }
-        public static dynamic _securityConfiguration { get; set; }
-        public static dynamic _compilerConfigurations { get; set; }
+        public static dynamic _serverConfiguration { get; private set; }
+        public static dynamic _databaseConfiguration { get; private set; }
+        public static dynamic _securityConfiguration { get; private set; }
+        public static dynamic _compilerConfigurations { get; private set; }
 
         private sbyte _aliveTestersCount;
-        private string _enabledLanguagesString;
+        private readonly string _enabledLanguagesString;
 
-        public static List<IServerPlugin> _serverPlugins;
-        public static List<ICompilerPlugin> _compilerPlugins;
-        public static List<IJudgePlugin> _judgePlugins;
+        public static List<IServerPlugin> _serverPlugins { get; private set; }
+        public static List<ICompilerPlugin> _compilerPlugins { get; private set; }
+        public static List<IJudgePlugin> _judgePlugins { get; private set; }
         
     }
     
