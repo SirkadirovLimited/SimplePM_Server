@@ -30,6 +30,7 @@
 using NLog;
 using System;
 using System.IO;
+using System.Text;
 using NLog.Config;
 using JudgePlugin;
 using CompilerPlugin;
@@ -182,6 +183,26 @@ namespace SimplePM_Server.Workers
                 logger.Warn("An error occured while trying to clear temp folder: " + ex);
 
             }
+            
+        }
+
+        private void GenerateServerID(string idFilePath = "./config/server.id")
+        {
+
+            // Генерируем новый идентификатор сервера если сейчас он не существует
+            if (!File.Exists(idFilePath))
+            {
+
+                // Записываем идентификатор в файл
+                File.WriteAllText(idFilePath, Guid.NewGuid().ToString(), Encoding.ASCII);
+                
+                // Устанавливаем некоторые аттрибуты файла
+                File.SetAttributes(idFilePath, FileAttributes.NotContentIndexed);
+
+            }
+            
+            // Получаем уникальный идентификатор сервера
+            _serverId = new Guid(File.ReadAllText(idFilePath, Encoding.ASCII));
             
         }
         
