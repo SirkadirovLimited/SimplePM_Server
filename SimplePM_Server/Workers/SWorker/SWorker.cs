@@ -39,6 +39,9 @@ namespace SimplePM_Server.Workers
             // Устанавливаем обработчик исключений
             SetExceptionHandler();
 
+            // Запрашваем генерацию/открыие уникального идентификатора сервера
+            GenerateServerID();
+            
             // Выполняем загрузку конфигурационных файлов сервера
             LoadConfigurations();
             

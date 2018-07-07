@@ -28,6 +28,7 @@
  */
 
 using NLog;
+using System;
 using JudgePlugin;
 using ServerPlugin;
 using CompilerPlugin;
@@ -45,6 +46,8 @@ namespace SimplePM_Server.Workers
         public static dynamic _databaseConfiguration { get; private set; }
         public static dynamic _securityConfiguration { get; private set; }
         public static dynamic _compilerConfigurations { get; private set; }
+        
+        public static Guid _serverId { get; private set; }
 
         private sbyte _aliveTestersCount;
         private readonly string _enabledLanguagesString;
