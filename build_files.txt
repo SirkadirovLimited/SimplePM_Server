@@ -1,6 +1,7 @@
 ﻿Build/*.dll
 Build/*.exe
 Build/*.ini
+Build/*.json
 Build/*.config
 Build/config/*.json
 Build/*/*.exe
