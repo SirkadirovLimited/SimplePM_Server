@@ -37,9 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Resources\MySQL\submission_result_query.txt" />
-    <Resource Include="Resources\MySQL\submission_result_query.txt" />
     <None Remove="Resources\MySQL\submission_query.txt" />
-    <Resource Include="Resources\MySQL\submission_query.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="config\compilers.json" />

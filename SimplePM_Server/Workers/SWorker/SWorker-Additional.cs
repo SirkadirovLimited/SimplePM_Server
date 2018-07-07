@@ -107,7 +107,7 @@ namespace SimplePM_Server.Workers
                 
                 // Получаем список плагинов сервера
                 _serverPlugins = SPluginsLoader.LoadPlugins<IServerPlugin>(
-                    (string)_serverConfiguration.path.ICompilerPlugin,
+                    (string)(_serverConfiguration.path.IServerrPlugin),
                     "ServerPlugin.Main"
                 );
                 
@@ -123,7 +123,7 @@ namespace SimplePM_Server.Workers
 
                 // Получаем список модулей компиляции
                 _compilerPlugins = SPluginsLoader.LoadPlugins<ICompilerPlugin>(
-                    (string)_serverConfiguration.path.ICompilerPlugin,
+                    (string)(_serverConfiguration.path.ICompilerPlugin),
                     "CompilerPlugin.Compiler"
                 );
 
@@ -139,7 +139,7 @@ namespace SimplePM_Server.Workers
 
                 // Получаем список модулей оценивания
                 _judgePlugins = SPluginsLoader.LoadPlugins<IJudgePlugin>(
-                    (string)_serverConfiguration.path.IJudgePlugin,
+                    (string)(_serverConfiguration.path.IJudgePlugin),
                     "JudgePlugin.Judge"
                 );
 

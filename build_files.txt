@@ -2,7 +2,7 @@
 Build/*.exe
 Build/*.ini
 Build/*.config
-Build/config/*
+Build/config/*.json
 Build/*/*.exe
 Build/*/*.dll
 Build/*/*.json
