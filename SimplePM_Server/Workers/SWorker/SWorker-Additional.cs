@@ -189,20 +189,35 @@ namespace SimplePM_Server.Workers
         private void GenerateServerID(string idFilePath = "./config/server.id")
         {
 
-            // Генерируем новый идентификатор сервера если сейчас он не существует
-            if (!File.Exists(idFilePath))
+            try
             {
 
-                // Записываем идентификатор в файл
-                File.WriteAllText(idFilePath, Guid.NewGuid().ToString(), Encoding.ASCII);
+                // Генерируем новый идентификатор сервера если сейчас он не существует
+                if (!File.Exists(idFilePath))
+                {
+                    
+                    // Записываем идентификатор в файл
+                    File.WriteAllText(idFilePath, Guid.NewGuid().ToString(), Encoding.ASCII);
+                    
+                    // Устанавливаем некоторые аттрибуты файла
+                    File.SetAttributes(idFilePath, FileAttributes.NotContentIndexed);
+                    
+                }
                 
-                // Устанавливаем некоторые аттрибуты файла
-                File.SetAttributes(idFilePath, FileAttributes.NotContentIndexed);
-
+                // Получаем уникальный идентификатор сервера
+                _serverId = new Guid(File.ReadAllText(idFilePath, Encoding.ASCII));
+                
             }
-            
-            // Получаем уникальный идентификатор сервера
-            _serverId = new Guid(File.ReadAllText(idFilePath, Encoding.ASCII));
+            catch (Exception ex)
+            {
+                
+                // Записываем информацию об исключении в лог-файл
+                logger.Fatal("Something went wrong while trying to get/set unique ServerID: " + ex);
+                
+                // Завершаем работу сервера
+                Environment.Exit(-1);
+                
+            }
             
         }
         
