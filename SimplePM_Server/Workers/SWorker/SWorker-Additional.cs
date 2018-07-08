@@ -108,7 +108,7 @@ namespace SimplePM_Server.Workers
                 
                 // Получаем список плагинов сервера
                 _serverPlugins = SPluginsLoader.LoadPlugins<IServerPlugin>(
-                    (string)(_serverConfiguration.path.IServerrPlugin),
+                    (string)(_serverConfiguration.path.IServerPlugin),
                     "ServerPlugin.Main"
                 );
                 
