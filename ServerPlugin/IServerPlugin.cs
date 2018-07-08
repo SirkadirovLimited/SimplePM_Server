@@ -31,12 +31,12 @@ using Plugin;
 
 namespace ServerPlugin
 {
-
+    
     public interface IServerPlugin : IPlugin
     {
-
         
-
+        
+        
     }
     
 }

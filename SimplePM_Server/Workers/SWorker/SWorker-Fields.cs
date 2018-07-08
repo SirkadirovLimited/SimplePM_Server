@@ -49,7 +49,7 @@ namespace SimplePM_Server.Workers
         
         public static Guid _serverId { get; private set; }
 
-        private sbyte _aliveTestersCount
+        private sbyte _aliveTestersCount;
         private readonly string _enabledLanguagesString;
 
         public static List<IServerPlugin> _serverPlugins { get; private set; }
