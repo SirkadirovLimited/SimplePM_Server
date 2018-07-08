@@ -159,8 +159,8 @@ namespace ProgramTestingAdditions
                         
                     }
 
-                    // Возвращаем результат выполнения операции с некоторыми изменениями
-                    return (current + aggTmpString + splitter.ToString()).Trim(' ', '\r', '\n', splitter);
+                    // Возвращаем результат выполнения операции
+                    return current + aggTmpString + splitter.ToString();
 
                 });
 
@@ -173,8 +173,8 @@ namespace ProgramTestingAdditions
 
             }
 
-            // Возвращаем результат выполнения операции
-            return resultString;
+            // Возвращаем результат выполнения операции с некоторыми изменениями
+            return resultString.Trim(' ', '\r', '\n');
 
         }
         
