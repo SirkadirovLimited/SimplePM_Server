@@ -60,5 +60,9 @@
     <Content Include="config\server.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Remove="simplepm-server.bat" />
+    <Content Include="simplepm-server.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>
