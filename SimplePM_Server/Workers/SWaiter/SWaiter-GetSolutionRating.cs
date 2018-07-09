@@ -41,63 +41,28 @@ namespace SimplePM_Server.Workers
         {
             
             /*
-             * Выполняем расчёт рейтинга
-             * пользовательского решения
-             * лишь  в  том случае, если
-             * типом тестирования выбран
-             * старый добрый "release".
+             * Расчёт рейтинга производится лишь при release-тестировании
+             * пользовательского решения поставленной задачи.
              */
             
             if (_submissionInfo.TestType == "release")
             {
 
-                /*
-                 * Выполняем все действия в блоке
-                 * обработки происходящих исключе
-                 * ний,  чтобы избежать возможных
-                 * "вылетов" сервера проверки реш
-                 * ений во время проверки пользов
-                 * ательских решений поставленных
-                 * задач по программированию.
-                 */
-
                 try
                 {
 
-                    /*
-                     * Получаем ссылку на объект
-                     * модуля оценивания пользов
-                     * ательских решений поставл
-                     * енных задач по программир
-                     * ованию.
-                     */
-
-                    var currentJudgePlugin = SJudge.GetJudgePluginByName(
-                        _submissionInfo.ProblemInformation.ProblemRatingType
-                    );
-
-                    /*
-                     * Выполняем генерацию оценочного
-                     * рейтинга пользовательского реш
-                     * ения  и  возвращаем полученный
-                     * рейтинг.
-                     */
-
-                    return currentJudgePlugin.GenerateJudgeResult(
+                    // Получаем ссылку на плагин судьи и возвращаем сгенерированный рейтинг
+                    return SJudge.GetJudgePluginByName(
+                        _submissionInfo.SolutionRatingType
+                    ).GenerateJudgeResult(
                                ref programTestingResult
-                           ).RatingMult * _submissionInfo.ProblemInformation.ProblemDifficulty;
+                               ).RatingMult * _submissionInfo.ProblemInformation.Difficulty;
 
                 }
                 catch (Exception ex)
                 {
 
-                    /*
-                     * В случае возникновения ошибки
-                     * записываем информацию о ней в
-                     * лог-файл,  дабы администратор
-                     * системы мог узнать её причину
-                     */
-
+                    // Записываем информацию об исключении в лог-файл
                     logger.Error(
                         "Error while generating rating for submission #" +
                         _submissionInfo.SubmissionId
@@ -111,12 +76,7 @@ namespace SimplePM_Server.Workers
 
             }
 
-            /*
-             * В других случаях низко оцениваем
-             * старания пользователя решить эту
-             * задачу, ведь нельзя же так!
-             */
-
+            // В другом случае возвращаем 0
             return 0;
 
         }

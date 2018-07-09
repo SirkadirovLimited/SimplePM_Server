@@ -44,7 +44,7 @@ namespace SimplePM_Server.Workers
 
             // Определяем конфигурацию компиляционного плагина
             var compilerConfiguration = SCompiler.GetCompilerConfig(
-                _submissionInfo.CodeLang
+                _submissionInfo.UserSolution.ProgrammingLanguage
             );
 
             // Получаем экземпляр компиляционного плагина
@@ -91,7 +91,7 @@ namespace SimplePM_Server.Workers
             );
             
             // Запись данных в файл исходного кода
-            File.WriteAllBytes(fileLocation, _submissionInfo.ProblemCode);
+            File.WriteAllBytes(fileLocation, _submissionInfo.UserSolution.SourceCode);
 
             // Установка аттрибутов файла исходного кода
             SetSourceFileAttributes(fileLocation);

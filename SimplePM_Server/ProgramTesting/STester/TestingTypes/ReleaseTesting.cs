@@ -67,7 +67,7 @@ namespace SimplePM_Server.ProgramTesting.STester
             
             // Определяем конфигурацию компиляционного плагина
             var languageConfiguration = SCompiler.GetCompilerConfig(
-                submissionInfo.CodeLang
+                submissionInfo.UserSolution.ProgrammingLanguage
             );
             
             // Получаем экземпляр компиляционного плагина
@@ -160,30 +160,31 @@ namespace SimplePM_Server.ProgramTesting.STester
             {
 
                 // Создаём новый тест
-                var testInfo = new ReleaseTestInfo.ReleaseTestInfo(
+                var testInfo = new ReleaseTestInfo.ReleaseTestInfo
+                {
 
                     // Уникальный идентификатор теста
-                    int.Parse(
+                    Id = int.Parse(
                         dataReader["id"].ToString()
                     ),
 
                     // Входные данные
-                    (byte[])dataReader["input"],
+                    InputData = (byte[]) dataReader["input"],
 
                     // Выходные данные
-                    (byte[])dataReader["output"],
+                    OutputData = (byte[]) dataReader["output"],
 
                     // Лимит используемой памяти
-                    long.Parse(
-                       dataReader["memoryLimit"].ToString()
+                    MemoryLimit = long.Parse(
+                        dataReader["memoryLimit"].ToString()
                     ),
 
                     // Лимит используемого процессорного времени
-                    int.Parse(
+                    ProcessorTimeLimit = int.Parse(
                         dataReader["timeLimit"].ToString()
                     )
 
-                );
+                };
                 
                 // Добавляем текущий тест в конец очереди обработки
                 testsQueue.Enqueue(testInfo);
