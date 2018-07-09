@@ -67,7 +67,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
 
             // Производим дозапись выходных данных
             var adaptedString = (_adaptOutput)
-                ? e.Data.Trim()
+                ? e.Data.TrimEnd()
                 : e.Data;
 
             // Записываем символ окончания строки
