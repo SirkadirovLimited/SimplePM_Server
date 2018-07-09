@@ -33,28 +33,30 @@ namespace ReleaseTestInfo
     public class ReleaseTestInfo
     {
 
-        public int Id { get; } //!< Уникальный идентификатор теста
+        /// <summary>
+        /// Идентификатор теста
+        /// </summary>
+        public int Id { get; set; }
 
-        public byte[] InputData { get; } //!< Входные данные для теста
-        public byte[] OutputData { get; } //!< Выходные данные для теста
+        /// <summary>
+        /// Входные данные теста
+        /// </summary>
+        public byte[] InputData { get; set; }
+        
+        /// <summary>
+        /// Ожидаемый правильный результат теста
+        /// </summary>
+        public byte[] OutputData { get; set; }
 
-        public long MemoryLimit { get; } //!< Лимит по используемой памяти
-        public int ProcessorTimeLimit { get; } //!< Лимит по используемому процессорному времени
-
-        public ReleaseTestInfo(int id, byte[] input, byte[] output, long memoryLimit, int timeLimit)
-        {
-
-            /*
-             * Инициализируем все необходимые переменные
-             */
-
-            Id = id;
-            InputData = input;
-            OutputData = output;
-            MemoryLimit = memoryLimit;
-            ProcessorTimeLimit = timeLimit;
-
-        }
+        /// <summary>
+        /// Лимит по используемой памяти
+        /// </summary>
+        public long MemoryLimit { get; set; }
+        
+        /// <summary>
+        /// Лимит по использованному процессорному времени
+        /// </summary>
+        public int ProcessorTimeLimit { get; set; }
 
     }
 
