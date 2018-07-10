@@ -42,24 +42,13 @@ namespace SimplePM_Server.Workers
         private void SendTestingResult(ref ProgramTestingResult ptResult, CompilationResult cResult)
         {
 
-            /*
-             * Указываем в лог-файле о скором
-             * завершении обработки данного
-             * запроса на тестирование.
-             */
-
             logger.Trace(
                 "#" +
                 _submissionInfo.SubmissionId +
                 ": Result is being sent to MySQL server..."
             );
             
-            /*
-             * Создаём команду для MySQL сервера
-             * на основе сформированного запроса
-             * к базе данных системы.
-             */
-
+            // Команда на обновление БД
             var updateSqlCommand = new MySqlCommand(
                 Resources.submission_result_query,
                 _connection
@@ -92,7 +81,9 @@ namespace SimplePM_Server.Workers
             
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_errorOutput",
-                Encoding.UTF8.GetBytes(ptResult.GetTestingResultInfoString(ProgramTestingResult.TestingResultInfo.ErrorOutput, '\n'))
+                Encoding.UTF8.GetBytes(
+                    ptResult.GetTestingResultInfoString(ProgramTestingResult.TestingResultInfo.ErrorOutput, '\n')
+                )
             ); // Вывод ошибок решения
 
             updateSqlCommand.Parameters.AddWithValue(

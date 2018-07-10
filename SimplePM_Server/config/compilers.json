@@ -35,7 +35,7 @@
     
     "language_name": "csharp",
     "source_ext": "cs",
-    "enabled": false,
+    "enabled": true,
     "module_name": "TypicalCompiler",
     "compiler_path": "msbuild",
     "compiler_arguments": "{%fileLocation%}"
