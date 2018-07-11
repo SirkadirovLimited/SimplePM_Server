@@ -1,3 +1,8 @@
+<div align="center">
+  <img src="https://raw.githubusercontent.com/SirkadirovTeam/simplepm-resources/master/logo.png" alt="SimplePM logo">
+  Automated verification system for programming tasks
+</div>
+
 # SimplePM Server
 Official repository of SimplePM Server, submissions checking subsystem of software product "Automated verification system for programming tasks "SimplePM".
 
