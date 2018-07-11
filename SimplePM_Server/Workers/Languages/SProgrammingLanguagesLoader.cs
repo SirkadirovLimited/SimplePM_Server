@@ -27,39 +27,33 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
+using NLog;
 using System.Collections.Generic;
 
 namespace SimplePM_Server.Workers
 {
     
-    public partial class SWorker
+    public static class SProgrammingLanguagesLoader
     {
         
-        private string GetEnabledLangsAsString()
+        private static readonly Logger logger = LogManager.GetLogger("SimplePM_Server.Workers.ProgrammingLanguagesLoader");
+        
+        /*
+         * Метод отвечает за генерацию списка поддерживаемых
+         * сервером проверки решений языков программирования.
+         */
+        
+        public static string GetEnabledLangsAsString()
         {
 
-            /*
-             * Записываем  в  лог, что генерация списка
-             * доступных   на   этом  сервере  проверки
-             * пользовательских   решений    задач   по
-             * программированию   скриптовых  языков  а
-             * также языков программирования начинается
-             * с этого великолепного момента.
-             */
-
+            // Записываем в лог-файл информацию о начале выполнения операции
             logger.Debug("Generation of enabled programming languages list started.");
 
             // Инициализируем список строк
             var enabledLangsList = new List<string>();
             
-            /*
-             * В цикле перебираем все поддерживаемые языки
-             * программирования  подключаемыми  модулями и
-             * приводим  список   поддерживаемых  системой
-             * языков к требуемому виду.
-             */
-
-            foreach (var compilerConfig in _compilerConfigurations)
+            // Обрабатываем все предоставленные конфигурации
+            foreach (var compilerConfig in SWorker._compilerConfigurations)
             {
 
                 // Добавляем в список только включённые конфигурации
@@ -80,15 +74,7 @@ namespace SimplePM_Server.Workers
             // Формируем список доступных языков в виде строки
             var resultStr = string.Join(", ", enabledLangsList);
             
-            /*
-             * Выводим список доступных языков программирования
-             * на данной сессии работы сервера в лог-файл.  Это
-             * возможно  поможет  системному  администратору  с
-             * решением  проблем,   связанных  с  подключаемыми
-             * модулями и другими  изменяемыми частями  сервера
-             * проверки решений SimplePM Server.
-             */
-            
+            // Записываем список поддерживаемых языков программирования в лог
             logger.Debug("Enabled compiler configurations list: " + resultStr);
 
             // Возвращаем результат выполнения метода
