@@ -55,7 +55,7 @@ namespace SimplePM_Server.Workers
             LoadPlugins();
             
             // Получаем список поддерживаемых сервером ЯП
-            _enabledLanguagesString = GetEnabledLangsAsString();
+            _enabledLanguagesString = SProgrammingLanguagesLoader.GetEnabledLangsAsString();
 
             // Сейчас решения не тестируются
             _aliveTestersCount = 0;
