@@ -35,7 +35,7 @@ Detailed information about the project you can get at project's official website
 ## Requirements
 
 ### System requirements
-- All supported by .NET Core platforms
+- All supported by .NET Core platforms (AMD64 / Intel64 only)
 - Minimum 2 GB RAM (DDR3) or greater
 - Minimum 20 GB free space on HDD/SSD (SATA 3 / PCIe connection recommended)
 - Stable LAN/WAN connection to MySQL Server (minimum 100 MBit/s for LAN and 50 MBit/s for WAN recommended)
@@ -47,6 +47,9 @@ Detailed information about the project you can get at project's official website
 ### Recommendations
 - Server execution scripts (`simplepm-server.bat` and `simplepm-server.sh`) before SimplePM Server launching love to kill all other .NET Core processes. If you need to continue running of all that apps, remove associated lines of code in that command files.
 - After SimplePM Server installed, you are about to add installation path to `Path` environment variable to enable using server startup scripts and other useful tools, pre-installed with SimplePM Server.
+
+### Notice
+Requirements list declared on this page is not full. More information about dependencies and requirements you can get on [project's download page](https://spm.sirkadirov.com/download.html).
 
 ## Used third-party projects
 - Logging feature powered by **NLog**
