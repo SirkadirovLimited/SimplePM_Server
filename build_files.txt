@@ -8,4 +8,3 @@ Build/*/*.dll
 Build/*/*.json
 Build/*/*.config
 Build/*/*.ini
-CREDITS.txt
