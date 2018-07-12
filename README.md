@@ -5,6 +5,14 @@
 </div>
 <div align="center">
   &nbsp;
+  <a href="https://github.com/SirkadirovTeam/SimplePM_Server/releases">
+    <img src="https://img.shields.io/github/release/SirkadirovTeam/SimplePM_Server/all.svg" alt="GitHub (pre-)release version">
+  </a>
+  &nbsp;
+  <a href="https://github.com/SirkadirovTeam/SimplePM_Server/commits/master">
+    <img src="https://img.shields.io/github/commits-since/SirkadirovTeam/SimplePM_Server/latest.svg" alt="Commits since last release">
+  </a>
+  &nbsp;
   <a href="https://ci.appveyor.com/project/sirkadirov/simplepm-server">
     <img src="https://ci.appveyor.com/api/projects/status/35hk5hpsn70j6vq0?svg=true" alt="AppVeyor Build">
   </a>
@@ -19,6 +27,10 @@
   &nbsp;
   <a href="https://app.fossa.io/projects/git%2Bgithub.com%2FSirkadirovTeam%2FSimplePM_Server?ref=badge_shield">
     <img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2FSirkadirovTeam%2FSimplePM_Server.svg?type=shield" alt="FOSSA status">
+  </a>
+  &nbsp;
+  <a>
+    <img src="https://img.shields.io/github/license/SirkadirovTeam/SimplePM_Server.svg" alt="Project license">
   </a>
   &nbsp;
 </div>
