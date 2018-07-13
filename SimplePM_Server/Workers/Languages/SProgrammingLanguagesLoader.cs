@@ -40,34 +40,6 @@ namespace SimplePM_Server.Workers
         private static readonly Logger logger = LogManager.GetLogger("SimplePM_Server.Workers.ProgrammingLanguagesLoader");
 
         /*
-         * Метод отвечает за генерацию списка поддерживаемых
-         * сервером проверки решений языков программирования.
-         */
-        
-        public static string GetEnabledLanguagesString()
-        {
-
-            // Записываем сведения о начале выполнения операции в лог
-            logger.Debug("Generation of enabled programming languages list started.");
-            
-            // Получаем список поддерживаемых сервером языков программирования в виде строки
-            var enabledLanguagesString = string.Join(
-                ", ",
-                GetLanguageInformation(compilerConfig => "'" + (string) (compilerConfig.language_name) + "'")
-            );
-
-            // Записываем список поддерживаемых сервером языков программирования в лог
-            logger.Info("Enabled compiler configurations list: " + enabledLanguagesString);
-            
-            // Записываем сведения об окончании выполнения операции в лог
-            logger.Debug("Generation of enabled programming languages list ended.");
-            
-            // Возвращаем список поддерживаемых сервером языков программирования
-            return enabledLanguagesString;
-
-        }
-        
-        /*
          * С помощью данного метода можно с лёгкостью совершить
          * полный перебор всех поддерживаемых данным сервером
          * проверки решений языков программирования.
@@ -99,6 +71,34 @@ namespace SimplePM_Server.Workers
 
             // Возвращаем сгенерированный нами список
             return informationList;
+
+        }
+        
+        /*
+         * Метод отвечает за генерацию списка поддерживаемых
+         * сервером проверки решений языков программирования.
+         */
+        
+        public static string GetEnabledLanguagesString()
+        {
+
+            // Записываем сведения о начале выполнения операции в лог
+            logger.Debug("Generation of enabled programming languages list started.");
+            
+            // Получаем список поддерживаемых сервером языков программирования в виде строки
+            var enabledLanguagesString = string.Join(
+                ", ",
+                GetLanguageInformation(compilerConfig => "'" + (string) (compilerConfig.language_name) + "'")
+            );
+
+            // Записываем список поддерживаемых сервером языков программирования в лог
+            logger.Info("Enabled compiler configurations list: " + enabledLanguagesString);
+            
+            // Записываем сведения об окончании выполнения операции в лог
+            logger.Debug("Generation of enabled programming languages list ended.");
+            
+            // Возвращаем список поддерживаемых сервером языков программирования
+            return enabledLanguagesString;
 
         }
         
