@@ -27,8 +27,6 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using System;
-
 namespace SubmissionInfo
 {
     

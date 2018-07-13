@@ -33,9 +33,9 @@ using System.IO;
 using System.Text;
 using NLog.Config;
 using JudgePlugin;
+using ServerPlugin;
 using CompilerPlugin;
 using Newtonsoft.Json;
-using ServerPlugin;
 using SimplePM_Server.Workers.Recourse;
 
 namespace SimplePM_Server.Workers
@@ -44,6 +44,11 @@ namespace SimplePM_Server.Workers
     public partial class SWorker
     {
 
+        /*
+         * Метод, отвечающий за загрузку серверных
+         * конфигураций в память приложения.
+         */
+        
         private void LoadConfigurations()
         {
             
@@ -67,13 +72,10 @@ namespace SimplePM_Server.Workers
                 File.ReadAllText("./config/compilers.json")
             );
             
-            /*
-             * Конфигурируем журнал событий (библиотека NLog)
-             */
-
             try
             {
 
+                // Загружаем глобальную конфигурацию NLog-а
                 LogManager.Configuration = new XmlLoggingConfiguration(
                     "./config/logger.config"
                 );
@@ -86,6 +88,11 @@ namespace SimplePM_Server.Workers
             
         }
 
+        /*
+         * Метод, отвечающий за загрузку плагинов
+         * сервера проверки решений в память.
+         */
+        
         private void LoadPlugins()
         {
 
@@ -148,18 +155,29 @@ namespace SimplePM_Server.Workers
             
         }
         
+        /*
+         * Метод автоконфигурации сервера. Если в конфигурационном
+         * файле явно это указно, автоматически определяет рекомендуемые
+         * значения некоторых параметров приложения.
+         */
+        
         private void RunAutoConfig()
         {
             
-            // rechecks without timeout
+            // Определение количества перепроверок без таймаута
             if (_serverConfiguration.submission.rechecks_without_timeout == "auto")
                 _serverConfiguration.submission.rechecks_without_timeout = Environment.ProcessorCount.ToString();
 
-            // max threads
+            // Максимальное количество одновлеменных проверок
             if (_serverConfiguration.submission.max_threads == "auto")
                 _serverConfiguration.submission.max_threads = Environment.ProcessorCount.ToString();
             
         }
+        
+        /*
+         * Метод выполняет очистку временной
+         * директории сервера проверки решений.
+         */
         
         private void CleanTempDirectory()
         {
@@ -186,6 +204,16 @@ namespace SimplePM_Server.Workers
             
         }
 
+        /*
+         * Метод генерирует уникальный идентификатор
+         * для данного сервера проверки решений, а
+         * также загружает его в память.
+         *
+         * Если файл с кодом уже существует, метод
+         * лишь осуществляет его чтение и запись в
+         * память приложения.
+         */
+        
         private void GenerateServerID(string idFilePath = "./config/server.id")
         {
 
