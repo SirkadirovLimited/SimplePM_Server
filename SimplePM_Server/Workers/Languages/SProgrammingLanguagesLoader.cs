@@ -28,6 +28,7 @@
  */
 
 using NLog;
+using System;
 using System.Collections.Generic;
 
 namespace SimplePM_Server.Workers
@@ -37,48 +38,67 @@ namespace SimplePM_Server.Workers
     {
         
         private static readonly Logger logger = LogManager.GetLogger("SimplePM_Server.Workers.ProgrammingLanguagesLoader");
-        
+
         /*
          * Метод отвечает за генерацию списка поддерживаемых
          * сервером проверки решений языков программирования.
          */
         
-        public static string GetEnabledLangsAsString()
+        public static string GetEnabledLanguagesString()
         {
 
-            // Записываем в лог-файл информацию о начале выполнения операции
+            // Записываем сведения о начале выполнения операции в лог
             logger.Debug("Generation of enabled programming languages list started.");
-
-            // Инициализируем список строк
-            var enabledLangsList = new List<string>();
             
-            // Обрабатываем все предоставленные конфигурации
+            // Получаем список поддерживаемых сервером языков программирования в виде строки
+            var enabledLanguagesString = string.Join(
+                ", ",
+                GetLanguageInformation(compilerConfig => "'" + (string) (compilerConfig.language_name) + "'")
+            );
+
+            // Записываем список поддерживаемых сервером языков программирования в лог
+            logger.Info("Enabled compiler configurations list: " + enabledLanguagesString);
+            
+            // Записываем сведения об окончании выполнения операции в лог
+            logger.Debug("Generation of enabled programming languages list ended.");
+            
+            // Возвращаем список поддерживаемых сервером языков программирования
+            return enabledLanguagesString;
+
+        }
+        
+        /*
+         * С помощью данного метода можно с лёгкостью совершить
+         * полный перебор всех поддерживаемых данным сервером
+         * проверки решений языков программирования.
+         */
+        
+        private static List<ItemType> GetLanguageInformation<ItemType>(
+            Func<dynamic, ItemType> GetItemFunc
+        )
+        {
+
+            // Объявляем новый список для хранения данных
+            var informationList = new List<ItemType>();
+
+            // Совершаем проход по всем конфигурациям поддерживаемых ЯП
             foreach (var compilerConfig in SWorker._compilerConfigurations)
             {
-
-                // Добавляем в список только включённые конфигурации
+                
+                // Обрабатываем только включённые компиляторы
                 if (compilerConfig.enabled != "true") continue;
 
-                // Добавляем текущую конфигурацию в список
-                enabledLangsList.Add("'" + (string)(compilerConfig.language_name) + "'");
-
-                // Записываем информацию об этом в лог-файл
-                logger.Debug(
-                    "Compiler configuration '" +
-                    (string)(compilerConfig.language_name) +
-                    "' loaded!"
-                );
+                // Получаем новый элемент для внесения в список
+                ItemType listItem = GetItemFunc(compilerConfig);
+                
+                // Добавляем новый непустой элемент в список
+                if (listItem != null)
+                    informationList.Add(listItem);
 
             }
 
-            // Формируем список доступных языков в виде строки
-            var resultStr = string.Join(", ", enabledLangsList);
-            
-            // Записываем список поддерживаемых языков программирования в лог
-            logger.Debug("Enabled compiler configurations list: " + resultStr);
-
-            // Возвращаем результат выполнения метода
-            return resultStr;
+            // Возвращаем сгенерированный нами список
+            return informationList;
 
         }
         
