@@ -7,7 +7,7 @@
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
  * SimplePM Server is a part of software product "Automated
- * vefification system for programming tasks "SimplePM".
+ * verification system for programming tasks "SimplePM".
  *
  * Copyright 2018 Yurij Kadirov
  *
@@ -30,11 +30,12 @@
 using NLog;
 using System;
 using System.IO;
+using System.Text;
 using NLog.Config;
 using JudgePlugin;
+using ServerPlugin;
 using CompilerPlugin;
 using Newtonsoft.Json;
-using ServerPlugin;
 using SimplePM_Server.Workers.Recourse;
 
 namespace SimplePM_Server.Workers
@@ -43,6 +44,11 @@ namespace SimplePM_Server.Workers
     public partial class SWorker
     {
 
+        /*
+         * Метод, отвечающий за загрузку серверных
+         * конфигураций в память приложения.
+         */
+        
         private void LoadConfigurations()
         {
             
@@ -66,13 +72,10 @@ namespace SimplePM_Server.Workers
                 File.ReadAllText("./config/compilers.json")
             );
             
-            /*
-             * Конфигурируем журнал событий (библиотека NLog)
-             */
-
             try
             {
 
+                // Загружаем глобальную конфигурацию NLog-а
                 LogManager.Configuration = new XmlLoggingConfiguration(
                     "./config/logger.config"
                 );
@@ -85,6 +88,11 @@ namespace SimplePM_Server.Workers
             
         }
 
+        /*
+         * Метод, отвечающий за загрузку плагинов
+         * сервера проверки решений в память.
+         */
+        
         private void LoadPlugins()
         {
 
@@ -107,7 +115,7 @@ namespace SimplePM_Server.Workers
                 
                 // Получаем список плагинов сервера
                 _serverPlugins = SPluginsLoader.LoadPlugins<IServerPlugin>(
-                    (string)_serverConfiguration.path.ICompilerPlugin,
+                    (string)(_serverConfiguration.path.IServerPlugin),
                     "ServerPlugin.Main"
                 );
                 
@@ -123,7 +131,7 @@ namespace SimplePM_Server.Workers
 
                 // Получаем список модулей компиляции
                 _compilerPlugins = SPluginsLoader.LoadPlugins<ICompilerPlugin>(
-                    (string)_serverConfiguration.path.ICompilerPlugin,
+                    (string)(_serverConfiguration.path.ICompilerPlugin),
                     "CompilerPlugin.Compiler"
                 );
 
@@ -139,7 +147,7 @@ namespace SimplePM_Server.Workers
 
                 // Получаем список модулей оценивания
                 _judgePlugins = SPluginsLoader.LoadPlugins<IJudgePlugin>(
-                    (string)_serverConfiguration.path.IJudgePlugin,
+                    (string)(_serverConfiguration.path.IJudgePlugin),
                     "JudgePlugin.Judge"
                 );
 
@@ -147,18 +155,29 @@ namespace SimplePM_Server.Workers
             
         }
         
+        /*
+         * Метод автоконфигурации сервера. Если в конфигурационном
+         * файле явно это указно, автоматически определяет рекомендуемые
+         * значения некоторых параметров приложения.
+         */
+        
         private void RunAutoConfig()
         {
             
-            // rechecks without timeout
+            // Определение количества перепроверок без таймаута
             if (_serverConfiguration.submission.rechecks_without_timeout == "auto")
                 _serverConfiguration.submission.rechecks_without_timeout = Environment.ProcessorCount.ToString();
 
-            // max threads
+            // Максимальное количество одновлеменных проверок
             if (_serverConfiguration.submission.max_threads == "auto")
                 _serverConfiguration.submission.max_threads = Environment.ProcessorCount.ToString();
             
         }
+        
+        /*
+         * Метод выполняет очистку временной
+         * директории сервера проверки решений.
+         */
         
         private void CleanTempDirectory()
         {
@@ -181,6 +200,51 @@ namespace SimplePM_Server.Workers
                 // Записываем информацию об исключении в лог-файл
                 logger.Warn("An error occured while trying to clear temp folder: " + ex);
 
+            }
+            
+        }
+
+        /*
+         * Метод генерирует уникальный идентификатор
+         * для данного сервера проверки решений, а
+         * также загружает его в память.
+         *
+         * Если файл с кодом уже существует, метод
+         * лишь осуществляет его чтение и запись в
+         * память приложения.
+         */
+        
+        private void GenerateServerID(string idFilePath = "./config/server.id")
+        {
+
+            try
+            {
+
+                // Генерируем новый идентификатор сервера если сейчас он не существует
+                if (!File.Exists(idFilePath))
+                {
+                    
+                    // Записываем идентификатор в файл
+                    File.WriteAllText(idFilePath, Guid.NewGuid().ToString(), Encoding.ASCII);
+                    
+                    // Устанавливаем некоторые аттрибуты файла
+                    File.SetAttributes(idFilePath, FileAttributes.NotContentIndexed);
+                    
+                }
+                
+                // Получаем уникальный идентификатор сервера
+                _serverId = new Guid(File.ReadAllText(idFilePath, Encoding.ASCII));
+                
+            }
+            catch (Exception ex)
+            {
+                
+                // Записываем информацию об исключении в лог-файл
+                logger.Fatal("Something went wrong while trying to get/set unique ServerID: " + ex);
+                
+                // Завершаем работу сервера
+                Environment.Exit(-1);
+                
             }
             
         }

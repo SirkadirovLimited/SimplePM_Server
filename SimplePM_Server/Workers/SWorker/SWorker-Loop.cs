@@ -7,7 +7,7 @@
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
  * SimplePM Server is a part of software product "Automated
- * vefification system for programming tasks "SimplePM".
+ * verification system for programming tasks "SimplePM".
  *
  * Copyright 2018 Yurij Kadirov
  *
@@ -115,7 +115,7 @@ namespace SimplePM_Server.Workers
                  * чтобы не мешать остальным потокам.
                  */
                     
-                var conn = StartMysqlConnection();
+                var conn = GetNewMysqlConnection();
                     
                 /*
                  * В случае успешного подключения к базе данных

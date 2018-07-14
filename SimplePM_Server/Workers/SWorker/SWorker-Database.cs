@@ -7,7 +7,7 @@
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
  * SimplePM Server is a part of software product "Automated
- * vefification system for programming tasks "SimplePM".
+ * verification system for programming tasks "SimplePM".
  *
  * Copyright 2018 Yurij Kadirov
  *
@@ -35,7 +35,7 @@ namespace SimplePM_Server.Workers
     public partial class SWorker
     {
         
-        private MySqlConnection StartMysqlConnection()
+        public static MySqlConnection GetNewMysqlConnection()
         {
 
             /*

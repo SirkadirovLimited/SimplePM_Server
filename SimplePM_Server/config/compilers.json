@@ -7,7 +7,7 @@
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
  * SimplePM Server is a part of software product "Automated
- * vefification system for programming tasks "SimplePM".
+ * verification system for programming tasks "SimplePM".
  *
  * Copyright 2018 Yurij Kadirov
  *
@@ -37,8 +37,8 @@
     "source_ext": "cs",
     "enabled": false,
     "module_name": "TypicalCompiler",
-    "compiler_path": "msbuild",
-    "compiler_arguments": "{%fileLocation%}"
+    "compiler_path": "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe",
+    "compiler_arguments": "/target:exe {%fileLocation%}"
   },
 
   {
@@ -133,7 +133,7 @@
     
     "language_name": "php",
     "source_ext": "php",
-    "enabled": true,
+    "enabled": false,
     "module_name": "ScriptLanguage",
     "runtime_path": "",
     "runtime_arguments": "\"{%fileLocation%}\""

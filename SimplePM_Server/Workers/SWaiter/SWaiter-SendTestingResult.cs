@@ -7,7 +7,7 @@
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
  * SimplePM Server is a part of software product "Automated
- * vefification system for programming tasks "SimplePM".
+ * verification system for programming tasks "SimplePM".
  *
  * Copyright 2018 Yurij Kadirov
  *
@@ -42,24 +42,13 @@ namespace SimplePM_Server.Workers
         private void SendTestingResult(ref ProgramTestingResult ptResult, CompilationResult cResult)
         {
 
-            /*
-             * Указываем в лог-файле о скором
-             * завершении  обработки  данного
-             * запроса на тестирование.
-             */
-
             logger.Trace(
                 "#" +
                 _submissionInfo.SubmissionId +
                 ": Result is being sent to MySQL server..."
             );
             
-            /*
-             * Создаём команду для MySQL сервера
-             * на     основе     сформированного
-             * запроса к базе данных.
-             */
-
+            // Команда на обновление БД
             var updateSqlCommand = new MySqlCommand(
                 Resources.submission_result_query,
                 _connection
@@ -92,7 +81,9 @@ namespace SimplePM_Server.Workers
             
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_errorOutput",
-                Encoding.UTF8.GetBytes(ptResult.GetErrorOutputAsLine())
+                Encoding.UTF8.GetBytes(
+                    ptResult.GetTestingResultInfoString(ProgramTestingResult.TestingResultInfo.ErrorOutput, '\n')
+                )
             ); // Вывод ошибок решения
 
             updateSqlCommand.Parameters.AddWithValue(
@@ -102,12 +93,12 @@ namespace SimplePM_Server.Workers
 
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_exitcodes",
-                ptResult.GetExitCodesAsLine('|')
+                ptResult.GetTestingResultInfoString(ProgramTestingResult.TestingResultInfo.ExitCodes)
             ); // Коды выхода решения
             
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_result",
-                ptResult.GetResultAsLine('|')
+                ptResult.GetTestingResultInfoString(ProgramTestingResult.TestingResultInfo.TestsResults)
             ); // Потестовые результаты решения
             
             updateSqlCommand.Parameters.AddWithValue(

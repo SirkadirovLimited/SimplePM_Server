@@ -7,7 +7,7 @@
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
  * SimplePM Server is a part of software product "Automated
- * vefification system for programming tasks "SimplePM".
+ * verification system for programming tasks "SimplePM".
  *
  * Copyright 2018 Yurij Kadirov
  *
@@ -43,33 +43,24 @@ namespace SimplePM_Server.Workers
 
             // Объявляем отдельную переменную для удобства
             var conn = (MySqlConnection) connObject;
-            
+
             try
             {
-                
-                // Записываем в лог информацию о событии
+
                 logger.Trace(
                     "Starting submission query; Running threads: " +
                     _aliveTestersCount + " from " +
-                    (ulong)(_serverConfiguration.submission.max_threads)
+                    (ulong) (_serverConfiguration.submission.max_threads)
                 );
                 
-                /*
-                 * Создаём новый запрос к базе данных на
-                 * выборку из неё информации  о  запросе
-                 * на тестирование.
-                 */
-                
-                var sqlCmd = new MySqlCommand(
+                // Выполняем запрос к БД и получаем ответ
+                var dataReader = new MySqlCommand(
                     Resources.submission_query.Replace(
                         "@EnabledLanguages",
                         _enabledLanguagesString
                     ),
                     conn
-                );
-                
-                // Выполняем запрос к БД и получаем ответ
-                var dataReader = sqlCmd.ExecuteReader();
+                ).ExecuteReader();
 
                 // Объявляем временную переменную, так называемый "флаг"
                 bool f;
@@ -78,7 +69,8 @@ namespace SimplePM_Server.Workers
                 lock (new object())
                 {
 
-                    f = _aliveTestersCount >= (sbyte)(_serverConfiguration.submission.max_threads) | !dataReader.Read();
+                    f = _aliveTestersCount >= (sbyte) (_serverConfiguration.submission.max_threads) |
+                        !dataReader.Read();
 
                 }
 
@@ -102,85 +94,81 @@ namespace SimplePM_Server.Workers
                 }
                 else
                 {
-                    
-                    /*
-                     * Запускаем   секундомер  для  того,
-                     * чтобы определить время, за которое
-                     * запрос на проверку  обрабатывается
-                     * сервером проверки решений задач.
-                     */
 
+                    // Создаём и запускаем секундомер
                     var sw = Stopwatch.StartNew();
-
-                    /*
-                     * Увеличиваем количество текущих соединений
-                     */
 
                     lock (new object())
                     {
 
+                        // Увеличиваем количество "живых" тестировщиков на единицу
                         _aliveTestersCount++;
 
                     }
-                    
-                    /*
-                     * Объявляем объект, который будет хранить
-                     * всю информацию об отправке и записываем
-                     * в него только что полученные данные.
-                     */
-                    
+
+                    // Получаем подробную информацию о пользовательском запросе на тестировании
                     var submissionInfo = new SubmissionInfo.SubmissionInfo
                     {
-                        
-                        /*
-                         * Основная информация о запросе
-                         */
-                        
-                        SubmissionId = int.Parse(dataReader["submissionId"].ToString()),
-                        UserId = int.Parse(dataReader["userId"].ToString()),
-                        
-                        /*
-                         * Привязка к соревнованию
-                         */
 
-                        OlympId = int.Parse(dataReader["olympId"].ToString()),
+                        // Идентификатор запроса
+                        SubmissionId = uint.Parse(dataReader["submissionId"].ToString()),
 
-                        /*
-                         * Тип тестирования и доплнительные поля
-                         */
+                        // Идентификатор пользователя
+                        UserId = uint.Parse(dataReader["userId"].ToString()),
 
+                        // Идентификатор связанного соревнования
+                        OlympId = uint.Parse(dataReader["olympId"].ToString()),
+
+                        // Тип отправки
                         TestType = dataReader["testType"].ToString(),
-                        CustomTest = (byte[])dataReader["customTest"],
 
-                        /*
-                         * Исходный код решения задачи
-                         * и дополнительная информация
-                         * о нём.
-                         */
+                        // Пользвательский тест
+                        CustomTest = (byte[]) dataReader["customTest"],
 
-                        ProblemCode = (byte[])dataReader["problemCode"],
-                        CodeLang = dataReader["codeLang"].ToString(),
-                        
-                        /*
-                         * Информация о задаче
-                         */
+                        // Информация о пользовательском решении
+                        UserSolution = new SolutionInfo
+                        {
 
+                            // Исходный код решения
+                            SourceCode = (byte[]) dataReader["problemCode"],
+
+                            // Использованный язык программирования
+                            ProgrammingLanguage = dataReader["codeLang"].ToString()
+
+                        },
+
+                        // Тип оценивания пользовательского решения
+                        SolutionRatingType = dataReader["judge"].ToString(),
+
+                        // Информация о задаче
                         ProblemInformation = new ProblemInfo
                         {
 
-                            ProblemId = int.Parse(dataReader["problemId"].ToString()),
-                            ProblemDifficulty = int.Parse(dataReader["difficulty"].ToString()),
+                            // Идентификатор задачи
+                            ProblemId = uint.Parse(dataReader["problemId"].ToString()),
+
+                            // Сложность задачи
+                            Difficulty = uint.Parse(dataReader["difficulty"].ToString()),
+
+                            // Указание на то, следует ли "адаптировать" выходные данные
                             AdaptProgramOutput = bool.Parse(dataReader["adaptProgramOutput"].ToString()),
 
-                            ProblemRatingType = dataReader["judge"].ToString(),
+                            // Информация об авторском решении
+                            AuthorSolution = new SolutionInfo
+                            {
 
-                            AuthorSolutionCode = (byte[])dataReader["authorSolution"],
-                            AuthorSolutionCodeLanguage = dataReader["authorSolutionLanguage"].ToString()
+                                // Исходный код
+                                SourceCode = (byte[]) dataReader["authorSolution"],
+
+                                // Использованный язык программирования
+                                ProgrammingLanguage = dataReader["authorSolutionLanguage"].ToString()
+
+                            }
 
                         }
-                        
+
                     };
-                    
+
                     // Закрываем чтение временной таблицы
                     dataReader.Close();
 
@@ -200,51 +188,28 @@ namespace SimplePM_Server.Workers
                         ;
                         COMMIT;
                     ";
-                    
+
                     // Выполняем запрос к базе данных
                     new MySqlCommand(queryUpdate, conn).ExecuteNonQuery();
 
-                    /*
-                     * Зовём официанта-шляпочника
-                     * уж он знает, что делать в таких
-                     * вот неожиданных ситуациях.
-                     */
+                    // Запускаем метод обработки пользовательского решения
+                    new SWaiter(conn, submissionInfo).ServeSubmission();
 
-                    new SWaiter(
-                        conn,
-                        submissionInfo
-                    ).ServeSubmission();
-
-                    /*
-                     * Уменьшаем количество текущих соединений
-                     * чтобы другие соединения были возможны.
-                     */
-                    
                     lock (new object())
                     {
+
+                        // Уменьшаем количество "живых" тестировщиков на единицу
                         _aliveTestersCount--;
+
                     }
 
-                    /*
-                     * Останавливаем секундомер и записываем
-                     * полученное значение в Debug log поток
-                     */
-
+                    // Останавливаем секундомер
                     sw.Stop();
 
                     // Выводим затраченное время на экран
                     logger.Trace("Submission checking time (ms): " + sw.ElapsedMilliseconds);
 
-                    // Закрываем соединение с БД
-                    conn.Close();
-
-                    // Очищаем не управляемую память
-                    conn.Dispose();
-                    
                 }
-                
-                // Задействуем сборщик мусора
-                GC.Collect(0, GCCollectionMode.Forced);
 
             }
             catch (Exception ex)
@@ -252,8 +217,11 @@ namespace SimplePM_Server.Workers
 
                 // Записываем информацию об ошибке в лог-файл
                 logger.Error(ex);
-
-                // Пытаемся закрыть соединение с БД
+                
+            }
+            finally
+            {
+                
                 try
                 {
 
@@ -265,7 +233,10 @@ namespace SimplePM_Server.Workers
 
                 }
                 catch { /* Никаких дополнительных действий не предусмотрено */ }
-
+                
+                // Задействуем сборщик мусора
+                GC.Collect(0, GCCollectionMode.Forced);
+                
             }
 
         }

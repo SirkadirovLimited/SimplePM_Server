@@ -7,7 +7,7 @@
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
  * SimplePM Server is a part of software product "Automated
- * vefification system for programming tasks "SimplePM".
+ * verification system for programming tasks "SimplePM".
  *
  * Copyright 2018 Yurij Kadirov
  *
@@ -99,27 +99,11 @@ namespace CompilerPlugin
             try
             {
                 
-                // Получаем информацию о файле
-                var fileInfo = new FileInfo(filePath);
-
-                // Устанавливаем рабочую папку процесса
-                startInfo.WorkingDirectory = fileInfo.DirectoryName
-                                             ?? throw new DirectoryNotFoundException(
-                                                 "inner",
-                                                 new FileNotFoundException(
-                                                     "ICompilerPlugin.Java",
-                                                     filePath
-                                                 )
-                                             );
-
                 // Устанавливаем имя запускаемой программы
                 startInfo.FileName = (string)(languageConfiguration.runtime_path);
                 
                 // Аргументы запуска данной программы
-                startInfo.Arguments = "-d64 -cp . " +
-                                      '"' +
-                                      Path.GetFileNameWithoutExtension(fileInfo.Name) +
-                                      '"';
+                startInfo.Arguments = "-d64 -cp . \"" + Path.GetFileNameWithoutExtension(new FileInfo(filePath).Name) + '"';
 
             }
             catch

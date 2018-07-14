@@ -7,7 +7,7 @@
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
  * SimplePM Server is a part of software product "Automated
- * vefification system for programming tasks "SimplePM".
+ * verification system for programming tasks "SimplePM".
  *
  * Copyright 2018 Yurij Kadirov
  *
@@ -67,7 +67,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
 
             // Производим дозапись выходных данных
             var adaptedString = (_adaptOutput)
-                ? e.Data.Trim()
+                ? e.Data.TrimEnd()
                 : e.Data;
 
             // Записываем символ окончания строки

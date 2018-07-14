@@ -7,7 +7,7 @@
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
  * SimplePM Server is a part of software product "Automated
- * vefification system for programming tasks "SimplePM".
+ * verification system for programming tasks "SimplePM".
  *
  * Copyright 2018 Yurij Kadirov
  *
@@ -29,85 +29,109 @@
 
 namespace SubmissionInfo
 {
-
-    /*
-     * Класс,   реализации   которого   являются
-     * хранилищами информации о пользовательских
-     * запросах на тестирование  решений  данных
-     * задач по программированию.
-     */
-
+    
+    /// <summary>
+    /// Класс, объекты которого служат для хранения информации
+    /// о пользовательском запросе на тестирование.
+    /// </summary>
     public class SubmissionInfo
     {
-
-        /*
-         * Базовая информация о запросе
-         */
         
-        public int SubmissionId { get; set; }
-        public int UserId { get; set; }
-
-        /*
-         * Информация о принадлежности
-         * пользовательской  попытки к
-         * указанному   уроку  и / или
-         * олимпиаде.
-         */
+        /// <summary>
+        /// Уникальный идентификатор пользовательского запроса на тестирование
+        /// </summary>
+        public uint SubmissionId { get; set; }
         
-        public int OlympId { get; set; }
+        /// <summary>
+        /// Уникальный идентификатор пользователя, отправившего запрос
+        /// </summary>
+        public uint UserId { get; set; }
         
-        /*
-         * Информация о параметрах тестирования
-         */
-
+        /// <summary>
+        /// Идентификатор связанной олимпиады
+        /// </summary>
+        /// <value>
+        /// <c>0</c> в случае отсутствия привязки,
+        /// положительное значение в другом случае.
+        /// </value>
+        public uint OlympId { get; set; }
+        
+        /// <summary>
+        /// Запрошенный тип тестирования пользовательского решения
+        /// </summary>
+        /// <value>
+        /// В большинстве случаев принимает значения
+        /// <c>syntax</c>, <c>debug</c> или <c>release</c>.
+        /// </value>
         public string TestType { get; set; }
-        public byte[] CustomTest { get; set; }
-
-        /*
-         * Информация  об  исходном коде  пользовательского
-         * решения поставленной задачи по программированию.
-         */
-
-        public string CodeLang { get; set; }
-        public byte[] ProblemCode { get; set; }
-
-        /*
-         * Дополнительная   информация,   которая
-         * помогает обрабатывать пользовательский
-         * запрос на тестирование решения.
-         */
-
-        public ProblemInfo ProblemInformation;
         
+        /// <summary>
+        /// Пользовательский тест для данной задачи.
+        /// Используется лишь в случае, когда значением
+        /// поля <c>TestType</c> является <c>debug</c>.
+        /// </summary>
+        /// <seealso cref="TestType"/>
+        public byte[] CustomTest { get; set; }
+        
+        /// <summary>
+        /// Хранит информацию о пользовательском
+        /// решении поставленной задачи.
+        /// </summary>
+        public SolutionInfo UserSolution { get; set; }
+
+        /// <summary>
+        /// Хранит информацию о задаче, для которой текущий
+        /// пользователь с идентификатором <c>UserId</c>
+        /// отправил собственное решение.
+        /// </summary>
+        public ProblemInfo ProblemInformation { get; set; }
+        
+        /// <summary>
+        /// Тип оценивания пользовательского решения
+        /// </summary>
+        public string SolutionRatingType { get; set; }
+
     }
 
-    /*
-     * Класс описывает поля и методы,
-     * которые относятся к данной задаче,
-     * по которой пришёл запрос на тестирование.
-     */
-
-    public class ProblemInfo
+    public struct ProblemInfo
     {
         
-        // Уникальный идентификатор задачи
-        public int ProblemId { get; set; }
-
-        // Сложность задачи
-        public int ProblemDifficulty { get; set; }
-
-        // Тип оценивания решения задачи
-        public string ProblemRatingType { get; set; }
-
-        // Указание, не строгая ли проверка выхода
-        public bool AdaptProgramOutput { get; set; } = true;
-
-        /*
-         * Информация об авторском решении данной задачи
-         */
-        public byte[] AuthorSolutionCode { get; set; }
-        public string AuthorSolutionCodeLanguage { get; set; }
-
+        /// <summary>
+        /// Уникальный идентификатор задачи
+        /// </summary>
+        public uint ProblemId { get; set; }
+        
+        /// <summary>
+        /// Сложность данной задачи
+        /// </summary>
+        public uint Difficulty { get; set; }
+        
+        /// <summary>
+        /// Указывает на то, следует ли очищать дополнительные символы в конце строк.
+        /// </summary>
+        public bool AdaptProgramOutput { get; set; }
+        
+        /// <summary>
+        /// Хранит информацию об авторском
+        /// решении поставленной задачи.
+        /// </summary>
+        public SolutionInfo AuthorSolution { get; set; }
+        
     }
 
+    public struct SolutionInfo
+    {
+        
+        /// <summary>
+        /// Исходный код решения
+        /// </summary>
+        public byte[] SourceCode { get; set; }
+        
+        /// <summary>
+        /// Язык написания исходного кода решения
+        /// </summary>
+        public string ProgrammingLanguage { get; set; }
+        
+    }
+    
 }

@@ -7,7 +7,7 @@
  * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
  *
  * SimplePM Server is a part of software product "Automated
- * vefification system for programming tasks "SimplePM".
+ * verification system for programming tasks "SimplePM".
  *
  * Copyright 2018 Yurij Kadirov
  *
@@ -89,7 +89,7 @@ namespace SimplePM_Server.ProgramTesting.STester
             
             // Определяем конфигурацию компиляционного плагина
             var userLanguageConfiguration = SCompiler.GetCompilerConfig(
-                submissionInfo.CodeLang
+                submissionInfo.UserSolution.ProgrammingLanguage
             );
             
             // Получаем экземпляр компиляционного плагина
@@ -167,7 +167,7 @@ namespace SimplePM_Server.ProgramTesting.STester
             
             // Определяем конфигурацию компиляционного плагина
             authorLanguageConfiguration = SCompiler.GetCompilerConfig(
-                submissionInfo.ProblemInformation.AuthorSolutionCodeLanguage
+                submissionInfo.ProblemInformation.AuthorSolution.ProgrammingLanguage
             );
 
             // Получаем экземпляр компиляционного плагина
@@ -202,7 +202,7 @@ namespace SimplePM_Server.ProgramTesting.STester
                 // Производим запись в файл исходного кода
                 File.WriteAllBytes(
                     tmpAuthorSrcLocation,
-                    submissionInfo.ProblemInformation.AuthorSolutionCode
+                    submissionInfo.ProblemInformation.AuthorSolution.SourceCode
                 );
 
                 // Устанавливаем его аттрибуты
