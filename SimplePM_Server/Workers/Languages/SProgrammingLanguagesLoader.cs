@@ -29,6 +29,7 @@
 
 using NLog;
 using System;
+using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 
 namespace SimplePM_Server.Workers
@@ -99,6 +100,68 @@ namespace SimplePM_Server.Workers
             
             // Возвращаем список поддерживаемых сервером языков программирования
             return enabledLanguagesString;
+
+        }
+
+        /*
+         * Данный метод несёт ответственность за отправку списка
+         * всех поддерживаемых сервером проверки решений языков
+         * программирования в базу данных системы.
+         */
+        
+        public static void SendEnabledLanguagesToServer()
+        {
+
+            // Создаём новое соединение к СУБД, получаем его дескриптор
+            var conn = SWorker.GetNewMysqlConnection();
+
+            // Обрабатываем все доступные языки программирования
+            GetLanguageInformation(compilerConfig =>
+            {
+
+                try
+                {
+
+                    // Создаём новый запрос на добавление языка программирования в список
+                    var insertCmd = new MySqlCommand(Resources.send_supported_languages_query, conn);
+                    
+                    // Добавляем параметры запроса с экранированием
+                    insertCmd.Parameters.AddWithValue("@title", (string)(compilerConfig.display_name));
+                    insertCmd.Parameters.AddWithValue("@name", (string)(compilerConfig.language_name));
+                    insertCmd.Parameters.AddWithValue("@syntax_name", (string)(compilerConfig.editor_mode));
+                    insertCmd.Parameters.AddWithValue("@owner_server_id", SWorker._serverId.ToString());
+
+                    // Выполняем запрос
+                    insertCmd.ExecuteNonQuery();
+
+                }
+                catch (Exception ex)
+                {
+                    
+                    // Сигнализируем о наличии ошибки в лог-файл
+                    logger.Error("An error occured while trying to send available lanuages to MySQL server: " + ex);
+
+                    // Возвращаем результат-заглушку
+                    return false;
+
+                }
+                
+                // Возвращаем результат-заглушку
+                return true;
+                
+            });
+
+            try
+            {
+
+                // Закрываем соединение с СУБД
+                conn.Close();
+                
+                // Проводим очистку всех связанных ресурсов
+                conn.Dispose();
+
+            }
+            catch { /* Обработки исключений не предусмотрено */ }
 
         }
         
