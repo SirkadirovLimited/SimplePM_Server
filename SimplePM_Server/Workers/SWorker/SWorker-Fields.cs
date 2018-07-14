@@ -40,16 +40,16 @@ namespace SimplePM_Server.Workers
     public partial class SWorker
     {
         
-        private readonly Logger logger = LogManager.GetLogger("SimplePM_Server.Workers.SWorker");
+        private static readonly Logger logger = LogManager.GetLogger("SimplePM_Server.Workers.SWorker");
 
         public static dynamic _serverConfiguration { get; private set; }
-        public static dynamic _databaseConfiguration { get; private set; }
+        private static dynamic _databaseConfiguration { get; set; }
         public static dynamic _securityConfiguration { get; private set; }
         public static dynamic _compilerConfigurations { get; private set; }
         
         public static Guid _serverId { get; private set; }
 
-        private sbyte _aliveTestersCount;
+        public static sbyte _aliveTestersCount { get; private set; }
         private readonly string _enabledLanguagesString;
 
         public static List<IServerPlugin> _serverPlugins { get; private set; }

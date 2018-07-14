@@ -115,7 +115,7 @@ namespace SimplePM_Server.Workers
                  * чтобы не мешать остальным потокам.
                  */
                     
-                var conn = StartMysqlConnection();
+                var conn = GetNewMysqlConnection();
                     
                 /*
                  * В случае успешного подключения к базе данных

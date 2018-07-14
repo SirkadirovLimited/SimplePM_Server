@@ -35,7 +35,7 @@ namespace SimplePM_Server.Workers
     public partial class SWorker
     {
         
-        private MySqlConnection StartMysqlConnection()
+        public static MySqlConnection GetNewMysqlConnection()
         {
 
             /*
