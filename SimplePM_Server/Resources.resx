@@ -117,6 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="send_supported_languages_query" xml:space="preserve">
+    <value>
+        INSERT INTO
+            `spm_supported_languages`
+        SET
+            `title` = @title,
+            `name` = @name,
+            `syntax_name` = @syntax_name,
+            `owner_server_id` = @owner_server_id
+        ON DUPLICATE KEY UPDATE
+            `title` = @title,
+            `syntax_name` = @syntax_name,
+            `owner_server_id` = @owner_server_id
+        ;
+    </value>
+  </data>
   <data name="submission_query" xml:space="preserve">
     <value>
         START TRANSACTION; 

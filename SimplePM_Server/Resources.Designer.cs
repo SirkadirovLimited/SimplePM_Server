@@ -84,6 +84,28 @@ namespace SimplePM_Server {
         
         /// <summary>
         ///   Looks up a localized string similar to 
+        ///        INSERT INTO
+        ///            `spm_supported_languages`
+        ///        SET
+        ///            `title` = @title,
+        ///            `name` = @name,
+        ///            `syntax_name` = @syntax_name,
+        ///            `owner_server_id` = @owner_server_id
+        ///        ON DUPLICATE KEY UPDATE
+        ///            `title` = @title,
+        ///            `syntax_name` = @syntax_name,
+        ///            `owner_server_id` = @owner_server_id
+        ///        ;
+        ///    .
+        /// </summary>
+        public static string send_supported_languages_query {
+            get {
+                return ResourceManager.GetString("send_supported_languages_query", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 
         ///        START TRANSACTION; 
         ///        SELECT 
         ///            `spm_problems`.`difficulty`, 
