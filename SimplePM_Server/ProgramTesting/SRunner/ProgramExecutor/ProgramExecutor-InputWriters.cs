@@ -38,6 +38,12 @@ namespace SimplePM_Server.ProgramTesting.SRunner
     public partial class ProgramExecutor
     {
 
+        /*
+         * Метод занимается тем, что записывает
+         * входные данные программы в её входной
+         * (как ни странно) поток.
+         */
+        
         private void WriteInputString()
         {
 
@@ -90,6 +96,13 @@ namespace SimplePM_Server.ProgramTesting.SRunner
 
         }
 
+        /*
+         * Метод занимается тем, что записывает
+         * входные данные программы в файл, из
+         * которого эта программа (возможно) их
+         * будет читать.
+         */
+        
         private void WriteInputFile()
         {
 
@@ -101,14 +114,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                 // Получаем полный путь к файлу с входными данными
                 var inputFilePath = Path.Combine(
                     new FileInfo(_programPath).DirectoryName ?? throw new DirectoryNotFoundException(),
-                    "input.txt"
+                    "input"
                 );
-
-                /*
-                 * Выполняем действия над файлом в синхронизируемом
-                 * блоке команд для обеспечения  безопасности и для
-                 * снжения нагрузки на накопитель.
-                 */
 
                 lock (new object())
                 {
@@ -122,7 +129,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                     // Указываем аттрибуты этого файла
                     File.SetAttributes(
                         inputFilePath,
-                        FileAttributes.Temporary | FileAttributes.NotContentIndexed
+                        FileAttributes.Temporary | FileAttributes.NotContentIndexed | FileAttributes.ReadOnly
                     );
 
                 }

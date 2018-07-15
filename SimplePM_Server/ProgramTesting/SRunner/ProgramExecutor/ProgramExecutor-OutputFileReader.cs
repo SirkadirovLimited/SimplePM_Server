@@ -27,7 +27,9 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using ProgramTestingAdditions;
+using System;
+using System.IO;
+using System.Text;
 
 namespace SimplePM_Server.ProgramTesting.SRunner
 {
@@ -35,49 +37,38 @@ namespace SimplePM_Server.ProgramTesting.SRunner
     public partial class ProgramExecutor
     {
 
-        private SingleTestResult GenerateTestResult()
+        private byte[] ReadOutputData()
         {
             
-            logger.Trace("ProgramExecutor for <" + _programPath + ">: GenerateTestResult() [started]");
-            
-            /*
-             * Проверяем на наличие файла output.
-             *
-             * В случае если он существует, производим
-             * чтение данных из него и представляем их
-             * в виде выходных данных приложения.
-             */
-            
-            // Генерируем результат тестирования программы
-            var result = new SingleTestResult
+            // Получаем полный путь к файлу с выходными данными
+            var outputFilePath = Path.Combine(
+                new FileInfo(_programPath).DirectoryName ?? throw new DirectoryNotFoundException(),
+                "output"
+            );
+
+            try
             {
 
-                // Выходные данные из стандартного потока
-                ErrorOutput = _programErrorOutput,
-                Output = ReadOutputData(),
+                //Ели файл не существует, используем стандартный выходной поток
+                if (!File.Exists(outputFilePath))
+                    throw new Exception(); // Выбрасываем исключение
 
-                // Результаты предварительного тестирования
-                ExitCode = _programProcess.ExitCode,
-                Result = _testingResult,
+                // Осуществляем чтение данных из файла и возвращаем их
+                return File.ReadAllBytes(outputFilePath);
 
-                // Информация об использовании ресурсов
-                UsedMemory = UsedMemory,
-                UsedProcessorTime = UsedProcessorTime
+            }
+            catch
+            {
+                
+                // В случае ошибки или если файл не найден, используем STDOUT
+                return Encoding.UTF8.GetBytes(
+                    (_adaptOutput)
+                        ? _programOutput.TrimEnd('\r', '\n')
+                        : _programOutput
+                );
 
-            };
+            }
             
-            /*
-             * Освобождаем все связанные с процессом ресурсы.
-             */
-
-            _programProcess.Close();
-            _programProcess.Dispose();
-
-            logger.Trace("ProgramExecutor for <" + _programPath + ">: GenerateTestResult() [finished]");
-            
-            // Возвращаем сгенерированный результат
-            return result;
-
         }
 
     }
