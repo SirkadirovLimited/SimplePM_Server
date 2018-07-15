@@ -27,7 +27,6 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using System.Text;
 using ProgramTestingAdditions;
 
 namespace SimplePM_Server.ProgramTesting.SRunner
@@ -41,17 +40,21 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             
             logger.Trace("ProgramExecutor for <" + _programPath + ">: GenerateTestResult() [started]");
             
+            /*
+             * Проверяем на наличие файла output.
+             *
+             * В случае если он существует, производим
+             * чтение данных из него и представляем их
+             * в виде выходных данных приложения.
+             */
+            
             // Генерируем результат тестирования программы
             var result = new SingleTestResult
             {
 
                 // Выходные данные из стандартного потока
                 ErrorOutput = _programErrorOutput,
-                Output = Encoding.UTF8.GetBytes(
-                    (_adaptOutput)
-                        ? _programOutput.TrimEnd('\r', '\n')
-                        : _programOutput
-                ),
+                Output = ReadOutputData(),
 
                 // Результаты предварительного тестирования
                 ExitCode = _programProcess.ExitCode,
