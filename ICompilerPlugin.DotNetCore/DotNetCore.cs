@@ -27,11 +27,9 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using Plugin;
+using System.IO;
+using System.Diagnostics;
 
 namespace CompilerPlugin
 {
@@ -54,17 +52,21 @@ namespace CompilerPlugin
             
             // Создаём новый .NET Core проект
             var generationResult = StandardCompilationMethods.RunCompiler(
-                "dotnet",
-                "new console --name " + submissionId + " --language c# --output " + directoryFullPath
+                (string)(languageConfiguration.dotnet_path),
+                ((string)(languageConfiguration.generator_arguments))
+                    .Replace("{%submission_id%}", submissionId)
+                    .Replace("{%directory_full_path%}", directoryFullPath)
             );
 
             // Удаляем стандартный файл исходного кода
-            File.Delete(Path.Combine(directoryFullPath, "Program.cs"));
+            File.Delete(Path.Combine(directoryFullPath, "Program." + (string)(languageConfiguration.source_ext)));
             
             // Выполняем сборку проекта средствами .NET Core's MSBuild
             var buildResult = StandardCompilationMethods.RunCompiler(
-                "dotnet",
-                "build " + Path.Combine(directoryFullPath, submissionId + ".csproj") + " --language c# --output " + directoryFullPath
+                (string)(languageConfiguration.dotnet_path),
+                ((string)(languageConfiguration.compiler_arguments))
+                    .Replace("{%project_path%}", Path.Combine(directoryFullPath, submissionId + ".csproj"))
+                    .Replace("{%directory_full_path%}", directoryFullPath)
             );
 
             // Формируем полные выходные данные приложения
