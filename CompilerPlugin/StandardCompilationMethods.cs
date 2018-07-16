@@ -78,7 +78,7 @@ namespace CompilerPlugin
 
         }
 
-        public static CompilationResult RunCompiler(string compilerFullName, string compilerArgs)
+        public static CompilationResult RunCompiler(string compilerFullName, string compilerArgs, string workingDirectory = null)
         {
 
             //TODO: Реализовать возможность установки рабочей папки компилятора
@@ -113,6 +113,10 @@ namespace CompilerPlugin
                     
                 };
 
+                // Если указана требуемая рабочая папка, устанавливаем её
+                if (workingDirectory != null)
+                    cplProc.StartInfo.WorkingDirectory = workingDirectory;
+                
                 // Запускаем процесс компилятора
                 cplProc.Start();
 
