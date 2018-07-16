@@ -30,15 +30,19 @@
 [
 
   {
-    "display_name": ".NET C# (latest)",
+    "display_name": ".NET Core C# (latest)",
     "editor_mode": "csharp",
     
     "language_name": "csharp",
     "source_ext": "cs",
-    "enabled": false,
-    "module_name": "TypicalCompiler",
-    "compiler_path": "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe",
-    "compiler_arguments": "/target:exe {%fileLocation%}"
+    "enabled": true,
+    "module_name": "DotNetCore",
+    
+    "dotnet_path": "dotnet",
+    "project_type": "csproj",
+    
+    "generator_arguments": "new console --name {%submission_id%} --language c# --output ./",
+    "compiler_arguments": "build --output ./"
   },
 
   {

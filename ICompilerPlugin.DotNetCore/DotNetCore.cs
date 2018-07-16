@@ -27,11 +27,9 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using Plugin;
+using System.IO;
+using System.Diagnostics;
 
 namespace CompilerPlugin
 {
@@ -54,17 +52,23 @@ namespace CompilerPlugin
             
             // Создаём новый .NET Core проект
             var generationResult = StandardCompilationMethods.RunCompiler(
-                "dotnet",
-                "new console --name " + submissionId + " --language c# --output " + directoryFullPath
+                (string)(languageConfiguration.dotnet_path),
+                ((string)(languageConfiguration.generator_arguments))
+                    .Replace("{%submission_id%}", submissionId),
+                directoryFullPath
             );
 
             // Удаляем стандартный файл исходного кода
-            File.Delete(Path.Combine(directoryFullPath, "Program.cs"));
+            File.Delete(Path.Combine(directoryFullPath, "Program." + (string)(languageConfiguration.source_ext)));
+            
+            // Делаем так, чтобы сборщик "подцепил" наш файл исходного кода
+            File.Move(fileLocation, Path.Combine(directoryFullPath, "Program." + (string)(languageConfiguration.source_ext)));
             
             // Выполняем сборку проекта средствами .NET Core's MSBuild
             var buildResult = StandardCompilationMethods.RunCompiler(
-                "dotnet",
-                "build " + Path.Combine(directoryFullPath, submissionId + ".csproj") + " --language c# --output " + directoryFullPath
+                (string)(languageConfiguration.dotnet_path),
+                ((string)(languageConfiguration.compiler_arguments)),
+                directoryFullPath
             );
 
             // Формируем полные выходные данные приложения
@@ -85,10 +89,10 @@ namespace CompilerPlugin
             {
                 
                 // Устанавливаем имя запускаемой программы
-                startInfo.FileName = (string)(languageConfiguration.runtime_path);
+                startInfo.FileName = (string)(languageConfiguration.dotnet_path);
                 
                 // Аргументы запуска данной программы
-                startInfo.Arguments = "-d64 -cp . \"" + Path.GetFileNameWithoutExtension(new FileInfo(filePath).Name) + '"';
+                startInfo.Arguments = filePath;
 
             }
             catch
