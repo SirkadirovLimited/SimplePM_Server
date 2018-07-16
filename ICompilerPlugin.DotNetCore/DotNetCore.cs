@@ -54,8 +54,7 @@ namespace CompilerPlugin
             var generationResult = StandardCompilationMethods.RunCompiler(
                 (string)(languageConfiguration.dotnet_path),
                 ((string)(languageConfiguration.generator_arguments))
-                    .Replace("{%submission_id%}", submissionId)
-                    .Replace("{%directory_full_path%}", directoryFullPath),
+                    .Replace("{%submission_id%}", submissionId),
                 directoryFullPath
             );
 
@@ -68,9 +67,7 @@ namespace CompilerPlugin
             // Выполняем сборку проекта средствами .NET Core's MSBuild
             var buildResult = StandardCompilationMethods.RunCompiler(
                 (string)(languageConfiguration.dotnet_path),
-                ((string)(languageConfiguration.compiler_arguments))
-                    .Replace("{%project_path%}", submissionId + ".csproj")
-                    .Replace("{%directory_full_path%}", directoryFullPath),
+                ((string)(languageConfiguration.compiler_arguments)),
                 directoryFullPath
             );
 
@@ -92,10 +89,10 @@ namespace CompilerPlugin
             {
                 
                 // Устанавливаем имя запускаемой программы
-                startInfo.FileName = (string)(languageConfiguration.runtime_path);
+                startInfo.FileName = (string)(languageConfiguration.dotnet_path);
                 
                 // Аргументы запуска данной программы
-                startInfo.Arguments = "-d64 -cp . \"" + Path.GetFileNameWithoutExtension(new FileInfo(filePath).Name) + '"';
+                startInfo.Arguments = filePath;
 
             }
             catch

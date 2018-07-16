@@ -41,8 +41,8 @@
     "dotnet_path": "dotnet",
     "project_type": "csproj",
     
-    "generator_arguments": "new console --name {%submission_id%} --language c# --output {%directory_full_path%}",
-    "compiler_arguments": "build {%project_path%} --output {%directory_full_path%}"
+    "generator_arguments": "new console --name {%submission_id%} --language c# --output ./",
+    "compiler_arguments": "build --output ./"
   },
 
   {
