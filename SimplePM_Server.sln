@@ -52,6 +52,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.TypicalComp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.ScriptLanguage", "ICompilerPlugin.ScriptLanguage\ICompilerPlugin.ScriptLanguage.csproj", "{7E868A66-F2DC-42B3-91B6-DC5B6A2DA3EA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICompilerPlugin.DotNetCore", "ICompilerPlugin.DotNetCore\ICompilerPlugin.DotNetCore.csproj", "{28C4AE90-FE6C-49D5-84A7-07B180D8A7BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
@@ -118,6 +120,8 @@ Global
 		{7E868A66-F2DC-42B3-91B6-DC5B6A2DA3EA}.Release|x64.Build.0 = Release|x64
 		{7E868A66-F2DC-42B3-91B6-DC5B6A2DA3EA}.Debug|x64.ActiveCfg = Debug|x64
 		{7E868A66-F2DC-42B3-91B6-DC5B6A2DA3EA}.Debug|x64.Build.0 = Debug|x64
+		{28C4AE90-FE6C-49D5-84A7-07B180D8A7BD}.Release|x64.ActiveCfg = Release|x64
+		{28C4AE90-FE6C-49D5-84A7-07B180D8A7BD}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6086B6E8-3A97-4035-BE17-8906D4ED6975} = {E3F6547F-B667-4D0A-85D5-1F43FD8FD07A}
@@ -143,5 +147,6 @@ Global
 		{0F956DB4-4DEE-40D6-905A-790EE16FEE3F} = {E12ED158-6FCC-43F3-83A5-B78312084155}
 		{E5B320E8-8301-4925-A62C-B7B3F87CC85C} = {E12ED158-6FCC-43F3-83A5-B78312084155}
 		{7E868A66-F2DC-42B3-91B6-DC5B6A2DA3EA} = {E12ED158-6FCC-43F3-83A5-B78312084155}
+		{28C4AE90-FE6C-49D5-84A7-07B180D8A7BD} = {E12ED158-6FCC-43F3-83A5-B78312084155}
 	EndGlobalSection
 EndGlobal
