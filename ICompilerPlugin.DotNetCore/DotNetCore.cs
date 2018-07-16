@@ -55,18 +55,23 @@ namespace CompilerPlugin
                 (string)(languageConfiguration.dotnet_path),
                 ((string)(languageConfiguration.generator_arguments))
                     .Replace("{%submission_id%}", submissionId)
-                    .Replace("{%directory_full_path%}", directoryFullPath)
+                    .Replace("{%directory_full_path%}", directoryFullPath),
+                directoryFullPath
             );
 
             // Удаляем стандартный файл исходного кода
             File.Delete(Path.Combine(directoryFullPath, "Program." + (string)(languageConfiguration.source_ext)));
             
+            // Делаем так, чтобы сборщик "подцепил" наш файл исходного кода
+            File.Move(fileLocation, Path.Combine(directoryFullPath, "Program." + (string)(languageConfiguration.source_ext)));
+            
             // Выполняем сборку проекта средствами .NET Core's MSBuild
             var buildResult = StandardCompilationMethods.RunCompiler(
                 (string)(languageConfiguration.dotnet_path),
                 ((string)(languageConfiguration.compiler_arguments))
-                    .Replace("{%project_path%}", Path.Combine(directoryFullPath, submissionId + ".csproj"))
-                    .Replace("{%directory_full_path%}", directoryFullPath)
+                    .Replace("{%project_path%}", submissionId + ".csproj")
+                    .Replace("{%directory_full_path%}", directoryFullPath),
+                directoryFullPath
             );
 
             // Формируем полные выходные данные приложения
