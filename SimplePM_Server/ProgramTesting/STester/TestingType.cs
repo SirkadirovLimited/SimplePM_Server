@@ -63,7 +63,7 @@ namespace SimplePM_Server.ProgramTesting.STester
             if (singleTestResult.Result == SingleTestResult.PossibleResult.MiddleSuccessResult)
             {
 
-                // TODO: Implement checkers
+                // TODO: Implement checkers [SERVER-28]
                     
                 // Сравнение выходных потоков и вынесение  результата по данному тесту
                 singleTestResult.Result = 

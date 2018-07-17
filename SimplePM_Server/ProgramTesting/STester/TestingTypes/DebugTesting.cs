@@ -114,13 +114,7 @@ namespace SimplePM_Server.ProgramTesting.STester
             MakeFinalTestResult(ref userTestingResult, authorTestingResult.Output);
 
             // Удаляем директорию с авторским решением
-            Directory.Delete(
-                new FileInfo(authorSolutionExePath).Directory?.FullName
-                    ?? throw new AuthorSolutionException(
-                        new DirectoryNotFoundException("", new NullReferenceException())
-                    ),
-                true
-            );
+            SWaiter.ClearCache(authorSolutionExePath);
             
             // Формируем результат тестирования пользовательского решения
             var programTestingResult = new ProgramTestingResult(1)

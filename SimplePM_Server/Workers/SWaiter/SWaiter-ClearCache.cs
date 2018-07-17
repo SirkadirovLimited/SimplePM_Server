@@ -36,19 +36,22 @@ namespace SimplePM_Server.Workers
     public partial class SWaiter
     {
         
-        private static void ClearCache(string fileLocation)
+        public static void ClearCache(string fileLocation)
         {
 
             try
             {
 
-                /*
-                 * Для безопасности синхронизируем потоки
-                 */
-
                 lock (new object())
                 {
 
+                    // Обновляем аттрибуты для всех файлов и папок по указанному пути
+                    UpdateFileAttributes(
+                        new DirectoryInfo(
+                            new FileInfo(fileLocation).DirectoryName ?? throw new DirectoryNotFoundException()
+                        )
+                    );
+                    
                     // Удаляем каталог временных файлов
                     Directory.Delete(
                         new FileInfo(fileLocation).DirectoryName
@@ -71,6 +74,21 @@ namespace SimplePM_Server.Workers
                 // Записываем исключение в лог-файл
                 logger.Warn("Cache clearing failed: " + ex);
 
+            }
+            
+            void UpdateFileAttributes(DirectoryInfo dInfo)
+            {
+                
+                // Set Directory attribute
+                dInfo.Attributes = FileAttributes.Directory | FileAttributes.Normal;
+
+                foreach (var file in dInfo.GetFiles())
+                    file.Attributes = FileAttributes.Normal;
+
+                // recurse all of the subdirectories
+                foreach (var subDir in dInfo.GetDirectories())
+                    UpdateFileAttributes(subDir);
+                
             }
 
         }
