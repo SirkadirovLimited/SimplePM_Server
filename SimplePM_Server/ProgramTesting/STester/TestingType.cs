@@ -27,6 +27,7 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
+using System;
 using MySql.Data.MySqlClient;
 using ProgramTestingAdditions;
 
@@ -54,6 +55,25 @@ namespace SimplePM_Server.ProgramTesting.STester
         }
 
         public abstract ProgramTestingResult RunTesting();
+
+        internal void MakeFinalTestResult(ref SingleTestResult singleTestResult, byte[] rightOutputData)
+        {
+            
+            // Действуем лишь в случае необходимости вынесения дополнительных итогов
+            if (singleTestResult.Result == SingleTestResult.PossibleResult.MiddleSuccessResult)
+            {
+
+                // TODO: Implement checkers
+                    
+                // Сравнение выходных потоков и вынесение  результата по данному тесту
+                singleTestResult.Result = 
+                    Convert.ToBase64String(singleTestResult.Output) == Convert.ToBase64String(rightOutputData)
+                        ? SingleTestResult.PossibleResult.FullSuccessResult
+                        : SingleTestResult.PossibleResult.FullNoSuccessResult;
+
+            }
+            
+        }
 
     }
     

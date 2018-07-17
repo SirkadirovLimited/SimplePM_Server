@@ -82,7 +82,7 @@ namespace SimplePM_Server.ProgramTesting.STester
                 // Получаем информацию о текущем тесте
                 var currentTest = ReleaseTestsInfo.Dequeue();
 
-                // Запускаем пользовательское решение поставленной задачи
+                // Запускаем тестирование пользовательской программы на данном тесте
                 var currentTestResult = new ProgramExecutor(
                     languageConfiguration,
                     compilerPlugin,
@@ -95,20 +95,8 @@ namespace SimplePM_Server.ProgramTesting.STester
                     submissionInfo.ProblemInformation.AdaptProgramOutput
                 ).RunTesting();
 
-                // Производим допроверку пользовательского решения на данном тесте
-                if (currentTestResult.Result == SingleTestResult.PossibleResult.MiddleSuccessResult)
-                {
-
-                    // TODO: Implement checkers
-                    // TODO: Одинаковые части кода с DebugTesting!
-                    
-                    // Сравнение выходных потоков и вынесение  результата по данному тесту
-                    currentTestResult.Result = 
-                        Convert.ToBase64String(currentTestResult.Output) == Convert.ToBase64String(currentTest.OutputData)
-                            ? SingleTestResult.PossibleResult.FullSuccessResult
-                            : SingleTestResult.PossibleResult.FullNoSuccessResult;
-
-                }
+                // Выносим финальный вердикт по тесту
+                MakeFinalTestResult(ref currentTestResult, currentTest.OutputData);
 
                 // Записываем результат на текущем тесте в массив
                 programTestingResult.TestingResults[currentTestIndex] = currentTestResult;

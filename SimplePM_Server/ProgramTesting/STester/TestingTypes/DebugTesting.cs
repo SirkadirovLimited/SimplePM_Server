@@ -110,25 +110,8 @@ namespace SimplePM_Server.ProgramTesting.STester
                 submissionInfo.ProblemInformation.AdaptProgramOutput
             ).RunTesting();
             
-            // В некоторых случаях необходимо произвести "допроверку"
-            if (userTestingResult.Result == SingleTestResult.PossibleResult.MiddleSuccessResult)
-            {
-
-                // TODO: Implement checkers
-                // TODO: Одинаковые части кода с ReleaseTesting!
-                
-                /*
-                 * Сравнение выходных потоков
-                 * и вынесение  результата по
-                 * данному тесту.
-                 */
-                
-                userTestingResult.Result =
-                    Convert.ToBase64String(userTestingResult.Output) == Convert.ToBase64String(authorTestingResult.Output)
-                    ? SingleTestResult.PossibleResult.FullSuccessResult
-                    : SingleTestResult.PossibleResult.FullNoSuccessResult;
-                
-            }
+            // Выносим финальный вердикт по тесту
+            MakeFinalTestResult(ref userTestingResult, authorTestingResult.Output);
 
             // Удаляем директорию с авторским решением
             Directory.Delete(
