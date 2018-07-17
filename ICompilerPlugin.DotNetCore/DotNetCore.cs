@@ -51,7 +51,7 @@ namespace CompilerPlugin
             var directoryFullPath = new FileInfo(fileLocation).DirectoryName ?? throw new FileNotFoundException();
             
             // Создаём новый .NET Core проект
-            var generationResult = StandardCompilationMethods.RunCompiler(
+            StandardCompilationMethods.RunCompiler(
                 (string)(languageConfiguration.dotnet_path),
                 ((string)(languageConfiguration.generator_arguments))
                     .Replace("{%submission_id%}", submissionId),
@@ -70,9 +70,6 @@ namespace CompilerPlugin
                 ((string)(languageConfiguration.compiler_arguments)),
                 directoryFullPath
             );
-
-            // Формируем полные выходные данные приложения
-            buildResult.CompilerOutput = generationResult.CompilerOutput + "\r\n" + buildResult.CompilerOutput;
             
             // Формируем полный путь к исполнительному файлу
             buildResult.ExeFullname = Path.Combine(directoryFullPath, submissionId + ".dll");
