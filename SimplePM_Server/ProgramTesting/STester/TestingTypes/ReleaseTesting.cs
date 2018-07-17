@@ -87,7 +87,7 @@ namespace SimplePM_Server.ProgramTesting.STester
                     languageConfiguration,
                     compilerPlugin,
                     exeFilePath,
-                    "",
+                    "--user-solution",
                     currentTest.MemoryLimit,
                     currentTest.ProcessorTimeLimit,
                     currentTest.InputData,
