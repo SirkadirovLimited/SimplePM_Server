@@ -42,18 +42,12 @@ namespace SimplePM_Server.Workers
             try
             {
 
+                // Синхронизируем потоки
                 lock (new object())
                 {
 
-                    // Обновляем аттрибуты для всех файлов и папок по указанному пути
-                    UpdateFileAttributes(
-                        new DirectoryInfo(
-                            new FileInfo(fileLocation).DirectoryName ?? throw new DirectoryNotFoundException()
-                        )
-                    );
-                    
                     // Удаляем каталог временных файлов
-                    Directory.Delete(
+                    DeleteDirectory(
                         new FileInfo(fileLocation).DirectoryName
                         ?? throw new DirectoryNotFoundException(),
                         true
@@ -76,19 +70,34 @@ namespace SimplePM_Server.Workers
 
             }
             
-            void UpdateFileAttributes(DirectoryInfo dInfo)
+            void DeleteDirectory(string directoryPath, bool recursive)
             {
-                
-                // Set Directory attribute
-                dInfo.Attributes = FileAttributes.Directory | FileAttributes.Normal;
-
-                foreach (var file in dInfo.GetFiles())
-                    file.Attributes = FileAttributes.Normal;
-
-                // recurse all of the subdirectories
-                foreach (var subDir in dInfo.GetDirectories())
-                    UpdateFileAttributes(subDir);
-                
+    
+                // Выполняем рекурсивное удаление директорий лишь по требованию
+                if (recursive)
+                {
+                    // Перебираем все папки по указанному пути
+                    foreach (var recursivePath in Directory.GetDirectories(directoryPath))
+                        DeleteDirectory(recursivePath, true); // Углубляемся на уровень ниже
+                }
+    
+                // Осуществляем перебор всех файлов по указанному пути
+                foreach (var file in Directory.GetFiles(directoryPath))
+                {
+                    // Получаем аттрибуты найденного файла
+                    var attr = File.GetAttributes(file);
+        
+                    // Если файл доступен только для чтения, исправляем это
+                    if ((attr & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                        File.SetAttributes(file, attr ^ FileAttributes.ReadOnly);
+        
+                    // Удаляем найденный файл
+                    File.Delete(file);
+                }
+ 
+                // Теперь мы попросту удаляем пустую папку
+                Directory.Delete(directoryPath);
+    
             }
 
         }
