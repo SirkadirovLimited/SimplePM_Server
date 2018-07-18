@@ -49,7 +49,7 @@ namespace SimplePM_Server.Workers
             RunAutoConfig();
             
             // Очищаем директорию временных файлов
-            CleanTempDirectory();
+            PrepareTempDirectory();
             
             // Выполняем загрузку всех плагинов
             LoadPlugins();
