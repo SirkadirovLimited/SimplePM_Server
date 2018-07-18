@@ -129,7 +129,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                     // Указываем аттрибуты этого файла
                     File.SetAttributes(
                         inputFilePath,
-                        FileAttributes.Temporary | FileAttributes.NotContentIndexed | FileAttributes.ReadOnly
+                        FileAttributes.NotContentIndexed | FileAttributes.ReadOnly
                     );
 
                 }

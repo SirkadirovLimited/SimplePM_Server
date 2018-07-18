@@ -179,13 +179,13 @@ namespace SimplePM_Server.Workers
          * директории сервера проверки решений.
          */
         
-        private void CleanTempDirectory()
+        private void PrepareTempDirectory()
         {
 
             try
             {
 
-                // Удаляем все файлы
+                // Удаляем все файлы в хранилище временных файлов сервера
                 foreach (var file in Directory.GetFiles((string) (_serverConfiguration.path.temp)))
                     File.Delete(file);
 
@@ -200,6 +200,9 @@ namespace SimplePM_Server.Workers
                 // Записываем информацию об исключении в лог-файл
                 logger.Warn("An error occured while trying to clear temp folder: " + ex);
 
+                // Завершаем работу сервера проверки решений
+                Environment.Exit(-1);
+                
             }
             
         }
