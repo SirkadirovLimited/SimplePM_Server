@@ -36,8 +36,7 @@ namespace SimplePM_Server.Workers
     public partial class SWaiter
     {
         
-        private string RandomGenSourceFileLocation(string submissionId, string fileExt)
-        {
+        private string RandomGenSourceFileLocation(string submissionId, string fileExt){
 
             // Генерируем имя директории
             var directoryName = Path.Combine(
@@ -48,6 +47,9 @@ namespace SimplePM_Server.Workers
 
             // Создаём все необходимые каталоги
             Directory.CreateDirectory(directoryName);
+
+            // Устанавливаем аттрибуты для созданной директории
+            new DirectoryInfo(directoryName).Attributes = FileAttributes.Normal;
 
             // Возвращаем результат работы функции
             return Path.Combine(directoryName, "s" + submissionId + fileExt);
