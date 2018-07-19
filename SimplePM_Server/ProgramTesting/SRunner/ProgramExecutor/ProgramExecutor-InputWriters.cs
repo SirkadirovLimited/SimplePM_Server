@@ -120,16 +120,19 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                 lock (new object())
                 {
 
+                    // Создаём файл
+                    File.Create(inputFilePath, 4096, FileOptions.None).Close();
+                    
+                    // Указываем аттрибуты этого файла
+                    File.SetAttributes(
+                        inputFilePath,
+                        FileAttributes.Normal | FileAttributes.NotContentIndexed
+                    );
+                    
                     // Записываем данные в файл input.txt
                     File.WriteAllBytes(
                         inputFilePath,
                         _programInputBytes
-                    );
-
-                    // Указываем аттрибуты этого файла
-                    File.SetAttributes(
-                        inputFilePath,
-                        FileAttributes.NotContentIndexed | FileAttributes.ReadOnly
                     );
 
                 }
