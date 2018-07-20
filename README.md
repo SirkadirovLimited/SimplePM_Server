@@ -29,6 +29,10 @@
     <img src="https://www.codefactor.io/repository/github/sirkadirovteam/simplepm_server/badge" alt="Codefactor">
   </a>
   &nbsp;
+  <a href="https://dependabot.com">
+    <img src="https://api.dependabot.com/badges/status?host=github&identifier=86981262" alt="Dependabot Status">
+  </a>
+  &nbsp;
   <a href="https://app.fossa.io/projects/git%2Bgithub.com%2FSirkadirovTeam%2FSimplePM_Server?ref=badge_shield">
     <img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2FSirkadirovTeam%2FSimplePM_Server.svg?type=shield" alt="FOSSA status">
   </a>
