@@ -62,6 +62,21 @@ namespace SimplePM_Server {
         
         /// <summary>
         ///   Looks up a localized string similar to 
+        ///        DELETE FROM
+        ///            `spm_supported_languages`
+        ///        WHERE
+        ///            `owner_server_id` = @owner_server_id
+        ///        ;
+        ///    .
+        /// </summary>
+        public static string delete_outdated_languages_query {
+            get {
+                return ResourceManager.GetString("delete_outdated_languages_query", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 
         ///        SELECT 
         ///            `memoryLimit`, 
         ///            `timeLimit` 
