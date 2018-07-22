@@ -173,6 +173,50 @@ namespace SimplePM_Server.Workers
             catch { /* Обработки исключений не предусмотрено */ }
 
         }
+
+        public static void SendSupportedJudgesToServer()
+        {
+            
+            // Создаём новое соединение к СУБД, получаем его дескриптор
+            var conn = SWorker.GetNewMysqlConnection();
+
+            // Удаляем все пункты списка поддерживаемых судей с текущим ServerID
+            new MySqlCommand(
+                Resources.delete_outdated_judges_query.Replace(
+                    "@owner_server_id",
+                    SWorker._serverId.ToString()
+                ),
+                conn
+            ).ExecuteNonQuery();
+            
+            // Записываем иенформацию о всех судьях в базу данных в цикле
+            foreach (var judgePlugin in SWorker._judgePlugins)
+            {
+
+                try
+                {
+
+                    // Создаём новый запрос на добавление плагина судьи в список
+                    var insertCmd = new MySqlCommand(Resources.send_supported_judges_query, conn);
+                    
+                    // Добавляем параметры запроса с экранированием
+                    insertCmd.Parameters.AddWithValue("@name", (string)(judgePlugin.PluginInformation.Name));
+                    insertCmd.Parameters.AddWithValue("@owner_server_id", SWorker._serverId.ToString());
+
+                    // Выполняем запрос
+                    insertCmd.ExecuteNonQuery();
+                    
+                }
+                catch (Exception ex)
+                {
+                    
+                    logger.Error("An error occured while trying to send supported judges list to MySQL server: " + ex);
+                    
+                }
+                
+            }
+            
+        }
         
     }
     
