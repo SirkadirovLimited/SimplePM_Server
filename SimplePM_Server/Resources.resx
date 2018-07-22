@@ -142,6 +142,27 @@
         ;
     </value>
   </data>
+  <data name="delete_outdated_judges_query" xml:space="preserve">
+    <value>
+        DELETE FROM
+            `spm_supported_judges`
+        WHERE
+            `owner_server_id` = @owner_server_id
+        ;
+    </value>
+  </data>
+  <data name="send_supported_judges_query" xml:space="preserve">
+    <value>
+        INSERT INTO
+            `spm_supported_judges`
+        SET
+            `name` = @name,
+            `owner_server_id` = @owner_server_id
+        ON DUPLICATE KEY UPDATE
+            `owner_server_id` = @owner_server_id
+        ;
+    </value>
+  </data>
   <data name="submission_query" xml:space="preserve">
     <value>
         START TRANSACTION; 

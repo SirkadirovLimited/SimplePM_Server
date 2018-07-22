@@ -63,6 +63,21 @@ namespace SimplePM_Server {
         /// <summary>
         ///   Looks up a localized string similar to 
         ///        DELETE FROM
+        ///            `spm_supported_judges`
+        ///        WHERE
+        ///            `owner_server_id` = @owner_server_id
+        ///        ;
+        ///    .
+        /// </summary>
+        public static string delete_outdated_judges_query {
+            get {
+                return ResourceManager.GetString("delete_outdated_judges_query", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 
+        ///        DELETE FROM
         ///            `spm_supported_languages`
         ///        WHERE
         ///            `owner_server_id` = @owner_server_id
@@ -94,6 +109,24 @@ namespace SimplePM_Server {
         public static string get_debug_limits {
             get {
                 return ResourceManager.GetString("get_debug_limits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 
+        ///        INSERT INTO
+        ///            `spm_supported_judges`
+        ///        SET
+        ///            `name` = @name,
+        ///            `owner_server_id` = @owner_server_id
+        ///        ON DUPLICATE KEY UPDATE
+        ///            `owner_server_id` = @owner_server_id
+        ///        ;
+        ///    .
+        /// </summary>
+        public static string send_supported_judges_query {
+            get {
+                return ResourceManager.GetString("send_supported_judges_query", resourceCulture);
             }
         }
         
