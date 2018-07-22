@@ -115,6 +115,15 @@ namespace SimplePM_Server.Workers
             // Создаём новое соединение к СУБД, получаем его дескриптор
             var conn = SWorker.GetNewMysqlConnection();
 
+            // Удаляем все пункты списка поддерживаемых ЯП с текущим ServerID
+            new MySqlCommand(
+                Resources.delete_outdated_languages_query.Replace(
+                    "@owner_server_id",
+                    SWorker._serverId.ToString()
+                ),
+                conn
+            ).ExecuteNonQuery();
+
             // Обрабатываем все доступные языки программирования
             GetLanguageInformation(compilerConfig =>
             {
