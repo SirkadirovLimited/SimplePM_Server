@@ -57,8 +57,11 @@ namespace SimplePM_Server.Workers
             // Получаем список поддерживаемых сервером ЯП
             _enabledLanguagesString = SProgrammingLanguagesLoader.GetEnabledLanguagesString();
 
-            // Записываем все поддерживаемые сервером ЯП в базу данных
+            // Записываем список всех поддерживаемых сервером ЯП в базу данных
             SProgrammingLanguagesLoader.SendEnabledLanguagesToServer();
+            
+            // Записываем список всех поддерживаемых сервером плагинов-судей в базу данных
+            SProgrammingLanguagesLoader.SendSupportedJudgesToServer();
             
             // Сейчас решения не тестируются
             _aliveTestersCount = 0;
