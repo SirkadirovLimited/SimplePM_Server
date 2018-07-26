@@ -122,7 +122,7 @@
         DELETE FROM
             `spm_supported_languages`
         WHERE
-            `owner_server_id` = @owner_server_id
+            `owner_server_id` = '@owner_server_id'
         ;
     </value>
   </data>
@@ -147,7 +147,7 @@
         DELETE FROM
             `spm_supported_judges`
         WHERE
-            `owner_server_id` = @owner_server_id
+            `owner_server_id` = '@owner_server_id'
         ;
     </value>
   </data>

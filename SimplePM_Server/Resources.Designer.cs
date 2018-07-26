@@ -65,7 +65,7 @@ namespace SimplePM_Server {
         ///        DELETE FROM
         ///            `spm_supported_judges`
         ///        WHERE
-        ///            `owner_server_id` = @owner_server_id
+        ///            `owner_server_id` = &apos;@owner_server_id&apos;
         ///        ;
         ///    .
         /// </summary>
@@ -80,7 +80,7 @@ namespace SimplePM_Server {
         ///        DELETE FROM
         ///            `spm_supported_languages`
         ///        WHERE
-        ///            `owner_server_id` = @owner_server_id
+        ///            `owner_server_id` = &apos;@owner_server_id&apos;
         ///        ;
         ///    .
         /// </summary>
