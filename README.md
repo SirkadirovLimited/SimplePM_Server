@@ -81,7 +81,7 @@ Requirements list declared on this page is not full. More information about depe
 Full list of SimplePM supporters available on [project's official website](https://spm.sirkadirov.com/). Anyway, you must to know that we love them :)
 
 ## Licensing
-Source code of the project is licensed under *Apache License 2.0*, official builds of this project licensed under SimplePM EULA, full text of it you can get at official website: https://spm.sirkadirov.com/
+Source code of the project is licensed under *GNU AGPLv3 License*, official builds of this project licensed under SimplePM EULA, full text of it you can get at official website: https://spm.sirkadirov.com/
 
 ### Author rights and patents
 Initial copyright and patents holder of this project - [Yurij Kadirov (Sirkadirov)](https://sirkadirov.com/).
