@@ -7,22 +7,21 @@ jobs:
       - checkout
       - run:
           name: Add Lazarus APT repository
-          command: sudo add-apt-repository ppa:ok2cqr/lazarus
+          command: |
+            sudo add-apt-repository ppa:ok2cqr/lazarus
+            sudo apt update
       
-      - run:
-          name: Updating local APT cache
-          command: sudo apt update
   install:
     docker:
       - image: ubuntu:18.04
       - image: microsoft/dotnet:latest
     steps:
       - run:
-          name: Clear NuGet locals
-          command: dotnet nuget locals --clear all
-      - run:
           name: Restore NuGet packages for this solution
-          command: dotnet restore
+          command: |
+            dotnet nuget locals --clear all
+            dotnet restore
+      
   build:
     docker:
       - image: ubuntu:18.04
