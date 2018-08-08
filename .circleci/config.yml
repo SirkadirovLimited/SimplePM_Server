@@ -39,6 +39,6 @@ workflows:
       - install:
           requires:
             - init
-      - build
+      - build:
           requires:
             - install
