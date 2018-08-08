@@ -1,0 +1,47 @@
+version: 2
+jobs:
+  init:
+    docker:
+      - image: ubuntu:18.04
+    steps:
+      - checkout
+      - run:
+          name: Add Lazarus APT repository
+          command: |
+            add-apt-repository ppa:ok2cqr/lazarus
+            apt update
+      
+  install:
+    docker:
+      - image: ubuntu:18.04
+      - image: microsoft/dotnet:latest
+    steps:
+      - run:
+          name: Restore NuGet packages for this solution
+          command: |
+            dotnet nuget locals --clear all
+            dotnet restore
+      
+  build:
+    docker:
+      - image: ubuntu:18.04
+      - image: microsoft/dotnet:latest
+    steps:
+      - run:
+          name: Working directory listing
+          command: ls
+      - run:
+          name: Build solution with dotnet publish
+          command: dotnet publish SimplePM_Server.sln --configuration $($env:build_type) --force --output ./Build/ --verbosity normal
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - init
+      - install:
+          requires:
+            - init
+      - build:
+          requires:
+            - install
