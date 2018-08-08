@@ -1,0 +1,27 @@
+language: csharp
+sudo: enabled
+mono: none
+dotnet: latest
+
+env:
+  global:
+    - RELEASE=false
+  matrix:
+    - BUILD_TYPE=Debug STRESS_TESTING=false
+    - BUILD_TYPE=Release STRESS_TESTING=true
+
+before-install:
+  - echo "Adding required APT repositories..."
+  - sudo add-apt-repository ppa:ok2cqr/lazarus
+  - echo "Updating APT local cache..."
+  - sudo apt update
+  
+install:
+  - echo "Restoring NuGet packages..."
+  - dotnet nuget locals --clear all
+  - dotnet restore
+  - echo "Restoring NuGet packages completed!"
+
+script:
+  - echo "Publishing SimplePM Server solution..."
+  - dotnet publish SimplePM_Server.sln --configuration $BUILD_TYPE --force --output ./Build/ --verbosity normal
