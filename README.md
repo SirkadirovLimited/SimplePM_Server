@@ -5,14 +5,6 @@
 </div>
 <div align="center">
   &nbsp;
-  <a href="https://ci.appveyor.com/project/sirkadirov/simplepm-server">
-    <img src="https://ci.appveyor.com/api/projects/status/35hk5hpsn70j6vq0?svg=true" alt="AppVeyor Build">
-  </a>
-  &nbsp;
-  <a href="https://ci.appveyor.com/project/sirkadirov/simplepm-server">
-    <img src="https://img.shields.io/appveyor/tests/sirkadirov/simplepm-server.png" alt="AppVeyor testing results">
-  </a>
-  &nbsp;
   <a href="https://github.com/SirkadirovTeam/SimplePM_Server/releases">
     <img src="https://img.shields.io/github/release/SirkadirovTeam/SimplePM_Server/all.png" alt="GitHub (pre-)release version">
   </a>
@@ -51,6 +43,33 @@
 Official repository of SimplePM Server, submissions checking subsystem of software complex "Automated verification system for programming tasks "SimplePM".
 
 Detailed information about the project you can get at project's official website: https://spm.sirkadirov.com/
+
+## Build information
+
+<div align="center">
+<table>
+  <tr>
+    <th>Windows</th>
+    <th>Linux</th>
+  </tr>
+  
+  <tr>
+<td><a href="https://ci.appveyor.com/project/sirkadirov/simplepm-server"><img src="https://ci.appveyor.com/api/projects/status/35hk5hpsn70j6vq0?svg=true"></a></td>
+<td><a href="https://travis-ci.org/SirkadirovTeam/SimplePM_Server"><img src="https://travis-ci.org/SirkadirovTeam/SimplePM_Server.svg?branch=master"></a></td>
+  </tr>
+  
+  <tr>
+<td><a href="https://ci.appveyor.com/project/sirkadirov/simplepm-server"><img src="https://img.shields.io/appveyor/tests/sirkadirov/simplepm-server.png"></a></td>
+<td>-</td>
+  </tr>
+  
+  <tr>
+<td>Powered by AppVeyor</td>
+<td>Powered by Travis CI</td>
+  </tr>
+  
+</table>
+</div>
 
 ## Requirements
 
