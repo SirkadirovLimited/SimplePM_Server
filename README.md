@@ -9,10 +9,6 @@
     <img src="https://img.shields.io/github/release/SirkadirovTeam/SimplePM_Server/all.png" alt="GitHub (pre-)release version">
   </a>
   &nbsp;
-  <a href="https://github.com/SirkadirovTeam/SimplePM_Server/commits/master">
-    <img src="https://img.shields.io/github/commits-since/SirkadirovTeam/SimplePM_Server/latest.png" alt="Commits since last release">
-  </a>
-  &nbsp;
   <a href="https://bestpractices.coreinfrastructure.org/projects/1230">
     <img src="https://bestpractices.coreinfrastructure.org/projects/1230/badge" alt="CII Best Practices">
   </a>
@@ -46,7 +42,6 @@ Detailed information about the project you can get at project's official website
 
 ## Build information
 
-<div align="center">
 <table>
   <tr>
     <th>Windows</th>
@@ -64,12 +59,11 @@ Detailed information about the project you can get at project's official website
   </tr>
   
   <tr>
-<td>Powered by AppVeyor</td>
-<td>Powered by Travis CI</td>
+<td>AppVeyor</td>
+<td>Travis CI</td>
   </tr>
   
 </table>
-</div>
 
 ## Requirements
 
