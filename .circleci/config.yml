@@ -1,0 +1,44 @@
+version: 2
+jobs:
+  init:
+    steps:
+      - checkout
+      - run:
+          name: Add Lazarus APT repository
+          command: sudo add-apt-repository ppa:ok2cqr/lazarus
+      
+      - run:
+          name: Updating local APT cache
+          command: sudo apt update
+  install:
+    docker:
+      - image: microsoft/dotnet:latest
+    steps:
+      - run:
+          name: Clear NuGet locals
+          command: dotnet nuget locals --clear all
+      - run:
+          name: Restore NuGet packages for this solution
+          command: dotnet restore
+  build:
+    docker:
+      - image: microsoft/dotnet:latest
+    steps:
+      - run:
+          name: Working directory listing
+          command: ls
+      - run:
+          name: Build solution with dotnet publish
+          command: dotnet publish SimplePM_Server.sln --configuration $($env:build_type) --force --output ./Build/ --verbosity normal
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - init
+      - install:
+          requires:
+            - init
+      - build
+          requires:
+            - install
