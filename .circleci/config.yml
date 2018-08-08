@@ -8,8 +8,8 @@ jobs:
       - run:
           name: Add Lazarus APT repository
           command: |
-            sudo add-apt-repository ppa:ok2cqr/lazarus
-            sudo apt update
+            add-apt-repository ppa:ok2cqr/lazarus
+            apt update
       
   install:
     docker:
