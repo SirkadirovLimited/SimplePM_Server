@@ -1,6 +1,8 @@
 version: 2
 jobs:
   init:
+    docker:
+      - image: ubuntu:18.04
     steps:
       - checkout
       - run:
@@ -12,6 +14,7 @@ jobs:
           command: sudo apt update
   install:
     docker:
+      - image: ubuntu:18.04
       - image: microsoft/dotnet:latest
     steps:
       - run:
@@ -22,6 +25,7 @@ jobs:
           command: dotnet restore
   build:
     docker:
+      - image: ubuntu:18.04
       - image: microsoft/dotnet:latest
     steps:
       - run:
