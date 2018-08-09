@@ -49,7 +49,7 @@ Detailed information about the project you can get at project's official website
   </tr>
   
   <tr>
-<td><a href="https://ci.appveyor.com/project/sirkadirov/simplepm-server"><img src="https://ci.appveyor.com/api/projects/status/35hk5hpsn70j6vq0?svg=true"></a></td>
+<td><a href="https://ci.appveyor.com/project/sirkadirov/simplepm-server"><img src="https://ci.appveyor.com/api/projects/status/35hk5hpsn70j6vq0/branch/master?svg=true"></a></td>
 <td><a href="https://travis-ci.org/SirkadirovTeam/SimplePM_Server"><img src="https://travis-ci.org/SirkadirovTeam/SimplePM_Server.svg?branch=master"></a></td>
   </tr>
   
