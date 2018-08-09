@@ -22,7 +22,7 @@ addons:
 
 env:
   global:
-    - RELEASE=false
+    - DEADLINE_RELEASE=false
   matrix:
     - BUILD_TYPE=Debug STRESS_TESTING=false
     - BUILD_TYPE=Release STRESS_TESTING=true
@@ -45,11 +45,11 @@ install:
 
 script:
   - echo "Publishing SimplePM Server solution..."
-  - dotnet publish SimplePM_Server.sln --configuration $BUILD_TYPE --force --output ./Build/ --verbosity normal
+  - dotnet publish SimplePM_Server.sln --configuration $BUILD_TYPE --force --output ./Build/ --verbosity minimal
 
 after_script:
   - fossa analyze
-  - fossa report --type licenses
+  - fossa report licenses
   - fossa test
 
 after_success:
