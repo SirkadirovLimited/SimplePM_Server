@@ -37,6 +37,7 @@ before-install:
   - sudo service mysql restart
   
 install:
+  - sudo curl https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | sudo bash
   - echo "Restoring NuGet packages..."
   - dotnet nuget locals --clear all
   - dotnet restore
@@ -45,6 +46,11 @@ install:
 script:
   - echo "Publishing SimplePM Server solution..."
   - dotnet publish SimplePM_Server.sln --configuration $BUILD_TYPE --force --output ./Build/ --verbosity normal
+
+after_script:
+  - fossa analyze
+  - fossa report --type licenses
+  - fossa test
 
 after_success:
   - wget https://raw.githubusercontent.com/k3rn31p4nic/travis-ci-discord-webhook/master/send.sh
