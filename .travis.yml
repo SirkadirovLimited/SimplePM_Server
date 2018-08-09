@@ -38,6 +38,7 @@ before-install:
   
 install:
   - sudo curl https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | sudo bash
+  - fossa init
   - echo "Restoring NuGet packages..."
   - dotnet nuget locals --clear all
   - dotnet restore
