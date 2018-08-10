@@ -4,7 +4,7 @@ os:
 language: csharp
 sudo: enabled
 mono: none
-dotnet: 2.1.302
+dotnet: none
 
 services:
   - mysql
@@ -30,13 +30,26 @@ env:
 before-install:
   - echo "Adding required APT repositories..."
   - sudo add-apt-repository ppa:ok2cqr/lazarus
-  - echo "Updating APT local cache..."
-  - sudo apt update
+  
+  - echo "APT https transport package is required for some in-build operations..."
+  - sudo apt install apt-transport-https
+  
+  - echo "Reset MySQL root password:"
   - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('root') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
   - sudo mysql_upgrade
   - sudo service mysql restart
   
 install:
+  - echo "Importing Microsoft production packages list..."
+  - wget -q https://packages.microsoft.com/config/ubuntu/14.04/packages-microsoft-prod.deb
+  - sudo dpkg -i packages-microsoft-prod.deb
+  
+  - echo "Updating APT local cache..."
+  - sudo apt update
+  
+  - echo "Installing .NET Core SDK v2.1 (latest)"
+  - sudo apt install dotnet-sdk-2.1
+  
   - echo "Restoring NuGet packages..."
   - dotnet nuget locals --clear all
   - dotnet restore
