@@ -1,0 +1,26 @@
+Name: SimplePM Server
+
+Section: education
+Priority: optional
+
+Author: Yurij Kadirov <admin@sirkadirov.com>
+Maintainer: Sirkadirov Team <admin@sirkadirov.com>
+
+Depends: dotnet-sdk-2.1
+Breaks: simplepm-server1
+
+Website: https://spm.sirkadirov.com/
+Homepage: https://spm.sirkadirov.com/
+
+Package: simplepm-server2
+Version: 2.0.0
+
+Architecture: AMD64
+
+Description: SimplePM submissions checking subsystem.
+  SimplePM Server is a submissions checking subsystem of
+  Software complex "Automated verification system for
+  programming tasks "SimplePM".
+  
+  Information about changes, copyrights and other important
+  things you can get on project's official website.
