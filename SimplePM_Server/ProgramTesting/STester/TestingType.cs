@@ -31,6 +31,7 @@
  */
 
 using System;
+using System.Linq;
 using MySql.Data.MySqlClient;
 using ProgramTestingAdditions;
 
@@ -70,7 +71,7 @@ namespace SimplePM_Server.ProgramTesting.STester
                     
                 // Сравнение выходных потоков и вынесение  результата по данному тесту
                 singleTestResult.Result = 
-                    Convert.ToBase64String(singleTestResult.Output) == Convert.ToBase64String(rightOutputData)
+                    singleTestResult.Output.SequenceEqual(rightOutputData)
                         ? SingleTestResult.PossibleResult.FullSuccessResult
                         : SingleTestResult.PossibleResult.FullNoSuccessResult;
 
