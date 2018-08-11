@@ -6,9 +6,6 @@ sudo: enabled
 mono: none
 dotnet: none
 
-services:
-  - mysql
-
 notifications:
   email: false
 
@@ -34,10 +31,10 @@ before-install:
   - echo "APT https transport package is required for some in-build operations..."
   - sudo apt install apt-transport-https
   
-  - echo "Reset MySQL root password:"
-  - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('root') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
-  - sudo mysql_upgrade
-  - sudo service mysql restart
+  - #echo "Reset MySQL root password:"
+  - #sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('root') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
+  - #sudo mysql_upgrade
+  - #sudo service mysql restart
   
 install:
   - echo "Importing Microsoft production packages list..."
