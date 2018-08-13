@@ -74,7 +74,7 @@ namespace SimplePM_Server.ProgramTesting.STester
             );
             
             // Запуск авторского решения поставленной задачи
-            var authorTestingResult = new ProgramExecutor(
+            SingleTestResult authorTestingResult = new ProgramExecutor(
                 authorLanguageConfiguration,
                 authorCompilerPlugin,
                 authorSolutionExePath,
@@ -101,7 +101,7 @@ namespace SimplePM_Server.ProgramTesting.STester
             );
 
             // Запуск пользовательского решения поставленной задачи
-            var userTestingResult = new ProgramExecutor(
+            SingleTestResult userTestingResult = new ProgramExecutor(
                 userLanguageConfiguration,
                 userCompilerPlugin,
                 exeFilePath,
@@ -200,7 +200,7 @@ namespace SimplePM_Server.ProgramTesting.STester
 
             // Производим проверку на наличие ошибок
             if (cResult.HasErrors)
-                throw new FileLoadException(cResult.ExeFullname);
+                throw new FileLoadException("Author solution executable file not found! Path: " + cResult.ExeFullname);
             
             logger.Trace("GetAuthorSolutionExePath for submission #" + submissionInfo.SubmissionId + " [finished]");
             
