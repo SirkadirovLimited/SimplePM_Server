@@ -103,9 +103,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
 
                     // Получаем текущее значение свойства
                     UsedProcessorTime = Convert.ToInt32(
-                        Math.Round(
-                            _programProcess.TotalProcessorTime.TotalMilliseconds
-                        )
+                        Math.Round(_programProcess.TotalProcessorTime.TotalMilliseconds)
                     );
 
                     /*

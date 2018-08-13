@@ -47,7 +47,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
         {
 
             // Различные проверки безопасности
-            if (e.Data == null || _testingResultReceived)
+            if (e.Data == null)
                 return;
             
             // Проверка на превышение лимитов вывода данных

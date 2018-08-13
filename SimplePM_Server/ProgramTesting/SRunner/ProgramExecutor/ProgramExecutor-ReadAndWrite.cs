@@ -182,10 +182,6 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             catch
             {
                 
-                logger.Fatal("#" + _programPath + ((_adaptOutput)
-                    ? _programOutput.TrimEnd('\r', '\n')
-                    : _programOutput));
-                
                 // В случае ошибки или если файл не найден, используем STDOUT
                 return Encoding.UTF8.GetBytes(
                     (_adaptOutput)
