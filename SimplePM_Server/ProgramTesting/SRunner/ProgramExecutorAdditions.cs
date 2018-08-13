@@ -33,6 +33,7 @@
 using CompilerPlugin;
 using System.Security;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using SimplePM_Server.Workers;
 
 namespace SimplePM_Server.ProgramTesting.SRunner
@@ -79,22 +80,34 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             // Указываем имя пользователя
             proc.StartInfo.UserName = (string)(SWorker._securityConfiguration.runas.username);
 
-            // Передаём, что загружать пользовательский профайл не нужно
-            proc.StartInfo.LoadUserProfile = false;
-
             /*
-             * Передаём пароль пользователя
+             * Выполняем специфичные для Windows
+             * операции для обеспечения безопасности
+             * при выполнении пользовательских программ.
              */
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                
+                // Передаём, что загружать пользовательский профайл не нужно
+                proc.StartInfo.LoadUserProfile = false;
+                
+                /*
+                 * Передаём пароль пользователя
+                 * (это работет только в Windows)
+                 */
+                
+                // Создаём защищённую строку
+                var encPassword = new SecureString();
 
-            // Создаём защищённую строку
-            var encPassword = new SecureString();
+                // Добавляем данные в защищённую строку
+                foreach (var c in (string)(SWorker._securityConfiguration.runas.password))
+                    encPassword.AppendChar(c);
 
-            // Добавляем данные в защищённую строку
-            foreach (var c in (string)(SWorker._securityConfiguration.runas.password))
-                encPassword.AppendChar(c);
-
-            // Устанавливаем пароль пользователя
-            proc.StartInfo.Password = encPassword;
+                // Устанавливаем пароль пользователя
+                proc.StartInfo.Password = encPassword;
+                
+            }
             
         }
         
