@@ -129,10 +129,10 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                     // Указываем аттрибуты этого файла
                     File.SetAttributes(
                         inputFilePath,
-                        FileAttributes.Normal | FileAttributes.NotContentIndexed
+                        FileAttributes.Normal
                     );
                     
-                    // Записываем данные в файл input.txt
+                    // Записываем данные в файл input
                     File.WriteAllBytes(
                         inputFilePath,
                         _programInputBytes
@@ -157,6 +157,44 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             
             logger.Trace("ProgramExecutor for <" + _programPath + ">: WriteInputFile() [finished]");
 
+        }
+        
+        private byte[] ReadOutputData()
+        {
+            
+            // Получаем полный путь к файлу с выходными данными
+            var outputFilePath = Path.Combine(
+                new FileInfo(_programPath).DirectoryName ?? throw new DirectoryNotFoundException(),
+                "output"
+            );
+
+            try
+            {
+
+                //Ели файл не существует, используем стандартный выходной поток
+                if (!File.Exists(outputFilePath))
+                    throw new Exception(); // Выбрасываем исключение
+
+                // Осуществляем чтение данных из файла и возвращаем их
+                return File.ReadAllBytes(outputFilePath);
+
+            }
+            catch
+            {
+                
+                logger.Fatal("#" + _programPath + ((_adaptOutput)
+                    ? _programOutput.TrimEnd('\r', '\n')
+                    : _programOutput));
+                
+                // В случае ошибки или если файл не найден, используем STDOUT
+                return Encoding.UTF8.GetBytes(
+                    (_adaptOutput)
+                        ? _programOutput.TrimEnd('\r', '\n')
+                        : _programOutput
+                );
+
+            }
+            
         }
 
     }

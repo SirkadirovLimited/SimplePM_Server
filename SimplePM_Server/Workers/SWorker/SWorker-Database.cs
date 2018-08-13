@@ -63,13 +63,15 @@ namespace SimplePM_Server.Workers
                         uid={_databaseConfiguration.username};
                         pwd={_databaseConfiguration.password};
                         database={_databaseConfiguration.basename};
-                        Charset={_databaseConfiguration.mainchst};
                         SslMode={_databaseConfiguration.sslmode};
                     "
                 );
 
                 // Открываем соединение с БД
                 db.Open();
+
+                // Устанавливаем стандартную кодировку
+                new MySqlCommand("SET NAMES utf8;", db).ExecuteNonQuery();
 
             }
             catch (MySqlException ex)

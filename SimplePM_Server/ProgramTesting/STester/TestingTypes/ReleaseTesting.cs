@@ -84,7 +84,7 @@ namespace SimplePM_Server.ProgramTesting.STester
                 var currentTest = ReleaseTestsInfo.Dequeue();
 
                 // Запускаем тестирование пользовательской программы на данном тесте
-                var currentTestResult = new ProgramExecutor(
+                SingleTestResult currentTestResult = new ProgramExecutor(
                     languageConfiguration,
                     compilerPlugin,
                     exeFilePath,

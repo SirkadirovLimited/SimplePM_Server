@@ -52,7 +52,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             {
 
                 StartInfo = programStartInfo, // устанавливаем информацию о программе
-                EnableRaisingEvents = true, // указываем, что хотим обрабатывать события
+                EnableRaisingEvents = true // указываем, что хотим обрабатывать события
 
             };
 
@@ -74,9 +74,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
             );
 
             // Устанавливаем информацию для запуска от имени иного пользователя
-            ProgramExecutorAdditions.SetProcessRunAs(
-                ref _programProcess
-            );
+            ProgramExecutorAdditions.SetProcessRunAs(ref _programProcess);
             
             /*
              * Добавляем обработчики для некоторых событий
