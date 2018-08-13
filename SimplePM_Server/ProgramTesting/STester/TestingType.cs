@@ -32,6 +32,7 @@
 
 using System;
 using System.Linq;
+using System.Text;
 using MySql.Data.MySqlClient;
 using ProgramTestingAdditions;
 
@@ -68,13 +69,13 @@ namespace SimplePM_Server.ProgramTesting.STester
             {
 
                 // TODO: Implement checkers [SERVER-28]
-                    
+                
                 // Сравнение выходных потоков и вынесение  результата по данному тесту
                 singleTestResult.Result = 
                     singleTestResult.Output.SequenceEqual(rightOutputData)
                         ? SingleTestResult.PossibleResult.FullSuccessResult
                         : SingleTestResult.PossibleResult.FullNoSuccessResult;
-
+                
             }
             
         }

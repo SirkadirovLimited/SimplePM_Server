@@ -57,8 +57,8 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                     UsedMemory = _programProcess.PeakWorkingSet64;
 
                     /*
-                     * Проверяем  на  превышение  лимита
-                     * и в случае обнаружения, "убиваем"
+                     * Проверяем на превышение лимита и
+                     * в случае обнаружения, "убиваем"
                      * процесс.
                      */
                         
@@ -69,7 +69,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                         _programProcess.Kill();
 
                         /*
-                         * Записываем   преждевременный   результат
+                         * Записываем преждевременный результат
                          * тестирования пользовательской программы.
                          */
 
@@ -109,7 +109,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                     );
 
                     /*
-                     * Проверяем  на  превышение  лимита
+                     * Проверяем на превышение лимита
                      * и в случае обнаружения, "убиваем"
                      * процесс.
                      */
@@ -121,7 +121,7 @@ namespace SimplePM_Server.ProgramTesting.SRunner
                         _programProcess.Kill();
 
                         /*
-                         * Записываем   преждевременный   результат
+                         * Записываем преждевременный результат
                          * тестирования пользовательской программы.
                          */
 
