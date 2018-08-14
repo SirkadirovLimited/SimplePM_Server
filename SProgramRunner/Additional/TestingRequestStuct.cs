@@ -1,0 +1,184 @@
+﻿/*
+ * ███████╗██╗███╗   ███╗██████╗ ██╗     ███████╗██████╗ ███╗   ███╗
+ * ██╔════╝██║████╗ ████║██╔══██╗██║     ██╔════╝██╔══██╗████╗ ████║
+ * ███████╗██║██╔████╔██║██████╔╝██║     █████╗  ██████╔╝██╔████╔██║
+ * ╚════██║██║██║╚██╔╝██║██╔═══╝ ██║     ██╔══╝  ██╔═══╝ ██║╚██╔╝██║
+ * ███████║██║██║ ╚═╝ ██║██║     ███████╗███████╗██║     ██║ ╚═╝ ██║
+ * ╚══════╝╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝     ╚═╝     ╚═╝
+ * 
+ * SimplePM Server is a part of software product "Automated
+ * verification system for programming tasks "SimplePM".
+ * 
+ * Copyright (C) 2016-2018 Yurij Kadirov
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * 
+ * GNU Affero General Public License applied only to source code of
+ * this program. More licensing information hosted on project's website.
+ * 
+ * Visit website for more details: https://spm.sirkadirov.com/
+ */
+
+using System.Security;
+using System.Diagnostics;
+
+namespace SProgramRunner
+{
+    
+    /// <summary>
+    /// Use when you need to run your program
+    /// with <code>SProgramRunner</code>.
+    /// </summary>
+    public struct TestingRequestStuct
+    {
+        
+        //============================================================================================================//
+        
+        /// <summary>
+        /// Information about program.
+        /// </summary>
+        /// <seealso cref="ProgramRuntimeInfo"/>
+        public ProgramRuntimeInfo RuntimeInfo;
+        
+        /// <summary>
+        /// Information about program struct
+        /// </summary>
+        public struct ProgramRuntimeInfo
+        {
+            
+            /// <summary>
+            /// Full (or Path-based) path to program
+            /// </summary>
+            public string FileName;
+            
+            /// <summary>
+            /// Program running arguments
+            /// </summary>
+            public string Arguments;
+
+        }
+        
+        //============================================================================================================//
+
+        /// <summary>
+        /// Run progam as another user information.
+        /// </summary>
+        /// <seealso cref="ProgramRunAsInfo"/>
+        public ProgramRunAsInfo RunAsInfo;
+        
+        /// <summary>
+        /// Run program as another user information struct
+        /// </summary>
+        public struct ProgramRunAsInfo
+        {
+
+            /// <summary>
+            /// Enable or not run as other user feature
+            /// </summary>
+            public bool Enable;
+
+            /// <summary>
+            /// Run program as user with specified username.
+            /// If Run As feature enabled, this mustn't be empty!
+            /// </summary>
+            /// <remarks>
+            /// Can be null if <code>Enabled</code> is <code>false</code>
+            /// </remarks>
+            /// <seealso cref="Enable"/>
+            public string UserName;
+
+            /// <summary>
+            /// Password of user with username specified
+            /// in <code>UserName</code> field of this struct.
+            /// </summary>
+            /// <remarks>
+            /// - Can be null if <code>Enabled</code> is <code>false</code>
+            /// - Not applicable if running on Unix!
+            /// </remarks>
+            /// <seealso cref="Enable"/>
+            /// <seealso cref="UserName"/>
+            public SecureString UserPassword;
+
+        }
+        
+        //============================================================================================================//
+
+        /// <summary>
+        /// Set process limits information.
+        /// </summary>
+        public ProcessLimitsInfo LimitsInfo;
+        
+        /// <summary>
+        /// Use if when you need to limit process resources
+        /// and/or if you want to add custom actions at
+        /// process limiting resources stage.
+        /// </summary>
+        public struct ProcessLimitsInfo
+        {
+            
+            /// <summary>
+            /// Enable or not process limits feature
+            /// </summary>
+            /// <value>true or false</value>
+            public bool Enable;
+
+            /// <summary>
+            /// Processor using time limit in milliseconds.
+            /// </summary>
+            /// <value>Set value <code>-1</code> to unlimited.</value>
+            /// <remarks>
+            /// - Used only when <code>Enabled</code> equals to <code>true</code>.
+            /// - Non-hard limit, cross-platform!
+            /// </remarks>
+            /// <seealso cref="Enable"/>
+            /// <seealso cref="System.Diagnostics.Process"/>
+            public int ProcessorTimeLimit;
+
+            /// <summary>
+            /// Process memory limit in bytes
+            /// </summary>
+            /// <value>Set value <code>-1</code> to unlimited.</value>
+            /// <remarks>
+            /// - Used only when <code>Enabled</code> equals to <code>true</code>.
+            /// - Non-hard limit, cross-platform!
+            /// </remarks>
+            /// <seealso cref="Enable"/>
+            /// <seealso cref="System.Diagnostics.Process"/>
+            public long ProcessWorkingSetLimit;
+
+            /// <summary>
+            /// Useful when you want to do custom actions
+            /// for limiting process resources or environment.
+            /// Also can be used for defining custom actions at
+            /// process limiting stage.
+            /// </summary>
+            /// <remarks>
+            /// - Used only when <code>Enabled</code> equals to <code>true</code>.
+            /// - Runs after all standard limiting actions
+            /// - Useful when starts a <code>Thread</code> or a <code>Task</code>.
+            /// - You need to think about cross-platform compatibility!
+            /// </remarks>
+            /// <seealso cref="Enable"/>
+            /// <seealso cref="System.Threading"/>
+            /// <seealso cref="System.Threading.Tasks"/>
+            /// <param name="proc">Reference to a running process</param>
+            public delegate void CutomLimitingAction(ref Process proc);
+
+        }
+        
+        //============================================================================================================//
+        
+    }
+    
+}
