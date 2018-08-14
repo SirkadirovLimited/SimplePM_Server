@@ -53,15 +53,28 @@ namespace SProgramRunner
         public ProcessRuntimeInfo RuntimeInfo { get; set; }
         
         /// <summary>
-        /// Information about program struct
+        /// Information about program struct.
         /// </summary>
         public struct ProcessRuntimeInfo
         {
             
             /// <summary>
-            /// Full (or Path-based) path to program
+            /// Full (or Path-based) path to program.
             /// </summary>
             public string FileName { get; set; }
+            
+            /// <summary>
+            /// Full (or non-recommended relative) path
+            /// to program's working directory.
+            /// </summary>
+            /// <remarks>
+            /// All path
+            /// parameters in <code>TestingRequestStruct</code>
+            /// are relative to it, but this not true for
+            /// <code>FileName</code> field.
+            /// </remarks>
+            /// <seealso cref="FileName"/>
+            public string WorkingDirectory { get; set; }
             
             /// <summary>
             /// Program running arguments
@@ -79,13 +92,13 @@ namespace SProgramRunner
         public ProcessRunAsInfo RunAsInfo { get; set; }
         
         /// <summary>
-        /// Run program as another user information struct
+        /// Run program as another user information struct.
         /// </summary>
         public struct ProcessRunAsInfo
         {
 
             /// <summary>
-            /// Enable or not run as other user feature
+            /// Enable or not run as other user feature.
             /// </summary>
             public bool Enable { get; set; }
 
@@ -94,17 +107,17 @@ namespace SProgramRunner
             /// If Run As feature enabled, this mustn't be empty!
             /// </summary>
             /// <remarks>
-            /// Can be null if <code>Enabled</code> is <code>false</code>
+            /// Can be null if <code>Enabled</code> is <code>false</code>.
             /// </remarks>
             /// <seealso cref="Enable"/>
             public string UserName { get; set; }
 
             /// <summary>
-            /// Password of user with username specified
-            /// in <code>UserName</code> field of this struct.
+            /// Password of user with username specified in
+            /// <code>UserName</code> field of this struct.
             /// </summary>
             /// <remarks>
-            /// - Can be null if <code>Enabled</code> is <code>false</code>
+            /// - Can be null if <code>Enabled</code> is <code>false</code>.
             /// - Not applicable if running on Unix!
             /// </remarks>
             /// <seealso cref="Enable"/>
@@ -130,7 +143,7 @@ namespace SProgramRunner
         {
             
             /// <summary>
-            /// Enable or not process limits feature
+            /// Enable or not process limits feature.
             /// </summary>
             /// <value>true or false</value>
             public bool Enable { get; set; }
@@ -194,7 +207,7 @@ namespace SProgramRunner
         {
 
             /// <summary>
-            /// Set this variable to inject custom input data to starting process
+            /// Set this variable to inject custom input data to starting process.
             /// </summary>
             public byte[] ProgramInput { get; set; }
             
@@ -225,7 +238,7 @@ namespace SProgramRunner
             /// Specify output file name, in which you think
             /// specified program will store result of it's
             /// work. If specified file not found, we'll use
-            /// data from 
+            /// data from <code>stdout</code>.
             /// </summary>
             public string OutputFileName { get; set; }
             
