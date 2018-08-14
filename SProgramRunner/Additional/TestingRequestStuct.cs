@@ -40,6 +40,7 @@ namespace SProgramRunner
     /// Use when you need to run your program
     /// with <code>SProgramRunner</code>.
     /// </summary>
+    /// <seealso cref="SProgramRunner"/>
     public struct TestingRequestStuct
     {
         
@@ -48,24 +49,24 @@ namespace SProgramRunner
         /// <summary>
         /// Information about program.
         /// </summary>
-        /// <seealso cref="ProgramRuntimeInfo"/>
-        public ProgramRuntimeInfo RuntimeInfo;
+        /// <seealso cref="ProcessRuntimeInfo"/>
+        public ProcessRuntimeInfo RuntimeInfo { get; set; }
         
         /// <summary>
         /// Information about program struct
         /// </summary>
-        public struct ProgramRuntimeInfo
+        public struct ProcessRuntimeInfo
         {
             
             /// <summary>
             /// Full (or Path-based) path to program
             /// </summary>
-            public string FileName;
+            public string FileName { get; set; }
             
             /// <summary>
             /// Program running arguments
             /// </summary>
-            public string Arguments;
+            public string Arguments { get; set; }
 
         }
         
@@ -74,19 +75,19 @@ namespace SProgramRunner
         /// <summary>
         /// Run progam as another user information.
         /// </summary>
-        /// <seealso cref="ProgramRunAsInfo"/>
-        public ProgramRunAsInfo RunAsInfo;
+        /// <seealso cref="ProcessRunAsInfo"/>
+        public ProcessRunAsInfo RunAsInfo { get; set; }
         
         /// <summary>
         /// Run program as another user information struct
         /// </summary>
-        public struct ProgramRunAsInfo
+        public struct ProcessRunAsInfo
         {
 
             /// <summary>
             /// Enable or not run as other user feature
             /// </summary>
-            public bool Enable;
+            public bool Enable { get; set; }
 
             /// <summary>
             /// Run program as user with specified username.
@@ -96,7 +97,7 @@ namespace SProgramRunner
             /// Can be null if <code>Enabled</code> is <code>false</code>
             /// </remarks>
             /// <seealso cref="Enable"/>
-            public string UserName;
+            public string UserName { get; set; }
 
             /// <summary>
             /// Password of user with username specified
@@ -108,7 +109,7 @@ namespace SProgramRunner
             /// </remarks>
             /// <seealso cref="Enable"/>
             /// <seealso cref="UserName"/>
-            public SecureString UserPassword;
+            public SecureString UserPassword { get; set; }
 
         }
         
@@ -117,7 +118,8 @@ namespace SProgramRunner
         /// <summary>
         /// Set process limits information.
         /// </summary>
-        public ProcessLimitsInfo LimitsInfo;
+        /// <seealso cref="ProcessLimitsInfo"/>
+        public ProcessLimitsInfo LimitsInfo { get; set; }
         
         /// <summary>
         /// Use if when you need to limit process resources
@@ -131,7 +133,7 @@ namespace SProgramRunner
             /// Enable or not process limits feature
             /// </summary>
             /// <value>true or false</value>
-            public bool Enable;
+            public bool Enable { get; set; }
 
             /// <summary>
             /// Processor using time limit in milliseconds.
@@ -143,7 +145,7 @@ namespace SProgramRunner
             /// </remarks>
             /// <seealso cref="Enable"/>
             /// <seealso cref="System.Diagnostics.Process"/>
-            public int ProcessorTimeLimit;
+            public int ProcessorTimeLimit { get; set; }
 
             /// <summary>
             /// Process memory limit in bytes
@@ -155,7 +157,7 @@ namespace SProgramRunner
             /// </remarks>
             /// <seealso cref="Enable"/>
             /// <seealso cref="System.Diagnostics.Process"/>
-            public long ProcessWorkingSetLimit;
+            public long ProcessWorkingSetLimit { get; set; }
 
             /// <summary>
             /// Useful when you want to do custom actions
@@ -174,6 +176,58 @@ namespace SProgramRunner
             /// <seealso cref="System.Threading.Tasks"/>
             /// <param name="proc">Reference to a running process</param>
             public delegate void CutomLimitingAction(ref Process proc);
+
+        }
+        
+        //============================================================================================================//
+
+        /// <summary>
+        /// Set input and output configuration for specified process.
+        /// </summary>
+        /// <seealso cref="ProcessIOConfig"/>
+        public ProcessIOConfig IOConfig { get; set; }
+        
+        /// <summary>
+        /// Input and output configuration for specified process.
+        /// </summary>
+        public struct ProcessIOConfig
+        {
+
+            /// <summary>
+            /// Set this variable to inject custom input data to starting process
+            /// </summary>
+            public byte[] ProgramInput { get; set; }
+            
+            /// <summary>
+            /// Set to <code>true</code> if you would like that SProgramRunner
+            /// create file in specified program's directory, that contains
+            /// duplicate of program's input stream. Otherwise set to <code>false</code>.
+            /// </summary>
+            /// <seealso cref="InputFileName"/>
+            public bool WriteInputToFile { get; set; }
+            
+            /// <summary>
+            /// Name of input file.
+            /// Require field <code>WriteInputToFile</code> set to <code>true</code>.
+            /// </summary>
+            /// <seealso cref="WriteInputToFile"/>
+            public string InputFileName { get; set; }
+            
+            /// <summary>
+            /// Prefer (enable) to read output from specified
+            /// in field <code>OutputFileName</code> file, that
+            /// reading from program's standard output stream.
+            /// </summary>
+            /// <seealso cref="OutputFileName"/>
+            public bool PreferReadFromOutputFile { get; set; }
+
+            /// <summary>
+            /// Specify output file name, in which you think
+            /// specified program will store result of it's
+            /// work. If specified file not found, we'll use
+            /// data from 
+            /// </summary>
+            public string OutputFileName { get; set; }
 
         }
         
