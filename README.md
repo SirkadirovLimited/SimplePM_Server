@@ -69,8 +69,8 @@ Requirements list declared on this page is not full. More information about depe
 
 ## How to build
 1. Use `PowerShell` or install `Powershell Core`.
-2. Run `PowerShell` script file `solution_release_build.ps1` located in the main repository folder.
-3. Horaaaaaaaaaay!!!
+2. Execute script file `solution_release_build.ps1` located in the main repository folder.
+3. **Horaaaaaaaaaay!!!**
 
 ## Used third-party projects
 - Logging feature powered by **NLog**
