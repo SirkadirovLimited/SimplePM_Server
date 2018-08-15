@@ -6,8 +6,13 @@ Write-Output "Restoring NuGet packages completed!"
 
 Write-Output "Removing temporary directories if they exist..."
 
-Remove-Item -path ./Build/ -recurse -whatif
-Remove-Item -path ./Build/ -recurse
+if (Test-Path "./Build/")
+{
+	
+	Remove-Item -path ./Build/ -recurse -whatif
+	Remove-Item -path ./Build/ -recurse
+	
+}
 
 Write-Output "Temporary directories removed!"
 

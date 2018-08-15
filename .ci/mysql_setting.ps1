@@ -4,9 +4,9 @@ $simplepm_database_dump_url = "https://raw.githubusercontent.com/SirkadirovTeam/
 $simplepm_mysql_db_dump_path = "$PSScriptRoot\simplepm.sql"
 $start_time = Get-Date
 
-Write-Output "Downloading SimplePM database dump file from $($url) to $($output)"
+Write-Output "Downloading SimplePM database dump file from $($simplepm_database_dump_url) to $($simplepm_mysql_db_dump_path)"
 
-Invoke-WebRequest -Uri $url -OutFile $output
+Invoke-WebRequest -Uri $simplepm_database_dump_url -OutFile $simplepm_mysql_db_dump_path
 
 Write-Output "Time taken: $((Get-Date).Subtract($start_time).Seconds) second(s)."
 
