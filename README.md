@@ -5,6 +5,14 @@
 </div>
 <div align="center">
   &nbsp;
+  <a href="https://ci.appveyor.com/project/sirkadirov/simplepm-server">
+    <img src="https://img.shields.io/appveyor/tests/sirkadirov/simplepm-server.png">
+  </a>
+  &nbsp;
+  <a href="https://ci.appveyor.com/project/sirkadirov/simplepm-server">
+    <img src="https://img.shields.io/appveyor/tests/sirkadirov/simplepm-server.png">
+  </a>
+  &nbsp;
   <a href="https://github.com/SirkadirovTeam/SimplePM_Server/releases">
     <img src="https://img.shields.io/github/release/SirkadirovTeam/SimplePM_Server/all.png" alt="GitHub (pre-)release version">
   </a>
@@ -40,31 +48,6 @@ Official repository of SimplePM Server, submissions checking subsystem of softwa
 
 Detailed information about the project you can get at project's official website: https://spm.sirkadirov.com/
 
-## Build information
-
-<table>
-  <tr>
-    <th>Windows</th>
-    <th>Linux</th>
-  </tr>
-  
-  <tr>
-<td><a href="https://ci.appveyor.com/project/sirkadirov/simplepm-server"><img src="https://ci.appveyor.com/api/projects/status/35hk5hpsn70j6vq0/branch/master?svg=true"></a></td>
-<td><a href="https://travis-ci.org/SirkadirovTeam/SimplePM_Server"><img src="https://travis-ci.org/SirkadirovTeam/SimplePM_Server.svg?branch=master"></a></td>
-  </tr>
-  
-  <tr>
-<td><a href="https://ci.appveyor.com/project/sirkadirov/simplepm-server"><img src="https://img.shields.io/appveyor/tests/sirkadirov/simplepm-server.png"></a></td>
-<td>-</td>
-  </tr>
-  
-  <tr>
-<td>AppVeyor</td>
-<td>Travis CI</td>
-  </tr>
-  
-</table>
-
 ## Requirements
 
 ### System requirements
@@ -83,6 +66,11 @@ Detailed information about the project you can get at project's official website
 
 ### Notice
 Requirements list declared on this page is not full. More information about dependencies and requirements you can get on [project's download page](https://spm.sirkadirov.com/download.html).
+
+## How to build
+1. Use `PowerShell` or install `Powershell Core`.
+2. Run `PowerShell` script file `solution_release_build.ps1` located in the main repository folder.
+3. Horaaaaaaaaaay!!!
 
 ## Used third-party projects
 - Logging feature powered by **NLog**
