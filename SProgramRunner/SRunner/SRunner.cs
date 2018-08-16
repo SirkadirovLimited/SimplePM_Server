@@ -30,6 +30,8 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
+using System;
+
 namespace SProgramRunner
 {
     
@@ -51,7 +53,8 @@ namespace SProgramRunner
                 
                 UsedProcessorTime = 0,
                 PeakUsedWorkingSet = 0,
-                WorkingDirectoryDiskUsage = 0
+                WorkingDirectoryDiskUsage = 0,
+                RealRunTime = new TimeSpan(0, 0, 0, 0)
                 
             };
 
