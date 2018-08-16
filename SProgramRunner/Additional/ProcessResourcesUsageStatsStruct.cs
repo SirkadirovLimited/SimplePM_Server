@@ -59,7 +59,7 @@ namespace SProgramRunner
         /// <summary>
         /// Indicates real run time of specified process.
         /// </summary>
-        public TimeSpan RealRunTime;
+        public TimeSpan RealRunTime { get; set; }
 
     }
     
