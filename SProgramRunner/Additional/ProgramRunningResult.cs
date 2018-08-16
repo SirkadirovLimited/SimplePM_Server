@@ -33,6 +33,12 @@
 namespace SProgramRunner
 {
     
+    /// <summary>
+    /// Definjes all information about running result
+    /// of specified in <code>TestingRequestStruct</code>
+    /// struct process.
+    /// </summary>
+    /// <seealso cref="TestingRequestStuct"/>
     public class ProgramRunningResult
     {
 
