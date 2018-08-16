@@ -67,7 +67,7 @@ namespace ProgramTestingAdditions
         }
 
         /*
-         * Раздел объявления переменных
+         * Раздел объявления переменных0
          */
 
         public string ErrorOutput { get; set; } // Выходной поток ошибок пользовательской программы

@@ -184,7 +184,7 @@ namespace ProgramTestingAdditions
         /// <summary>
         /// Метод осуществляет проверку на успешность прохождения пользовательской программой тестирования.
         /// </summary>
-        /// <exception cref="ArgumentNullException">Что-то не так с данными результата тестирования</exception>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <returns>Возвращает значение, которое сигнализирует об успешности прохождения всех тестов.</returns>
         public bool IsSuccessful()
         {
