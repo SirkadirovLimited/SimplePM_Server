@@ -6,7 +6,7 @@
 <div align="center">
   &nbsp;
   <a href="https://ci.appveyor.com/project/sirkadirov/simplepm-server">
-    <img src="https://img.shields.io/appveyor/tests/sirkadirov/simplepm-server.png">
+    <img src="https://ci.appveyor.com/api/projects/status/35hk5hpsn70j6vq0/branch/master?svg=true">
   </a>
   &nbsp;
   <a href="https://ci.appveyor.com/project/sirkadirov/simplepm-server">
