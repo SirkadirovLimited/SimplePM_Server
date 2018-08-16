@@ -1,4 +1,4 @@
-﻿/*
+/*
  * ███████╗██╗███╗   ███╗██████╗ ██╗     ███████╗██████╗ ███╗   ███╗
  * ██╔════╝██║████╗ ████║██╔══██╗██║     ██╔════╝██╔══██╗████╗ ████║
  * ███████╗██║██╔████╔██║██████╔╝██║     █████╗  ██████╔╝██╔████╔██║
@@ -31,6 +31,9 @@
  */
 
 using System;
+using System.Text;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace SProgramRunner
 {
@@ -40,6 +43,7 @@ namespace SProgramRunner
 
         private readonly TestingRequestStuct _testingRequestStuct;
         private ProcessResourcesUsageStatsStruct _processResourcesUsageStats;
+        private Process _process;
         
         public SRunner(TestingRequestStuct testingRequestStuct)
         {
@@ -57,6 +61,92 @@ namespace SProgramRunner
                 RealRunTime = new TimeSpan(0, 0, 0, 0)
                 
             };
+            
+            // Init process object with required info
+            _process = new Process
+            {
+                
+                StartInfo = new ProcessStartInfo
+                {
+                    
+                    /*
+                     * Specify basic process information,
+                     * such as path to program, its arguments
+                     * and working directory.
+                     */
+                    
+                    FileName = _testingRequestStuct.RuntimeInfo.FileName,
+                    Arguments = _testingRequestStuct.RuntimeInfo.Arguments,
+                    WorkingDirectory = _testingRequestStuct.RuntimeInfo.WorkingDirectory,
+                    
+                    /*
+                     * To rewrite input for specified process
+                     * and read all output data from standard
+                     * output and standard error output we need
+                     * to redirect all that outputs.
+                     */
+                    
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    
+                    /*
+                     * Set default encodings to all standard streams.
+                     * This required for compatibility.
+                     */
+                    
+                    StandardInputEncoding = Encoding.UTF8,
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8,
+                    
+                    /*
+                     * We need full control on starting process,
+                     * so we don't need to use shell execute and
+                     * create that process GUI to work with it.
+                     */
+                    
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
+                    ErrorDialog = false,
+                    UseShellExecute = false
+                    
+                },
+                
+                // We need to catch all events, that associated with process
+                EnableRaisingEvents = true
+                
+            };
+            
+            // Set RunAs feature information with lovely inline void :)
+            SetRunAsInformation();
+
+            void SetRunAsInformation()
+            {
+
+                // Continue only if this feature enabled
+                if (!_testingRequestStuct.RunAsInfo.Enable)
+                    return;
+
+                // Set username
+                _process.StartInfo.UserName = _testingRequestStuct.RunAsInfo.UserName;
+
+                /*
+                 * Some features currently work only on Windows.
+                 * I'm so sorry about it...
+                 */
+                
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+
+                    // We don't need to load user profile
+                    _process.StartInfo.LoadUserProfile = false;
+
+                    // Give user's password required to log in
+                    _process.StartInfo.Password = _testingRequestStuct.RunAsInfo.UserPassword;
+
+                }
+
+            }
 
         }
         
