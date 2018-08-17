@@ -185,7 +185,7 @@ namespace SProgramRunner
             /// </remarks>
             /// <seealso cref="Enable"/>
             /// <seealso cref="System.Diagnostics.Process"/>
-            public int ProcessRealWorkingTime { get; set; }
+            public int ProcessRealWorkingTimeLimit { get; set; }
             
             /// <summary>
             /// Useful when you want to do custom actions
