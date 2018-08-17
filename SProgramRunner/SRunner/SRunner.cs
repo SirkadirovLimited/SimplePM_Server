@@ -109,6 +109,7 @@ namespace SProgramRunner
             // Set RunAs feature information with lovely inline void :)
             SetRunAsInformation();
 
+            // Init new ProgramRunningResult object with default values
             _programRunningResult = new ProgramRunningResult
             {
                 
