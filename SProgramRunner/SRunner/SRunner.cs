@@ -38,11 +38,11 @@ using System.Runtime.InteropServices;
 namespace SProgramRunner
 {
     
-    public class SRunner
+    public partial class SRunner
     {
 
         private readonly TestingRequestStuct _testingRequestStuct;
-        private ProcessResourcesUsageStatsStruct _processResourcesUsageStats;
+        private ProgramRunningResult _programRunningResult;
         private Process _process;
         
         public SRunner(TestingRequestStuct testingRequestStuct)
@@ -50,17 +50,6 @@ namespace SProgramRunner
 
             // Store testing request data localy
             _testingRequestStuct = testingRequestStuct;
-
-            // Reset process resources usage statistics
-            _processResourcesUsageStats = new ProcessResourcesUsageStatsStruct
-            {
-                
-                UsedProcessorTime = 0,
-                PeakUsedWorkingSet = 0,
-                WorkingDirectoryDiskUsage = 0,
-                RealRunTime = new TimeSpan(0, 0, 0, 0)
-                
-            };
             
             // Init process object with required info
             _process = new Process
@@ -120,6 +109,35 @@ namespace SProgramRunner
             // Set RunAs feature information with lovely inline void :)
             SetRunAsInformation();
 
+            _programRunningResult = new ProgramRunningResult
+            {
+                
+                // Reset process resources usage statistics
+                ProcessResourcesUsageStats = new ProcessResourcesUsageStatsStruct
+                {
+                
+                    UsedProcessorTime = 0,
+                    PeakUsedWorkingSet = 0,
+                    WorkingDirectoryDiskUsage = 0,
+                    RealRunTime = new TimeSpan(0, 0, 0, 0)
+                
+                },
+                
+                /*
+                 * Set output data of all types to null (reset).
+                 */
+                
+                ProgramOutputData = null,
+                ProgramErrorData = null,
+                
+                // Default exit code - '-1'
+                ProgramExitCode = -1,
+                
+                // Indicates that testing is in progress or corrupted
+                Result = TestingResult.NoTestingResult
+                
+            };
+            
             void SetRunAsInformation()
             {
 
