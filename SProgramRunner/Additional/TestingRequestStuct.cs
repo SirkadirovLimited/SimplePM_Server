@@ -173,6 +173,21 @@ namespace SProgramRunner
             public long ProcessWorkingSetLimit { get; set; }
 
             /// <summary>
+            /// Set process real working time limit.
+            /// </summary>
+            /// <value>Set value <code>-1</code> to unlimited.</value>
+            /// <remarks>
+            /// - Used only when <code>Enabled</code> equals to <code>true</code>.
+            /// - Non-ard limit, cross-platform!
+            /// - Process can work more time than specified here.
+            ///   Get real working time by using one of parameters
+            ///   in testing results objects, returned by <code>SRunner</code>.
+            /// </remarks>
+            /// <seealso cref="Enable"/>
+            /// <seealso cref="System.Diagnostics.Process"/>
+            public int ProcessRealWorkingTime { get; set; }
+            
+            /// <summary>
             /// Useful when you want to do custom actions
             /// for limiting process resources or environment.
             /// Also can be used for defining custom actions at
