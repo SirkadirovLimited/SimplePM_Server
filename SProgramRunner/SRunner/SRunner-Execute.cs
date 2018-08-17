@@ -30,15 +30,93 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
+using System;
+
 namespace SProgramRunner
 {
     
     public partial class SRunner
     {
 
-        //WriteInputFile();
-        
-        
+        public ProgramRunningResult Execute()
+        {
+
+            try
+            {
+
+                // Run program testing
+                RunTesting();
+                
+            }
+            catch (Exception ex)
+            {
+
+                // Inform about internal error in checking subsystem
+                _programRunningResult.Result = TestingResult.ServerErrorResult;
+
+                // Return full exception text to program's error output
+                _programRunningResult.ProgramErrorData = ex.ToString();
+
+            }
+            
+            throw new NotImplementedException();
+            
+        }
+
+        private void RunTesting()
+        {
+            
+            //WriteInputFile();
+
+            if (IsTestingResultReceived)
+                return;
+
+            _process.Start();
+            
+            _process.BeginOutputReadLine();
+            
+            // WriteStandardInput();
+            
+            //new Task(ExecuteLimitsChecker).Start();
+
+            //========================================================================================================//
+            // WAIT FOR CHILD PROCESS TO END (OR KIL IT MANUALlY)                                                     //
+            //========================================================================================================//
+            
+            // Check for process real working time limit
+            var checkIsWaitChldLimitRequired = (
+                _testingRequestStuct.LimitsInfo.Enable && // is this feature enabled
+                _testingRequestStuct.LimitsInfo.ProcessRealWorkingTimeLimit != -1 && // is limit required
+                !_process.WaitForExit(_testingRequestStuct.LimitsInfo.ProcessRealWorkingTimeLimit) // is limit reached
+            );
+
+            // Kill process if timeout reached
+            if (checkIsWaitChldLimitRequired)
+            {
+
+                try
+                {
+
+                    // Kill process
+                    _process.Kill();
+
+                }
+                catch
+                {
+                    /* Dead End */
+                }
+
+                // Set testing result as "wait error result".
+                _programRunningResult.Result = TestingResult.WaitErrorResult;
+
+            }
+            //...or wait unlimited time for process to end
+            else
+                _process.WaitForExit();
+
+            //========================================================================================================//
+            
+        }
         
     }
     
