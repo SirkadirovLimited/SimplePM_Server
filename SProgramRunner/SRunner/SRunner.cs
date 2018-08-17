@@ -139,6 +139,8 @@ namespace SProgramRunner
                 
             };
             
+            //========================================================================================================//
+            
             void SetRunAsInformation()
             {
 
@@ -151,7 +153,7 @@ namespace SProgramRunner
 
                 /*
                  * Some features currently work only on Windows.
-                 * I'm so sorry about it...
+                 * I'm so sorry about that...
                  */
                 
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -166,6 +168,8 @@ namespace SProgramRunner
                 }
 
             }
+            
+            //========================================================================================================//
 
         }
         
