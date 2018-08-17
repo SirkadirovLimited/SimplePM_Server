@@ -100,7 +100,13 @@ namespace SProgramRunner
         /// Real running time limit reached.
         /// </summary>
         public const char WaitErrorResult = 'W';
-        
+
+        /// <summary>
+        /// Indicates that no testing (running) result defined.
+        /// </summary>
+        /// <remarks>Used for internal purposes only!</remarks>
+        public const char NoTestingResult = 'X';
+
     }
     
 }
