@@ -146,7 +146,7 @@ namespace SProgramRunner
                 if (!_testingRequestStuct.RunAsInfo.Enable)
                     return;
 
-                // Set username
+                // Set username for RunAs functionality
                 _process.StartInfo.UserName = _testingRequestStuct.RunAsInfo.UserName;
 
                 /*
