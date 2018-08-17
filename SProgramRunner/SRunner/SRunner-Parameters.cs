@@ -36,6 +36,9 @@ namespace SProgramRunner
     public partial class SRunner
     {
 
+        /// <summary>
+        /// Get is testing result received or not.
+        /// </summary>
         private bool IsTestingResultReceived => (
             _programRunningResult.Result != TestingResult.NoTestingResult
         );
