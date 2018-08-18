@@ -65,22 +65,32 @@ namespace SProgramRunner
 
         private void RunTesting()
         {
+
+            //========================================================================================================//
+            // WRITE PROGRAM INPUT DATA TO A FILE                                                                     //
+            //========================================================================================================//
             
-            //WriteInputFile();
+            WriteInputData_File();
 
             if (IsTestingResultReceived)
                 return;
+            
+            //========================================================================================================//
 
+            // Start program process
             _process.Start();
             
+            // Begin asynchronous read of program's output
             _process.BeginOutputReadLine();
+
+            // Write program input data to STDIN
+            WriteInputData_StandardInputStream();
             
-            // WriteStandardInput();
-            
+            // Start limits checker task
             //new Task(ExecuteLimitsChecker).Start();
 
             //========================================================================================================//
-            // WAIT FOR CHILD PROCESS TO END (OR KIL IT MANUALlY)                                                     //
+            // WAIT FOR CHILD PROCESS TO END (OR KILl IT MANUALlY)                                                    //
             //========================================================================================================//
             
             // Check for process real working time limit
