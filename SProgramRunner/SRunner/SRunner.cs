@@ -48,6 +48,10 @@ namespace SProgramRunner
         public SRunner(TestingRequestStuct testingRequestStuct)
         {
 
+            //========================================================================================================//
+            // OBJECTS INITALIZATION AND FIRST-TIME CONFIGURATION                                                     //
+            //========================================================================================================//
+            
             // Store testing request data localy
             _testingRequestStuct = testingRequestStuct;
             
@@ -139,6 +143,8 @@ namespace SProgramRunner
                 
             };
             
+            //========================================================================================================//
+            // INLINE METHOD, THAT SETS RUN AS FEATURE REQUIRED INFORMATION                                           //
             //========================================================================================================//
             
             void SetRunAsInformation()
