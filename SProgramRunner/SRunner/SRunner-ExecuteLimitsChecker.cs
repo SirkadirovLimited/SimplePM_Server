@@ -110,10 +110,7 @@ namespace SProgramRunner
                                                     limitsInfo.ProcessorTimeLimit;
 
                     if (ptlimreached_checker)
-                        TestingExceptionCatched(
-                            new ProgramRunnerExceptions.ProcessorUsageTimeLimitReachedException(),
-                            TestingResult.TimeLimitResult
-                        );
+                        SetNewTestingResult(TestingResult.TimeLimitResult);
                     
                     /*
                      * Working set limit reached checker
@@ -124,10 +121,7 @@ namespace SProgramRunner
                                                     limitsInfo.ProcessWorkingSetLimit;
 
                     if (wslimreached_checker)
-                        TestingExceptionCatched(
-                            new ProgramRunnerExceptions.MemoryUsageLimitReachedException(),
-                            TestingResult.MemoryLimitResult
-                        );
+                        SetNewTestingResult(TestingResult.MemoryLimitResult);
                     
                 }
                 
