@@ -110,6 +110,13 @@ namespace SProgramRunner
                 
             };
             
+            /*
+             * Add some useful event handlers
+             */
+            
+            // On process terminated event handler
+            _process.Exited += ProcessOnExited;
+            
             // Set RunAs feature information with lovely inline void :)
             SetRunAsInformation();
 
@@ -178,8 +185,8 @@ namespace SProgramRunner
             //========================================================================================================//
 
         }
-
-        private void TestingExceptionCatched(Exception ex, char testingResult, bool killProcess = false)
+        
+        private void TestingExceptionCatched(Exception ex, char testingResult, bool killProcess = true)
         {
 
             // Check if we need to kill associated process before we continue
