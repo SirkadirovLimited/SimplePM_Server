@@ -63,6 +63,18 @@ namespace SProgramRunner
 
         }
         
+        [Serializable]
+        public sealed class OutputDataLimitReachedException : Exception
+        {
+            
+            public OutputDataLimitReachedException() : base("Solution at run time reached output data limit!")
+            {
+                Source = "SProgramRunner";
+                HelpLink = "https://spm.sirkadirov.com/";
+            }
+
+        }
+        
     }
     
 }
