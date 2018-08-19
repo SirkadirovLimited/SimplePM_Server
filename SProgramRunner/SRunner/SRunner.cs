@@ -178,6 +178,32 @@ namespace SProgramRunner
             //========================================================================================================//
 
         }
+
+        private void TestingExceptionCatched(Exception ex, char testingResult, bool killProcess = false)
+        {
+
+            // Check if we need to kill associated process before we continue
+            if (killProcess)
+            {
+
+                try
+                {
+
+                    // Kill process
+                    _process.Kill();
+
+                }
+                catch { /* We don't need information about this exception. */ }
+                
+            }
+            
+            // Write exception information to program error data param (testing result section).
+            _programRunningResult.ProgramErrorData = ex.ToString();
+                
+            // Now we have a new program running result - Input error result.
+            _programRunningResult.Result = testingResult;
+            
+        }
         
     }
     
