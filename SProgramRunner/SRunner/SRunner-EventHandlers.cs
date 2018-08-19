@@ -72,15 +72,7 @@ namespace SProgramRunner
             
             // Aggregate checking results
             if (outputCharsLimitReached_checker)
-            {
-                
-                // Set testing results
-                TestingExceptionCatched(
-                    new ProgramRunnerExceptions.OutputDataLimitReachedException(),
-                    TestingResult.OutputErrorResult
-                );
-                
-            }
+                SetNewTestingResult(TestingResult.OutputErrorResult);
             
             //========================================================================================================//
             // APPEND NEW LINE TO PROGRAM'S OUTPUT PARAMETER                                                          //
