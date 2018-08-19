@@ -30,13 +30,112 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
+using System;
+using System.Threading;
+
 namespace SProgramRunner
 {
     
     public partial class SRunner
     {
 
-        
+        private void ExecuteLimitsChecker()
+        {
+
+            // Create a new limits checker thread
+            var limitsCheckerThread = new Thread(InfiniteCheckForLimitsReached);
+            
+            try
+            {
+
+                // Start newly created limits checker thread
+                limitsCheckerThread.Start();
+                
+                // Get new values if only process is running now
+                while (!_process.HasExited)
+                {
+
+                    try
+                    {
+                        
+                        // Clear all cache associated with testing program process
+                        _process.Refresh();
+
+                        // Get new peak working set value
+                        _programRunningResult.ProcessResourcesUsageStats.PeakUsedWorkingSet =
+                            _process.PeakWorkingSet64;
+
+                        // Get total value of processor time, used by testing program process
+                        _programRunningResult.ProcessResourcesUsageStats.UsedProcessorTime =
+                            Convert.ToInt32(
+                                Math.Round(
+                                    _process.TotalProcessorTime.TotalMilliseconds,
+                                    MidpointRounding.ToEven
+                                )
+                            );
+                        
+                    }
+                    catch { /* No catching blocks required */ }
+                    
+                }
+                
+                // Abort limits checker thread, because we don't neeed it anymore
+                limitsCheckerThread.Abort();
+                
+            }
+            catch { /* No catching blocks required */ }
+
+            //========================================================================================================//
+            // INLINE METHOD THAT INFINITELY CHECKS FOR LIMITS REACHED BY ASSOCIATED PROGRAM PROCESS                  //
+            //========================================================================================================//
+            
+            void InfiniteCheckForLimitsReached()
+            {
+
+                if (!_testingRequestStuct.LimitsInfo.Enable)
+                    return;
+                
+                while (true)
+                {
+
+                    // Variable for quick access to requested process resources limits
+                    var limitsInfo = _testingRequestStuct.LimitsInfo;
+
+                    /*
+                     * Processor time limit reached checker
+                     */
+                    
+                    var ptlimreached_checker = limitsInfo.ProcessorTimeLimit != -1 &&
+                                               _programRunningResult.ProcessResourcesUsageStats.UsedProcessorTime >
+                                                    limitsInfo.ProcessorTimeLimit;
+
+                    if (ptlimreached_checker)
+                        TestingExceptionCatched(
+                            new ProgramRunnerExceptions.ProcessorUsageTimeLimitReachedException(),
+                            TestingResult.TimeLimitResult
+                        );
+                    
+                    /*
+                     * Working set limit reached checker
+                     */
+                    
+                    var wslimreached_checker = limitsInfo.ProcessWorkingSetLimit != -1 &&
+                                               _programRunningResult.ProcessResourcesUsageStats.PeakUsedWorkingSet >
+                                                    limitsInfo.ProcessWorkingSetLimit;
+
+                    if (wslimreached_checker)
+                        TestingExceptionCatched(
+                            new ProgramRunnerExceptions.MemoryUsageLimitReachedException(),
+                            TestingResult.MemoryLimitResult
+                        );
+                    
+                }
+                
+            }
+            
+            //========================================================================================================//
+            
+        }
         
     }
     
