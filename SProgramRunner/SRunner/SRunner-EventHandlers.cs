@@ -31,6 +31,7 @@
  */
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -40,6 +41,64 @@ namespace SProgramRunner
     public partial class SRunner
     {
 
+        private void ProcessOnOutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+
+            //========================================================================================================//
+            // PREPARE OUTPUT DATA BEFORE MAIN APPEND PROCESS                                                         //
+            //========================================================================================================//
+            
+            // Ignore if output data is null
+            if (e.Data == null)
+                return;
+
+            // Adapt program's output if requested
+            var dataLine = (_testingRequestStuct.IOConfig.AdaptOutput)
+                ? e.Data.TrimEnd()
+                : e.Data;
+
+            //========================================================================================================//
+            // OUTPUT DATA LIMIT REACHED CHECKER SECTION                                                              //
+            //========================================================================================================//
+            
+            // Define output data limit reached checker
+            var outputCharsLimitReached_checker = _testingRequestStuct.IOConfig.OutputCharsLimit > 0 &&
+                                                    (
+                                                        Encoding.UTF8.GetCharCount(
+                                                            _programRunningResult.ProgramOutputData
+                                                        ) + dataLine.Length >
+                                                            _testingRequestStuct.IOConfig.OutputCharsLimit
+                                                    );
+            
+            // Aggregate checking results
+            if (outputCharsLimitReached_checker)
+            {
+                
+                // Set testing results
+                TestingExceptionCatched(
+                    new ProgramRunnerExceptions.OutputDataLimitReachedException(),
+                    TestingResult.OutputErrorResult
+                );
+                
+            }
+            
+            //========================================================================================================//
+            // APPEND NEW LINE TO PROGRAM'S OUTPUT PARAMETER                                                          //
+            //========================================================================================================//
+
+            // Some work with encodings due to types incompatibility
+            _programRunningResult.ProgramOutputData = Encoding.UTF8.GetBytes(
+                    new StringBuilder(
+                        Encoding.UTF8.GetString(
+                            _programRunningResult.ProgramOutputData
+                        )
+                    ).AppendLine(dataLine).ToString()
+            );
+
+            //========================================================================================================//
+
+        }
+        
         private void ProcessOnExited(object sender, EventArgs e)
         {
 
