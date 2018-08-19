@@ -32,6 +32,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 
 namespace SProgramRunner
 {
@@ -41,8 +42,29 @@ namespace SProgramRunner
 
         private void WriteInputData_StandardInputStream()
         {
-            
-            throw new NotImplementedException();
+
+            try
+            {
+
+                // Write input data to program's STDIN
+                _process.StandardInput.Write(
+                    Encoding.UTF8.GetString(_testingRequestStuct.IOConfig.ProgramInput)
+                );
+
+                // Clear all buffers and write pending data to stream
+                _process.StandardInput.Flush();
+                
+                // Close program's standard input stream
+                _process.StandardInput.Close();
+
+            }
+            catch (Exception ex)
+            {
+                
+                // Call method, that specifies new testing result, writes exception and kills associated process.
+                TestingExceptionCatched(ex, TestingResult.InputErrorResult, true);
+                
+            }
             
         }
 
@@ -72,11 +94,8 @@ namespace SProgramRunner
             catch (Exception ex)
             {
 
-                // Write exception information to program error data param (testing result section).
-                _programRunningResult.ProgramErrorData = ex.ToString();
-                
-                // Now we have a new program running result - Input error result.
-                _programRunningResult.Result = TestingResult.InputErrorResult;
+                // Call method, that specifies new testing result and writes exception.
+                TestingExceptionCatched(ex, TestingResult.InputErrorResult);
 
             }
 
