@@ -114,6 +114,9 @@ namespace SProgramRunner
              * Add some useful event handlers
              */
             
+            // On output line received from a running program
+            _process.OutputDataReceived += ProcessOnOutputDataReceived;
+            
             // On process terminated event handler
             _process.Exited += ProcessOnExited;
             
