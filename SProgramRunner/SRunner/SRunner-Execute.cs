@@ -53,11 +53,46 @@ namespace SProgramRunner
             {
 
                 // Inform user about catched exception
-                TestingExceptionCatched(ex, TestingResult.ServerErrorResult);
+                SetNewTestingResult(TestingResult.ServerErrorResult, true, ex);
 
             }
-            
-            throw new NotImplementedException();
+
+            void ExecuteAdditonalCheckers()
+            {
+
+                /*
+                 * Checkers for TestingResult.ErrorOutputNotNullResult
+                 */
+                
+                var realErrorOutputData = _process.StandardError.ReadToEnd();
+
+                if (!IsTestingResultReceived && string.IsNullOrWhiteSpace(_programRunningResult.ProgramErrorData) &&
+                    !string.IsNullOrWhiteSpace(realErrorOutputData))
+                {
+                    
+                    // Set new testing result
+                    SetNewTestingResult(TestingResult.ErrorOutputNotNullResult, false);
+                    
+                    // Set program's error output data property
+                    _programRunningResult.ProgramErrorData = realErrorOutputData;
+                    
+                }
+                
+                /*
+                 * Checkers for TestingResult.RuntimeErrorResult
+                 */
+                
+                if (!IsTestingResultReceived && _process.ExitCode != 0)
+                    SetNewTestingResult(TestingResult.RuntimeErrorResult, false);
+                
+                /*
+                 * Checkers for TestingResult.MiddleSuccessResult
+                 */
+
+                if (!IsTestingResultReceived)
+                    SetNewTestingResult(TestingResult.MiddleSuccessResult);
+                
+            }
             
         }
 
