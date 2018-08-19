@@ -46,7 +46,7 @@ namespace SProgramRunner
         /// Process runtime resources usage statistics.
         /// </summary>
         /// <seealso cref="ProcessResourcesUsageStatsStruct"/>
-        public ProcessResourcesUsageStatsStruct ProcessResourcesUsageStats { get; set; }
+        public ProcessResourcesUsageStatsStruct ProcessResourcesUsageStats;
 
         /// <summary>
         /// Output data of specified process as bytes array
