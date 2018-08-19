@@ -189,7 +189,7 @@ namespace SProgramRunner
 
         }
         
-        private void TestingExceptionCatched(Exception ex, char testingResult, bool killProcess = true)
+        private void SetNewTestingResult(char testingResult, bool killProcess = true, Exception ex = null)
         {
 
             // Check if we need to kill associated process before we continue
@@ -208,8 +208,9 @@ namespace SProgramRunner
             }
             
             // Write exception information to program error data param (testing result section).
-            _programRunningResult.ProgramErrorData = ex.ToString();
-                
+            if (ex != null)
+                _programRunningResult.ProgramErrorData = ex.ToString();
+            
             // Now we have a new program running result - Input error result.
             _programRunningResult.Result = testingResult;
             
