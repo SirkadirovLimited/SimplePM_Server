@@ -31,6 +31,7 @@
  */
 
 using System;
+using System.Threading;
 
 namespace SProgramRunner
 {
@@ -51,11 +52,8 @@ namespace SProgramRunner
             catch (Exception ex)
             {
 
-                // Inform about internal error in checking subsystem
-                _programRunningResult.Result = TestingResult.ServerErrorResult;
-
-                // Return full exception text to program's error output
-                _programRunningResult.ProgramErrorData = ex.ToString();
+                // Inform user about catched exception
+                TestingExceptionCatched(ex, TestingResult.ServerErrorResult);
 
             }
             
@@ -65,13 +63,15 @@ namespace SProgramRunner
 
         private void RunTesting()
         {
-
+            
             //========================================================================================================//
-            // WRITE PROGRAM INPUT DATA TO A FILE                                                                     //
+            // WRITE PROGRAM INPUT DATA TO A FILE, THEN DO SOME STUFF                                                 //
             //========================================================================================================//
             
+            // Write program's input data to an input file
             WriteInputData_File();
 
+            // Check for some errors occured during writing process
             if (IsTestingResultReceived)
                 return;
             
@@ -87,21 +87,21 @@ namespace SProgramRunner
             WriteInputData_StandardInputStream();
             
             // Start limits checker task
-            //new Task(ExecuteLimitsChecker).Start();
+            new Thread(ExecuteLimitsChecker).Start();
 
             //========================================================================================================//
             // WAIT FOR CHILD PROCESS TO END (OR KILl IT MANUALlY)                                                    //
             //========================================================================================================//
             
             // Check for process real working time limit
-            var checkIsWaitChldLimitRequired = (
+            var checkIsWaitChldLimitOccured = (
                 _testingRequestStuct.LimitsInfo.Enable && // is this feature enabled
                 _testingRequestStuct.LimitsInfo.ProcessRealWorkingTimeLimit != -1 && // is limit required
                 !_process.WaitForExit(_testingRequestStuct.LimitsInfo.ProcessRealWorkingTimeLimit) // is limit reached
             );
 
             // Kill process if timeout reached
-            if (checkIsWaitChldLimitRequired)
+            if (checkIsWaitChldLimitOccured)
             {
 
                 try
