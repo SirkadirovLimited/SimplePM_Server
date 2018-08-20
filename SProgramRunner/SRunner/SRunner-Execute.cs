@@ -42,6 +42,36 @@ namespace SProgramRunner
         public ProgramRunningResult Execute()
         {
 
+            // Init new ProgramRunningResult object with default values
+            _programRunningResult = new ProgramRunningResult
+            {
+                
+                // Reset process resources usage statistics
+                ProcessResourcesUsageStats = new ProcessResourcesUsageStatsStruct
+                {
+                
+                    UsedProcessorTime = 0,
+                    PeakUsedWorkingSet = 0,
+                    WorkingDirectoryDiskUsage = 0,
+                    RealRunTime = new TimeSpan(0, 0, 0, 0)
+                
+                },
+                
+                /*
+                 * Set output data of all types to null (reset).
+                 */
+                
+                ProgramOutputData = null,
+                ProgramErrorData = null,
+                
+                // Default exit code - '-1'
+                ProgramExitCode = -1,
+                
+                // Indicates that testing is in progress or corrupted
+                Result = TestingResult.NoTestingResult
+                
+            };
+            
             try
             {
 
@@ -57,6 +87,19 @@ namespace SProgramRunner
 
             }
 
+
+            /*
+             * Close and dispose all associated with
+             * SRunner resources.
+             */
+            
+            // Return formed program testing (running) result
+            return _programRunningResult;
+            
+            //========================================================================================================//
+            // INLINE METHOD, THAT DEFINES AND EXECUTES ADDITIONAL FINAL TESTING CHECKERS                             //
+            //========================================================================================================//
+            
             void ExecuteAdditonalCheckers()
             {
 
@@ -93,9 +136,8 @@ namespace SProgramRunner
                     SetNewTestingResult(TestingResult.MiddleSuccessResult);
                 
             }
-
-            // Return formed program testing (running) result
-            return _programRunningResult;
+            
+            //========================================================================================================//
 
         }
 
@@ -165,7 +207,7 @@ namespace SProgramRunner
             //========================================================================================================//
             
         }
-        
+
     }
     
 }
