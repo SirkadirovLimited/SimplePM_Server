@@ -25,6 +25,7 @@
     <ProjectReference Include="..\ReleaseTestInfo\ReleaseTestInfo.csproj" />
     <ProjectReference Include="..\ServerExceptions\ServerExceptions.csproj" />
     <ProjectReference Include="..\ServerPlugin\ServerPlugin.csproj" />
+    <ProjectReference Include="..\SProgramRunner\SProgramRunner.csproj" />
     <ProjectReference Include="..\SubmissionInfo\SubmissionInfo.csproj" />
   </ItemGroup>
   <ItemGroup>
