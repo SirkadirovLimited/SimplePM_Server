@@ -198,11 +198,13 @@ namespace SProgramRunner
             /// - Runs after all standard limiting actions
             /// - Useful when starts a <code>Thread</code> or a <code>Task</code>.
             /// - You need to think about cross-platform compatibility!
+            /// - Reserved for future use
             /// </remarks>
             /// <seealso cref="Enable"/>
             /// <seealso cref="System.Threading"/>
             /// <seealso cref="System.Threading.Tasks"/>
             /// <param name="proc">Reference to a running process</param>
+            /// TODO
             public delegate void CutomLimitingAction(ref Process proc);
 
         }
