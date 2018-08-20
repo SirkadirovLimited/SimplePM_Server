@@ -40,7 +40,7 @@ using MySql.Data.MySqlClient;
 using ProgramTestingAdditions;
 using SimplePM_Server.Workers;
 using SimplePM_Server.Workers.Recourse;
-using SimplePM_Server.ProgramTesting.SRunner;
+using SProgramRunner;
 
 namespace SimplePM_Server.ProgramTesting.STester
 {
@@ -56,71 +56,133 @@ namespace SimplePM_Server.ProgramTesting.STester
             ref SubmissionInfo.SubmissionInfo submissionInfo
         ) : base(ref conn, exeFilePath, ref submissionInfo) {  }
 
-        public override ProgramTestingResult RunTesting()
+        public override SolutionTestingResult RunTesting()
         {
 
             logger.Trace("#" + submissionInfo.SubmissionId + ": DebugTesting.RunTesting() [started]");
+            
+            // Получаем лимиты для пользовательского решения
+            GetDebugProgramLimits(
+                out var memoryLimit, // переменная, хранящая значение лимита по памяти
+                out var timeLimit // переменная, хранящая значение лимита по процессорному времени
+            );
+
+            var processLimitsInfo = new TestingRequestStuct.ProcessLimitsInfo
+            {
+
+                Enable = true,
+
+                ProcessorTimeLimit = timeLimit,
+                ProcessWorkingSetLimit = memoryLimit,
+                ProcessRealWorkingTimeLimit = timeLimit * 5
+
+            };
+            
+            //========================================================================================================//
             
             // Получаем путь к авторскому решению поставленной задачи
             var authorSolutionExePath = GetAuthorSolutionExePath(
                 out var authorLanguageConfiguration,
                 out var authorCompilerPlugin
             );
-
-            // Получаем лимиты для пользовательского решения
-            GetDebugProgramLimits(
-                out var memoryLimit, // переменная, хранящая значение лимита по памяти
-                out var timeLimit // переменная, хранящая значение лимита по процессорному времени
-            );
             
-            // Запуск авторского решения поставленной задачи
-            SingleTestResult authorTestingResult = new ProgramExecutor(
-                authorLanguageConfiguration,
-                authorCompilerPlugin,
-                authorSolutionExePath,
-                "--author-solution",
-                memoryLimit,
-                timeLimit,
-                submissionInfo.CustomTest,
-                0,
-                submissionInfo.ProblemInformation.AdaptProgramOutput
-            ).RunTesting();
-
+            // Run author solution
+            var authorTestingResult = new SRunner(
+                
+                new TestingRequestStuct
+                {
+                    
+                    RuntimeInfo = authorCompilerPlugin.SetRunningMethod(
+                        ref authorLanguageConfiguration,
+                        authorSolutionExePath,
+                        "--author-solution"
+                    ),
+                    
+                    RunAsInfo = defaultRunAsInfo,
+                    
+                    LimitsInfo = processLimitsInfo,
+                    
+                    IOConfig = new TestingRequestStuct.ProcessIOConfig
+                    {
+                        
+                        ProgramInput = submissionInfo.CustomTest,
+                        
+                        WriteInputToFile = true,
+                        InputFileName = "input",
+                        
+                        PreferReadFromOutputFile = true,
+                        OutputFileName = "output",
+                        
+                        OutputCharsLimit = -1,
+                        
+                        AdaptOutput = submissionInfo.ProblemInformation.AdaptProgramOutput
+                        
+                    }
+                    
+                }
+                
+            ).Execute();
+            
             // Осуществляем проверки на наличие ошибок
-            if (authorTestingResult.Result != SingleTestResult.PossibleResult.MiddleSuccessResult)
+            if (!authorTestingResult.IsMiddleSuccessful)
                 throw new AuthorSolutionException("AUTHOR_SOLUTION_RUNTIME_EXCEPTION");
+            
+            //========================================================================================================//
             
             // Определяем конфигурацию компиляционного плагина
             var userLanguageConfiguration = SCompiler.GetCompilerConfig(
                 submissionInfo.UserSolution.ProgrammingLanguage
             );
-            
-            // Получаем экземпляр компиляционного плагина
-            var userCompilerPlugin = SCompiler.FindCompilerPlugin(
-                (string)(userLanguageConfiguration.module_name)
-            );
 
-            // Запуск пользовательского решения поставленной задачи
-            SingleTestResult userTestingResult = new ProgramExecutor(
-                userLanguageConfiguration,
-                userCompilerPlugin,
-                exeFilePath,
-                "--user-solution",
-                memoryLimit,
-                timeLimit,
-                submissionInfo.CustomTest,
-                Encoding.UTF8.GetString(authorTestingResult.Output).Length * 2,
-                submissionInfo.ProblemInformation.AdaptProgramOutput
-            ).RunTesting();
+            // Run user's solution
+            var userTestingResult = new SRunner(
+                
+                new TestingRequestStuct
+                {
+                    
+                    RuntimeInfo = SCompiler.FindCompilerPlugin(
+                        (string)(userLanguageConfiguration.module_name)
+                    ).SetRunningMethod(
+                        ref userLanguageConfiguration,
+                        exeFilePath,
+                        "--user-solution"
+                    ),
+                    
+                    RunAsInfo = defaultRunAsInfo,
+                    
+                    LimitsInfo = processLimitsInfo,
+                    
+                    IOConfig = new TestingRequestStuct.ProcessIOConfig
+                    {
+                        
+                        ProgramInput = submissionInfo.CustomTest,
+                        
+                        WriteInputToFile = true,
+                        InputFileName = "input",
+                        
+                        PreferReadFromOutputFile = true,
+                        OutputFileName = "output",
+                        
+                        OutputCharsLimit = Encoding.UTF8.GetString(authorTestingResult.ProgramOutputData).Length * 2,
+                        
+                        AdaptOutput = submissionInfo.ProblemInformation.AdaptProgramOutput
+                        
+                    }
+                    
+                }
+                
+            ).Execute();
+            
+            //========================================================================================================//
             
             // Выносим финальный вердикт по тесту
-            MakeFinalTestResult(ref userTestingResult, authorTestingResult.Output);
+            MakeFinalTestResult(ref userTestingResult, authorTestingResult.ProgramOutputData);
 
             // Удаляем директорию с авторским решением
             SWaiter.ClearCache(authorSolutionExePath);
             
             // Формируем результат тестирования пользовательского решения
-            var programTestingResult = new ProgramTestingResult(1)
+            var programTestingResult = new SolutionTestingResult(1)
             {
 
                 TestingResults =
