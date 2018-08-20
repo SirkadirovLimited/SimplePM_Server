@@ -62,7 +62,7 @@ namespace SProgramRunner
             {
                 
                 // Call method, that specifies new testing result, writes exception and kills associated process.
-                SetNewTestingResult(ex, TestingResult.InputErrorResult);
+                SetNewTestingResult(TestingResult.InputErrorResult, true, ex);
                 
             }
             
@@ -95,7 +95,7 @@ namespace SProgramRunner
             {
 
                 // Call method, that specifies new testing result and writes exception.
-                SetNewTestingResult(ex, TestingResult.InputErrorResult, false);
+                SetNewTestingResult(TestingResult.InputErrorResult, false, ex);
 
             }
 
