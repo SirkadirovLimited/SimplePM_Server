@@ -93,7 +93,10 @@ namespace SProgramRunner
                     SetNewTestingResult(TestingResult.MiddleSuccessResult);
                 
             }
-            
+
+            // Return formed program testing (running) result
+            return _programRunningResult;
+
         }
 
         private void RunTesting()
