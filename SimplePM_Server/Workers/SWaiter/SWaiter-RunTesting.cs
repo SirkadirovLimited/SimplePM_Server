@@ -42,7 +42,7 @@ namespace SimplePM_Server.Workers
     public partial class SWaiter
     {
         
-        private ProgramTestingResult RunTesting(
+        private SolutionTestingResult RunTesting(
             CompilationResult cResult
         )
         {
@@ -65,7 +65,7 @@ namespace SimplePM_Server.Workers
                 _submissionInfo.TestType = "syntax";
 
             // Временная перемення для хранения результатов тестирования
-            ProgramTestingResult tmpResult = null;
+            SolutionTestingResult tmpResult = null;
 
             try
             {
@@ -122,7 +122,7 @@ namespace SimplePM_Server.Workers
                  * возникшем исключении.
                  */
 
-                tmpResult = new ProgramTestingResult(1)
+                tmpResult = new SolutionTestingResult(1)
                 {
 
                     // Создаём псевдотест

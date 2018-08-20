@@ -29,24 +29,25 @@
  * 
  * Visit website for more details: https://spm.sirkadirov.com/
  */
- 
+
 using System;
 using System.Linq;
+using SProgramRunner;
 
 namespace ProgramTestingAdditions
 {
-
+    
     /// <summary>
     /// Класс, содержащий свойства и методы, необходимые для обработки
     /// результатов тестирования пользовательской программы.
     /// </summary>
-    public class ProgramTestingResult
+    public class SolutionTestingResult
     {
 
         /// <summary>
         /// Массив результатов тестирования
         /// </summary>
-        public SingleTestResult[] TestingResults { get; set; }
+        public ProgramRunningResult[] TestingResults { get; set; }
 
         /// <summary>
         /// Количество тестов
@@ -66,7 +67,7 @@ namespace ProgramTestingAdditions
              * и возвращаем полученное значение.
              */
 
-            return TestingResults.Sum(test => Convert.ToInt32(test.IsSuccessful));
+            return TestingResults.Sum(test => Convert.ToInt32(test.IsFullySuccessful));
 
         }
 
@@ -75,11 +76,11 @@ namespace ProgramTestingAdditions
         /// Инициализирует массив результатов <c>SingleTestResult</c>
         /// </summary>
         /// <param name="testsCount">Количество тестов</param>
-        public ProgramTestingResult(int testsCount)
+        public SolutionTestingResult(int testsCount)
         {
 
             // Инициализируем массив результатов тестирования
-            TestingResults = new SingleTestResult[testsCount];
+            TestingResults = new ProgramRunningResult[testsCount];
 
         }
 
@@ -137,22 +138,22 @@ namespace ProgramTestingAdditions
                         
                         // Использованная память
                         case TestingResultInfo.UsedMemory:
-                            aggTmpString = test.UsedMemory.ToString();
+                            aggTmpString = test.ProcessResourcesUsageStats.PeakUsedWorkingSet.ToString();
                             break;
                         
                         // Использованное процессорное время
                         case TestingResultInfo.UsedProcessorTime:
-                            aggTmpString = test.UsedProcessorTime.ToString();
+                            aggTmpString = test.ProcessResourcesUsageStats.UsedProcessorTime.ToString();
                             break;
                         
                         // Данные с потока stderr
                         case TestingResultInfo.ErrorOutput:
-                            aggTmpString = test.ErrorOutput;
+                            aggTmpString = test.ProgramErrorData;
                             break;
                         
                         // Выходной код программы на тесте
                         case TestingResultInfo.ExitCodes:
-                            aggTmpString = test.ExitCode.ToString();
+                            aggTmpString = test.ProgramExitCode.ToString();
                             break;
                         
                         // Обработка исключительной ситуации
@@ -184,7 +185,7 @@ namespace ProgramTestingAdditions
         /// <summary>
         /// Метод осуществляет проверку на успешность прохождения пользовательской программой тестирования.
         /// </summary>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">Что-то не так с данными результата тестирования</exception>
         /// <returns>Возвращает значение, которое сигнализирует об успешности прохождения всех тестов.</returns>
         public bool IsSuccessful()
         {
@@ -192,11 +193,11 @@ namespace ProgramTestingAdditions
             // Обрабатываем данные и возвращаем результат
             return TestingResults.Aggregate(
                 true,
-                (current, test) => current && test.IsSuccessful
+                (current, test) => current && test.IsFullySuccessful
             );
 
         }
 
     }
-
+    
 }

@@ -40,7 +40,7 @@ namespace SimplePM_Server.Workers
     public partial class SWaiter
     {
         
-        private float GetSolutionRating(ref ProgramTestingResult programTestingResult)
+        private float GetSolutionRating(ref SolutionTestingResult programTestingResult)
         {
             
             /*
@@ -59,7 +59,7 @@ namespace SimplePM_Server.Workers
                         _submissionInfo.SolutionRatingType
                     ).GenerateJudgeResult(
                                ref programTestingResult
-                               ).RatingMult * _submissionInfo.ProblemInformation.Difficulty;
+                    ).RatingMult * _submissionInfo.ProblemInformation.Difficulty;
 
                 }
                 catch (Exception ex)
