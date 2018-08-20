@@ -38,7 +38,7 @@ using System.Runtime.InteropServices;
 namespace SProgramRunner
 {
     
-    public partial class SRunner
+    public partial class SRunner : IDisposable
     {
 
         private readonly TestingRequestStuct _testingRequestStuct;
@@ -214,6 +214,14 @@ namespace SProgramRunner
             // Now we have a new program running result - Input error result.
             _programRunningResult.Result = testingResult;
             
+        }
+        
+        public void Dispose()
+        {
+
+            _process.Close();
+            _process.Dispose();
+
         }
         
     }
