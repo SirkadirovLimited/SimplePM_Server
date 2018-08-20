@@ -30,9 +30,12 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
+using System.Net;
 using System.Linq;
+using SProgramRunner;
 using MySql.Data.MySqlClient;
 using ProgramTestingAdditions;
+using SimplePM_Server.Workers;
 
 namespace SimplePM_Server.ProgramTesting.STester
 {
@@ -44,6 +47,8 @@ namespace SimplePM_Server.ProgramTesting.STester
         internal string exeFilePath { get; }
         internal SubmissionInfo.SubmissionInfo submissionInfo { get; }
 
+        internal TestingRequestStuct.ProcessRunAsInfo defaultRunAsInfo;
+
         protected TestingType(
             ref MySqlConnection conn,
             string exeFilePath,
@@ -54,6 +59,19 @@ namespace SimplePM_Server.ProgramTesting.STester
             this.conn = conn;
             this.exeFilePath = exeFilePath;
             this.submissionInfo = submissionInfo;
+            
+            defaultRunAsInfo = new TestingRequestStuct.ProcessRunAsInfo
+            {
+
+                Enable = (string) (SWorker._securityConfiguration.runas.enabled) == "true",
+
+                UserName = (string) (SWorker._securityConfiguration.runas.username),
+                UserPassword = new NetworkCredential(
+                    "",
+                    (string) (SWorker._securityConfiguration.runas.password)
+                ).SecurePassword
+
+            };
 
         }
 
