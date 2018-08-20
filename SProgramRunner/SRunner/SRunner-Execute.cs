@@ -87,12 +87,9 @@ namespace SProgramRunner
 
             }
 
+            // Execute additonal checkers
+            ExecuteAdditonalCheckers();
 
-            /*
-             * Close and dispose all associated with
-             * SRunner resources.
-             */
-            
             // Return formed program testing (running) result
             return _programRunningResult;
             
