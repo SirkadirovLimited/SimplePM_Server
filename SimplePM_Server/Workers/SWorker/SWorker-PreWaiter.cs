@@ -50,12 +50,6 @@ namespace SimplePM_Server.Workers
             try
             {
 
-                logger.Trace(
-                    "Starting submission query; Running threads: " +
-                    _aliveTestersCount + " from " +
-                    (ulong) (_serverConfiguration.submission.max_threads)
-                );
-                
                 // Выполняем запрос к БД и получаем ответ
                 var dataReader = new MySqlCommand(
                     Resources.submission_query.Replace(
@@ -65,24 +59,8 @@ namespace SimplePM_Server.Workers
                     conn
                 ).ExecuteReader();
 
-                // Объявляем временную переменную, так называемый "флаг"
-                bool f;
-
-                // Проверка на наличие свободных мест и на ошибки
-                lock (new object())
-                {
-
-                    f = _aliveTestersCount >= (sbyte) (_serverConfiguration.submission.max_threads) |
-                        !dataReader.Read();
-
-                }
-
-                /*
-                 * Проверка на пустоту полученного результата
-                 * или на переполнение очереди проверки.
-                 */
-
-                if (f)
+                // Проверка на пустоту полученного результата
+                if (!dataReader.Read())
                 {
 
                     // Закрываем чтение пустой временной таблицы
@@ -100,14 +78,6 @@ namespace SimplePM_Server.Workers
 
                     // Создаём и запускаем секундомер
                     var sw = Stopwatch.StartNew();
-
-                    lock (new object())
-                    {
-
-                        // Увеличиваем количество "живых" тестировщиков на единицу
-                        _aliveTestersCount++;
-
-                    }
 
                     // Получаем подробную информацию о пользовательском запросе на тестировании
                     var submissionInfo = new SubmissionInfo.SubmissionInfo
@@ -197,14 +167,6 @@ namespace SimplePM_Server.Workers
 
                     // Запускаем метод обработки пользовательского решения
                     new SWaiter(conn, submissionInfo).ServeSubmission();
-
-                    lock (new object())
-                    {
-
-                        // Уменьшаем количество "живых" тестировщиков на единицу
-                        _aliveTestersCount--;
-
-                    }
 
                     // Останавливаем секундомер
                     sw.Stop();

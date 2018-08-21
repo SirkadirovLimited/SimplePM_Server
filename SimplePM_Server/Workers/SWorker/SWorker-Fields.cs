@@ -51,8 +51,7 @@ namespace SimplePM_Server.Workers
         public static dynamic _compilerConfigurations { get; private set; }
         
         public static Guid _serverId { get; private set; }
-
-        public static sbyte _aliveTestersCount { get; private set; }
+        
         private readonly string _enabledLanguagesString;
 
         public static List<IServerPlugin> _serverPlugins { get; private set; }
