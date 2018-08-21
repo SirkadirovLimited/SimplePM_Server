@@ -31,6 +31,7 @@
  */
 
 using System;
+using System.Text;
 using System.Threading;
 
 namespace SProgramRunner
@@ -61,7 +62,7 @@ namespace SProgramRunner
                  * Set output data of all types to null (reset).
                  */
                 
-                ProgramOutputData = null,
+                ProgramOutputData = Encoding.UTF8.GetBytes(""),
                 ProgramErrorData = null,
                 
                 // Default exit code - '-1'
@@ -86,7 +87,7 @@ namespace SProgramRunner
                 SetNewTestingResult(TestingResult.ServerErrorResult, true, ex);
 
             }
-
+            
             // Execute additonal checkers
             ExecuteAdditonalCheckers();
 
@@ -100,6 +101,17 @@ namespace SProgramRunner
             void ExecuteAdditonalCheckers()
             {
 
+                /*
+                 * Get some information about past from process
+                 * object, so we can give more information to user.
+                 */
+                
+                // Get process exit code
+                _programRunningResult.ProgramExitCode = _process.ExitCode;
+
+                // Get process real running time as TimeSpan
+                _programRunningResult.ProcessResourcesUsageStats.RealRunTime = _process.ExitTime - _process.StartTime;
+                
                 /*
                  * Checkers for TestingResult.ErrorOutputNotNullResult
                  */
