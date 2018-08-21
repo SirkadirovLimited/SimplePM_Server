@@ -34,7 +34,7 @@ using System;
 using System.Text;
 using CompilerPlugin;
 using MySql.Data.MySqlClient;
-using ProgramTestingAdditions;
+using SProgramRunner;
 
 namespace SimplePM_Server.Workers
 {
@@ -91,7 +91,7 @@ namespace SimplePM_Server.Workers
 
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_output",
-                ptResult.TestingResults[ptResult.TestingResults.Length - 1].Output
+                ptResult.TestingResults[ptResult.TestingResults.Length - 1].ProgramOutputData
             ); // Вывод решения
 
             updateSqlCommand.Parameters.AddWithValue(
