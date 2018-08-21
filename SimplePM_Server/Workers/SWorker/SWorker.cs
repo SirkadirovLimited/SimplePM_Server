@@ -65,9 +65,6 @@ namespace SimplePM_Server.Workers
             
             // Записываем список всех поддерживаемых сервером плагинов-судей в базу данных
             SProgrammingLanguagesLoader.SendSupportedJudgesToServer();
-            
-            // Сейчас решения не тестируются
-            _aliveTestersCount = 0;
 
         }
 

@@ -166,10 +166,6 @@ namespace SimplePM_Server.Workers
         
         private void RunAutoConfig()
         {
-            
-            // Определение количества перепроверок без таймаута
-            if (_serverConfiguration.submission.rechecks_without_timeout == "auto")
-                _serverConfiguration.submission.rechecks_without_timeout = Environment.ProcessorCount.ToString();
 
             // Максимальное количество одновлеменных проверок
             if (_serverConfiguration.submission.max_threads == "auto")
