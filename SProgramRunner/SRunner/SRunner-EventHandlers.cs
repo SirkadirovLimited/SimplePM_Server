@@ -30,7 +30,6 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using System;
 using System.IO;
 using System.Text;
 using System.Diagnostics;
@@ -91,13 +90,13 @@ namespace SProgramRunner
 
         }
         
-        private void ProcessOnExited(object sender, EventArgs e)
+        private void ProcessOnExited()
         {
 
             //========================================================================================================//
             
             // If program output data is not null, adapt output
-            if (!string.IsNullOrEmpty(Encoding.UTF8.GetString(_programRunningResult.ProgramOutputData)))
+            if (!string.IsNullOrWhiteSpace(Encoding.UTF8.GetString(_programRunningResult.ProgramOutputData)))
             {
 
                 // Adapt output if only this required by IO configuration section of testing request.
@@ -150,7 +149,7 @@ namespace SProgramRunner
                     _programRunningResult.ProgramOutputData = File.ReadAllBytes(programOutputFilePath);
 
                 }
-                catch (Exception ex)
+                catch
                 {
                     /* Additional operations not required */
                 }

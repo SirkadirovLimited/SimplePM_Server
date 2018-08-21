@@ -214,7 +214,10 @@ namespace SProgramRunner
                 _process.WaitForExit();
 
             //========================================================================================================//
-            
+
+            // Call method that does some work to finalize testing on process exit
+            ProcessOnExited();
+
         }
 
     }
