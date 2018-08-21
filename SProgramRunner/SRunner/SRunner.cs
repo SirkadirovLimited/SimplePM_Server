@@ -88,7 +88,7 @@ namespace SProgramRunner
                      * This required for compatibility.
                      */
                     
-                    StandardInputEncoding = Encoding.UTF8,
+                    //StandardInputEncoding = Encoding.UTF8,
                     StandardOutputEncoding = Encoding.UTF8,
                     StandardErrorEncoding = Encoding.UTF8,
                     
