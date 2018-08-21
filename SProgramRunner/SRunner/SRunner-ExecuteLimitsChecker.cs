@@ -77,7 +77,7 @@ namespace SProgramRunner
                     }
                     catch { /* No catching blocks required */ }
                     
-                    Thread.Sleep(50);
+                    Thread.Sleep(100);
                     
                 }
                 
@@ -125,7 +125,7 @@ namespace SProgramRunner
                     if (wslimreached_checker)
                         SetNewTestingResult(TestingResult.MemoryLimitResult);
                     
-                    Thread.Sleep(50);
+                    Thread.Sleep(100);
                     
                 }
                 
