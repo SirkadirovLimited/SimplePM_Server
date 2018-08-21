@@ -80,7 +80,7 @@ namespace SimplePM_Server.ProgramTesting.STester
         {
             
             // Действуем лишь в случае необходимости вынесения дополнительных итогов
-            if (singleTestResult.Result == TestingResult.MiddleSuccessResult)
+            if (singleTestResult.IsMiddleSuccessful)
             {
 
                 // TODO: Implement checkers [SERVER-28]
