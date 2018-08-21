@@ -32,11 +32,10 @@
 
 using NLog;
 using System.Text;
+using SProgramRunner;
 using MySql.Data.MySqlClient;
-using ProgramTestingAdditions;
 using System.Collections.Generic;
 using SimplePM_Server.Workers.Recourse;
-using SimplePM_Server.ProgramTesting.SRunner;
 
 namespace SimplePM_Server.ProgramTesting.STester
 {
@@ -52,7 +51,7 @@ namespace SimplePM_Server.ProgramTesting.STester
             ref SubmissionInfo.SubmissionInfo submissionInfo
         ) : base(ref conn, exeFilePath, ref submissionInfo) {  }
 
-        public override ProgramTestingResult RunTesting()
+        public override SolutionTestingResult RunTesting()
         {
 
             logger.Trace("#" + submissionInfo.SubmissionId + ": ReleaseTesting.RunTesting() [started]");
@@ -64,16 +63,11 @@ namespace SimplePM_Server.ProgramTesting.STester
             var testsCount = ReleaseTestsInfo.Count;
 
             // Создаём объект, где будем хранить результаты тестирования
-            var programTestingResult = new ProgramTestingResult(testsCount);
+            var programTestingResult = new SolutionTestingResult(testsCount);
             
             // Определяем конфигурацию компиляционного плагина
             var languageConfiguration = SCompiler.GetCompilerConfig(
                 submissionInfo.UserSolution.ProgrammingLanguage
-            );
-            
-            // Получаем экземпляр компиляционного плагина
-            var compilerPlugin = SCompiler.FindCompilerPlugin(
-                (string)(languageConfiguration.module_name)
             );
             
             // Производим тестирования пользовательского решения поставленной задачи по всем тестам
@@ -83,18 +77,53 @@ namespace SimplePM_Server.ProgramTesting.STester
                 // Получаем информацию о текущем тесте
                 var currentTest = ReleaseTestsInfo.Dequeue();
 
-                // Запускаем тестирование пользовательской программы на данном тесте
-                SingleTestResult currentTestResult = new ProgramExecutor(
-                    languageConfiguration,
-                    compilerPlugin,
-                    exeFilePath,
-                    "--user-solution",
-                    currentTest.MemoryLimit,
-                    currentTest.ProcessorTimeLimit,
-                    currentTest.InputData,
-                    Encoding.UTF8.GetString(currentTest.OutputData).Length * 2,
-                    submissionInfo.ProblemInformation.AdaptProgramOutput
-                ).RunTesting();
+                // Run user's solution on current test
+                var currentTestResult = new SRunner(
+                
+                    new TestingRequestStuct
+                    {
+                    
+                        RuntimeInfo = SCompiler.FindCompilerPlugin(
+                            (string)(languageConfiguration.module_name)
+                        ).SetRunningMethod(
+                            ref languageConfiguration,
+                            exeFilePath,
+                            "--user-solution"
+                        ),
+                    
+                        RunAsInfo = defaultRunAsInfo,
+                    
+                        LimitsInfo = new TestingRequestStuct.ProcessLimitsInfo
+                        {
+
+                            Enable = true,
+
+                            ProcessorTimeLimit = currentTest.ProcessorTimeLimit,
+                            ProcessWorkingSetLimit = currentTest.MemoryLimit,
+                            ProcessRealWorkingTimeLimit = currentTest.ProcessorTimeLimit * 5
+
+                        },
+                    
+                        IOConfig = new TestingRequestStuct.ProcessIOConfig
+                        {
+                        
+                            ProgramInput = currentTest.InputData,
+                        
+                            WriteInputToFile = true,
+                            InputFileName = "input",
+                        
+                            PreferReadFromOutputFile = true,
+                            OutputFileName = "output",
+                        
+                            OutputCharsLimit = Encoding.UTF8.GetString(currentTest.OutputData).Length * 2,
+                        
+                            AdaptOutput = submissionInfo.ProblemInformation.AdaptProgramOutput
+                        
+                        }
+                    
+                    }
+                
+                ).Execute();
 
                 // Выносим финальный вердикт по тесту
                 MakeFinalTestResult(ref currentTestResult, currentTest.OutputData);

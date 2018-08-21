@@ -31,7 +31,7 @@
  */
 
 using Plugin;
-using System.Diagnostics;
+using SProgramRunner;
 
 namespace CompilerPlugin
 {
@@ -43,7 +43,7 @@ namespace CompilerPlugin
         CompilationResult RunCompiler(ref dynamic languageConfiguration, string submissionId, string fileLocation);
         
         // Метод устанавливает необходимые параметры для запуска программ
-        bool SetRunningMethod(ref dynamic languageConfiguration, ref ProcessStartInfo startInfo, string filePath);
+        TestingRequestStuct.ProcessRuntimeInfo SetRunningMethod(ref dynamic languageConfiguration, string filePath, string arguments);
         
     }
     

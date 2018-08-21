@@ -30,11 +30,11 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using System;
+using System.Net;
 using System.Linq;
-using System.Text;
+using SProgramRunner;
 using MySql.Data.MySqlClient;
-using ProgramTestingAdditions;
+using SimplePM_Server.Workers;
 
 namespace SimplePM_Server.ProgramTesting.STester
 {
@@ -46,6 +46,8 @@ namespace SimplePM_Server.ProgramTesting.STester
         internal string exeFilePath { get; }
         internal SubmissionInfo.SubmissionInfo submissionInfo { get; }
 
+        internal TestingRequestStuct.ProcessRunAsInfo defaultRunAsInfo;
+
         protected TestingType(
             ref MySqlConnection conn,
             string exeFilePath,
@@ -56,25 +58,38 @@ namespace SimplePM_Server.ProgramTesting.STester
             this.conn = conn;
             this.exeFilePath = exeFilePath;
             this.submissionInfo = submissionInfo;
+            
+            defaultRunAsInfo = new TestingRequestStuct.ProcessRunAsInfo
+            {
+
+                Enable = (string) (SWorker._securityConfiguration.runas.enabled) == "true",
+
+                UserName = (string) (SWorker._securityConfiguration.runas.username),
+                UserPassword = new NetworkCredential(
+                    "",
+                    (string) (SWorker._securityConfiguration.runas.password)
+                ).SecurePassword
+
+            };
 
         }
 
-        public abstract ProgramTestingResult RunTesting();
+        public abstract SolutionTestingResult RunTesting();
 
-        internal void MakeFinalTestResult(ref SingleTestResult singleTestResult, byte[] rightOutputData)
+        internal void MakeFinalTestResult(ref ProgramRunningResult singleTestResult, byte[] rightOutputData)
         {
             
             // Действуем лишь в случае необходимости вынесения дополнительных итогов
-            if (singleTestResult.Result == SingleTestResult.PossibleResult.MiddleSuccessResult)
+            if (singleTestResult.Result == TestingResult.MiddleSuccessResult)
             {
 
                 // TODO: Implement checkers [SERVER-28]
                 
                 // Сравнение выходных потоков и вынесение  результата по данному тесту
                 singleTestResult.Result = 
-                    singleTestResult.Output.SequenceEqual(rightOutputData)
-                        ? SingleTestResult.PossibleResult.FullSuccessResult
-                        : SingleTestResult.PossibleResult.FullNoSuccessResult;
+                    singleTestResult.ProgramOutputData.SequenceEqual(rightOutputData)
+                        ? TestingResult.FullSuccessResult
+                        : TestingResult.FullFailResult;
                 
             }
             

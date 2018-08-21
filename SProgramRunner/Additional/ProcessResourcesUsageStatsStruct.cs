@@ -30,53 +30,38 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using System.Diagnostics;
-using ProgramTestingAdditions;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace SimplePM_Server.ProgramTesting.SRunner
+using System;
+
+namespace SProgramRunner
 {
     
-    public partial class ProgramExecutor
+    /// <summary>
+    /// Stores resources usage statistics of specified process.
+    /// </summary>
+    public struct ProcessResourcesUsageStatsStruct
     {
 
-        /*
-         * Обработка поступающих выходных данных приложения
-         */
-        
-        private void ProgramProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
+        /// <summary>
+        /// Indicates total processor time, used by specified process.
+        /// </summary>
+        public int UsedProcessorTime { get; set; }
 
-            // Различные проверки безопасности
-            if (e.Data == null)
-                return;
-            
-            // Проверка на превышение лимитов вывода данных
-            if (_outputCharsLimit > 0 && _programOutput.Length + e.Data.Length > _outputCharsLimit)
-            {
+        /// <summary>
+        /// Indicates peak working set, used by specified process.
+        /// </summary>
+        public long PeakUsedWorkingSet { get; set; }
 
-                // Указываем, что результаты проверки уже есть
-                _testingResultReceived = true;
+        /// <summary>
+        /// Indicates size of working directory of specified process.
+        /// </summary>
+        public long WorkingDirectoryDiskUsage { get; set; }
 
-                // Указываем результат тестирования
-                _testingResult = SingleTestResult.PossibleResult.OutputErrorResult;
-
-                // Добавляем сообщение пояснения
-                _programOutput = "=== OUTPUT CHARS LIMIT REACHED ===";
-
-                // Завершаем выполнение метода
-                return;
-
-            }
-
-            // Производим дозапись выходных данных
-            var adaptedString = (_adaptOutput)
-                ? e.Data.TrimEnd(new[] { ' ' })
-                : e.Data;
-
-            // Записываем символ окончания строки
-            _programOutput += adaptedString + '\n';
-
-        }
+        /// <summary>
+        /// Indicates real run time of specified process.
+        /// </summary>
+        public TimeSpan RealRunTime { get; set; }
 
     }
     

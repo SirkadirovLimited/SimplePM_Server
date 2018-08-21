@@ -33,8 +33,8 @@
 using System;
 using System.Text;
 using CompilerPlugin;
-using ProgramTestingAdditions;
 using SimplePM_Server.ProgramTesting.STester;
+using SProgramRunner;
 
 namespace SimplePM_Server.Workers
 {
@@ -42,7 +42,7 @@ namespace SimplePM_Server.Workers
     public partial class SWaiter
     {
         
-        private ProgramTestingResult RunTesting(
+        private SolutionTestingResult RunTesting(
             CompilationResult cResult
         )
         {
@@ -65,7 +65,7 @@ namespace SimplePM_Server.Workers
                 _submissionInfo.TestType = "syntax";
 
             // Временная перемення для хранения результатов тестирования
-            ProgramTestingResult tmpResult = null;
+            SolutionTestingResult tmpResult = null;
 
             try
             {
@@ -122,36 +122,36 @@ namespace SimplePM_Server.Workers
                  * возникшем исключении.
                  */
 
-                tmpResult = new ProgramTestingResult(1)
+                tmpResult = new SolutionTestingResult(1)
                 {
 
                     // Создаём псевдотест
                     TestingResults =
                     {
 
-                        [0] = new SingleTestResult
+                        [0] = new ProgramRunningResult
                         {
                             
                             // За код выхода принимаем номер исклбчения
-                            ExitCode = ex.HResult,
+                            ProgramExitCode = ex.HResult,
 
                             // За выходной поток ошибок принимаем исключение
-                            ErrorOutput = ex.ToString(),
+                            ProgramErrorData = ex.ToString(),
 
                             // Заполняем выходные данные информацией (not null)
-                            Output = Encoding.UTF8.GetBytes("An exception occured during testing!"),
+                            ProgramOutputData = Encoding.UTF8.GetBytes("An exception occured during testing!"),
 
                             // Устанавливаем результат тестирования
-                            Result = SingleTestResult.PossibleResult.ErrorOutputNotNullResult,
+                            Result = TestingResult.ServerErrorResult,
 
-                            /*
-                             * Указываем, что память и процессорное
-                             * время не были использованы.
-                             */
-
-                            UsedMemory = 0,
-                            UsedProcessorTime = 0
-
+                            // Указываем, что никаких ресурсов не было использовано
+                            ProcessResourcesUsageStats = new ProcessResourcesUsageStatsStruct
+                            {
+                                UsedProcessorTime = 0,
+                                PeakUsedWorkingSet = 0,
+                                WorkingDirectoryDiskUsage = 0
+                            }
+                            
                         }
 
                     }

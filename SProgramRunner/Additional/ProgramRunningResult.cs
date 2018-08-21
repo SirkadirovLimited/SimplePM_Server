@@ -30,31 +30,68 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using Plugin;
-using SProgramRunner;
-
-namespace JudgePlugin
+namespace SProgramRunner
 {
     
-    // ReSharper disable once UnusedMember.Global
-    public class Judge : IJudgePlugin
+    /// <summary>
+    /// Definjes all information about running result
+    /// of specified in <code>TestingRequestStruct</code>
+    /// struct process.
+    /// </summary>
+    /// <seealso cref="TestingRequestStuct"/>
+    public class ProgramRunningResult
     {
+
+        /// <summary>
+        /// Process runtime resources usage statistics.
+        /// </summary>
+        /// <seealso cref="ProcessResourcesUsageStatsStruct"/>
+        public ProcessResourcesUsageStatsStruct ProcessResourcesUsageStats;
+
+        /// <summary>
+        /// Output data of specified process as bytes array
+        /// </summary>
+        public byte[] ProgramOutputData { get; set; }
+
+        /// <summary>
+        /// Data from process standard error output (<code>STDERR</code>).
+        /// </summary>
+        public string ProgramErrorData { get; set; }
+
+        /// <summary>
+        /// Exit code of the specified process.
+        /// </summary>
+        public int ProgramExitCode { get; set; }
+
+        /// <summary>
+        /// Result on current run.
+        /// </summary>
+        /// <see cref="TestingResult"/>
+        public char Result { get; set; }
         
-        public PluginInfo PluginInformation => new PluginInfo(
-            "none",
-            "Yurij Kadirov (Sirkadirov)",
-            "https://spm.sirkadirov.com/"
+        /// <summary>
+        /// Check if current run is middle successful.
+        /// </summary>
+        /// <remarks>
+        /// Analog of manual check for <code>Result</code> equals to <code>TestingResult.MiddleSuccessResult</code>.
+        /// </remarks>
+        /// <see cref="TestingResult"/>
+        /// <seealso cref="TestingResult.MiddleSuccessResult"/>
+        public bool IsMiddleSuccessful => (
+            Result == TestingResult.MiddleSuccessResult
         );
-
-        public JudgingResult GenerateJudgeResult(ref SolutionTestingResult programTestingResult)
-        {
-
-            return new JudgingResult
-            {
-                RatingMult = 0
-            };
-
-        }
+        
+        /// <summary>
+        /// Check if current run is fully succesful.
+        /// </summary>
+        /// <remarks>
+        /// Analog of manual check for <code>Result</code> equals to <code>TestingResult.FullSuccessResult</code>.
+        /// </remarks>
+        /// <see cref="TestingResult"/>
+        /// <seealso cref="TestingResult.FullSuccessResult"/>
+        public bool IsFullySuccessful => (
+            Result == TestingResult.FullSuccessResult
+        );
 
     }
     

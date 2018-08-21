@@ -32,7 +32,7 @@
 
 using System;
 using Plugin;
-using ProgramTestingAdditions;
+using SProgramRunner;
 
 namespace JudgePlugin
 {
@@ -47,7 +47,7 @@ namespace JudgePlugin
             "https://spm.sirkadirov.com/"
         );
 
-        public JudgingResult GenerateJudgeResult(ref ProgramTestingResult programTestingResult)
+        public JudgingResult GenerateJudgeResult(ref SolutionTestingResult programTestingResult)
         {
 
             return new JudgingResult

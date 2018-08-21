@@ -33,7 +33,7 @@
 using System;
 using Plugin;
 using System.IO;
-using System.Diagnostics;
+using SProgramRunner;
 
 namespace CompilerPlugin
 {
@@ -96,29 +96,17 @@ namespace CompilerPlugin
 
         }
         
-        public bool SetRunningMethod(ref dynamic languageConfiguration, ref ProcessStartInfo startInfo, string filePath)
+        public TestingRequestStuct.ProcessRuntimeInfo SetRunningMethod(ref dynamic languageConfiguration, string filePath, string arguments)
         {
             
-            try
+            return new TestingRequestStuct.ProcessRuntimeInfo
             {
                 
-                // Устанавливаем имя запускаемой программы
-                startInfo.FileName = (string)(languageConfiguration.runtime_path);
+                FileName = (string)(languageConfiguration.runtime_path),
+                Arguments = "-d64 -cp . \"" + Path.GetFileNameWithoutExtension(new FileInfo(filePath).Name) + '"' + (!string.IsNullOrWhiteSpace(arguments) ? " " + arguments : ""),
+                WorkingDirectory = new FileInfo(filePath).DirectoryName
                 
-                // Аргументы запуска данной программы
-                startInfo.Arguments = "-d64 -cp . \"" + Path.GetFileNameWithoutExtension(new FileInfo(filePath).Name) + '"';
-
-            }
-            catch
-            {
-
-                // Сигнализируем о наличии ошибок в процессе операции
-                return false;
-
-            }
-            
-            // Сигнализируем об успешном выполнении операции
-            return true;
+            };
 
         }
         

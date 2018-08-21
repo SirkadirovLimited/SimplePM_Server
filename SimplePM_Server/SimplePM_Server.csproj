@@ -21,10 +21,10 @@
     <ProjectReference Include="..\CompilerPlugin\CompilerPlugin.csproj" />
     <ProjectReference Include="..\JudgePlugin\JudgePlugin.csproj" />
     <ProjectReference Include="..\Plugin\Plugin.csproj" />
-    <ProjectReference Include="..\ProgramTestingAdditions\ProgramTestingAdditions.csproj" />
     <ProjectReference Include="..\ReleaseTestInfo\ReleaseTestInfo.csproj" />
     <ProjectReference Include="..\ServerExceptions\ServerExceptions.csproj" />
     <ProjectReference Include="..\ServerPlugin\ServerPlugin.csproj" />
+    <ProjectReference Include="..\SProgramRunner\SProgramRunner.csproj" />
     <ProjectReference Include="..\SubmissionInfo\SubmissionInfo.csproj" />
   </ItemGroup>
   <ItemGroup>

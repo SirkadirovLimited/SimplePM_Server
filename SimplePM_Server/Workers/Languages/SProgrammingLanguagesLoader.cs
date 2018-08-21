@@ -203,7 +203,7 @@ namespace SimplePM_Server.Workers
                     var insertCmd = new MySqlCommand(Resources.send_supported_judges_query, conn);
                     
                     // Добавляем параметры запроса с экранированием
-                    insertCmd.Parameters.AddWithValue("@name", (string)(judgePlugin.PluginInformation.Name));
+                    insertCmd.Parameters.AddWithValue("@name", judgePlugin.PluginInformation.Name);
                     insertCmd.Parameters.AddWithValue("@owner_server_id", SWorker._serverId.ToString());
 
                     // Выполняем запрос

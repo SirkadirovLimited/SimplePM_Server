@@ -2,8 +2,8 @@
 
   "submission": {
     "check_timeout": 500,
-    "rechecks_without_timeout": "auto",
-    "max_threads": "auto"
+    "rechecks_without_timeout": "2",
+    "max_threads": "2"
   },
 
   "path": {

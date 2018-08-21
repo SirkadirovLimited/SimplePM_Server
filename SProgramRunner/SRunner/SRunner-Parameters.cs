@@ -1,4 +1,4 @@
-﻿/*
+/*
  * ███████╗██╗███╗   ███╗██████╗ ██╗     ███████╗██████╗ ███╗   ███╗
  * ██╔════╝██║████╗ ████║██╔══██╗██║     ██╔════╝██╔══██╗████╗ ████║
  * ███████╗██║██╔████╔██║██████╔╝██║     █████╗  ██████╔╝██╔████╔██║
@@ -30,32 +30,19 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
-using Plugin;
-using SProgramRunner;
-
-namespace JudgePlugin
+namespace SProgramRunner
 {
     
-    // ReSharper disable once UnusedMember.Global
-    public class Judge : IJudgePlugin
+    public partial class SRunner
     {
-        
-        public PluginInfo PluginInformation => new PluginInfo(
-            "none",
-            "Yurij Kadirov (Sirkadirov)",
-            "https://spm.sirkadirov.com/"
+
+        /// <summary>
+        /// Get is testing result received or not.
+        /// </summary>
+        private bool IsTestingResultReceived => (
+            _programRunningResult.Result != TestingResult.NoTestingResult
         );
-
-        public JudgingResult GenerateJudgeResult(ref SolutionTestingResult programTestingResult)
-        {
-
-            return new JudgingResult
-            {
-                RatingMult = 0
-            };
-
-        }
-
+        
     }
     
 }

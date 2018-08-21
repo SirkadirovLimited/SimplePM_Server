@@ -4,6 +4,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <Configurations>Release;Debug</Configurations>
     <Platforms>x64</Platforms>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <OutputPath>../Build/</OutputPath>
@@ -11,14 +12,8 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <OutputPath>../Build/</OutputPath>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <DebugType>none</DebugType>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Plugin\Plugin.csproj" />
-    <ProjectReference Include="..\SProgramRunner\SProgramRunner.csproj" />
-  </ItemGroup>
 </Project>

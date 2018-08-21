@@ -31,7 +31,8 @@
  */
 
 using Plugin;
-using System.Diagnostics;
+using System.IO;
+using SProgramRunner;
 
 namespace CompilerPlugin
 {
@@ -71,19 +72,17 @@ namespace CompilerPlugin
 
         }
         
-        public bool SetRunningMethod(ref dynamic languageConfiguration, ref ProcessStartInfo startInfo, string filePath)
+        public TestingRequestStuct.ProcessRuntimeInfo SetRunningMethod(ref dynamic languageConfiguration, string filePath, string arguments)
         {
 
-            /*
-             * Устанавливаем имя исполняемого файла
-             * и аргументы запуска программы.
-             */
-            
-            startInfo.FileName = filePath;
-            startInfo.Arguments = "";
-
-            // Сигнализируем об успешности выполнения операции
-            return true;
+            return new TestingRequestStuct.ProcessRuntimeInfo
+            {
+                
+                FileName = filePath,
+                Arguments = (!string.IsNullOrWhiteSpace(arguments) ? " " + arguments : ""),
+                WorkingDirectory = new FileInfo(filePath).DirectoryName
+                
+            };
 
         }
         

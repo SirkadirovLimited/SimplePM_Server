@@ -1,4 +1,4 @@
-﻿/*
+/*
  * ███████╗██╗███╗   ███╗██████╗ ██╗     ███████╗██████╗ ███╗   ███╗
  * ██╔════╝██║████╗ ████║██╔══██╗██║     ██╔════╝██╔══██╗████╗ ████║
  * ███████╗██║██╔████╔██║██████╔╝██║     █████╗  ██████╔╝██╔████╔██║
@@ -30,60 +30,74 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
+using System;
 using System.IO;
-using System.Diagnostics;
+using System.Text;
 
-namespace SimplePM_Server.ProgramTesting.SRunner
+namespace SProgramRunner
 {
     
-    public partial class ProgramExecutor
+    public partial class SRunner
     {
 
-        private void Init()
+        private void WriteInputData_StandardInputStream()
         {
 
-            logger.Trace("ProgramExecutor for <" + _programPath + ">: Init() [started]");
-            
-            /*
-             * Инициализация необходимых для тестирования переменных
-             */
-            
-            _programProcess = new Process
+            try
             {
 
-                StartInfo = programStartInfo, // устанавливаем информацию о программе
-                EnableRaisingEvents = true // указываем, что хотим обрабатывать события
+                // Write input data to program's STDIN
+                _process.StandardInput.Write(
+                    Encoding.UTF8.GetString(_testingRequestStuct.IOConfig.ProgramInput)
+                );
 
-            };
+                // Clear all buffers and write pending data to stream
+                _process.StandardInput.Flush();
+                
+                // Close program's standard input stream
+                _process.StandardInput.Close();
 
-            // Устанавливаем рабочую директорию для пользовательской программы
-            _programProcess.StartInfo.WorkingDirectory =
-                new FileInfo(_programPath).DirectoryName ?? throw new DirectoryNotFoundException();
-
-            /*
-             * Управление методом запуска пользовательского процесса
-             */
-
-            // Устанавливаем служебную информацию о типе запуска
-            ProgramExecutorAdditions.SetExecInfoByFileExt(
-                ref _compilerConfiguration,
-                ref _compilerPlugin,
-                ref programStartInfo,
-                _programPath,
-                _programArguments
-            );
-
-            // Устанавливаем информацию для запуска от имени иного пользователя
-            ProgramExecutorAdditions.SetProcessRunAs(ref _programProcess);
+            }
+            catch (Exception ex)
+            {
+                
+                // Call method, that specifies new testing result, writes exception and kills associated process.
+                SetNewTestingResult(TestingResult.InputErrorResult, true, ex);
+                
+            }
             
-            /*
-             * Добавляем обработчики для некоторых событий
-             */
-            
-            // Добавляем обработчик события записи данных в выходной поток
-            _programProcess.OutputDataReceived += ProgramProcess_OutputDataReceived;
-            
-            logger.Trace("ProgramExecutor for <" + _programPath + ">: Init() [finished]");
+        }
+
+        private void WriteInputData_File()
+        {
+
+            // Write input data to specified file only when this feature enabled.
+            if (!_testingRequestStuct.IOConfig.WriteInputToFile)
+                return;
+
+            try
+            {
+
+                // Form full path to a new file, that will be input data file.
+                var inputDataFilePath = Path.Combine(
+                    _testingRequestStuct.RuntimeInfo.WorkingDirectory,
+                    _testingRequestStuct.IOConfig.InputFileName
+                );
+
+                // Create file at specified path
+                File.Create(inputDataFilePath).Close();
+                
+                // Write program input data to newly created file
+                File.WriteAllBytes(inputDataFilePath, _testingRequestStuct.IOConfig.ProgramInput);
+
+            }
+            catch (Exception ex)
+            {
+
+                // Call method, that specifies new testing result and writes exception.
+                SetNewTestingResult(TestingResult.InputErrorResult, false, ex);
+
+            }
 
         }
         

@@ -33,7 +33,7 @@
 using NLog;
 using System.Text;
 using MySql.Data.MySqlClient;
-using ProgramTestingAdditions;
+using SProgramRunner;
 
 namespace SimplePM_Server.ProgramTesting.STester
 {
@@ -49,37 +49,45 @@ namespace SimplePM_Server.ProgramTesting.STester
             ref SubmissionInfo.SubmissionInfo submissionInfo
         ) : base(ref conn, exeFilePath, ref submissionInfo) {  }
 
-        public override ProgramTestingResult RunTesting()
+        public override SolutionTestingResult RunTesting()
         {
             
             logger.Trace("#" + submissionInfo.SubmissionId + ": SyntaxTesting.RunTesting() [started|finished]");
             
-            return new ProgramTestingResult(1)
+            return new SolutionTestingResult(1)
             {
 
                 TestingResults =
                 {
 
-                    [0] = new SingleTestResult
+                    [0] = new ProgramRunningResult
                     {
 
                         // Выходные данные заполняем кракозябрами
-                        Output = Encoding.UTF8.GetBytes("NULL"),
+                        ProgramOutputData = Encoding.UTF8.GetBytes("NULL"),
 
                         // Выходные данные исключений устанавливаем в null
-                        ErrorOutput = null,
+                        ProgramErrorData = null,
 
                         // Код выхода - стандартный
-                        ExitCode = 0,
+                        ProgramExitCode = 0,
 
                         // Результатом будет промежуточный успешный
-                        Result = SingleTestResult.PossibleResult.MiddleSuccessResult,
+                        Result = TestingResult.MiddleSuccessResult,
 
-                        // Использованная память
-                        UsedMemory = 0,
-
-                        // Использованное процессорное время
-                        UsedProcessorTime = 0
+                        ProcessResourcesUsageStats = new ProcessResourcesUsageStatsStruct
+                        {
+                            
+                            // Использованная память
+                            PeakUsedWorkingSet = 0,
+                            
+                            // Использованное процессорное время
+                            UsedProcessorTime = 0,
+                            
+                            // Использованное место на дискеы
+                            WorkingDirectoryDiskUsage = 0 //TODO: Count solution working directory disk usage
+                            
+                        }
 
                     }
 

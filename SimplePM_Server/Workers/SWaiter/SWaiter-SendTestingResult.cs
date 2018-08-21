@@ -34,7 +34,7 @@ using System;
 using System.Text;
 using CompilerPlugin;
 using MySql.Data.MySqlClient;
-using ProgramTestingAdditions;
+using SProgramRunner;
 
 namespace SimplePM_Server.Workers
 {
@@ -42,7 +42,7 @@ namespace SimplePM_Server.Workers
     public partial class SWaiter
     {
         
-        private void SendTestingResult(ref ProgramTestingResult ptResult, CompilationResult cResult)
+        private void SendTestingResult(ref SolutionTestingResult ptResult, CompilationResult cResult)
         {
 
             logger.Trace(
@@ -85,23 +85,23 @@ namespace SimplePM_Server.Workers
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_errorOutput",
                 Encoding.UTF8.GetBytes(
-                    ptResult.GetTestingResultInfoString(ProgramTestingResult.TestingResultInfo.ErrorOutput, '\n')
+                    ptResult.GetTestingResultInfoString(SolutionTestingResult.TestingResultInfo.ErrorOutput, '\n')
                 )
             ); // Вывод ошибок решения
 
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_output",
-                ptResult.TestingResults[ptResult.TestingResults.Length - 1].Output
+                ptResult.TestingResults[ptResult.TestingResults.Length - 1].ProgramOutputData
             ); // Вывод решения
 
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_exitcodes",
-                ptResult.GetTestingResultInfoString(ProgramTestingResult.TestingResultInfo.ExitCodes)
+                ptResult.GetTestingResultInfoString(SolutionTestingResult.TestingResultInfo.ExitCodes)
             ); // Коды выхода решения
             
             updateSqlCommand.Parameters.AddWithValue(
                 "@param_result",
-                ptResult.GetTestingResultInfoString(ProgramTestingResult.TestingResultInfo.TestsResults)
+                ptResult.GetTestingResultInfoString(SolutionTestingResult.TestingResultInfo.TestsResults)
             ); // Потестовые результаты решения
             
             updateSqlCommand.Parameters.AddWithValue(
