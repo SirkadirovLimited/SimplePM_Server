@@ -32,9 +32,8 @@
 
 using System;
 using System.Linq;
-using SProgramRunner;
 
-namespace ProgramTestingAdditions
+namespace SProgramRunner
 {
     
     /// <summary>

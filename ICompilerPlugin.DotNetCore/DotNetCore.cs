@@ -32,7 +32,6 @@
 
 using Plugin;
 using System.IO;
-using System.Diagnostics;
 using SProgramRunner;
 
 namespace CompilerPlugin

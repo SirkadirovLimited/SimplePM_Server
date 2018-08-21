@@ -33,7 +33,6 @@
 using NLog;
 using System.Text;
 using MySql.Data.MySqlClient;
-using ProgramTestingAdditions;
 using SProgramRunner;
 
 namespace SimplePM_Server.ProgramTesting.STester

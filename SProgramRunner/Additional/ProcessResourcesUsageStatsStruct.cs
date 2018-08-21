@@ -30,6 +30,8 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
 using System;
 
 namespace SProgramRunner
