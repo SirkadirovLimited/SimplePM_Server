@@ -117,9 +117,6 @@ namespace SProgramRunner
             // On output line received from a running program
             _process.OutputDataReceived += ProcessOnOutputDataReceived;
             
-            // On process terminated event handler
-            _process.Exited += ProcessOnExited;
-            
             // Set RunAs feature information with lovely inline void :)
             SetRunAsInformation();
 
