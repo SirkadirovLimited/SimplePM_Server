@@ -77,6 +77,8 @@ namespace SProgramRunner
                     }
                     catch { /* No catching blocks required */ }
                     
+                    Thread.Sleep(50);
+                    
                 }
                 
                 // Abort limits checker thread, because we don't neeed it anymore
@@ -122,6 +124,8 @@ namespace SProgramRunner
 
                     if (wslimreached_checker)
                         SetNewTestingResult(TestingResult.MemoryLimitResult);
+                    
+                    Thread.Sleep(50);
                     
                 }
                 
