@@ -42,106 +42,42 @@ namespace SimplePM_Server.Workers
         public void RunServer()
         {
             
-            /*
-             * Объявляем переменную,  которая хранит количество
-             * произведенных проверок на наличие необработанных
-             * запросов  на  тестирование,   после  которых  не
-             * производилась задержка.
-             */
-
-            uint rechecksCount = 0;
-            
-            /*
-             * В бесконечном цикле опрашиваем базу данных
-             * на наличие новых не обработанных  запросов
-             * на тестирование решений задач.
-             */
-
-            while (true)
+            // Start as many threads, as specified by user
+            for (sbyte i = 0; i < (sbyte) (_serverConfiguration.submission.max_threads); i++)
             {
-                
-                // Выполняем единственный шаг цикла
-                ServerLoopStep();
-                
-                /*
-                 * Проверяем, необходимо ли установить
-                 * таймаут для ослабления  нагрузки на
-                 * процессор, или нет.
-                 */
 
-                var tmpCheck = rechecksCount >= uint.Parse(
-                    (string)(_serverConfiguration.submission.rechecks_without_timeout)
-                );
-
-                if (_aliveTestersCount < (sbyte)(_serverConfiguration.submission.max_threads) && tmpCheck)
+                // Run new starter thread, that starts 1/max_threads waiter threads
+                new Thread(() =>
                 {
 
-                    // Ожидание для уменьшения нагрузки на сервер
-                    Thread.Sleep((int)(_serverConfiguration.submission.check_timeout));
-
-                    // Обнуляем итератор
-                    rechecksCount = 0;
-
-                }
-                else
-                    rechecksCount++;
-
-            }
-            
-            // ReSharper disable once FunctionNeverReturns
-
-        }
-
-        // ReSharper disable once MemberCanBePrivate.Global
-        public void ServerLoopStep()
-        {
-            
-            // Продолжаем лишь тогда, когда имеется свободные места
-            if (_aliveTestersCount >= (sbyte) (_serverConfiguration.submission.max_threads)) return;
-            
-            /*
-             * Действия  необходимо   выполнять  в  блоке
-             * обработки    непредвиденных    исключений,
-             * так   как   при   выполнении   операций  с
-             * удалённой  базой  данных  могут  возникать
-             * непредвиденные ошибки,   которые не должны
-             * повлиять   на    общую    стабильность   и
-             * работоспособность сервер проверки решений.
-             */
-                
-            try
-            {
+                    // ReSharper disable once TooWideLocalVariableScope
+                    // Declare new thread variable
+                    Thread waiterThread;
                     
-                /*
-                 * Инициализируем   новое   уникальное
-                 * соединение с базой данных для того,
-                 * чтобы не мешать остальным потокам.
-                 */
-                    
-                var conn = GetNewMysqlConnection();
-                    
-                /*
-                 * В случае успешного подключения к базе данных
-                 * SimplePM  Server,  вызываем  метод,  который
-                 * занимается поиском  и  дальнейшей обработкой
-                 * пользовательских запросов на тестирование.
-                 */
-                
-                if (conn != null)
-                    new Thread(RunPreWaiter).Start(conn);
-            }
-                
-            /*
-             * В случае  обнаружения  каких-либо
-             * ошибок, записываем их в лог-файл.
-             */
-                
-            catch (Exception ex)
-            {
-                    
-                // Записываем все исключения как ошибки в лог
-                logger.Error(ex);
-                    
+                    // Execute code infinitely
+                    while (true)
+                    {
+                        
+                        // Create new waiter thread
+                        waiterThread = new Thread(RunPreWaiter);
+                        
+                        // Start newly created thread
+                        waiterThread.Start(GetNewMysqlConnection());
+                        
+                        // Wait for started thread to end
+                        waiterThread.Join();
+                        
+                        // This thread must sleep for check_timeout ms to minimize CPU usage
+                        Thread.Sleep((int)(_serverConfiguration.submission.check_timeout));
+                        
+                        // Call garbage collector
+                        GC.Collect(1, GCCollectionMode.Optimized);
+                        GC.Collect(2, GCCollectionMode.Optimized);
+                        
+                    }
+
+                }).Start();
+
             }
 
         }
