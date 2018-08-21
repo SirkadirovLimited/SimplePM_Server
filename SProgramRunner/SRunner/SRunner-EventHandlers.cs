@@ -97,7 +97,7 @@ namespace SProgramRunner
             //========================================================================================================//
             
             // If program output data is not null, adapt output
-            if (_programRunningResult.ProgramOutputData != null)
+            if (!string.IsNullOrEmpty(Encoding.UTF8.GetString(_programRunningResult.ProgramOutputData)))
             {
 
                 // Adapt output if only this required by IO configuration section of testing request.
@@ -142,7 +142,7 @@ namespace SProgramRunner
                 // Check if formed file with output data exists
                 if (!File.Exists(programOutputFilePath))
                     return;
-                
+
                 try
                 {
 
@@ -150,7 +150,10 @@ namespace SProgramRunner
                     _programRunningResult.ProgramOutputData = File.ReadAllBytes(programOutputFilePath);
 
                 }
-                catch { /* Additional operations not required */ }
+                catch (Exception ex)
+                {
+                    /* Additional operations not required */
+                }
 
             }
             
