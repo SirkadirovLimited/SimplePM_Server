@@ -31,7 +31,7 @@
  */
 
 using Plugin;
-using ProgramTestingAdditions;
+using SProgramRunner;
 
 namespace JudgePlugin
 {
@@ -45,7 +45,7 @@ namespace JudgePlugin
          * данного решения поставленной задачи.
          */
 
-        JudgingResult GenerateJudgeResult(ref ProgramTestingResult programTestingResult);
+        JudgingResult GenerateJudgeResult(ref SolutionTestingResult programTestingResult);
         
     }
     

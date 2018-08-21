@@ -19,6 +19,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Plugin\Plugin.csproj" />
-    <ProjectReference Include="..\ProgramTestingAdditions\ProgramTestingAdditions.csproj" />
+    <ProjectReference Include="..\SProgramRunner\SProgramRunner.csproj" />
   </ItemGroup>
 </Project>
