@@ -168,12 +168,15 @@ namespace SProgramRunner
 
             // Start program process
             _process.Start();
-            
-            // Begin asynchronous read of program's output
-            _process.BeginOutputReadLine();
 
             // Write program input data to STDIN
             WriteInputData_StandardInputStream();
+            
+            // Initialize advanced output stream reader
+            _outputStreamReader = new AdvancedStreamReader(_process.StandardOutput.BaseStream);
+            
+            // Start output stream reader
+            _outputStreamReader.Run();
             
             // Start limits checker task
             new Thread(ExecuteLimitsChecker).Start();
