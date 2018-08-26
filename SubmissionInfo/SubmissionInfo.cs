@@ -110,11 +110,6 @@ namespace SubmissionInfo
         public uint Difficulty { get; set; }
         
         /// <summary>
-        /// Указывает на то, следует ли очищать дополнительные символы в конце строк.
-        /// </summary>
-        public bool AdaptProgramOutput { get; set; }
-        
-        /// <summary>
         /// Хранит информацию об авторском
         /// решении поставленной задачи.
         /// </summary>

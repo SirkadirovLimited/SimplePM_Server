@@ -115,9 +115,7 @@ namespace SimplePM_Server.ProgramTesting.STester
                             PreferReadFromOutputFile = true,
                             OutputFileName = "output",
                         
-                            OutputCharsLimit = Encoding.UTF8.GetString(currentTest.OutputData).Length * 2,
-                        
-                            AdaptOutput = submissionInfo.ProblemInformation.AdaptProgramOutput
+                            OutputCharsLimit = Encoding.UTF8.GetString(currentTest.OutputData).Length * 2
                         
                         }
                     

@@ -161,8 +161,6 @@ namespace SimplePM_Server {
         ///            `spm_problems`.`authorSolution`, 
         ///            `spm_problems`.`authorSolutionLanguage`, 
         ///        
-        ///            `spm_problems`.`adaptProgramOutput`, 
-        ///        
         ///            `spm_submissions`.`submissionId`, 
         ///        
         ///            `spm_submissions`.`olympId`, 
@@ -170,7 +168,9 @@ namespace SimplePM_Server {
         ///            `spm_submissions`.`time`, 
         ///        
         ///            `spm_submissions`.`userId`, 
-        ///            `spm_submissions`.`prob [rest of string was truncated]&quot;;.
+        ///            `spm_submissions`.`problemId`, 
+        ///        
+        ///            `spm_submissions`.`testType`, [rest of string was truncated]&quot;;.
         /// </summary>
         public static string submission_query {
             get {
