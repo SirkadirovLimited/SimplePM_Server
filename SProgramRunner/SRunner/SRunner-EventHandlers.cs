@@ -60,19 +60,13 @@ namespace SProgramRunner
 
                 // Canceloutput reading process and get output data
                 _programRunningResult.ProgramOutputData = _outputStreamReader.KillAndGet();
+
+            }
+            else
+            {
                 
-                // Adapt output if only this required by IO configuration section of testing request.
-                if (_testingRequestStuct.IOConfig.AdaptOutput)
-                {
-                    
-                    // Some convertations due to types incompatibility
-                    _programRunningResult.ProgramOutputData = Encoding.UTF8.GetBytes(
-                        Encoding.UTF8.GetString(
-                            _programRunningResult.ProgramOutputData
-                        ).TrimEnd()
-                    );
-                    
-                }
+                // Otherwise just cancel output data reading task
+                _outputStreamReader.KillAndGet();
                 
             }
 

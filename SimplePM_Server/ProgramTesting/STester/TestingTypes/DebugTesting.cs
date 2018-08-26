@@ -112,9 +112,7 @@ namespace SimplePM_Server.ProgramTesting.STester
                         PreferReadFromOutputFile = true,
                         OutputFileName = "output",
                         
-                        OutputCharsLimit = -1,
-                        
-                        AdaptOutput = submissionInfo.ProblemInformation.AdaptProgramOutput
+                        OutputCharsLimit = -1
                         
                     }
                     
@@ -162,9 +160,7 @@ namespace SimplePM_Server.ProgramTesting.STester
                         PreferReadFromOutputFile = true,
                         OutputFileName = "output",
                         
-                        OutputCharsLimit = Encoding.UTF8.GetString(authorTestingResult.ProgramOutputData).Length * 2,
-                        
-                        AdaptOutput = submissionInfo.ProblemInformation.AdaptProgramOutput
+                        OutputCharsLimit = Encoding.UTF8.GetString(authorTestingResult.ProgramOutputData).Length * 2
                         
                     }
                     

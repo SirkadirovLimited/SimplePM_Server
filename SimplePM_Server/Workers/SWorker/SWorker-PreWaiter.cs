@@ -123,9 +123,6 @@ namespace SimplePM_Server.Workers
                             // Сложность задачи
                             Difficulty = uint.Parse(dataReader["difficulty"].ToString()),
 
-                            // Указание на то, следует ли "адаптировать" выходные данные
-                            AdaptProgramOutput = bool.Parse(dataReader["adaptProgramOutput"].ToString()),
-
                             // Информация об авторском решении
                             AuthorSolution = new SolutionInfo
                             {

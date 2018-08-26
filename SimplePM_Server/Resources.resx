@@ -172,8 +172,6 @@
             `spm_problems`.`authorSolution`, 
             `spm_problems`.`authorSolutionLanguage`, 
         
-            `spm_problems`.`adaptProgramOutput`, 
-        
             `spm_submissions`.`submissionId`, 
         
             `spm_submissions`.`olympId`, 

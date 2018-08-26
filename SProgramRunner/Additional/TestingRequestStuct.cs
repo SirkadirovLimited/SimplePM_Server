@@ -266,13 +266,6 @@ namespace SProgramRunner
             /// <value>Set value <code>-1</code> to unlimited.</value>
             /// <seealso cref="OutputFileName"/>
             public int OutputCharsLimit { get; set; }
-            
-            /// <summary>
-            /// Set to <code>true</code> when you allow <code>SProgramRunner</code>
-            /// to delete ending whitespace characters from every line of program's output.
-            /// </summary>
-            /// <remarks>Works only with <code>stdout</code>.</remarks>
-            public bool AdaptOutput { get; set; }
 
         }
         
