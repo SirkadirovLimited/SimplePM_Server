@@ -40,65 +40,28 @@ namespace SProgramRunner
     public partial class SRunner
     {
 
-        private void ProcessOnOutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-
-            //========================================================================================================//
-            // PREPARE OUTPUT DATA BEFORE MAIN APPEND PROCESS                                                         //
-            //========================================================================================================//
-            
-            // Ignore if output data is null
-            if (e.Data == null)
-                return;
-
-            // Adapt program's output if requested
-            var dataLine = (_testingRequestStuct.IOConfig.AdaptOutput)
-                ? e.Data.TrimEnd()
-                : e.Data;
-
-            //========================================================================================================//
-            // OUTPUT DATA LIMIT REACHED CHECKER SECTION                                                              //
-            //========================================================================================================//
-            
-            // Define output data limit reached checker
-            var outputCharsLimitReached_checker = _testingRequestStuct.IOConfig.OutputCharsLimit > 0 &&
-                                                    (
-                                                        Encoding.UTF8.GetCharCount(
-                                                            _programRunningResult.ProgramOutputData
-                                                        ) + dataLine.Length >
-                                                            _testingRequestStuct.IOConfig.OutputCharsLimit
-                                                    );
-            
-            // Aggregate checking results
-            if (outputCharsLimitReached_checker)
-                SetNewTestingResult(TestingResult.OutputErrorResult);
-            
-            //========================================================================================================//
-            // APPEND NEW LINE TO PROGRAM'S OUTPUT PARAMETER                                                          //
-            //========================================================================================================//
-
-            // Some work with encodings due to types incompatibility
-            _programRunningResult.ProgramOutputData = Encoding.UTF8.GetBytes(
-                    new StringBuilder(
-                        Encoding.UTF8.GetString(
-                            _programRunningResult.ProgramOutputData
-                        )
-                    ).AppendLine(dataLine).ToString()
-            );
-
-            //========================================================================================================//
-
-        }
-        
         private void ProcessOnExited()
         {
 
-            //========================================================================================================//
+            // Is output data read from file or not checker
+            var isOutputReadFromFile = false;
             
-            // If program output data is not null, adapt output
-            if (!string.IsNullOrWhiteSpace(Encoding.UTF8.GetString(_programRunningResult.ProgramOutputData)))
+            // Try to read from file when this is preferred way to read output data
+            if (_testingRequestStuct.IOConfig.PreferReadFromOutputFile)
+            {
+                
+                // We need to read output from file
+                isOutputReadFromFile = ReadOutputDataFromFile();
+                
+            }
+
+            // Adapt STDOUT output only if we read from it, not from file
+            if (!isOutputReadFromFile)
             {
 
+                // Canceloutput reading process and get output data
+                _programRunningResult.ProgramOutputData = _outputStreamReader.KillAndGet();
+                
                 // Adapt output if only this required by IO configuration section of testing request.
                 if (_testingRequestStuct.IOConfig.AdaptOutput)
                 {
@@ -113,11 +76,20 @@ namespace SProgramRunner
                 }
                 
             }
-            else
+
+            // If output data limit enabled, check for it.
+            if (_testingRequestStuct.IOConfig.OutputCharsLimit > 0)
             {
-                
-                // Otherwise we need to read output from file
-                ReadOutputDataFromFile();
+
+                // If output characters limit reached
+                if (Encoding.UTF8.GetCharCount(_programRunningResult.ProgramOutputData) >
+                    _testingRequestStuct.IOConfig.OutputCharsLimit)
+                {
+                    
+                    // Output data limit reached, so we need to set new testing result
+                    SetNewTestingResult(TestingResult.OutputErrorResult, false);
+                    
+                }
                 
             }
             
@@ -125,12 +97,8 @@ namespace SProgramRunner
             // INLINE METHOD, THAT READS OUTPUT DATA FROM FILE (WHEN THIS ACTION IS REALLY NEEDED)                    //
             //========================================================================================================//
             
-            void ReadOutputDataFromFile()
+            bool ReadOutputDataFromFile()
             {
-
-                // Check if we need to read output data from specified outptu file
-                if (!_testingRequestStuct.IOConfig.PreferReadFromOutputFile)
-                    return;
 
                 // Form full path to file, that (maybe) contains output data
                 var programOutputFilePath = Path.Combine(
@@ -140,7 +108,7 @@ namespace SProgramRunner
 
                 // Check if formed file with output data exists
                 if (!File.Exists(programOutputFilePath))
-                    return;
+                    return false;
 
                 try
                 {
@@ -153,6 +121,9 @@ namespace SProgramRunner
                 {
                     /* Additional operations not required */
                 }
+
+                // Signal that we read from file, not from STDOUT
+                return true;
 
             }
             
