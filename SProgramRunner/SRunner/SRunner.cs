@@ -44,6 +44,7 @@ namespace SProgramRunner
         private readonly TestingRequestStuct _testingRequestStuct;
         private ProgramRunningResult _programRunningResult;
         private Process _process;
+        private AdvancedStreamReader _outputStreamReader;
         
         public SRunner(TestingRequestStuct testingRequestStuct)
         {
@@ -109,13 +110,6 @@ namespace SProgramRunner
                 EnableRaisingEvents = true
                 
             };
-            
-            /*
-             * Add some useful event handlers
-             */
-            
-            // On output line received from a running program
-            _process.OutputDataReceived += ProcessOnOutputDataReceived;
             
             // Set RunAs feature information with lovely inline void :)
             SetRunAsInformation();
