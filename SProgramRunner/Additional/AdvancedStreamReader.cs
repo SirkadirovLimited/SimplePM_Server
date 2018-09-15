@@ -30,6 +30,7 @@
  * Visit website for more details: https://spm.sirkadirov.com/
  */
 
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -68,36 +69,46 @@ namespace SProgramRunner
         /// </summary>
         public void Run()
         {
-            
+
             // Generate new cancellation token
             _cancellationToken = new CancellationTokenSource();
             
             // Run new output reading task
             new Task(async () =>
             {
-                
-                // Create and init new buffer to read output to
-                var buffer = new byte[BufferSize];
-                
-                while (true)
+
+                try
                 {
+
+                    // Create and init new buffer to read output to
+                    var buffer = new byte[BufferSize];
+                
+                    while (true)
+                    {
                     
-                    // Check for pending cancellation requests
-                    _cancellationToken.Token.ThrowIfCancellationRequested();
+                        // Check for pending cancellation requests
+                        if (_cancellationToken.IsCancellationRequested)
+                            return;
+                        
+                        // Get count of bytes
+                        var count = await _source.ReadAsync(buffer, 0, BufferSize, _cancellationToken.Token);
                     
-                    // Get count of bytes
-                    var count = await _source.ReadAsync(buffer, 0, BufferSize, _cancellationToken.Token);
+                        // Break cycle on stream end
+                        if (count <= 0)
+                            break;
                     
-                    // Break cycle on stream end
-                    if (count <= 0)
-                        break;
+                        // Write data from buffer to output stream
+                        await _outputMemoryStream.WriteAsync(buffer, 0, count, _cancellationToken.Token);
                     
-                    // Write data from buffer to output stream
-                    await _outputMemoryStream.WriteAsync(buffer, 0, count, _cancellationToken.Token);
+                        // Flush output stream data
+                        await _outputMemoryStream.FlushAsync(_cancellationToken.Token);
                     
-                    // Flush output stream data
-                    await _outputMemoryStream.FlushAsync(_cancellationToken.Token);
+                    }
                     
+                }
+                catch (Exception)
+                {
+                    /* We don't need to serve this exception. */
                 }
                 
             }, _cancellationToken.Token).Start();
@@ -112,8 +123,17 @@ namespace SProgramRunner
         public byte[] KillAndGet()
         {
             
-            // Try to cancel reading task
-            _cancellationToken.Cancel();
+            try
+            {
+
+                // Try to cancel reading task
+                _cancellationToken.Cancel();
+                
+            }
+            catch (Exception)
+            {
+                /* We don't need to serve this exception. */
+            }
             
             // Return output data
             return _outputMemoryStream.ToArray();
