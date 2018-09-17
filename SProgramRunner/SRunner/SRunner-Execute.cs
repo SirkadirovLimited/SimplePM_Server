@@ -196,20 +196,8 @@ namespace SProgramRunner
             if (checkIsWaitChldLimitOccured)
             {
 
-                try
-                {
-
-                    // Kill process
-                    _process.Kill();
-
-                }
-                catch
-                {
-                    /* Dead End */
-                }
-
-                // Set testing result as "wait error result".
-                _programRunningResult.Result = TestingResult.WaitErrorResult;
+                // Try kill the process and set testing result as "wait error result".
+                SetNewTestingResult(TestingResult.WaitErrorResult);
 
             }
             //...or wait unlimited time for process to end
