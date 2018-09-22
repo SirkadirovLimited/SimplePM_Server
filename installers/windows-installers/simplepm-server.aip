@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DOCUMENT Type="Advanced Installer" CreateVersion="15.2" version="15.2" Modules="professional" RootPath="." Language="en" Id="{1BE5AC7B-706D-4470-8FC3-D6FEE3F16723}">
+  <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
+    <ROW Name="HiddenItems" Value="AppXProductDetailsComponent;AppXDependenciesComponent;AppXAppDetailsComponent;AppXVisualAssetsComponent;AppXCapabilitiesComponent;AppXAppDeclarationsComponent;AppXUriRulesComponent;AnalyticsComponent;ActSyncAppComponent"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
+    <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
+    <ROW Property="AI_EXTERNALUIUNINSTALLERNAME" MultiBuildValue="DefaultBuild:aiui"/>
+    <ROW Property="AI_FINDEXE_TITLE" Value="Select the installation package for [|ProductName]" ValueLocId="AI.Property.FindExeTitle"/>
+    <ROW Property="AI_PATH_VALIDATION_OPT" Value="2"/>
+    <ROW Property="AI_PREDEF_LCONDS_PROPS" Value="AI_DETECTED_SCREEN_RESOLUTION_X;AI_DETECTED_SCREEN_RESOLUTION_Y;AI_DETECTED_PHYSICAL_MEMORY"/>
+    <ROW Property="AI_PRODUCTNAME_ARP" Value="SimplePM Server"/>
+    <ROW Property="AI_QUICKLAUNCH_SH" Type="4" MsiKey="AI_QUICKLAUNCH_SH"/>
+    <ROW Property="AI_REQUIRED_PHYSICAL_MEMORY" MultiBuildValue="DefaultBuild:1024" ValueLocId="-"/>
+    <ROW Property="AI_REQUIRED_SCREEN_RESOLUTION_X" MultiBuildValue="DefaultBuild:640" ValueLocId="-"/>
+    <ROW Property="AI_REQUIRED_SCREEN_RESOLUTION_Y" MultiBuildValue="DefaultBuild:480" ValueLocId="-"/>
+    <ROW Property="AI_SHORTCUTSREG" Value="0|0|0|0|"/>
+    <ROW Property="AI_STARTUP_SH" Type="4" MsiKey="AI_STARTUP_SH"/>
+    <ROW Property="AI_UNINSTALLER" Value="msiexec.exe"/>
+    <ROW Property="AI_UPGRADE" Value="No"/>
+    <ROW Property="ALLUSERS" Value="1"/>
+    <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
+    <ROW Property="ARPCONTACT" Value="Yuriy Kadirov"/>
+    <ROW Property="ARPHELPLINK" Value="https://spm.sirkadirov.com/"/>
+    <ROW Property="ARPHELPTELEPHONE" Value="+380 (98) 121-16-52"/>
+    <ROW Property="ARPNOREPAIR" Value="1" MultiBuildValue="DefaultBuild:1"/>
+    <ROW Property="ARPPRODUCTICON" Value="simplepmserver.exe" Type="8"/>
+    <ROW Property="ARPSYSTEMCOMPONENT" Value="1"/>
+    <ROW Property="ARPURLINFOABOUT" Value="https://spm.sirkadirov.com/"/>
+    <ROW Property="ARPURLUPDATEINFO" Value="https://spm.sirkadirov.com/"/>
+    <ROW Property="AiFeatIcocompiler_plugins" Value="simplepmserver.exe" Type="8"/>
+    <ROW Property="AiFeatIcojudge_plugins" Value="simplepmserver.exe" Type="8"/>
+    <ROW Property="AiFeatIcosimplepm_server" Value="simplepmserver.exe" Type="8"/>
+    <ROW Property="AiFeatIcostandard_server_plugins" Value="simplepmserver.exe" Type="8"/>
+    <ROW Property="Manufacturer" Value="Sirkadirov Team"/>
+    <ROW Property="MsiLogging" MultiBuildValue="DefaultBuild:vp"/>
+    <ROW Property="ProductCode" Value="1033:{03444246-1E99-4ED0-8A56-19B21B4AC83B} " Type="16"/>
+    <ROW Property="ProductLanguage" Value="1033"/>
+    <ROW Property="ProductName" Value="SimplePM Server"/>
+    <ROW Property="ProductVersion" Value="2.0.0" Type="32"/>
+    <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
+    <ROW Property="UpgradeCode" Value="{27B55BA9-C244-4F1A-AC0A-E29C3D1645AB}"/>
+    <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
+    <ROW Property="WindowsType9XDisplay" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT" MultiBuildValue="DefaultBuild:Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT40" MultiBuildValue="DefaultBuild:Windows NT 4.0" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT40Display" MultiBuildValue="DefaultBuild:Windows NT 4.0" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT50" MultiBuildValue="DefaultBuild:Windows 2000" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT50Display" MultiBuildValue="DefaultBuild:Windows 2000" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5X" MultiBuildValue="DefaultBuild:Windows XP/2003 RTM, Windows XP/2003 SP1, Windows XP SP2 x86" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5XDisplay" MultiBuildValue="DefaultBuild:Windows XP/2003 RTM, Windows XP/2003 SP1, Windows XP SP2 x86" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT64" MultiBuildValue="DefaultBuild:Windows XP SP2 x64, Windows Server 2003 SP2 x64, Windows Vista x64, Windows Server 2008 x64, Windows 7 RTM x64" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT64Display" MultiBuildValue="DefaultBuild:Windows XP SP2 x64, Windows Server 2003 SP2 x64, Windows Vista x64, Windows Server 2008 x64, Windows 7 RTM x64" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNTDisplay" MultiBuildValue="DefaultBuild:32-bit Windows versions" ValueLocId="-"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
+    <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
+    <ROW Directory="DesktopFolder" Directory_Parent="TARGETDIR" DefaultDir="DESKTO~1|DesktopFolder" IsPseudoRoot="1"/>
+    <ROW Directory="SHORTCUTDIR" Directory_Parent="TARGETDIR" DefaultDir="SHORTC~1|SHORTCUTDIR" IsPseudoRoot="1"/>
+    <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
+    <ROW Directory="config_Dir" Directory_Parent="APPDIR" DefaultDir="config"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
+    <ROW Component="AIShRegAnswer" ComponentId="{5A868DE7-E3F2-4114-8B85-A9B2040774E8}" Directory_="APPDIR" Attributes="260" KeyPath="AIShRegAnswer"/>
+    <ROW Component="AI_CustomARPName" ComponentId="{2C53C763-2A84-4469-AE54-841DD4B79F2A}" Directory_="APPDIR" Attributes="260" KeyPath="DisplayName" Options="1"/>
+    <ROW Component="AI_ExePath" ComponentId="{050BAEE7-4163-4D80-92CC-4091A1D1786F}" Directory_="APPDIR" Attributes="260" KeyPath="AI_ExePath"/>
+    <ROW Component="APPDIR" ComponentId="{0EC43A2D-36CD-439C-89C3-93F34B2AFDAF}" Directory_="APPDIR" Attributes="0"/>
+    <ROW Component="CompilerPlugin.deps.json" ComponentId="{23085075-4F65-4EEA-A14D-8B36E2159127}" Directory_="APPDIR" Attributes="0" KeyPath="CompilerPlugin.deps.json" Type="0"/>
+    <ROW Component="CompilerPlugin.dll" ComponentId="{B337C1D4-E705-49E0-8927-6706ABAD28D0}" Directory_="APPDIR" Attributes="256" KeyPath="CompilerPlugin.dll"/>
+    <ROW Component="ICompilerPlugin.DotNetCore.dll" ComponentId="{38720030-61B9-4131-9547-D8EC755E4A43}" Directory_="APPDIR" Attributes="256" KeyPath="ICompilerPlugin.DotNetCore.dll"/>
+    <ROW Component="ICompilerPlugin.Java.dll" ComponentId="{386EB2B8-C39E-4C92-A4B2-78884D94FDD0}" Directory_="APPDIR" Attributes="256" KeyPath="ICompilerPlugin.Java.dll"/>
+    <ROW Component="ICompilerPlugin.ScriptLanguage.dll" ComponentId="{D2A968A1-CB3F-4CA1-9F8B-646B6391D637}" Directory_="APPDIR" Attributes="256" KeyPath="ICompilerPlugin.ScriptLanguage.dll"/>
+    <ROW Component="ICompilerPlugin.TypicalCompiler.dll" ComponentId="{D0A79AF4-D6BD-4C83-BD84-ABE31286D3D7}" Directory_="APPDIR" Attributes="256" KeyPath="ICompilerPlugin.TypicalCompiler.dll"/>
+    <ROW Component="IJudgePlugin.Full.dll" ComponentId="{DAFD010B-235A-4526-B908-52A3DA3C0386}" Directory_="APPDIR" Attributes="256" KeyPath="IJudgePlugin.Full.dll"/>
+    <ROW Component="IJudgePlugin.None.dll" ComponentId="{A52225C0-32F5-4787-9FFD-329A80EBD5EE}" Directory_="APPDIR" Attributes="256" KeyPath="IJudgePlugin.None.dll"/>
+    <ROW Component="IJudgePlugin.TestByTest.dll" ComponentId="{CB5AD876-B5A6-4E7E-B68B-CC3D1D0ECA05}" Directory_="APPDIR" Attributes="256" KeyPath="IJudgePlugin.TestByTest.dll"/>
+    <ROW Component="JudgePlugin.dll" ComponentId="{0720C5D3-C2B1-4AF1-B275-850E592A5A9D}" Directory_="APPDIR" Attributes="256" KeyPath="JudgePlugin.dll"/>
+    <ROW Component="Plugin.dll" ComponentId="{36C9378A-2CBF-4820-820C-6876C2EE0E3C}" Directory_="APPDIR" Attributes="256" KeyPath="Plugin.dll"/>
+    <ROW Component="ProductInformation" ComponentId="{5152A611-EE8B-4A24-A0DA-B592D9E072DD}" Directory_="APPDIR" Attributes="260" KeyPath="Version" Options="1"/>
+    <ROW Component="ProgramTestingAdditions.dll" ComponentId="{A686ED28-44E8-4C90-9EAB-B70C87F16222}" Directory_="APPDIR" Attributes="256" KeyPath="ProgramTestingAdditions.dll"/>
+    <ROW Component="ReleaseTestInfo.dll" ComponentId="{BDBBCF6B-0E48-4A39-A459-4604CB910FAA}" Directory_="APPDIR" Attributes="256" KeyPath="ReleaseTestInfo.dll"/>
+    <ROW Component="SHORTCUTDIR" ComponentId="{2AA9B1C2-EDC2-4C05-9A9F-DEC9B84501D4}" Directory_="SHORTCUTDIR" Attributes="0"/>
+    <ROW Component="SProgramRunner.dll" ComponentId="{DBFD7070-D650-401B-9437-A7C983A88D00}" Directory_="APPDIR" Attributes="256" KeyPath="SProgramRunner.dll"/>
+    <ROW Component="ServerExceptions.dll" ComponentId="{EAF5A027-FC8A-4863-A324-27CC1AF018F0}" Directory_="APPDIR" Attributes="256" KeyPath="ServerExceptions.dll"/>
+    <ROW Component="ServerPlugin.dll" ComponentId="{BB503CB7-FFA0-4AD8-AD89-15BB25651CE6}" Directory_="APPDIR" Attributes="256" KeyPath="ServerPlugin.dll"/>
+    <ROW Component="SimplePM_Server.dll" ComponentId="{EBBF88DA-CC73-498E-A401-E840D11D383F}" Directory_="APPDIR" Attributes="256" KeyPath="SimplePM_Server.dll"/>
+    <ROW Component="SubmissionInfo.dll" ComponentId="{F7D08FE8-4111-4286-A882-CFB620D2CD02}" Directory_="APPDIR" Attributes="256" KeyPath="SubmissionInfo.dll"/>
+    <ROW Component="logger.config" ComponentId="{AB1E424E-E4CD-4C43-A368-94329D76901D}" Directory_="config_Dir" Attributes="0" KeyPath="logger.config" Type="0"/>
+    <ROW Component="simplepmserver.bat" ComponentId="{8008C074-2423-42C5-BF76-E22F1CA37EC7}" Directory_="APPDIR" Attributes="0" KeyPath="simplepmserver.bat"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
+    <ROW Feature="compiler_plugins" Feature_Parent="standard_server_plugins" Title="Compiler plugins" Description="Standard compiler plugins" Display="3" Level="1" Directory_="APPDIR" Attributes="8" Components="ICompilerPlugin.DotNetCore.dll ICompilerPlugin.Java.dll ICompilerPlugin.ScriptLanguage.dll ICompilerPlugin.TypicalCompiler.dll"/>
+    <ROW Feature="judge_plugins" Feature_Parent="standard_server_plugins" Title="Judge plugins" Description="Standard judge plugins" Display="5" Level="1" Directory_="APPDIR" Attributes="8" Components="IJudgePlugin.Full.dll IJudgePlugin.None.dll IJudgePlugin.TestByTest.dll"/>
+    <ROW Feature="simplepm_server" Title="SimplePM Server" Description="Main SimplePM Server files" Display="3" Level="1" Directory_="APPDIR" Attributes="24" Components="AIShRegAnswer AI_CustomARPName AI_ExePath CompilerPlugin.deps.json CompilerPlugin.dll JudgePlugin.dll Plugin.dll ProductInformation ProgramTestingAdditions.dll ReleaseTestInfo.dll SHORTCUTDIR SProgramRunner.dll ServerExceptions.dll ServerPlugin.dll SimplePM_Server.dll SubmissionInfo.dll logger.config simplepmserver.bat"/>
+    <ROW Feature="standard_server_plugins" Title="Standard server plugins" Description="Standard SimplePM Server plugins" Display="5" Level="1" Directory_="APPDIR" Attributes="8" Components="APPDIR"/>
+    <ATTRIBUTE name="CurrentFeature" value="simplepm_server"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
+    <ROW File="CompilerPlugin.deps.json" Component_="CompilerPlugin.deps.json" FileName="COMPIL~1.JSO|CompilerPlugin.deps.json" Attributes="0" SourcePath="..\..\Build\CompilerPlugin.deps.json" SelfReg="false" NextFile="CompilerPlugin.dll"/>
+    <ROW File="CompilerPlugin.dll" Component_="CompilerPlugin.dll" FileName="COMPIL~1.DLL|CompilerPlugin.dll" Attributes="0" SourcePath="..\..\Build\CompilerPlugin.dll" SelfReg="false" NextFile="ICompilerPlugin.DotNetCore.deps.json"/>
+    <ROW File="ICompilerPlugin.DotNetCore.deps.json" Component_="CompilerPlugin.deps.json" FileName="ICOMPI~1.JSO|ICompilerPlugin.DotNetCore.deps.json" Attributes="0" SourcePath="..\..\Build\ICompilerPlugin.DotNetCore.deps.json" SelfReg="false" NextFile="ICompilerPlugin.DotNetCore.dll"/>
+    <ROW File="ICompilerPlugin.DotNetCore.dll" Component_="ICompilerPlugin.DotNetCore.dll" FileName="ICOMPI~1.DLL|ICompilerPlugin.DotNetCore.dll" Attributes="0" SourcePath="..\..\Build\ICompilerPlugin.DotNetCore.dll" SelfReg="false" NextFile="ICompilerPlugin.Java.deps.json"/>
+    <ROW File="ICompilerPlugin.Java.deps.json" Component_="CompilerPlugin.deps.json" FileName="ICOMPI~2.JSO|ICompilerPlugin.Java.deps.json" Attributes="0" SourcePath="..\..\Build\ICompilerPlugin.Java.deps.json" SelfReg="false" NextFile="ICompilerPlugin.Java.dll"/>
+    <ROW File="ICompilerPlugin.Java.dll" Component_="ICompilerPlugin.Java.dll" FileName="ICOMPI~2.DLL|ICompilerPlugin.Java.dll" Attributes="0" SourcePath="..\..\Build\ICompilerPlugin.Java.dll" SelfReg="false" NextFile="ICompilerPlugin.ScriptLanguage.deps.json"/>
+    <ROW File="ICompilerPlugin.ScriptLanguage.deps.json" Component_="CompilerPlugin.deps.json" FileName="ICOMPI~3.JSO|ICompilerPlugin.ScriptLanguage.deps.json" Attributes="0" SourcePath="..\..\Build\ICompilerPlugin.ScriptLanguage.deps.json" SelfReg="false" NextFile="ICompilerPlugin.ScriptLanguage.dll"/>
+    <ROW File="ICompilerPlugin.ScriptLanguage.dll" Component_="ICompilerPlugin.ScriptLanguage.dll" FileName="ICOMPI~3.DLL|ICompilerPlugin.ScriptLanguage.dll" Attributes="0" SourcePath="..\..\Build\ICompilerPlugin.ScriptLanguage.dll" SelfReg="false" NextFile="ICompilerPlugin.TypicalCompiler.deps.json"/>
+    <ROW File="ICompilerPlugin.TypicalCompiler.deps.json" Component_="CompilerPlugin.deps.json" FileName="ICOMPI~4.JSO|ICompilerPlugin.TypicalCompiler.deps.json" Attributes="0" SourcePath="..\..\Build\ICompilerPlugin.TypicalCompiler.deps.json" SelfReg="false" NextFile="ICompilerPlugin.TypicalCompiler.dll"/>
+    <ROW File="ICompilerPlugin.TypicalCompiler.dll" Component_="ICompilerPlugin.TypicalCompiler.dll" FileName="ICOMPI~4.DLL|ICompilerPlugin.TypicalCompiler.dll" Attributes="0" SourcePath="..\..\Build\ICompilerPlugin.TypicalCompiler.dll" SelfReg="false" NextFile="IJudgePlugin.Full.deps.json"/>
+    <ROW File="IJudgePlugin.Full.deps.json" Component_="CompilerPlugin.deps.json" FileName="IJUDGE~1.JSO|IJudgePlugin.Full.deps.json" Attributes="0" SourcePath="..\..\Build\IJudgePlugin.Full.deps.json" SelfReg="false" NextFile="IJudgePlugin.Full.dll"/>
+    <ROW File="IJudgePlugin.Full.dll" Component_="IJudgePlugin.Full.dll" FileName="IJUDGE~1.DLL|IJudgePlugin.Full.dll" Attributes="0" SourcePath="..\..\Build\IJudgePlugin.Full.dll" SelfReg="false" NextFile="IJudgePlugin.None.deps.json"/>
+    <ROW File="IJudgePlugin.None.deps.json" Component_="CompilerPlugin.deps.json" FileName="IJUDGE~2.JSO|IJudgePlugin.None.deps.json" Attributes="0" SourcePath="..\..\Build\IJudgePlugin.None.deps.json" SelfReg="false" NextFile="IJudgePlugin.None.dll"/>
+    <ROW File="IJudgePlugin.None.dll" Component_="IJudgePlugin.None.dll" FileName="IJUDGE~2.DLL|IJudgePlugin.None.dll" Attributes="0" SourcePath="..\..\Build\IJudgePlugin.None.dll" SelfReg="false" NextFile="IJudgePlugin.TestByTest.deps.json"/>
+    <ROW File="IJudgePlugin.TestByTest.deps.json" Component_="CompilerPlugin.deps.json" FileName="IJUDGE~3.JSO|IJudgePlugin.TestByTest.deps.json" Attributes="0" SourcePath="..\..\Build\IJudgePlugin.TestByTest.deps.json" SelfReg="false" NextFile="IJudgePlugin.TestByTest.dll"/>
+    <ROW File="IJudgePlugin.TestByTest.dll" Component_="IJudgePlugin.TestByTest.dll" FileName="IJUDGE~3.DLL|IJudgePlugin.TestByTest.dll" Attributes="0" SourcePath="..\..\Build\IJudgePlugin.TestByTest.dll" SelfReg="false" NextFile="JudgePlugin.deps.json"/>
+    <ROW File="JudgePlugin.deps.json" Component_="CompilerPlugin.deps.json" FileName="JUDGEP~1.JSO|JudgePlugin.deps.json" Attributes="0" SourcePath="..\..\Build\JudgePlugin.deps.json" SelfReg="false" NextFile="JudgePlugin.dll"/>
+    <ROW File="JudgePlugin.dll" Component_="JudgePlugin.dll" FileName="JUDGEP~1.DLL|JudgePlugin.dll" Attributes="0" SourcePath="..\..\Build\JudgePlugin.dll" SelfReg="false" NextFile="Plugin.deps.json"/>
+    <ROW File="Plugin.deps.json" Component_="CompilerPlugin.deps.json" FileName="PLUGIN~1.JSO|Plugin.deps.json" Attributes="0" SourcePath="..\..\Build\Plugin.deps.json" SelfReg="false" NextFile="Plugin.dll"/>
+    <ROW File="Plugin.dll" Component_="Plugin.dll" FileName="Plugin.dll" Attributes="0" SourcePath="..\..\Build\Plugin.dll" SelfReg="false" NextFile="ProgramTestingAdditions.deps.json"/>
+    <ROW File="ProgramTestingAdditions.deps.json" Component_="CompilerPlugin.deps.json" FileName="PROGRA~1.JSO|ProgramTestingAdditions.deps.json" Attributes="0" SourcePath="..\..\Build\ProgramTestingAdditions.deps.json" SelfReg="false" NextFile="ProgramTestingAdditions.dll"/>
+    <ROW File="ProgramTestingAdditions.dll" Component_="ProgramTestingAdditions.dll" FileName="PROGRA~1.DLL|ProgramTestingAdditions.dll" Attributes="0" SourcePath="..\..\Build\ProgramTestingAdditions.dll" SelfReg="false" NextFile="ReleaseTestInfo.deps.json"/>
+    <ROW File="ReleaseTestInfo.deps.json" Component_="CompilerPlugin.deps.json" FileName="RELEAS~1.JSO|ReleaseTestInfo.deps.json" Attributes="0" SourcePath="..\..\Build\ReleaseTestInfo.deps.json" SelfReg="false" NextFile="ReleaseTestInfo.dll"/>
+    <ROW File="ReleaseTestInfo.dll" Component_="ReleaseTestInfo.dll" FileName="RELEAS~1.DLL|ReleaseTestInfo.dll" Attributes="0" SourcePath="..\..\Build\ReleaseTestInfo.dll" SelfReg="false" NextFile="ServerExceptions.deps.json"/>
+    <ROW File="SProgramRunner.deps.json" Component_="CompilerPlugin.deps.json" FileName="SPROGR~1.JSO|SProgramRunner.deps.json" Attributes="0" SourcePath="..\..\Build\SProgramRunner.deps.json" SelfReg="false" NextFile="SProgramRunner.dll"/>
+    <ROW File="SProgramRunner.dll" Component_="SProgramRunner.dll" FileName="SPROGR~1.DLL|SProgramRunner.dll" Attributes="0" SourcePath="..\..\Build\SProgramRunner.dll" SelfReg="false" NextFile="SubmissionInfo.deps.json"/>
+    <ROW File="ServerExceptions.deps.json" Component_="CompilerPlugin.deps.json" FileName="SERVER~1.JSO|ServerExceptions.deps.json" Attributes="0" SourcePath="..\..\Build\ServerExceptions.deps.json" SelfReg="false" NextFile="ServerExceptions.dll"/>
+    <ROW File="ServerExceptions.dll" Component_="ServerExceptions.dll" FileName="SERVER~1.DLL|ServerExceptions.dll" Attributes="0" SourcePath="..\..\Build\ServerExceptions.dll" SelfReg="false" NextFile="ServerPlugin.deps.json"/>
+    <ROW File="ServerPlugin.deps.json" Component_="CompilerPlugin.deps.json" FileName="SERVER~2.JSO|ServerPlugin.deps.json" Attributes="0" SourcePath="..\..\Build\ServerPlugin.deps.json" SelfReg="false" NextFile="ServerPlugin.dll"/>
+    <ROW File="ServerPlugin.dll" Component_="ServerPlugin.dll" FileName="SERVER~2.DLL|ServerPlugin.dll" Attributes="0" SourcePath="..\..\Build\ServerPlugin.dll" SelfReg="false" NextFile="SimplePM_Server.deps.json"/>
+    <ROW File="SimplePM_Server.deps.json" Component_="CompilerPlugin.deps.json" FileName="SIMPLE~1.JSO|SimplePM_Server.deps.json" Attributes="0" SourcePath="..\..\Build\SimplePM_Server.deps.json" SelfReg="false" NextFile="SimplePM_Server.dll"/>
+    <ROW File="SimplePM_Server.dll" Component_="SimplePM_Server.dll" FileName="SIMPLE~1.DLL|SimplePM_Server.dll" Attributes="0" SourcePath="..\..\Build\SimplePM_Server.dll" SelfReg="false" NextFile="SimplePM_Server.runtimeconfig.dev.json"/>
+    <ROW File="SimplePM_Server.runtimeconfig.dev.json" Component_="CompilerPlugin.deps.json" FileName="SIMPLE~2.JSO|SimplePM_Server.runtimeconfig.dev.json" Attributes="0" SourcePath="..\..\Build\SimplePM_Server.runtimeconfig.dev.json" SelfReg="false" NextFile="SimplePM_Server.runtimeconfig.json"/>
+    <ROW File="SimplePM_Server.runtimeconfig.json" Component_="CompilerPlugin.deps.json" FileName="SIMPLE~3.JSO|SimplePM_Server.runtimeconfig.json" Attributes="0" SourcePath="..\..\Build\SimplePM_Server.runtimeconfig.json" SelfReg="false" NextFile="simplepmserver.bat"/>
+    <ROW File="SubmissionInfo.deps.json" Component_="CompilerPlugin.deps.json" FileName="SUBMIS~1.JSO|SubmissionInfo.deps.json" Attributes="0" SourcePath="..\..\Build\SubmissionInfo.deps.json" SelfReg="false" NextFile="SubmissionInfo.dll"/>
+    <ROW File="SubmissionInfo.dll" Component_="SubmissionInfo.dll" FileName="SUBMIS~1.DLL|SubmissionInfo.dll" Attributes="0" SourcePath="..\..\Build\SubmissionInfo.dll" SelfReg="false" NextFile="logger.config"/>
+    <ROW File="logger.config" Component_="logger.config" FileName="LOGGER~1.CON|logger.config" Attributes="0" SourcePath="..\..\Build\config\logger.config" SelfReg="false"/>
+    <ROW File="simplepmserver.bat" Component_="simplepmserver.bat" FileName="SIMPLE~1.BAT|simplepm-server.bat" Attributes="0" SourcePath="..\..\Build\simplepm-server.bat" SelfReg="false" NextFile="SProgramRunner.deps.json"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.custcomp.MsiShortcutPropertyComponent">
+    <ROW MsiShortcutProperty="UninstallSimplePMServer0" Shortcut_="UninstallSimplePMServer" PropertyKey="System.AppUserModel.PreventPinning" PropVariantValue="1"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
+    <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BootstrapperUISequenceComponent">
+    <ROW Action="AI_DetectSoftware" Sequence="101"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
+    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" PackageFolder="bin" Languages="en" InstallationType="2" CabsLocation="1" CompressCabs="false" UseLzma="true" LzmaMethod="2" LzmaCompressionLevel="4" PackageType="1" FilesInsideExe="true" ExeIconPath="..\..\..\..\..\SimplePM_Videos\if_39_Trophy_2064514.ico" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName] [|ProductVersion]\install" ExtUI="true" UseLargeSchema="true" Unicode="true" ExeName="simplepm-server" MsiPackageType="x64" UACExecutionLevel="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
+    <ROW Path="&lt;AI_DICTS&gt;ui_en.ail"/>
+    <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.DigCertStoreComponent">
+    <ROW TimeStampUrl="http://timestamp.digicert.com" SignerDescription="[|ProductName]" SignOptions="0" SignTool="0" UseSha256="1"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.FragmentComponent">
+    <ROW Fragment="CommonUI.aip" Path="&lt;AI_FRAGS&gt;CommonUI.aip"/>
+    <ROW Fragment="FolderDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\FolderDlg.aip"/>
+    <ROW Fragment="LicenseAgreementDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\LicenseAgreementDlg.aip"/>
+    <ROW Fragment="MaintenanceTypeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\MaintenanceTypeDlg.aip"/>
+    <ROW Fragment="MaintenanceWelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\MaintenanceWelcomeDlg.aip"/>
+    <ROW Fragment="PreparePrereqDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\PreparePrereqDlg.aip"/>
+    <ROW Fragment="PrerequisitesDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\PrerequisitesDlg.aip"/>
+    <ROW Fragment="ProgressPrereqDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\ProgressPrereqDlg.aip"/>
+    <ROW Fragment="ReadmeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\ReadmeDlg.aip"/>
+    <ROW Fragment="SequenceDialogs.aip" Path="&lt;AI_THEMES&gt;classic\fragments\SequenceDialogs.aip"/>
+    <ROW Fragment="Sequences.aip" Path="&lt;AI_FRAGS&gt;Sequences.aip"/>
+    <ROW Fragment="ShortcutsDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\ShortcutsDlg.aip"/>
+    <ROW Fragment="StaticUIStrings.aip" Path="&lt;AI_FRAGS&gt;StaticUIStrings.aip"/>
+    <ROW Fragment="UI.aip" Path="&lt;AI_THEMES&gt;classic\fragments\UI.aip"/>
+    <ROW Fragment="UpgradeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\UpgradeDlg.aip"/>
+    <ROW Fragment="Validation.aip" Path="&lt;AI_FRAGS&gt;Validation.aip"/>
+    <ROW Fragment="VerifyRemoveDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRemoveDlg.aip"/>
+    <ROW Fragment="VerifyRepairDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRepairDlg.aip"/>
+    <ROW Fragment="WelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\WelcomeDlg.aip"/>
+    <ROW Fragment="WelcomePrereqDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\WelcomePrereqDlg.aip"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiActionTextComponent">
+    <ROW Action="AI_DeleteLzma" Description="Deleting files extracted from archive" DescriptionLocId="ActionText.Description.AI_DeleteLzma" TemplateLocId="-"/>
+    <ROW Action="AI_DeleteRLzma" Description="Deleting files extracted from archive" DescriptionLocId="ActionText.Description.AI_DeleteLzma" TemplateLocId="-"/>
+    <ROW Action="AI_ExtractFiles" Description="Extracting files from archive" DescriptionLocId="ActionText.Description.AI_ExtractLzma" TemplateLocId="-"/>
+    <ROW Action="AI_ExtractLzma" Description="Extracting files from archive" DescriptionLocId="ActionText.Description.AI_ExtractLzma" TemplateLocId="-"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiAppSearchComponent">
+    <ROW Property="AI_SETUPEXEPATH" Signature_="AI_EXE_PATH_LM" Builds="DefaultBuild"/>
+    <ROW Property="AI_SETUPEXEPATH" Signature_="AI_EXE_PATH_CU" Builds="DefaultBuild"/>
+    <ROW Property="AI_SHORTCUTSREG" Signature_="AI_ShRegOptionUser"/>
+    <ROW Property="AI_SHORTCUTSREG" Signature_="AI_ShRegOptionMachine"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
+    <ROW Name="DataUploader.dll" SourcePath="&lt;AI_CUSTACTS&gt;DataUploader.dll"/>
+    <ROW Name="ExternalUICleaner.dll" SourcePath="&lt;AI_CUSTACTS&gt;ExternalUICleaner.dll"/>
+    <ROW Name="Prereq.dll" SourcePath="&lt;AI_CUSTACTS&gt;Prereq.dll"/>
+    <ROW Name="ShortcutFlags.dll" SourcePath="&lt;AI_CUSTACTS&gt;ShortcutFlags.dll"/>
+    <ROW Name="SoftwareDetector.dll" SourcePath="&lt;AI_CUSTACTS&gt;SoftwareDetector.dll"/>
+    <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
+    <ROW Name="lzmaextractor.dll" SourcePath="&lt;AI_CUSTACTS&gt;lzmaextractor.dll"/>
+    <ROW Name="viewer.exe" SourcePath="&lt;AI_CUSTACTS&gt;viewer.exe"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlComponent">
+    <ROW Dialog_="LicenseAgreementDlg" Control="AgreementText" Type="ScrollableText" X="20" Y="60" Width="330" Height="120" Attributes="7" Text="..\..\..\simplepm-resources\simplepm-license-file.rtf" Order="400" TextLocId="Control.Text.LicenseAgreementDlg#AgreementText_2" MsiKey="LicenseAgreementDlg#AgreementText"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlEventComponent">
+    <ROW Dialog_="WelcomePrereqDlg" Control_="Next" Event="NewDialog" Argument="PrerequisitesDlg" Condition="AI_BOOTSTRAPPER" Ordering="1"/>
+    <ROW Dialog_="PrerequisitesDlg" Control_="Next" Event="EndDialog" Argument="Return" Condition="AI_BOOTSTRAPPER" Ordering="1"/>
+    <ROW Dialog_="PrerequisitesDlg" Control_="Back" Event="NewDialog" Argument="WelcomePrereqDlg" Condition="AI_BOOTSTRAPPER" Ordering="1"/>
+    <ROW Dialog_="WelcomeDlg" Control_="Next" Event="NewDialog" Argument="LicenseAgreementDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="LicenseAgreementDlg" Control_="Next" Event="NewDialog" Argument="ReadmeDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="LicenseAgreementDlg" Control_="Back" Event="NewDialog" Argument="WelcomeDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="ReadmeDlg" Control_="Next" Event="NewDialog" Argument="UpgradeDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="ReadmeDlg" Control_="Back" Event="NewDialog" Argument="LicenseAgreementDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="UpgradeDlg" Control_="Next" Event="NewDialog" Argument="ShortcutsDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="UpgradeDlg" Control_="Back" Event="NewDialog" Argument="ReadmeDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="ShortcutsDlg" Control_="Next" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="ShortcutsDlg" Control_="Back" Event="NewDialog" Argument="UpgradeDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL AND (NOT AI_PATH_VALIDATION_FAILED)" Ordering="201"/>
+    <ROW Dialog_="FolderDlg" Control_="Back" Event="NewDialog" Argument="ShortcutsDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_INSTALL" Ordering="197"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="MaintenanceWelcomeDlg" Control_="Next" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="99"/>
+    <ROW Dialog_="CustomizeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_MAINT" Ordering="101"/>
+    <ROW Dialog_="CustomizeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_MAINT" Ordering="198"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="202"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="ChangeButton" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="501"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceWelcomeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="RemoveButton" Event="NewDialog" Argument="VerifyRemoveDlg" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="601"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="RepairButton" Event="NewDialog" Argument="VerifyRepairDlg" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="601"/>
+    <ROW Dialog_="VerifyRepairDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="1"/>
+    <ROW Dialog_="VerifyRepairDlg" Control_="Repair" Event="EndDialog" Argument="Return" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="399" Options="1"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control_="Remove" Event="EndDialog" Argument="Return" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="299" Options="1"/>
+    <ROW Dialog_="PatchWelcomeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_PATCH" Ordering="201"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_PATCH" Ordering="199"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="PatchWelcomeDlg" Condition="AI_PATCH" Ordering="203"/>
+    <ROW Dialog_="ResumeDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_RESUME" Ordering="299"/>
+    <ROW Dialog_="FolderDlg" Control_="Next" Event="DoAction" Argument="AI_ValidateInstallPath" Condition="AI_INSTALL" Ordering="199"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
+    <ROW Directory_="SHORTCUTDIR" Component_="SHORTCUTDIR" ManualDelete="false"/>
+    <ROW Directory_="APPDIR" Component_="APPDIR" ManualDelete="false"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
+    <ROW Action="AI_AppSearchEx" Type="1" Source="Prereq.dll" Target="DoAppSearchEx"/>
+    <ROW Action="AI_ApplyShortcutFlags" Type="3073" Source="ShortcutFlags.dll" Target="UpdateShortcutFlags" WithoutSeq="true"/>
+    <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Type="51" Source="AI_SETUPEXEPATH_ORIGINAL" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_DATA_SETTER" Type="51" Source="AI_ExtractFiles" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_DATA_SETTER_1" Type="51" Source="CustomActionData" Target="HttpPostCollectData&#2;WindowsBuild;SystemLanguageID;ComputerName;AdminUser;Privileged;PhysicalMemory;VirtualMemory;Date;Time;SourceDir;LogonUser;Intel64;AMD64;ScreenX;ScreenY;ServicePackLevel;ServicePackLevelMinor;VersionNT;VersionNT64&#1;HttpPostSuppressSpawnMsgBox&#2;1&#1;HttpPostUrl&#2;"/>
+    <ROW Action="AI_DATA_SETTER_2" Type="51" Source="AI_DEL_EMPTY_SHORTCUTDIR" Target="[SHORTCUTDIR]"/>
+    <ROW Action="AI_DATA_SETTER_3" Type="51" Source="CustomActionData" Target="dotnet.exe"/>
+    <ROW Action="AI_DELETE_SHORTCUTS" Type="1" Source="aicustact.dll" Target="DeleteShortcuts"/>
+    <ROW Action="AI_DEL_EMPTY_SHORTCUTDIR" Type="3073" Source="aicustact.dll" Target="DeleteEmptyDirectory" AdditionalSeq="AI_DATA_SETTER_2"/>
+    <ROW Action="AI_DeleteCadLzma" Type="51" Source="AI_DeleteLzma" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_DeleteLzma" Type="1025" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
+    <ROW Action="AI_DeleteRCadLzma" Type="51" Source="AI_DeleteRLzma" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_DeleteRLzma" Type="1281" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
+    <ROW Action="AI_DetectSoftware" Type="257" Source="SoftwareDetector.dll" Target="OnDetectSoftware"/>
+    <ROW Action="AI_DoRemoveExternalUIStub" Type="3585" Source="ExternalUICleaner.dll" Target="DoRemoveExternalUIStub" WithoutSeq="true"/>
+    <ROW Action="AI_DpiContentScale" Type="1" Source="aicustact.dll" Target="DpiContentScale"/>
+    <ROW Action="AI_EnableDebugLog" Type="321" Source="aicustact.dll" Target="EnableDebugLog"/>
+    <ROW Action="AI_EstimateExtractFiles" Type="1" Source="Prereq.dll" Target="EstimateExtractFiles"/>
+    <ROW Action="AI_ExtractCadLzma" Type="51" Source="AI_ExtractLzma" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_ExtractFiles" Type="1025" Source="Prereq.dll" Target="ExtractSourceFiles" AdditionalSeq="AI_DATA_SETTER"/>
+    <ROW Action="AI_ExtractLzma" Type="1025" Source="lzmaextractor.dll" Target="ExtractLZMAFiles"/>
+    <ROW Action="AI_FindExeLzma" Type="1" Source="lzmaextractor.dll" Target="FindEXE"/>
+    <ROW Action="AI_GetArpIconPath" Type="1" Source="aicustact.dll" Target="GetArpIconPath"/>
+    <ROW Action="AI_InstallModeCheck" Type="1" Source="aicustact.dll" Target="UpdateInstallMode" WithoutSeq="true"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
+    <ROW Action="AI_PinShortcuts" Type="1" Source="ShortcutFlags.dll" Target="PinShortcuts"/>
+    <ROW Action="AI_PinToStartScreen" Type="1025" Source="ShortcutFlags.dll" Target="PinToStartScreen" WithoutSeq="true"/>
+    <ROW Action="AI_PinToTaskbar" Type="1025" Source="ShortcutFlags.dll" Target="PinToTaskbar" WithoutSeq="true"/>
+    <ROW Action="AI_PrepareShortcutFlags" Type="1" Source="ShortcutFlags.dll" Target="PrepareActionData"/>
+    <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Type="51" Source="AI_SETUPEXEPATH" Target="[AI_SETUPEXEPATH_ORIGINAL]"/>
+    <ROW Action="AI_RemoveExternalUIStub" Type="1" Source="ExternalUICleaner.dll" Target="RemoveExternalUIStub"/>
+    <ROW Action="AI_ResolveKnownFolders" Type="1" Source="aicustact.dll" Target="AI_ResolveKnownFolders"/>
+    <ROW Action="AI_SHOW_LOG" Type="65" Source="aicustact.dll" Target="LaunchLogFile" WithoutSeq="true"/>
+    <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
+    <ROW Action="AI_UnpinFromStartScreen" Type="1025" Source="ShortcutFlags.dll" Target="UnpinFromStartScreen" WithoutSeq="true"/>
+    <ROW Action="AI_UnpinFromTaskbar" Type="1025" Source="ShortcutFlags.dll" Target="UnpinFromTaskbar" WithoutSeq="true"/>
+    <ROW Action="AI_UnpinShortcuts" Type="1" Source="ShortcutFlags.dll" Target="UnpinShortcuts"/>
+    <ROW Action="AI_ValidateInstallPath" Type="1" Source="aicustact.dll" Target="ValidateInstallFolder" WithoutSeq="true"/>
+    <ROW Action="OpenUrl" Type="66" Source="viewer.exe" Target="https://spm.sirkadirov.com/" Options="1"/>
+    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFiles64Folder][Manufacturer]\[ProductName]"/>
+    <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
+    <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
+    <ROW Action="SendCollectedData" Type="65" Source="DataUploader.dll" Target="SendCollectedData" Options="1" AdditionalSeq="AI_DATA_SETTER_1"/>
+    <ROW Action="StopProcess" Type="1" Source="aicustact.dll" Target="StopProcess" Options="1" AdditionalSeq="AI_DATA_SETTER_3"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiEnvComponent">
+    <ROW Environment="SIMPLEPM_SERVER_INSTALL_PATH" Name="=-SIMPLEPM_SERVER_INSTALL_PATH" Component_="ProductInformation"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
+    <ROW Name="SystemFoldermsiexec.exe" SourcePath="&lt;AI_RES&gt;uninstall.ico" Index="0"/>
+    <ROW Name="simplepmserver.exe" SourcePath="..\..\..\..\..\SimplePM_Videos\if_39_Trophy_2064514.ico" Index="0"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
+    <ROW Action="AI_STORE_LOCATION" Condition="(Not Installed) OR REINSTALL" Sequence="1502"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Condition="AI_UPGRADE=&quot;No&quot; AND (Not Installed)" Sequence="1399"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="52"/>
+    <ROW Action="AI_EnableDebugLog" Sequence="51"/>
+    <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99" Builds="DefaultBuild"/>
+    <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="103" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="199" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteRCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="198" Builds="DefaultBuild"/>
+    <ROW Action="AI_ExtractCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="197" Builds="DefaultBuild"/>
+    <ROW Action="AI_FindExeLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="196" Builds="DefaultBuild"/>
+    <ROW Action="AI_ExtractLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="1549" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteRLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="1548" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="6599" Builds="DefaultBuild"/>
+    <ROW Action="AI_ExtractFiles" Sequence="3998" Builds="DefaultBuild"/>
+    <ROW Action="AI_DATA_SETTER" Sequence="3997"/>
+    <ROW Action="AI_EstimateExtractFiles" Sequence="3999" Builds="DefaultBuild"/>
+    <ROW Action="AI_DetectSoftware" Sequence="102"/>
+    <ROW Action="AI_GetArpIconPath" Sequence="1402"/>
+    <ROW Action="AI_RemoveExternalUIStub" Condition="(REMOVE=&quot;ALL&quot;) AND ((VersionNT &gt; 500) OR((VersionNT = 500) AND (ServicePackLevel &gt;= 4)))" Sequence="1501"/>
+    <ROW Action="AI_PrepareShortcutFlags" Condition="(VersionNT &gt; 501) AND ((NOT Installed) OR (Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;)))" Sequence="4501"/>
+    <ROW Action="AI_PinShortcuts" Condition="(VersionNT &gt; 600) AND ((NOT Installed) OR (Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;)))" Sequence="6499"/>
+    <ROW Action="AI_UnpinShortcuts" Condition="(VersionNT &gt; 600) AND (REMOVE = &quot;ALL&quot;)" Sequence="3199"/>
+    <ROW Action="AI_DELETE_SHORTCUTS" Condition="NOT (REMOVE=&quot;ALL&quot;)" Sequence="1401"/>
+    <ROW Action="AI_DEL_EMPTY_SHORTCUTDIR" Condition="NOT (REMOVE=&quot;ALL&quot;)" Sequence="6402"/>
+    <ROW Action="AI_DATA_SETTER_2" Condition="NOT (REMOVE=&quot;ALL&quot;)" Sequence="6401"/>
+    <ROW Action="AI_AppSearchEx" Sequence="101"/>
+    <ROW Action="StopProcess" Sequence="1602"/>
+    <ROW Action="AI_DATA_SETTER_3" Sequence="1601"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstallUISequenceComponent">
+    <ROW Action="AI_ResolveKnownFolders" Sequence="53"/>
+    <ROW Action="AI_DpiContentScale" Sequence="52"/>
+    <ROW Action="AI_EnableDebugLog" Sequence="51"/>
+    <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99"/>
+    <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="103"/>
+    <ROW Action="OpenUrl" Sequence="1303"/>
+    <ROW Action="SendCollectedData" Condition="( NOT Installed )" Sequence="1302"/>
+    <ROW Action="AI_DATA_SETTER_1" Condition="( NOT Installed )" Sequence="1301"/>
+    <ROW Action="AI_DetectSoftware" Sequence="102"/>
+    <ROW Action="AI_AppSearchEx" Sequence="101"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
+    <ROW Condition="( Version9X OR ( NOT VersionNT64 ) OR ( VersionNT64 AND ((VersionNT64 &lt;&gt; 502) OR (ServicePackLevel &lt;&gt; 2) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 502) OR (ServicePackLevel &lt;&gt; 2) OR (MsiNTProductType = 1)) AND ((VersionNT64 &lt;&gt; 600) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 600) OR (MsiNTProductType = 1)) AND ((VersionNT64 &lt;&gt; 601) OR (ServicePackLevel &lt;&gt; 0) OR (MsiNTProductType &lt;&gt; 1)) ) )" Description="[ProductName] cannot be installed on the following Windows versions: [WindowsTypeNT64Display]." DescriptionLocId="AI.LaunchCondition.NoSpecificNT64" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="( Version9X OR VersionNT64 )" Description="[ProductName] cannot be installed on [WindowsTypeNTDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(AI_DETECTED_SCREEN_RESOLUTION_X &gt;= AI_REQUIRED_SCREEN_RESOLUTION_X) AND (AI_DETECTED_SCREEN_RESOLUTION_Y &gt;= AI_REQUIRED_SCREEN_RESOLUTION_Y)" Description="[ProductName] cannot be installed on systems with screen resolution smaller than [AI_REQUIRED_SCREEN_RESOLUTION_X] x [AI_REQUIRED_SCREEN_RESOLUTION_Y]." DescriptionLocId="AI.LaunchCondition.Resolution" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT &lt;&gt; 400)" Description="[ProductName] cannot be installed on [WindowsTypeNT40Display]." DescriptionLocId="AI.LaunchCondition.NoNT40" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT &lt;&gt; 500)" Description="[ProductName] cannot be installed on [WindowsTypeNT50Display]." DescriptionLocId="AI.LaunchCondition.NoNT50" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT64 OR ((VersionNT &lt;&gt; 501) OR (ServicePackLevel = 3))) AND ((VersionNT &lt;&gt; 502) OR (ServicePackLevel = 2))" Description="[ProductName] cannot be installed on [WindowsTypeNT5XDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT5X" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="AI_DETECTED_PHYSICAL_MEMORY &gt;= AI_REQUIRED_PHYSICAL_MEMORY" Description="[ProductName] cannot be installed on systems with less physical memory than [AI_REQUIRED_PHYSICAL_MEMORY] MB." DescriptionLocId="AI.LaunchCondition.RAM" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="Privileged" Description="[ProductName] requires administrative privileges to install." DescriptionLocId="AI.LaunchCondition.Privileged" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="SETUPEXEDIR OR (REMOVE=&quot;ALL&quot;)" Description="This package can only be run from a bootstrapper." DescriptionLocId="AI.LaunchCondition.RequireBootstrapper" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRegLocatorComponent">
+    <ROW Signature_="AI_EXE_PATH_CU" Root="1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="2"/>
+    <ROW Signature_="AI_EXE_PATH_LM" Root="2" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="2"/>
+    <ROW Signature_="AI_ShRegOptionMachine" Root="2" Key="Software\Caphyon\Advanced Installer\Installs\[ProductCode]" Name="AIShRegAnswer" Type="2"/>
+    <ROW Signature_="AI_ShRegOptionUser" Root="1" Key="Software\Caphyon\Advanced Installer\Installs\[ProductCode]" Name="AIShRegAnswer" Type="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
+    <ROW Registry="AIShRegAnswer" Root="-1" Key="Software\Caphyon\Advanced Installer\Installs\[ProductCode]" Name="AIShRegAnswer" Value="[AI_SHORTCUTSREG]" Component_="AIShRegAnswer"/>
+    <ROW Registry="AI_ExePath" Root="-1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Value="[AI_SETUPEXEPATH]" Component_="AI_ExePath"/>
+    <ROW Registry="Comments" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="Comments" Value="[ARPCOMMENTS]" Component_="AI_CustomARPName"/>
+    <ROW Registry="Contact" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="Contact" Value="[ARPCONTACT]" Component_="AI_CustomARPName"/>
+    <ROW Registry="DisplayIcon" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="DisplayIcon" Value="[ARP_ICON_PATH]" Component_="AI_CustomARPName"/>
+    <ROW Registry="DisplayName" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="DisplayName" Value="[AI_PRODUCTNAME_ARP]" Component_="AI_CustomARPName"/>
+    <ROW Registry="DisplayVersion" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="DisplayVersion" Value="[ProductVersion]" Component_="AI_CustomARPName"/>
+    <ROW Registry="EstimatedSize" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="EstimatedSize" Value="#[AI_ARP_SIZE]" Component_="AI_CustomARPName"/>
+    <ROW Registry="HelpLink" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="HelpLink" Value="[ARPHELPLINK]" Component_="AI_CustomARPName"/>
+    <ROW Registry="HelpTelephone" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="HelpTelephone" Value="[ARPHELPTELEPHONE]" Component_="AI_CustomARPName"/>
+    <ROW Registry="InstallLocation" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="InstallLocation" Value="[APPDIR]" Component_="AI_CustomARPName"/>
+    <ROW Registry="ModifyPath" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="ModifyPath" Value="[AI_UNINSTALLER] /i [ProductCode] AI_UNINSTALLER_CTP=1" Component_="AI_CustomARPName"/>
+    <ROW Registry="NoRepair" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="NoRepair" Value="#1" Component_="AI_CustomARPName"/>
+    <ROW Registry="Path" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
+    <ROW Registry="Publisher" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="Publisher" Value="[Manufacturer]" Component_="AI_CustomARPName"/>
+    <ROW Registry="Readme" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="Readme" Value="[ARPREADME]" Component_="AI_CustomARPName"/>
+    <ROW Registry="URLInfoAbout" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="URLInfoAbout" Value="[ARPURLINFOABOUT]" Component_="AI_CustomARPName"/>
+    <ROW Registry="URLUpdateInfo" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="URLUpdateInfo" Value="[ARPURLUPDATEINFO]" Component_="AI_CustomARPName"/>
+    <ROW Registry="UninstallPath" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="UninstallPath" Value="[AI_UNINSTALLER] /x [ProductCode] AI_UNINSTALLER_CTP=1" Component_="AI_CustomARPName"/>
+    <ROW Registry="UninstallString" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="UninstallString" Value="[AI_UNINSTALLER] /x [ProductCode] AI_UNINSTALLER_CTP=1" Component_="AI_CustomARPName"/>
+    <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
+    <ROW Registry="VersionMajor" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="VersionMajor" Value="#1" Component_="AI_CustomARPName"/>
+    <ROW Registry="VersionMinor" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="VersionMinor" Value="#0" Component_="AI_CustomARPName"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiReserveCostComponent">
+    <ROW ReserveKey="SimplePM_Server.dll" Component_="SimplePM_Server.dll" ReserveFolder="APPDIR" ReserveLocal="104857600" ReserveSource="104857600"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
+    <ROW Shortcut="RunSimplePMServer" Directory_="DesktopFolder" Name="RUNSIM~1|Run SimplePM Server" Component_="SimplePM_Server.dll" Target="[#SimplePM_Server.dll]" Hotkey="0" Icon_="simplepmserver.exe" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
+    <ROW Shortcut="SimplePMServerconfigurationfolder" Directory_="SHORTCUTDIR" Name="SIMPLE~2|SimplePM Server configuration folder" Component_="simplepmserver.bat" Target="[config_Dir]" Hotkey="0" IconIndex="0" ShowCmd="1"/>
+    <ROW Shortcut="UninstallSimplePMServer" Directory_="SHORTCUTDIR" Name="UNINST~1|Uninstall SimplePM Server" Component_="SProgramRunner.dll" Target="[SystemFolder]msiexec.exe" Arguments="/x [ProductCode]" Hotkey="0" Icon_="SystemFoldermsiexec.exe" IconIndex="0" ShowCmd="1" CustomFlags="1"/>
+    <ROW Shortcut="simplepmserver" Directory_="SHORTCUTDIR" Name="SIMPLE~1|simplepm-server" Component_="simplepmserver.bat" Target="[#simplepmserver.bat]" Description="Run SimplePM Server in user-visible mode" Hotkey="0" Icon_="simplepmserver.exe" IconIndex="0" ShowCmd="1" WkDir="APPDIR" CustomFlags="1"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
+    <ATTRIBUTE name="UsedTheme" value="classic"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiUpgradeComponent">
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="0.0.1" VersionMax="[|ProductVersion]" Attributes="257" ActionProperty="OLDPRODUCTS"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.PreReqComponent">
+    <ROW PrereqKey="RequiredApplication" DisplayName=".NET Core SDK" VersionMin="2.1.302" SetupFileUrl="https://www.microsoft.com/net/download" Location="2" ExactSize="0" Operator="1" Options="yi"/>
+    <ROW PrereqKey="RequiredApplication_1" DisplayName="Free Pascal Compiler x64 for Windows" VersionMin="3.0.4" SetupFileUrl="https://www.freepascal.org/down/x86_64/win64.var" Location="2" ExactSize="0" Operator="1" Options="yi"/>
+    <ATTRIBUTE name="PrereqsOrder" value="RequiredApplication RequiredApplication_1"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.PreReqSearchComponent">
+    <ROW SearchKey="SystemFolderfile.dll" Prereq="RequiredApplication" SearchType="0" SearchString="[SystemFolder]file.dll" VerMin="1.0" Order="1" Property="PreReqSearch"/>
+    <ROW SearchKey="SystemFolderfile.dll_1" Prereq="RequiredApplication_1" SearchType="0" SearchString="[SystemFolder]file.dll" VerMin="1.0" Order="1" Property="PreReqSearch_1"/>
+  </COMPONENT>
+</DOCUMENT>

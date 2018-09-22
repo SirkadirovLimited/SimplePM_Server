@@ -26,7 +26,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Bb]uild/
-[Ii]nstaller
+simplepm-server-cache/
 
 # Visual Studio 2015 cache/options directory
 .vs/
