@@ -57,7 +57,7 @@ Detailed information about the project you can get at project's official website
 - Stable LAN/WAN connection to MySQL Server (minimum 100 MBit/s for LAN and 50 MBit/s for WAN recommended)
 
 ### Runtime requirements
-- .NET Core 2.1 or higher
+- .NET Core 2.1 or higher (latest build)
 - MySQL Server 5.8+ (latest)
 
 ### Recommendations
