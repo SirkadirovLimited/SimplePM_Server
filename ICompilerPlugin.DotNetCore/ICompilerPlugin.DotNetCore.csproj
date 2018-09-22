@@ -5,6 +5,7 @@
     <RootNamespace>CompilerPlugin</RootNamespace>
     <Configurations>Release;Debug</Configurations>
     <Platforms>x64</Platforms>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <OutputPath>../Build/</OutputPath>
