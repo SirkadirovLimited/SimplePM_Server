@@ -22,7 +22,7 @@
   </a>
   &nbsp;
   <a href="https://www.codefactor.io/repository/github/sirkadirovteam/simplepm_server">
-    <img src="https://www.codefactor.io/repository/github/sirkadirovteam/simplepm_server/badge" alt="Codefactor">
+    <img src="https://www.codefactor.io/repository/github/sirkadirovteam/simplepm-server/badge" alt="Codefactor">
   </a>
   &nbsp;
   <a href="https://dependabot.com">
