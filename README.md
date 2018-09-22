@@ -22,7 +22,7 @@
   </a>
   &nbsp;
   <a href="https://www.codefactor.io/repository/github/sirkadirovteam/simplepm_server">
-    <img src="https://www.codefactor.io/repository/github/sirkadirovteam/simplepm_server/badge" alt="Codefactor">
+    <img src="https://www.codefactor.io/repository/github/sirkadirovteam/simplepm-server/badge" alt="Codefactor">
   </a>
   &nbsp;
   <a href="https://dependabot.com">
@@ -89,6 +89,3 @@ Initial copyright and patents holder of this project - [Yurij Kadirov (Sirkadiro
 
 - SimplePM v2.X.X "Moongirl" - Copyright (C) 2018, Yurij Kadirov and other contributors. All rights reserved.
 - SimplePM v1.X.X "Alien Baroness" - Copyright (C) 2017, Yurij Kadirov and other contributors. All rights reserved.
-
-### Open source license approval
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSirkadirovTeam%2FSimplePM_Server.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FSirkadirovTeam%2FSimplePM_Server?ref=badge_large)
