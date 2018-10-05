@@ -70,16 +70,16 @@ Requirements list declared on this page is not full. More information about depe
 ## How to build
 1. Use `PowerShell` or install `Powershell Core`.
 2. Execute script file `solution_release_build.ps1` located in the main repository folder.
-3. **Horaaaaaaaaaay!!!**
+3. **Horaaaaaaaaaay!!! This is what we need.**
 
 ## Used third-party projects
 - Logging feature powered by **NLog**
 - Database connection by **MySQL Connector/NET**
 - JSON configuration files parsing by **Newtonsoft.JSON (Json.NET)**
-- Other NuGet packages, see `packages` files for more
+- Other NuGet packages, see `packages` files for more information on this topic.
 
 ## Sponsors, partners, donors
-Full list of SimplePM supporters available on [project's official website](https://spm.sirkadirov.com/). Anyway, you must to know that we love them :)
+Full list of SimplePM supporters available on [project's official website](https://spm.sirkadirov.com/). Anyway, you must to know that we love them! :)
 
 ## Licensing
 Source code of the project is licensed under *GNU AGPLv3 License*, official builds of this project licensed under SimplePM EULA, full text of it you can get at official website: https://spm.sirkadirov.com/
@@ -87,5 +87,6 @@ Source code of the project is licensed under *GNU AGPLv3 License*, official buil
 ### Author rights and patents
 Initial copyright and patents holder of this project - [Yurij Kadirov (Sirkadirov)](https://sirkadirov.com/).
 
-- SimplePM v2.X.X "Moongirl" - Copyright (C) 2018, Yurij Kadirov and other contributors. All rights reserved.
-- SimplePM v1.X.X "Alien Baroness" - Copyright (C) 2017, Yurij Kadirov and other contributors. All rights reserved.
+- **SimplePM v2.1.X "Bloody Moongirl"** - Copyright (C) 2018-2019, Yurii Kadirov and other contributors. All rights reserved.
+- **SimplePM v2.0.X "Moongirl"** - Copyright (C) 2018-2019, Yurii Kadirov and other contributors. All rights reserved.
+- **SimplePM v1.X.X "Alien Baroness"** - Copyright (C) 2017, Yurii Kadirov and other contributors. All rights reserved.
