@@ -38,7 +38,7 @@
   <ItemGroup>
     <PackageReference Include="MySql.Data" Version="8.0.16" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="NLog" Version="4.6.2" />
+    <PackageReference Include="NLog" Version="4.6.3" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Resources\MySQL\submission_result_query.txt" />
